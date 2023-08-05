@@ -29,6 +29,9 @@
       trusted-users = [ "nregner" ];
       trusted-public-keys =
         [ "builder-name:8HCwoSUcLvQOsrG8WyPTABSgBqK1SGqRsrUqQu1sTSk=" ];
+      trusted-substituters = [
+        "s3://nregner-nix-binary-cache?region=us-west-2&parallel-compression=true"
+      ];
     };
   };
 
