@@ -1,0 +1,18 @@
+{
+  "name": "route53-ddns",
+  "module": "index.ts",
+  "type": "module",
+  "devDependencies": {
+    "bun-types": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "@aws-sdk/client-route-53": "^3.409.0",
+    "@commander-js/extra-typings": "^11.0.0",
+    "@types/ip": "^1.1.0",
+    "commander": "^11.0.0",
+    "ip": "^1.1.8"
+  }
+}

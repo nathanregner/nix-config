@@ -2,7 +2,6 @@
   services.k3s = {
     enable = true;
     role = "server";
-    extraFlags = "--disable=traefik";
   };
 
   # fixes hang on shutdown but breaks nondistruptive upgrades

@@ -4,7 +4,7 @@
   inputs = {
     # Nixpkgs
     nixpkgs.url = "github:nixos/nixpkgs/nixos-23.05";
-    nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
+    nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable-small";
 
     # Home manager
     home-manager.url = "github:nix-community/home-manager/release-23.05";
@@ -60,16 +60,20 @@
       # Acessible through 'nix build', 'nix shell', etc
       packages = forAllSystems (system:
         let
-          pkgs = nixpkgs.legacyPackages.${system} // {
-            # TODO: Don't duplicate overlay?
-            unstable = nixpkgs-unstable.legacyPackages.${system};
+          pkgs = import nixpkgs {
+            inherit system;
+            overlays = with overlays; [ unstable-packages ];
           };
         in import ./pkgs { inherit inputs pkgs; });
 
       # Devshell for bootstrapping
       # Acessible through 'nix develop' or 'nix-shell' (legacy)
       devShells = forAllSystems (system:
-        let pkgs = nixpkgs-unstable.legacyPackages.${system};
+        let
+          pkgs = import nixpkgs {
+            inherit system;
+            overlays = with overlays; [ unstable-packages ];
+          };
         in import ./shell.nix { inherit pkgs; });
 
       # Your custom packages and modifications, exported as overlays

@@ -9,8 +9,7 @@
     packages = with pkgs; [ deploy-rs sops terraform just ];
   };
 
-  rust = pkgs.mkShell {
-    # Enable experimental features without having to specify the argument
-    packages = with pkgs; [ cargo rustfmt ];
-  };
+  rust = pkgs.mkShell { packages = with pkgs; [ cargo rustfmt ]; };
+
+  bun = pkgs.mkShell { packages = with pkgs.unstable; [ bun ]; };
 }

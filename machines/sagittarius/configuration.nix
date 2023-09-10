@@ -1,15 +1,14 @@
 { inputs, config, lib, modulesPath, nixpkgs, pkgs, ... }: {
   imports = [
     inputs.nixos-generators.nixosModules.all-formats
+    ./hardware-configuration.nix
     ../../common/global
     ../../common/server
-    ./hardware-configuration.nix
     ./k8s.nix
-    ./networking.nix
-    ./nginx.nix
   ];
 
   nixpkgs.hostPlatform = lib.mkForce "x86_64-linux";
+  networking.hostName = "sagittarius";
 
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
@@ -20,6 +19,17 @@
 
   users.users.root = {
     password = "root"; # ssh password auth disabled, so whatever :)
+  };
+
+  systemd.network = {
+    enable = true;
+    networks = {
+      "10-eth0" = {
+        matchConfig.Name = "enp4s0";
+        networkConfig = { DHCP = "yes"; };
+        linkConfig.RequiredForOnline = "routable";
+      };
+    };
   };
 
   virtualisation.docker = {
