@@ -1,9 +1,10 @@
-{ inputs, config, lib, modulesPath, nixpkgs, pkgs, ... }: {
+{ inputs, lib, modulesPath, pkgs, ... }: {
   imports = [
     "${modulesPath}/installer/sd-card/sd-image-aarch64.nix"
     "${modulesPath}/profiles/minimal.nix"
     ../../common/global
     ../../common/server
+    ../../common/server/netdata/agent.nix
     ./klipper.nix
     ./mainsail.nix
     ./moonraker.nix

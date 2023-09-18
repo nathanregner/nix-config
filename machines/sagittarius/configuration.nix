@@ -6,6 +6,7 @@
     ./hardware-configuration.nix
     ./attic.nix
     ./k8s.nix
+    ./netdata.nix
     ./networking.nix
     ./nginx.nix
   ];

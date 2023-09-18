@@ -12,6 +12,12 @@ resource "tailscale_acl" "acl" {
         action = "accept"
         src    = ["group:admin"]
         dst    = ["*:*"]
+      },
+      # allow inter-node Netdata streaming
+      {
+        action = "accept"
+        src    = ["tag:server"]
+        dst    = ["tag:server:19999"]
       }
     ]
 

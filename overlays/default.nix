@@ -17,6 +17,22 @@
 
     inherit (final.unstable) tailscale;
 
+    netdata-latest = final.unstable.netdata.overrideAttrs (oldAttrs: rec {
+      version = "1.42.3";
+
+      src = final.fetchFromGitHub {
+        owner = "netdata";
+        repo = "netdata";
+        rev = "v${version}";
+        hash = "sha256-8L8PhPgNIHvw+Dcx2D6OE8fp2+GEYOc9wEIoPJSqXME=";
+        fetchSubmodules = true;
+      };
+
+      # FIXME: Typo in nixpkgs
+      # enableParallelBuild = true;
+      enableParallelBuilding = true;
+    });
+
     # FIXME: hack to bypass "FATAL: Module ahci not found" error
     # https://github.com/NixOS/nixpkgs/issues/154163#issuecomment-1350599022
     makeModulesClosure = x:
