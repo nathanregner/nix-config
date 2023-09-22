@@ -3,7 +3,7 @@
 
   sops.secrets.atticd = {
     key = "atticd";
-    owner = "atticd";
+    owner = config.services.atticd.user;
     group = "wheel";
     mode = "0440";
   };
