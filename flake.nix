@@ -98,34 +98,34 @@
       # Available through 'nixos-rebuild --flake .#'
       nixosConfigurations = {
         iapetus = lib.nixosSystem {
-          specialArgs = { inherit inputs outputs; };
+          specialArgs = { inherit self inputs outputs; };
           modules = [ ./machines/iapetus/configuration.nix ];
         };
 
         sagittarius = lib.nixosSystem {
-          specialArgs = { inherit inputs outputs; };
+          specialArgs = { inherit self inputs outputs; };
           modules = [ ./machines/sagittarius/configuration.nix ];
         };
 
         # Builder VM
         ec2-aarch64 = lib.nixosSystem {
-          system = "aarch64-linux";
+          specialArgs = { inherit self inputs outputs; };
           modules = [ ./machines/ec2-aarch64/configuration.nix ];
-          specialArgs = { inherit inputs outputs; };
+          system = "aarch64-linux";
         };
 
         # Voron 2.4r2 Klipper machine
         voron = lib.nixosSystem {
-          system = "aarch64-linux";
+          specialArgs = { inherit self inputs outputs nixpkgs-unstable; };
           modules = [ ./machines/voron/configuration.nix ];
-          specialArgs = { inherit inputs outputs nixpkgs-unstable; };
+          system = "aarch64-linux";
         };
       } // forEachNode (hostname:
         # 3d print farm node
         lib.nixosSystem {
-          system = "aarch64-linux";
+          specialArgs = { inherit self inputs outputs nixpkgs hostname; };
           modules = [ ./machines/kraken/configuration.nix ];
-          specialArgs = { inherit inputs outputs nixpkgs hostname; };
+          system = "aarch64-linux";
         });
 
       # Standalone home-manager configuration entrypoint

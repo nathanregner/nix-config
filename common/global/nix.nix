@@ -1,4 +1,4 @@
-{ lib, pkgs, outputs, ... }: {
+{ self, lib, pkgs, outputs, ... }: {
   nixpkgs = {
     config = {
       allowUnfree = true;
@@ -24,6 +24,10 @@
       auto-optimise-store = true;
     };
   };
+
+  # https://www.reddit.com/r/NixOS/comments/16t2njf/small_trick_for_people_using_nixos_with_flakes
+  environment.etc."nixos-flake".source = ../..;
+  system.nixos.tags = [ self.sourceInfo.shortRev or "dirty" ];
 
   # https://discourse.nixos.org/t/nvd-simple-nix-nixos-version-diff-tool/12397/33
   system.activationScripts.report-changes = ''
