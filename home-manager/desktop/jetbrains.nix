@@ -1,5 +1,5 @@
 { pkgs, ... }: {
-  home.packages = with pkgs; [
+  home.packages = with pkgs.unstable; [
     jetbrains-toolbox
     rustup # can IntelliJ just get this from direnv somehow?
     stdenv.cc # can IntelliJ just get this from direnv somehow?

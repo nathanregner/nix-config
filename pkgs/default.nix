@@ -4,7 +4,7 @@
 { inputs, pkgs }: {
   inherit (inputs.attic.packages.${pkgs.stdenv.hostPlatform.system}) attic;
   route53-ddns = pkgs.unstable.callPackage ./route53-ddns { };
-  jetbrains-toolbox = pkgs.unstable.callPackage ./jetbrains-toolbox.nix { };
+  # jetbrains-toolbox = pkgs.unstable.callPackage ./jetbrains-toolbox.nix { };
 
   # https://github.com/netdata/netdata/releases
   netdata-latest = pkgs.unstable.netdata.overrideAttrs (oldAttrs: rec {
