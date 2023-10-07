@@ -1,6 +1,15 @@
-{ config, lib, pkgs, ... }: {
+{ inputs, config, lib, pkgs, ... }: {
   imports =
     [ ../../modules/nixos/desktop ./hardware-configuration.nix ./windows-vm ];
+
+  nix.settings = {
+    substituters =
+      [ "https://hyprland.cachix.org" "https://nixpkgs-wayland.cachix.org" ];
+    trusted-public-keys = [
+      "hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc="
+      "nixpkgs-wayland.cachix.org-1:3lwxaILxMRkVhehr5StQprHdEo4IrE8sRho9R9HOLYA="
+    ];
+  };
 
   # bootloader
   boot.loader.systemd-boot.enable = true;
@@ -18,9 +27,9 @@
     enable = true;
     videoDrivers = [ "nvidia" ];
 
-    displayManager.gdm.enable = true;
-    displayManager.gdm.wayland = false;
-    desktopManager.gnome.enable = true;
+    # displayManager.gdm.enable = true;
+    # displayManager.gdm.wayland = false;
+    # desktopManager.gnome.enable = true;
 
     layout = "us";
     xkbVariant = "";
@@ -28,6 +37,11 @@
 
   services.xserver.displayManager.autoLogin.enable = true;
   services.xserver.displayManager.autoLogin.user = "nregner";
+
+  programs.hyprland = {
+    enable = true;
+    package = inputs.hyprland.packages.${pkgs.system}.hyprland;
+  };
 
   # Workaround for GNOME autologin: https://github.com/NixOS/nixpkgs/issues/103746#issuecomment-945091229
   systemd.services."getty@tty1".enable = false;
@@ -68,13 +82,13 @@
   environment.systemPackages = [
     config.boot.kernelPackages.perf
     pkgs.virt-manager
-    pkgs.gnome.nautilus-python
+    # pkgs.gnome.nautilus-python
     pkgs.insync-nautilus
   ];
 
   # Adds to `environment.pathsToLink` the path: `/share/nautilus-python/extensions`
   # needed for nautilus Python extensions to work.
-  services.gnome.core-utilities.enable = true;
+  # services.gnome.core-utilities.enable = true;
 
   # boot.binfmt.emulatedSystems = [ "aarch64-linux" ];
 

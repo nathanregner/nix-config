@@ -1,4 +1,4 @@
-{ config, lib, pkgs, ... }: {
+{ inputs, config, lib, pkgs, ... }: {
   imports =
     [ ../../modules/nixos/desktop ./disko.nix ./hardware-configuration.nix ];
 
@@ -18,9 +18,9 @@
     enable = true;
     # videoDrivers = [ "nvidia" ];
 
-    displayManager.gdm.enable = true;
-    displayManager.gdm.wayland = false;
-    desktopManager.gnome.enable = true;
+    # displayManager.gdm.enable = true;
+    # displayManager.gdm.wayland = false;
+    # desktopManager.gnome.enable = true;
 
     layout = "us";
     xkbVariant = "";
@@ -29,7 +29,13 @@
   services.xserver.displayManager.autoLogin.enable = true;
   services.xserver.displayManager.autoLogin.user = "nregner";
 
-  # workaround for GNOME autologin: https://github.com/NixOS/nixpkgs/issues/103746#issuecomment-945091229
+  programs.hyprland = {
+    enable = true;
+    package = inputs.hyprland.packages.${pkgs.system}.hyprland;
+    nvidiaPatches = true;
+  };
+
+  # Workaround for GNOME autologin: https://github.com/NixOS/nixpkgs/issues/103746#issuecomment-945091229
   systemd.services."getty@tty1".enable = false;
   systemd.services."autovt@tty1".enable = false;
 

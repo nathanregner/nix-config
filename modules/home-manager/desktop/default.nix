@@ -1,4 +1,4 @@
-{ inputs, outputs, pkgs, lib, ... }: {
+{ inputs, outputs, ... }: {
   imports = [
     #
     ../base

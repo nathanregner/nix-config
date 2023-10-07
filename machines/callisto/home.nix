@@ -1,7 +1,7 @@
 { lib, pkgs, ... }: {
   imports = [
     ../../modules/home-manager/desktop
-    ../../modules/home-manager/desktop/gnome
+    ../../modules/home-manager/desktop/hyprland
     ../../modules/home-manager/desktop/jetbrains
   ];
 

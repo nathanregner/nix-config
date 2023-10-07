@@ -44,9 +44,13 @@
       inputs.nixpkgs-stable.follows = "nixpkgs";
     };
 
-    # Themes
+    # Desktop
     catppuccin-alacritty = {
       url = "github:catppuccin/alacritty";
+      flake = false;
+    };
+    catppuccin-hyprland = {
+      url = "github:catppuccin/hyprland";
       flake = false;
     };
     catppuccin-k9s = {
@@ -60,6 +64,18 @@
     catppuccin-papirus-folders = {
       url = "github:catppuccin/papirus-folders";
       flake = false;
+    };
+    catppuccin-waybar = {
+      url = "github:catppuccin/waybar";
+      flake = false;
+    };
+    hyprland = {
+      url = "github:hyprwm/Hyprland";
+      # inputs.nixpkgs.follows = "nixpkgs";
+    };
+    nixpkgs-wayland = {
+      url = "github:nix-community/nixpkgs-wayland";
+      # inputs.nixpkgs.follows = "nixpkgs";
     };
 
     # 3d printing
