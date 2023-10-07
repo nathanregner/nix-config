@@ -33,7 +33,15 @@
       inputs.nixpkgs-stable.follows = "nixpkgs";
     };
 
-    # Themes
+    # Desktop
+    hyprland = {
+      url = "github:hyprwm/Hyprland";
+      # inputs.nixpkgs.follows = "nixpkgs";
+    };
+    nixpkgs-wayland = {
+      url = "github:nix-community/nixpkgs-wayland";
+      # inputs.nixpkgs.follows = "nixpkgs";
+    };
     catppuccin-alacritty = {
       url = "github:catppuccin/alacritty";
       flake = false;
