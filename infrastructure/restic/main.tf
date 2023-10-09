@@ -10,6 +10,7 @@ module "s3" {
   source = "./s3"
   for_each = toset([
     "sagittarius",
+    "voron",
   ])
   bucket_name = "nregner-restic-${each.key}"
   username    = each.key
@@ -17,7 +18,7 @@ module "s3" {
 
 locals {
   secrets = {
-    s3 = { for machine, s3 in module.s3 : machine => s3.env }
+    s3_env = { for machine, s3 in module.s3 : machine => s3.env }
   }
   machines = toset(flatten([for _, machines in local.secrets : keys(machines)]))
 }
