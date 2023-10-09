@@ -4,6 +4,7 @@
     ../../common/global
     ../../common/server
     ../../home-manager/server.nix
+    ../../common/optional/restic
     ./hardware-configuration.nix
     ./attic.nix
     ./k8s.nix
