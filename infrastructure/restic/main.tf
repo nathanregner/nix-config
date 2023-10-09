@@ -6,25 +6,13 @@ terraform {
   }
 }
 
-resource "aws_s3_bucket" "restic" {
-  bucket_prefix = "restic-"
-}
-
-resource "aws_s3_bucket_versioning" "restic" {
-  bucket = aws_s3_bucket.restic.id
-  versioning_configuration {
-    status = "Enabled"
-  }
-}
-
 module "s3" {
   source = "./s3"
   for_each = toset([
     "sagittarius",
-    "voron"
   ])
-  bucket_prefix = "restic-${each.key}"
-  username      = each.key
+  bucket_name = "nregner-restic-${each.key}"
+  username    = each.key
 }
 
 locals {
