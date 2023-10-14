@@ -1,4 +1,4 @@
-{ lib, pkgs, ... }: {
+{ config, lib, pkgs, ... }: {
   imports = [
     ../common/global
     ../../terraform/tailscale
@@ -61,10 +61,10 @@
 
   # Windows VM
   vfio.enable = true;
-  virtualisation.libvirtd.enable = true;
-  environment.systemPackages = with pkgs; [ virt-manager ];
 
   # Misc
+  environment.systemPackages = with pkgs; [ config.boot.kernelPackages.perf ];
+
   boot.binfmt.emulatedSystems = [ "aarch64-linux" ];
 
   virtualisation.docker = {
