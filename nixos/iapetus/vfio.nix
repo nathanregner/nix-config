@@ -47,7 +47,10 @@ in {
         ];
     };
 
-    virtualisation.spiceUSBRedirection.enable = true;
+    virtualisation = {
+      libvirtd.enable = true;
+      spiceUSBRedirection.enable = true;
+    };
 
     environment.systemPackages = with pkgs; [ virt-manager ];
 
