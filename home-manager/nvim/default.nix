@@ -1,4 +1,4 @@
-{ config, pkgs, ... }: {
+{ inputs, config, pkgs, ... }: {
   xdg.configFile."nvim/lua".source = config.lib.file.mkFlakeSymlink ./lua;
 
   programs.neovim = {
@@ -43,8 +43,9 @@
       nvim-cmp
       cmp-nvim-lsp
       cmp_luasnip
-      luasnip
       copilot-lua
+      friendly-snippets
+      luasnip
     ];
   };
 
@@ -61,6 +62,7 @@
     gopls
     lua-language-server
     nil
+    nixd
     prettierd
     stylua
     terraform-ls
