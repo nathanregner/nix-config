@@ -63,7 +63,9 @@
   vfio.enable = true;
 
   # Misc
-  environment.systemPackages = with pkgs; [ config.boot.kernelPackages.perf ];
+  zramSwap.enable = true;
+
+  environment.systemPackages = [ config.boot.kernelPackages.perf ];
 
   boot.binfmt.emulatedSystems = [ "aarch64-linux" ];
 
