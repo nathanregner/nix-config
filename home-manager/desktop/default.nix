@@ -1,5 +1,5 @@
 { pkgs, ... }: {
-  imports = [ ./alacritty.nix ./theme.nix ];
+  imports = [ ./alacritty.nix ./k9s.nix ./theme.nix ];
 
   home.packages = with pkgs.unstable; [
     # apps
@@ -32,4 +32,5 @@
       pbpaste = "xclip -selection clipboard -o";
     };
   };
+
 }

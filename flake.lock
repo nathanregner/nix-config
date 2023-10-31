@@ -42,6 +42,22 @@
         "type": "github"
       }
     },
+    "catppuccin-k9s": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1690140445,
+        "narHash": "sha256-PtBJRBNbLkj7D2ko7ebpEjbfK9Ywjs7zbE+Y8FQVEfA=",
+        "owner": "catppuccin",
+        "repo": "k9s",
+        "rev": "516f44dd1a6680357cb30d96f7e656b653aa5059",
+        "type": "github"
+      },
+      "original": {
+        "owner": "catppuccin",
+        "repo": "k9s",
+        "type": "github"
+      }
+    },
     "catppuccin-lazygit": {
       "flake": false,
       "locked": {
@@ -234,15 +250,15 @@
         ]
       },
       "locked": {
-        "lastModified": 1695108154,
-        "narHash": "sha256-gSg7UTVtls2yO9lKtP0yb66XBHT1Fx5qZSZbGMpSn2c=",
-        "owner": "nix-community",
+        "lastModified": 1698861344,
+        "narHash": "sha256-g+K8cRYukKaa92YlKutIFKNhHPjQJ7DlhbE1j6p++6Y=",
+        "owner": "nathanregner",
         "repo": "home-manager",
-        "rev": "07682fff75d41f18327a871088d20af2710d4744",
+        "rev": "a0d1dc1b668883ceac66281883e03832efaec624",
         "type": "github"
       },
       "original": {
-        "owner": "nix-community",
+        "owner": "nathanregner",
         "ref": "release-23.05",
         "repo": "home-manager",
         "type": "github"
@@ -396,6 +412,7 @@
       "inputs": {
         "attic": "attic",
         "catppuccin-alacritty": "catppuccin-alacritty",
+        "catppuccin-k9s": "catppuccin-k9s",
         "catppuccin-lazygit": "catppuccin-lazygit",
         "catppuccin-papirus-folders": "catppuccin-papirus-folders",
         "conform-nvim": "conform-nvim",
