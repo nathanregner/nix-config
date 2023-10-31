@@ -5,7 +5,7 @@
     nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable-small";
     # hardware.url = "github:nixos/nixos-hardware";
     home-manager = {
-      url = "github:nix-community/home-manager/release-23.05";
+      url = "github:nathanregner/home-manager/release-23.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -38,12 +38,16 @@
       url = "github:catppuccin/alacritty";
       flake = false;
     };
-    catppuccin-papirus-folders = {
-      url = "github:catppuccin/papirus-folders";
+    catppuccin-k9s = {
+      url = "github:catppuccin/k9s";
       flake = false;
     };
     catppuccin-lazygit = {
       url = "github:catppuccin/lazygit";
+      flake = false;
+    };
+    catppuccin-papirus-folders = {
+      url = "github:catppuccin/papirus-folders";
       flake = false;
     };
 
