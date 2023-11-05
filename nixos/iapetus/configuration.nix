@@ -63,6 +63,11 @@
   vfio.enable = true;
 
   # Misc
+  services.hardware.openrgb = {
+    enable = true;
+    motherboard = "amd";
+  };
+
   zramSwap.enable = true;
 
   environment.systemPackages = [ config.boot.kernelPackages.perf ];

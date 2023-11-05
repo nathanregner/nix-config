@@ -7,7 +7,6 @@
   home.packages = with pkgs; [
     # apps
     insync
-    openrgb
 
     # tools
     rclone
