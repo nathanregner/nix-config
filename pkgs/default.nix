@@ -24,4 +24,12 @@
     # the Makefile non-deterministically pulls git repos for linting/testing - don't need it
     postPatch = "rm Makefile";
   };
+
+  nvim-lspconfig-next = pkgs.unstable.vimPlugins.nvim-lspconfig.overrideAttrs
+    (prev: {
+      src = inputs.nvim-lspconfig;
+      # meta.homepage = "https://github.com/stevearc/conform.nvim";
+      # the Makefile non-deterministically pulls git repos for linting/testing - don't need it
+      # postPatch = "rm Makefile";
+    });
 }

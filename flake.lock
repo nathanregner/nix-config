@@ -408,6 +408,19 @@
         "type": "github"
       }
     },
+    "nvim-lspconfig": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1699208153,
+        "narHash": "sha256-kbFw6SI2r/YoKukxtER61i00Phsoe0InYnktxWm0T+w=",
+        "path": "/home/nregner/dev/github/nvim-lspconfig",
+        "type": "path"
+      },
+      "original": {
+        "path": "/home/nregner/dev/github/nvim-lspconfig",
+        "type": "path"
+      }
+    },
     "root": {
       "inputs": {
         "attic": "attic",
@@ -425,6 +438,7 @@
         "nixos-generators": "nixos-generators",
         "nixpkgs": "nixpkgs",
         "nixpkgs-unstable": "nixpkgs-unstable",
+        "nvim-lspconfig": "nvim-lspconfig",
         "sops-nix": "sops-nix"
       }
     },

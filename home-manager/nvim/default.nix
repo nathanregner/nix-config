@@ -39,7 +39,7 @@
       vim-surround
 
       # lsp/completion
-      nvim-lspconfig
+      pkgs.nvim-lspconfig-next
       nvim-cmp
       cmp-nvim-lsp
       cmp_luasnip

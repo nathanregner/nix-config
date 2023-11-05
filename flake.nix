@@ -53,6 +53,10 @@
 
     # Misc
     # https://github.com/realthunder/FreeCAD/releases
+    nvim-lspconfig = {
+      url = "path:/home/nregner/dev/github/nvim-lspconfig";
+      flake = false;
+    };
     conform-nvim = {
       url = "github:stevearc/conform.nvim";
       flake = false;

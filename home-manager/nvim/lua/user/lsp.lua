@@ -34,3 +34,25 @@ vim.api.nvim_create_autocmd("LspAttach", {
     end, opts)
   end,
 })
+
+local lspconfig = require("lspconfig")
+
+local configs = require("lspconfig.configs")
+
+vim.cmd([[ autocmd BufNewFile,BufRead *.nu set filetype=nu ]])
+
+-- Check if the config is already defined (useful when reloading this file)
+if not configs.nu then
+  configs.nu = {
+    default_config = {
+      cmd = { "/home/nregner/.cargo/bin/nu", "--lsp" },
+      filetypes = { "nu" },
+      root_dir = function(fname)
+        return lspconfig.util.find_git_ancestor(fname)
+      end,
+      settings = {},
+    },
+  }
+end
+
+lspconfig.nu.setup({})
