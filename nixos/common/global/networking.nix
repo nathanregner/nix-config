@@ -9,4 +9,6 @@
     };
     openFirewall = true;
   };
+
+  programs.mosh.enable = true;
 }

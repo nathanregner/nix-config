@@ -8,10 +8,11 @@
     gparted
 
     # tools
-    pkgs.attic
     awscli2
     gh
     jq
+    mosh
+    pkgs.attic
     pv
     xclip
 
