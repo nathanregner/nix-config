@@ -1,5 +1,5 @@
 return {
-  "Olical/conjure",
+  { "Olical/conjure", ft = { "clojure" } },
 
   -- Structural editing, optional
   -- https://github.com/guns/vim-sexp
