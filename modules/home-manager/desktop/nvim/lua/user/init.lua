@@ -22,40 +22,6 @@ require("lazy").setup({
   -- https://github.com/j-hui/fidget.nvim
   { "j-hui/fidget.nvim", opts = {} },
 
-  -- Formatting
-  -- https://github.com/stevearc/conform.nvim
-  {
-    "stevearc/conform.nvim",
-    opts = {
-      format_on_save = {
-        lsp_fallback = true,
-      },
-      formatters_by_ft = {
-        css = { "prettierd" },
-        gitcommit = { "prettier", "injected" }, -- FIXME: prettierd erroring out
-        go = { "gofmt" },
-        html = { "prettierd" },
-        javascript = { "prettierd" },
-        json = { "prettierd" },
-        lua = { "stylua" },
-        markdown = { "prettierd", "injected" },
-        nix = { "nixfmt" },
-        rust = { "rustfmt" },
-        terraform = { "terraform_fmt" },
-        yaml = { "prettierd" },
-
-        -- all filetypes
-        ["*"] = { "codespell", "trim_whitespace" },
-
-        -- unspecified filetypes
-        ["_"] = { "trim_whitespace" },
-      },
-      formatters = {
-        prettier = { options = { ft_parsers = { gitcommit = "markdown" } } },
-      },
-    },
-  },
-
   {
     -- Autocompletion
     "hrsh7th/nvim-cmp",
