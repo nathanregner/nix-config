@@ -3,13 +3,19 @@
     # Nix
     nixpkgs.url = "github:nixos/nixpkgs/nixos-23.11";
     nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
+    # nixpkgs-nregner.url = "github:nathanregner/nixpkgs/master";
+    nixpkgs-nregner.url =
+      "git+file:///Users/nregner/dev/github/nixpkgs?shallow=1";
+
     # hardware.url = "github:nixos/nixos-hardware";
     home-manager = {
       url = "github:nathanregner/home-manager/master";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     nix-darwin = {
-      url = "github:LnL7/nix-darwin";
+      # url = "github:LnL7/nix-darwin";
+      # url = "github:nathanregner/nix-darwin/master";
+      url = "git+file:///Users/nregner/dev/github/nix-darwin?shallow=1";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     mac-app-util = {

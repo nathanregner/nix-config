@@ -1,5 +1,8 @@
 { lib, ... }: {
-  imports = [ ../../modules/nixos/server ];
+  imports = [
+    ../../modules/nixos/server
+    # ../../modules/nixos/server/home-manager.nix
+  ];
 
   virtualisation = {
     cores = 8; # TOOD: Figure out why this can't be > 8

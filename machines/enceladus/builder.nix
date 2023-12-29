@@ -7,7 +7,7 @@ let
 
   cfg = config.nix.linux-builder-2;
 
-  system = pkgs.stdenv.hostPlatform.system;
+  system = "aarch64-darwin";
   inherit (inputs) nixpkgs;
   pkgs = nixpkgs.legacyPackages."${system}";
   linuxSystem = builtins.replaceStrings [ "darwin" ] [ "linux" ] system;

@@ -1,4 +1,4 @@
-{ inputs, outputs, config, pkgs, ... }@args: {
+{ self, inputs, outputs, config, pkgs, ... }@args: {
   imports = [ ./builder.nix ];
 
   nix = {
@@ -22,13 +22,16 @@
         [ "default:h0V4pJnSGtvqgGKLO3KF0VJ0iOaiVBfa4OjmnnR2ob8=" ];
     };
 
-    linux-builder-2 = {
+    linux-builder = {
       enable = true;
       # package = pkgs.darwin.linux-builder;
       maxJobs = 12;
       # comment out for inital setup (pulls vm image via cache.nixos.org)
       # remove /var/lib/darwin-builder/*.img to force a reset
+      specialArgs = { inherit self inputs outputs; };
       config = import ./linux-builder.nix args;
+      package =
+        inputs.nixpkgs-nregner.legacyPackages.aarch64-darwin.darwin.linux-builder;
     };
   };
 

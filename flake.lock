@@ -448,17 +448,18 @@
         ]
       },
       "locked": {
-        "lastModified": 1703649338,
-        "narHash": "sha256-n2MkBotGgTQsfB+wH09R+otBwYCvGCsnHX7eUMGkKL0=",
-        "owner": "LnL7",
-        "repo": "nix-darwin",
-        "rev": "8a8321271f0835fae2cb195e1137cb381fdbcc8e",
-        "type": "github"
+        "lastModified": 1703877637,
+        "narHash": "sha256-xQW4AxxrQxG6jAqMYkh1APAiLYFJia52F5UtAr4pA+g=",
+        "ref": "refs/heads/master",
+        "rev": "0253ce4f183eeb51b386594223e63afe20a66778",
+        "shallow": true,
+        "type": "git",
+        "url": "file:///Users/nregner/dev/github/nix-darwin"
       },
       "original": {
-        "owner": "LnL7",
-        "repo": "nix-darwin",
-        "type": "github"
+        "shallow": true,
+        "type": "git",
+        "url": "file:///Users/nregner/dev/github/nix-darwin"
       }
     },
     "nix-github-actions": {
@@ -553,6 +554,22 @@
         "ref": "nixos-23.11",
         "repo": "nixpkgs",
         "type": "github"
+      }
+    },
+    "nixpkgs-nregner": {
+      "locked": {
+        "lastModified": 1703878153,
+        "narHash": "sha256-st65HbnuLCz4obxMH4N0q/U0iMfSwJqghRipTXiopTk=",
+        "ref": "refs/heads/master",
+        "rev": "3b980dccd6dff149ac2be0594126689916bf9aeb",
+        "shallow": true,
+        "type": "git",
+        "url": "file:///Users/nregner/dev/github/nixpkgs"
+      },
+      "original": {
+        "shallow": true,
+        "type": "git",
+        "url": "file:///Users/nregner/dev/github/nixpkgs"
       }
     },
     "nixpkgs-unstable": {
@@ -701,6 +718,7 @@
         "nix-index-database": "nix-index-database",
         "nixos-generators": "nixos-generators",
         "nixpkgs": "nixpkgs_2",
+        "nixpkgs-nregner": "nixpkgs-nregner",
         "nixpkgs-unstable": "nixpkgs-unstable",
         "orangepi-nix": "orangepi-nix",
         "sops-nix": "sops-nix"
