@@ -95,6 +95,17 @@
         (map (n: "kraken-${toString n}"))
         lib.genAttrs
       ];
+
+      machines = [ import ./machines/iapetus import ./machines/callisto ];
+
+      forEachMachine = attr: wrap:
+        builtins.map (machine:
+          lib.mapAttrs (_: args: (wrap args))
+          (if builtins.hasAttr attr machine then
+            builtins.getAttr attr machine
+          else
+            { })) machines;
+
     in rec {
       # Your custom packages
       # Acessible through 'nix build', 'nix shell', etc
@@ -116,10 +127,10 @@
       overlays = import ./overlays { inherit inputs; };
       # Reusable nixos modules you might want to export
       # These are usually stuff you would upstream into nixpkgs
-      nixosModules = import ./modules/nixos;
+      # nixosModules = import ./modules/nixos;
       # Reusable home-manager modules you might want to export
       # These are usually stuff you would upstream into home-manager
-      homeManagerModules = import ./modules/home-manager;
+      # homeManagerModules = import ./modules/home-manager;
 
       # NixOS configuration entrypoint
       # Available through 'nixos-rebuild --flake .#'
@@ -127,46 +138,46 @@
         # Desktop
         iapetus = lib.nixosSystem {
           specialArgs = { inherit self inputs outputs; };
-          modules = [ ./nixos/iapetus/configuration.nix ];
+          modules = [ ./machines/iapetus/configuration.nix ];
         };
 
         # GE73VR Laptop
         callisto = lib.nixosSystem {
           specialArgs = { inherit self inputs outputs; };
-          modules = [ ./nixos/callisto/configuration.nix ];
+          modules = [ ./machines/callisto/configuration.nix ];
         };
 
         # Server
         sagittarius = lib.nixosSystem {
           specialArgs = { inherit self inputs outputs; };
-          modules = [ ./nixos/sagittarius/configuration.nix ];
+          modules = [ ./machines/sagittarius/configuration.nix ];
         };
 
         # Builder VM
         ec2-aarch64 = lib.nixosSystem {
           specialArgs = { inherit self inputs outputs; };
-          modules = [ ./nixos/ec2-aarch64/configuration.nix ];
+          modules = [ ./machines/ec2-aarch64/configuration.nix ];
           system = "aarch64-linux";
         };
 
         # Voron 2.4r2 Klipper machine
         voron = lib.nixosSystem {
           specialArgs = { inherit self inputs outputs; };
-          modules = [ ./nixos/voron/configuration.nix ];
+          modules = [ ./machines/voron/configuration.nix ];
           system = "aarch64-linux";
         };
       } // forEachNode (hostname:
         # 3d print farm node
         nixpkgs.lib.nixosSystem {
           specialArgs = { inherit self inputs outputs nixpkgs hostname; };
-          modules = [ ./nixos/kraken/configuration.nix ];
+          modules = [ ./machines/kraken/configuration.nix ];
           system = "aarch64-linux";
         });
 
       darwinConfigurations = {
         "Nathans-MacBook-Pro" = nix-darwin.lib.darwinSystem {
           specialArgs = { inherit self inputs outputs; };
-          modules = [ ./nixos/mac/configuration.nix ];
+          modules = [ ./machines/enceladus/configuration.nix ];
         };
       };
 
@@ -176,17 +187,17 @@
         "nregner@iapetus" = home-manager.lib.homeManagerConfiguration {
           pkgs = nixpkgs.legacyPackages.x86_64-linux;
           extraSpecialArgs = { inherit inputs outputs; };
-          modules = [ ./home-manager/iapetus.nix ];
+          modules = [ ./machines/iapetus/home.nix ];
         };
         "nregner@callisto" = home-manager.lib.homeManagerConfiguration {
           pkgs = nixpkgs.legacyPackages.x86_64-linux;
           extraSpecialArgs = { inherit inputs outputs; };
-          modules = [ ./home-manager/callisto.nix ];
+          modules = [ ./machines/callisto/home.nix ];
         };
         "nregner" = home-manager.lib.homeManagerConfiguration {
           pkgs = nixpkgs.legacyPackages.aarch64-darwin;
           extraSpecialArgs = { inherit inputs outputs; };
-          modules = [ ./home-manager/mac.nix ];
+          modules = [ ./machines/enceladus/home.nix ];
         };
       };
 
