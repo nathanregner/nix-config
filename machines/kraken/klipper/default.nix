@@ -39,4 +39,9 @@
   # mainsail
   services.mainsail = { enable = true; };
   services.nginx = { clientMaxBodySize = "1G"; };
+  networking.firewall = let ports = [ 80 81 ];
+  in {
+    allowedTCPPorts = ports;
+    allowedUDPPorts = ports;
+  };
 }
