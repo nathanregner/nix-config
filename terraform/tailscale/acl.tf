@@ -23,6 +23,7 @@ resource "tailscale_acl" "acl" {
         dst = [
           "tag:server:8080",  # atticd
           "tag:server:19999", # netdata
+          "tag:server:7125",  # moonraker
         ]
       }
     ]

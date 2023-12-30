@@ -33,12 +33,6 @@ resource "tailscale_tailnet_key" "builder" {
   tags          = ["tag:server"]
 }
 
-resource "tailscale_dns_search_paths" "default" {
-  search_paths = [
-    "nregner.net"
-  ]
-}
-
 output "server_key" {
   value     = tailscale_tailnet_key.server.key
   sensitive = true

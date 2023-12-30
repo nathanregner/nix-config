@@ -23,11 +23,11 @@
   services.moonraker = {
     enable = true;
     allowSystemControl = true;
-
+    address = "0.0.0.0";
     settings = {
       authorization = {
         cors_domains = [ "*://*.nregner.net" "*://${hostname}" ];
-        trusted_clients = [ "127.0.0.0/8" "::1/128" ];
+        trusted_clients = [ "127.0.0.0/8" "::1/128" "100.0.0.0/8" ];
       };
       history = { };
     };
@@ -39,7 +39,7 @@
   # mainsail
   services.mainsail = { enable = true; };
   services.nginx = { clientMaxBodySize = "1G"; };
-  networking.firewall = let ports = [ 80 81 ];
+  networking.firewall = let ports = [ 80 81 7125 ];
   in {
     allowedTCPPorts = ports;
     allowedUDPPorts = ports;
