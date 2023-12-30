@@ -1,17 +1,9 @@
-{ inputs, lib, pkgs, ... }: {
+{ inputs, pkgs, ... }: {
   services.klipper = {
     enable = true;
     user = "moonraker";
     group = "moonraker";
     configFile = ./printer.cfg;
-    firmwares = {
-      mcu = {
-        enable = true;
-        configFile = ./firmware.cfg;
-        serial =
-          "/dev/serial/by-id/usb-Klipper_stm32f446xx_450016000450335331383520-if00";
-      };
-    };
   };
 
   # restart Klipper when printer is powerd on
@@ -24,18 +16,4 @@
   disabledModules = [ "services/misc/klipper.nix" ];
   imports =
     [ "${inputs.nixpkgs-unstable}/nixos/modules/services/misc/klipper.nix" ];
-
-  nixpkgs.overlays = [
-    (final: prev: {
-      inherit (final.unstable) klipper;
-
-      # build without massive gui dependencies
-      # TODO: submit patch to nixpkgs to make optional?
-      klipper-firmware = final.unstable.klipper-firmware.overrideAttrs (prev: {
-        nativeBuidlInputs =
-          builtins.filter (pkg: lib.strings.hasPrefix "wxwidgets" pkg.name)
-          prev.nativeBuildInputs;
-      });
-    })
-  ];
 }

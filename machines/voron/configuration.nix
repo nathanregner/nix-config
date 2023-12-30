@@ -3,7 +3,7 @@
     "${modulesPath}/installer/sd-card/sd-image-aarch64.nix"
     "${modulesPath}/profiles/minimal.nix"
     ../../modules/nixos/server
-    ../../modules/nixos/server/home-manager.nix
+    # ../../modules/nixos/server/home-manager.nix
     ./builders.nix
     ./klipper.nix
     ./mainsail.nix
