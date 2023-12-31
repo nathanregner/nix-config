@@ -6,6 +6,7 @@
     enable = true;
     user = "moonraker";
     group = "moonraker";
+    mutableConfig = true;
     configFile = ./printer-sunlu-s8-2020.cfg;
   };
 
