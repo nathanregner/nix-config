@@ -84,6 +84,7 @@
     let
       inherit (self) outputs;
       inherit (nixpkgs) lib;
+      forAllLinuxSystems = lib.genAttrs [ "aarch64-linux" "x86_64-linux" ];
       forAllSystems = lib.genAttrs [
         "aarch64-linux"
         "x86_64-linux"
@@ -95,17 +96,6 @@
         (map (n: "kraken-${toString n}"))
         lib.genAttrs
       ];
-
-      machines = [ import ./machines/iapetus import ./machines/callisto ];
-
-      forEachMachine = attr: wrap:
-        builtins.map (machine:
-          lib.mapAttrs (_: args: (wrap args))
-          (if builtins.hasAttr attr machine then
-            builtins.getAttr attr machine
-          else
-            { })) machines;
-
     in rec {
       # Your custom packages
       # Acessible through 'nix build', 'nix shell', etc
@@ -114,7 +104,19 @@
           pkgs = nixpkgs.legacyPackages.${system} // {
             unstable = nixpkgs-unstable.legacyPackages.${system};
           };
-        in import ./pkgs { inherit inputs pkgs; });
+        in import ./pkgs { inherit inputs pkgs; }) // forAllLinuxSystems
+        (system:
+          let
+            pkgs = nixpkgs.legacyPackages.${system} // {
+              unstable = nixpkgs-unstable.legacyPackages.${system};
+            };
+          in {
+            kraken-image = inputs.disko.lib.lib.makeDiskImagesScript {
+              nixosConfig = self.nixosConfigurations.kraken-0;
+              inherit pkgs;
+              inherit (pkgs) lib;
+            };
+          });
 
       # Devshells for flake development
       devShells = forAllSystems (system:

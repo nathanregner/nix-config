@@ -13,11 +13,10 @@
   environment.systemPackages =
     [ pkgs.klipper-firmware-sunlu-s8.passthru.klipper-flash ];
 
-  # FIXME
   # restart Klipper when printer is powerd on
   # https://github.com/Klipper3d/klipper/issues/835
   services.udev.extraRules = ''
-    ACTION=="add", ATTRS{idProduct}=="614e", ATTRS{idVendor}=="1d50", RUN+="${pkgs.bash} -c 'systemctl restart klipper.service'"
+    SUBSYSTEM=="usb", ACTION=="add", ATTRS{idVendor}=="1a86", ATTRS{idProduct}=="7523", RUN+="${pkgs.bash} -c 'systemctl restart klipper.service'"
   '';
 
   # moonraker

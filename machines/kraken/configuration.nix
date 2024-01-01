@@ -2,11 +2,12 @@
   imports = [
     inputs.orangepi-nix.nixosModules.zero2
     ../../modules/nixos/server
-    ../../modules/nixos/server/home-manager.nix
+    # ../../modules/nixos/server/home-manager.nix
+    ./disko.nix
     ./klipper
   ];
 
-  sdImage.imageName = "orangepi-zero2";
+  # sdImage.imageName = "orangepi-zero2";
 
   nixpkgs.overlays = [ inputs.orangepi-nix.overlays.default ];
 
@@ -14,7 +15,7 @@
   networking.hostName = hostname;
 
   # keep a reference to the flake source that was used to build
-  environment.etc."nix/flake-channels/system".source = inputs.self;
+  # environment.etc."nix/flake-channels/system".source = inputs.self;
 
   users.users.root = {
     password = "root"; # ssh password auth disabled, so whatever :)
