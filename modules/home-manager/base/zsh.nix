@@ -45,11 +45,6 @@
       hms = "home-manager --flake . switch";
 
       npd = "nix profile diff-closures --profile /nix/var/nix/profiles/system";
-
-      vimdiff = "nvim -d";
-      vim = "nvim";
-      vi = "vim";
-      v = "vim";
     };
   };
 

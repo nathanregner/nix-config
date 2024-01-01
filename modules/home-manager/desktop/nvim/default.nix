@@ -43,6 +43,8 @@
     };
   };
 
+  programs.zsh.shellAliases = { vimdiff = "nvim -d"; };
+
   home.packages = with pkgs.unstable; [
     clojure-lsp
     gopls
