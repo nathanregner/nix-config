@@ -24,7 +24,12 @@
       inputs.nixpkgs-stable.follows = "nixpkgs";
     };
     disko = {
-      url = "github:nix-community/disko";
+      # url = "github:nix-community/disko";
+      url = "/home/nregner/dev/github/disko";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    nix2container = {
+      url = "github:nlewo/nix2container";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     deploy-rs = {
@@ -106,15 +111,13 @@
           };
         in import ./pkgs { inherit inputs pkgs; }) // forAllLinuxSystems
         (system:
-          let
-            pkgs = nixpkgs.legacyPackages.${system} // {
-              unstable = nixpkgs-unstable.legacyPackages.${system};
-            };
+          let pkgs = nixpkgs.legacyPackages.${system};
           in {
-            kraken-image = inputs.disko.lib.lib.makeDiskImagesScript {
-              nixosConfig = self.nixosConfigurations.kraken-0;
+            kraken-image = pkgs.callPackage ./pkgs/make-disk-image.nix {
+              inherit (inputs) disko;
               inherit pkgs;
               inherit (pkgs) lib;
+              nixosConfig = self.nixosConfigurations.kraken-0;
             };
           });
 
