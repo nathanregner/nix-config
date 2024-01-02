@@ -171,16 +171,17 @@
         ]
       },
       "locked": {
-        "dirtyRev": "59f915b45a38cb0ec0e97a713237877a06b43386-dirty",
-        "dirtyShortRev": "59f915b-dirty",
         "lastModified": 1704072400,
-        "narHash": "sha256-UKDjU56WS5obI7IGxQhlFoIHSkCfOgRABB1ad/JTIv4=",
-        "type": "git",
-        "url": "file:///home/nregner/dev/github/disko"
+        "narHash": "sha256-Es4zcFoCJ+Pa9TN46VoqgNlYznuhc6s50LRcDqQEATs=",
+        "owner": "nix-community",
+        "repo": "disko",
+        "rev": "59f915b45a38cb0ec0e97a713237877a06b43386",
+        "type": "github"
       },
       "original": {
-        "type": "git",
-        "url": "file:///home/nregner/dev/github/disko"
+        "owner": "nix-community",
+        "repo": "disko",
+        "type": "github"
       }
     },
     "flake-compat": {

@@ -9,13 +9,14 @@
     device = lib.mkForce "/dev/disk/by-label/disk-NIXOS_SD-root";
   };
 
+  diskoSdImage.disk = "NIXOS_SD";
+
   disko = {
-    sdImage.disk = "NIXOS_SD";
     devices = {
       disk = {
         NIXOS_SD = {
           type = "disk";
-          device = "/dev/vda";
+          device = "/dev/disk/by-label/NIXOS_SD";
           content = {
             type = "gpt";
             partitions = {

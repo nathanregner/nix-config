@@ -52,15 +52,113 @@ in {
     memSize = nixosConfig.config.disko.memSize;
   } (let cfg = nixosConfig.config;
   in ''
-    ls /dev
-    echo ${preVM}
-    echo $(ls /)
-    ls /
-  '')
-  #${disko.lib.create cfg}
-  #${disko.lib.mount cfg}
-  #(partitioner + installer)
-  );
+        ls /dev
+        echo ${preVM}
+        echo $(ls /)
+
+    disko_devices_dir=$(mktemp -d)
+    trap 'rm -rf "$disko_devices_dir"' EXIT
+    mkdir -p "$disko_devices_dir"
+
+    ( # disk NIXOS_SD /dev/vda   #
+      device='/dev/vda'
+      imageSize='2G'
+      name='NIXOS_SD'
+      type='disk'
+
+      ( # gpt  /dev/vda   #
+        device='/dev/vda'
+        type='gpt'
+
+        sgdisk \
+          --set-alignment=2048 \
+          --align-end \
+          --new=1:0:-0 \
+          --change-name=1:disk-NIXOS_SD-root \
+          --typecode=1:8300 \
+          /dev/vda
+        # ensure /dev/disk/by-path/..-partN exists before continuing
+        partprobe /dev/vda
+        udevadm trigger --subsystem-match=block
+        udevadm settle
+
+        ( # btrfs  /dev/disk/by-partlabel/disk-NIXOS_SD-root  /partition-root #
+          device='/dev/disk/by-partlabel/disk-NIXOS_SD-root'
+          declare -a extraArgs=('-f')
+          declare -a mountOptions=('defaults')
+          mountpoint='/partition-root'
+          type='btrfs'
+
+          mkfs.btrfs /dev/disk/by-partlabel/disk-NIXOS_SD-root -f
+          (
+            MNTPOINT=$(mktemp -d)
+            mount /dev/disk/by-partlabel/disk-NIXOS_SD-root "$MNTPOINT" -o subvol=/
+            trap 'umount $MNTPOINT; rm -rf $MNTPOINT' EXIT
+            btrfs filesystem mkswapfile --size 20M "$MNTPOINT/swapfile"
+          btrfs filesystem mkswapfile --size 20M "$MNTPOINT/swapfile1"
+          )
+
+          (
+            MNTPOINT=$(mktemp -d)
+            mount /dev/disk/by-partlabel/disk-NIXOS_SD-root "$MNTPOINT" -o subvol=/
+            trap 'umount $MNTPOINT; rm -rf $MNTPOINT' EXIT
+            SUBVOL_ABS_PATH="$MNTPOINT//home"
+            mkdir -p "$(dirname "$SUBVOL_ABS_PATH")"
+            btrfs subvolume create "$SUBVOL_ABS_PATH"
+
+          )
+          (
+            MNTPOINT=$(mktemp -d)
+            mount /dev/disk/by-partlabel/disk-NIXOS_SD-root "$MNTPOINT" -o subvol=/
+            trap 'umount $MNTPOINT; rm -rf $MNTPOINT' EXIT
+            SUBVOL_ABS_PATH="$MNTPOINT//home/user"
+            mkdir -p "$(dirname "$SUBVOL_ABS_PATH")"
+            btrfs subvolume create "$SUBVOL_ABS_PATH"
+
+          )
+          (
+            MNTPOINT=$(mktemp -d)
+            mount /dev/disk/by-partlabel/disk-NIXOS_SD-root "$MNTPOINT" -o subvol=/
+            trap 'umount $MNTPOINT; rm -rf $MNTPOINT' EXIT
+            SUBVOL_ABS_PATH="$MNTPOINT//nix"
+            mkdir -p "$(dirname "$SUBVOL_ABS_PATH")"
+            btrfs subvolume create "$SUBVOL_ABS_PATH"
+
+          )
+          (
+            MNTPOINT=$(mktemp -d)
+            mount /dev/disk/by-partlabel/disk-NIXOS_SD-root "$MNTPOINT" -o subvol=/
+            trap 'umount $MNTPOINT; rm -rf $MNTPOINT' EXIT
+            SUBVOL_ABS_PATH="$MNTPOINT//rootfs"
+            mkdir -p "$(dirname "$SUBVOL_ABS_PATH")"
+            btrfs subvolume create "$SUBVOL_ABS_PATH"
+
+          )
+          (
+            MNTPOINT=$(mktemp -d)
+            mount /dev/disk/by-partlabel/disk-NIXOS_SD-root "$MNTPOINT" -o subvol=/
+            trap 'umount $MNTPOINT; rm -rf $MNTPOINT' EXIT
+            SUBVOL_ABS_PATH="$MNTPOINT//swap"
+            mkdir -p "$(dirname "$SUBVOL_ABS_PATH")"
+            btrfs subvolume create "$SUBVOL_ABS_PATH"
+            btrfs filesystem mkswapfile --size 20M "$SUBVOL_ABS_PATH/swapfile"
+          btrfs filesystem mkswapfile --size 20M "$SUBVOL_ABS_PATH/rel-path"
+          )
+          (
+            MNTPOINT=$(mktemp -d)
+            mount /dev/disk/by-partlabel/disk-NIXOS_SD-root "$MNTPOINT" -o subvol=/
+            trap 'umount $MNTPOINT; rm -rf $MNTPOINT' EXIT
+            SUBVOL_ABS_PATH="$MNTPOINT//test"
+            mkdir -p "$(dirname "$SUBVOL_ABS_PATH")"
+            btrfs subvolume create "$SUBVOL_ABS_PATH"
+
+          )
+          )
+
+
+        ${installer}
+        ls /
+  ''));
   impure = diskoLib.writeCheckedBash { inherit checked pkgs; } name ''
     set -efu
     export PATH=${lib.makeBinPath dependencies}

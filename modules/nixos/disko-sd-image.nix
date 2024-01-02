@@ -11,12 +11,13 @@
 # The derivation for the SD image will be placed in
 # config.system.build.sdImage
 
-{ config, lib, pkgs, ... }:
+{ inputs, config, lib, pkgs, ... }:
 
 with lib;
 
-{
-  options.disko.sdImage = {
+let disko = inputs.disko;
+in {
+  options.diskoSdImage = {
     disk = mkOption {
       description = lib.mdDoc ''
         Name of the disko disk to use for the SD image.
@@ -86,42 +87,50 @@ with lib;
   };
 
   config = {
-    disko.sdImage.storePaths = [ config.system.build.toplevel ];
+    diskoSdImage.storePaths = [ config.system.build.toplevel ];
 
-    system.build.diskoSdImage =
-      let disk = config.disko.devices.disk.${config.disko.sdImage.disk};
-      in pkgs.callPackage
-      ({ stdenv, dosfstools, e2fsprogs, mtools, libfaketime, util-linux, zstd }:
-        stdenv.mkDerivation {
-          name = config.sdImage.imageName;
+    system.build.diskoSdFormat = disko.lib.create config;
+    system.build.diskoSdImage = let
+      disk = config.disko.devices.disk.${config.diskoSdImage.disk};
 
-          nativeBuildInputs =
-            [ dosfstools e2fsprogs libfaketime mtools util-linux ]
-            ++ lib.optional config.sdImage.compressImage zstd;
+      diskCfg = config;
 
-          inherit (config.sdImage) imageName compressImage;
+      formatScript = disko.lib.create diskCfg;
 
-          buildCommand = ''
-            mkdir -p $out/nix-support $out/sd-image
-            export img=$out/sd-image/${config.sdImage.imageName}
+    in pkgs.callPackage ({ stdenv, gptfdisk, zstd }:
+      stdenv.mkDerivation {
+        name = config.sdImage.imageName;
 
-            echo "${pkgs.stdenv.buildPlatform.system}" > $out/nix-support/system
-            if test -n "$compressImage"; then
-              echo "file sd-image $img.zst" >> $out/nix-support/hydra-build-products
-            else
-              echo "file sd-image $img" >> $out/nix-support/hydra-build-products
-            fi
+        nativeBuildInputs = [ gptfdisk ]
+          ++ lib.optional config.sdImage.compressImage zstd;
 
-            imageSize= ${disk.imageSize}
-            truncate -s $imageSize $img
+        inherit (config.sdImage) imageName compressImage;
 
-            ${config.sdImage.postBuildCommands}
+        buildCommand = ''
+          mkdir -p $out/nix-support $out/sd-image
+          echo 'out is'
+          echo $out
+          exit 1
+          export img=$out/sd-image/${config.sdImage.imageName}
 
-            if test -n "$compressImage"; then
-                zstd -T$NIX_BUILD_CORES --rm $img
-            fi
-          '';
-        }) { };
+          echo "${pkgs.stdenv.buildPlatform.system}" > $out/nix-support/system
+          if test -n "$compressImage"; then
+            echo "file sd-image $img.zst" >> $out/nix-support/hydra-build-products
+          else
+            echo "file sd-image $img" >> $out/nix-support/hydra-build-products
+          fi
+
+          truncate -s ${disk.imageSize} $img
+
+          ${formatScript}
+
+          ${config.sdImage.postBuildCommands}
+
+          if test -n "$compressImage"; then
+              zstd -T$NIX_BUILD_CORES --rm $img
+          fi
+        '';
+      }) { };
 
     boot.postBootCommands = lib.mkIf config.sdImage.expandOnBoot ''
       # On the first boot do some maintenance tasks

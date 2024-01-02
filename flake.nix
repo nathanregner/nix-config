@@ -24,8 +24,7 @@
       inputs.nixpkgs-stable.follows = "nixpkgs";
     };
     disko = {
-      # url = "github:nix-community/disko";
-      url = "/home/nregner/dev/github/disko";
+      url = "github:nix-community/disko";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     nix2container = {
