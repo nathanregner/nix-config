@@ -62,7 +62,14 @@
     nodePackages_latest.graphql-language-service-cli
     nodePackages_latest.typescript-language-server
     nodePackages_latest.prettier
-    prettierd
+    (prettierd.overrideAttrs {
+      src = fetchFromGitHub {
+        owner = "fsouza";
+        repo = "prettierd";
+        rev = "0d077fe55711bba2c6c6756a953cf04e5acce86c";
+        hash = "sha256-EQHnQo8NQLP1+2QmtmeV4t/b1yFmrwC6Fdoe69/QEAE=";
+      };
+    })
     stylua
     terraform-ls
   ];
