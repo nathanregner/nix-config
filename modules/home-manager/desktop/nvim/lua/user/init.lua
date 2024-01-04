@@ -4,6 +4,24 @@ require("lazy").setup({
   "tpope/vim-fugitive",
   "tpope/vim-rhubarb",
 
+  -- {
+  --   "akinsho/git-conflict.nvim",
+  --   version = "*",
+  --   config = true,
+  -- },
+
+  -- https://github.com/sindrets/diffview.nvim#configuration
+  {
+    "sindrets/diffview.nvim",
+    opts = {
+      view = {
+        merge_tool = {
+          layout = "diff3_mixed",
+        },
+      },
+    },
+  },
+
   -- Detect tabstop and shiftwidth automatically
   "tpope/vim-sleuth",
 
@@ -97,9 +115,6 @@ require("lazy").setup({
 
   -- Useful plugin to show you pending keybinds.
   "folke/which-key.nvim",
-
-  -- https://github.com/lewis6991/gitsigns.nvim
-  "sindrets/diffview.nvim",
 
   -- https://github.com/mbbill/undotree#configuration
   {

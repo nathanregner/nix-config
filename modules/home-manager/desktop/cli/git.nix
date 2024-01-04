@@ -1,4 +1,4 @@
-{ inputs, config, pkgs, ... }: {
+{ inputs, outputs, config, pkgs, lib, ... }: {
   programs.git = {
     enable = true;
     userName = "Nathan Regner";
@@ -6,8 +6,11 @@
     lfs.enable = true;
     extraConfig = {
       push = { autoSetupRemote = true; };
-      # use difftastic as difftool: https://difftastic.wilfred.me.uk/git.html
-      diff.tool = "difftastic";
+      diff = {
+        # use difftastic as difftool: https://difftastic.wilfred.me.uk/git.html
+        tool = lib.mkDefault "difftastic";
+        algorithm = "histogram";
+      };
       difftool = {
         prompt = false;
         difftastic.cmd = ''difft "$LOCAL" "$REMOTE"'';

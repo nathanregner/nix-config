@@ -36,10 +36,18 @@
     ];
   };
 
+  # https://github.com/sindrets/diffview.nvim/issues/324
   programs.git.extraConfig = {
-    merge = { tool = "vimdiff"; };
-    mergetool.vimdiff = {
-      cmd = "nvim -d $LOCAL $REMOTE $MERGED -c '$wincmd w' -c 'wincmd J'";
+    diff.tool = "nvim";
+    difftool = {
+      prompt = false;
+      nvim.cmd = ''nvim -d \"$LOCAL\" \"$REMOTE\" -c \"DiffviewOpen\"'';
+    };
+    merge = { tool = "nvim"; };
+    mergetool = {
+      propmt = false;
+      keepBackup = false;
+      nvim.cmd = ''nvim -n -c "DiffviewOpen" "$MERGE"'';
     };
   };
 
