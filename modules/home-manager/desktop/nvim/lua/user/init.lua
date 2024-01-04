@@ -628,6 +628,7 @@ require("which-key").register({
 local servers = {
   clojure_lsp = {},
   gopls = {},
+  graphql = {},
   html = { filetypes = { "html", "twig", "hbs" } },
   nil_ls = {},
   rust_analyzer = {
