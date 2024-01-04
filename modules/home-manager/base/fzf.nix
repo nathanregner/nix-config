@@ -1,21 +1,16 @@
 {
-  programs.fzf = {
+  programs.fzf = rec {
     enable = true;
     enableZshIntegration = true;
-    # https://github.com/catppuccin/fzf
-    colors = {
-      "bg" = "#1e1e2e";
-      "bg+" = "#313244";
-      "fg" = "#cdd6f4";
-      "fg+" = "#cdd6f4";
-      "header" = "#f38ba8";
-      "hl" = "#f38ba8";
-      "hl+" = "#f38ba8";
-      "info" = "#cba6f7";
-      "marker" = "#f5e0dc";
-      "pointer" = "#f5e0dc";
-      "prompt" = "#cba6f7";
-      "spinner" = "#f5e0dc";
-    };
+    # https://github.com/sharkdp/fd#using-fd-with-fzf
+    defaultCommand = "fd --hidden --follow --exclude .git --color=always";
+    fileWidgetCommand = defaultCommand;
+    defaultOptions = [
+      "--ansi"
+      # https://github.com/catppuccin/fzf
+      "--color=bg+:#313244,bg:#1e1e2e,spinner:#f5e0dc,hl:#f38ba8"
+      "--color=fg:#cdd6f4,header:#f38ba8,info:#cba6f7,pointer:#f5e0dc"
+      "--color=marker:#f5e0dc,fg+:#cdd6f4,prompt:#cba6f7,hl+:#f38ba8"
+    ];
   };
 }
