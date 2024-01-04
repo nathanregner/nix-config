@@ -3,7 +3,7 @@
     enable = true;
     enableZshIntegration = true;
     # https://github.com/sharkdp/fd#using-fd-with-fzf
-    defaultCommand = "fd --hidden --follow --exclude .git --color=always";
+    defaultCommand = "fd --hidden --follow --exclude .git";
     fileWidgetCommand = defaultCommand;
     defaultOptions = [
       "--ansi"
