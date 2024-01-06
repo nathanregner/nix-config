@@ -14,6 +14,8 @@
     (oldAttrs: { nativeCheckInputs = [ ]; })).overrideAttrs
     (oldAttrs: { doInstallCheck = false; });
 
+  mainsail-develop = pkgs.callPackage ./mainsail.nix { inherit inputs; };
+
   prepare-sd-card = pkgs.writeShellApplication {
     name = "prepare-sd-card";
     runtimeInputs = with pkgs; [ gnutar zstd ];

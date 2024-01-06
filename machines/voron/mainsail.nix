@@ -1,5 +1,8 @@
 { pkgs, ... }: {
-  services.mainsail = { enable = true; };
+  services.mainsail = {
+    package = pkgs.mainsail-develop;
+    enable = true;
+  };
   services.nginx = { clientMaxBodySize = "1G"; };
 
   systemd.services.ustreamer = {
