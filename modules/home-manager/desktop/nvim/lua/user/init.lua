@@ -612,6 +612,7 @@ local servers = {
   graphql = {},
   html = { filetypes = { "html", "twig", "hbs" } },
   nil_ls = {},
+  nushell = { filetypes = { "nu" } },
   rust_analyzer = {
     -- https://rust-analyzer.github.io/manual.html#configuration
     ["rust-analyzer"] = {

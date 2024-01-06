@@ -23,12 +23,15 @@
       # diffview-nvim
 
       # file type/syntax highlighting
-      # (let plugin = nvim-treesitter;
-      # in plugin.withAllGrammars.overrideAttrs (prev: {
-      #   passthru.dependencies = prev.passthru.dependencies
-      #     ++ [ (plugin.passthru.grammarToPlugin pkgs.tree-sitter-nu) ];
-      # }))
-      nvim-treesitter.withAllGrammars
+      (let plugin = nvim-treesitter;
+      in plugin.withAllGrammars.overrideAttrs (prev: {
+        passthru.dependencies = prev.passthru.dependencies ++ [
+          (plugin.passthru.grammarToPlugin
+            pkgs.unstable.tree-sitter-grammars.tree-sitter-nu)
+        ];
+      }))
+      # nvim-treesitter.withAllGrammars
+      # tree-sitter-grammars.tree-sitter-nu
       vim-nix
 
       # formatting
