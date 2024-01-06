@@ -10,7 +10,7 @@
       };
       history = { };
       # required by KAMP
-      file_manager.enable_object_processing = true;
+      file_manager.enable_object_processing = "True";
     };
   };
 
