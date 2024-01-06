@@ -77,6 +77,10 @@
       url = "github:kyleisah/Klipper-Adaptive-Meshing-Purging";
       flake = false;
     };
+    mainsail = {
+      url = "github:nathanregner/mainsail/develop";
+      flake = false;
+    };
   };
 
   outputs =
