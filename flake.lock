@@ -381,6 +381,23 @@
         "type": "github"
       }
     },
+    "mainsail": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1704578074,
+        "narHash": "sha256-TJHKzZKh8H69bvE8dGOd6NVccdJH3OkZhO4YHE3WN3g=",
+        "owner": "nathanregner",
+        "repo": "mainsail",
+        "rev": "5b837d0a51fa431c781f369ecc17ded2f7324af8",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nathanregner",
+        "ref": "develop",
+        "repo": "mainsail",
+        "type": "github"
+      }
+    },
     "mealie": {
       "inputs": {
         "flakelight": "flakelight",
@@ -674,6 +691,7 @@
         "kamp": "kamp",
         "linux-rockchip": "linux-rockchip",
         "mac-app-util": "mac-app-util",
+        "mainsail": "mainsail",
         "mealie": "mealie",
         "nix-darwin": "nix-darwin",
         "nix-index-database": "nix-index-database",
