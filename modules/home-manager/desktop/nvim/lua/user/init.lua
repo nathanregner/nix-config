@@ -626,6 +626,7 @@ local servers = {
   },
   terraformls = {},
   tsserver = {},
+  volar = {},
 
   lua_ls = {
     Lua = {

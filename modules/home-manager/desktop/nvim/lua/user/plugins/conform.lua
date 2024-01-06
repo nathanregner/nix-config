@@ -33,6 +33,7 @@ return {
       nix = { "nixfmt" },
       rust = { "rustfmt" },
       terraform = { "terraform_fmt" },
+      vue = { "prettierd" },
       yaml = { "prettierd" },
 
       -- all filetypes

@@ -64,6 +64,9 @@
     nixd
     nodePackages_latest.graphql-language-service-cli
     nodePackages_latest.typescript-language-server
+    nodePackages_latest.volar
+    terraform-ls
+
     nodePackages_latest.prettier
     (prettierd.overrideAttrs {
       src = fetchFromGitHub {
@@ -74,6 +77,5 @@
       };
     })
     stylua
-    terraform-ls
   ];
 }
