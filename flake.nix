@@ -73,6 +73,10 @@
       url = "github:nathanregner/orangepi-nix";
       # inputs.nixpkgs.follows = "nixpkgs";
     };
+    kamp = {
+      url = "github:kyleisah/Klipper-Adaptive-Meshing-Purging";
+      flake = false;
+    };
   };
 
   outputs =

@@ -308,6 +308,22 @@
         "type": "github"
       }
     },
+    "kamp": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1699016388,
+        "narHash": "sha256-LZmGNkKe1RUTe2kN2cF0CamPEsTjjv6sf4ErluSmA1A=",
+        "owner": "kyleisah",
+        "repo": "Klipper-Adaptive-Meshing-Purging",
+        "rev": "3eca87b784895ec7d8679f5dae56f1ffa975552b",
+        "type": "github"
+      },
+      "original": {
+        "owner": "kyleisah",
+        "repo": "Klipper-Adaptive-Meshing-Purging",
+        "type": "github"
+      }
+    },
     "linux-orangepi-sun50iw9": {
       "flake": false,
       "locked": {
@@ -655,6 +671,7 @@
         "catppuccin-papirus-folders": "catppuccin-papirus-folders",
         "disko": "disko",
         "home-manager": "home-manager",
+        "kamp": "kamp",
         "linux-rockchip": "linux-rockchip",
         "mac-app-util": "mac-app-util",
         "mealie": "mealie",

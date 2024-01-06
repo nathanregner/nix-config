@@ -3,7 +3,10 @@
     enable = true;
     user = "moonraker";
     group = "moonraker";
-    configFile = ./printer.cfg;
+    configFile = pkgs.writeText "printer.cfg" ''
+      [include /etc/klipper/printer.cfg]
+    '';
+    mutableConfig = true;
     firmwares = {
       mcu = {
         enable = true;
@@ -12,6 +15,14 @@
           "/dev/serial/by-id/usb-Klipper_stm32f446xx_450016000450335331383520-if00";
       };
     };
+  };
+
+  environment.etc = {
+    "klipper/KAMP".source = "${inputs.kamp}/Configuration";
+    "klipper/printer.cfg".source = pkgs.writeText "printer.immutable.cfg" ''
+      [include ${./printer.cfg}]
+      [include ${./kamp.cfg}]
+    '';
   };
 
   # restart Klipper when printer is powerd on

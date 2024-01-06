@@ -9,6 +9,8 @@
         trusted_clients = [ "127.0.0.0/8" "::1/128" ];
       };
       history = { };
+      # required by KAMP
+      file_manager.enable_object_processing = true;
     };
   };
 
