@@ -20,16 +20,6 @@
         speedFactor = 2;
       }
       {
-        hostName = "sagittarius";
-        protocol = "ssh";
-        sshUser = "nregner";
-        system = "x86_64-linux";
-        supportedFeatures = [ "nixos-test" "benchmark" "big-parallel" "kvm" ];
-        mandatoryFeatures = [ ];
-        maxJobs = 10;
-        speedFactor = 1;
-      }
-      {
         hostName = "m3-linux-builder";
         protocol = "ssh";
         sshUser = "root";
