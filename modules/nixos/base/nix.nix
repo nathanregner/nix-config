@@ -36,4 +36,6 @@
     PATH=$PATH:${lib.makeBinPath [ pkgs.nvd config.nix.package ]}
     nvd diff $(ls -dv /nix/var/nix/profiles/system-*-link | tail -2)
   '';
+
+  environment.systemPackages = [ config.nix.package ];
 }
