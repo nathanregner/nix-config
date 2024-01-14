@@ -22,6 +22,7 @@ in
         "docker"
         "libvirtd"
         "networkmanager"
+        "video"
       ];
     openssh.authorizedKeys.keys = builtins.attrValues self.globals.ssh.userKeys.nregner;
   };
