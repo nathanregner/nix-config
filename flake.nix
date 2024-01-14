@@ -81,6 +81,10 @@
       url = "github:nathanregner/mainsail/develop";
       flake = false;
     };
+    rockchip-mpp = {
+      url = "github:rockchip-linux/mpp/develop";
+      flake = false;
+    };
   };
 
   outputs =

@@ -679,6 +679,23 @@
         "type": "github"
       }
     },
+    "rockchip-mpp": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1705027044,
+        "narHash": "sha256-81gUwHqPLloW7ijoR+B7OQuPLluspoprPwrkoBfsdOg=",
+        "owner": "rockchip-linux",
+        "repo": "mpp",
+        "rev": "0e03d3bc704da949da044519c32ecf9b6e09de09",
+        "type": "github"
+      },
+      "original": {
+        "owner": "rockchip-linux",
+        "ref": "develop",
+        "repo": "mpp",
+        "type": "github"
+      }
+    },
     "root": {
       "inputs": {
         "attic": "attic",
@@ -699,6 +716,7 @@
         "nixpkgs": "nixpkgs_2",
         "nixpkgs-unstable": "nixpkgs-unstable",
         "orangepi-nix": "orangepi-nix",
+        "rockchip-mpp": "rockchip-mpp",
         "sops-nix": "sops-nix"
       }
     },

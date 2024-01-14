@@ -34,9 +34,10 @@
       echo "$tmp"
     '';
   };
-}
 
-// {
+  rockchip-mpp = pkgs.unstable.callPackage ./mpp.nix { inherit inputs; };
+  gst-plugins-good = pkgs.unstable.gst_all_1.gst-plugins-good;
+} // {
   inherit (pkgs.unstable.callPackage ../machines/print-farm/klipper/firmware
     { })
     klipper-flash-sunlu-s8;
