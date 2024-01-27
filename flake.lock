@@ -460,6 +460,28 @@
         "type": "github"
       }
     },
+    "preprocess-cancellation": {
+      "inputs": {
+        "flake-utils": "flake-utils_4",
+        "nixpkgs": [
+          "nixpkgs-unstable"
+        ],
+        "rust-overlay": "rust-overlay"
+      },
+      "locked": {
+        "lastModified": 1706413533,
+        "narHash": "sha256-YFt/psbloXe1HUi/ZUd+j/Xu4hY0Vk/LAg5SoYCojhI=",
+        "owner": "nathanregner",
+        "repo": "preprocess_cancellation",
+        "rev": "8706f406af0106c735e1d4734a3c0c9b8377d593",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nathanregner",
+        "repo": "preprocess_cancellation",
+        "type": "github"
+      }
+    },
     "root": {
       "inputs": {
         "catppuccin-nix": "catppuccin-nix",
@@ -481,6 +503,28 @@
         "orangepi-nix": "orangepi-nix",
         "sops-nix": "sops-nix",
         "treefmt-nix": "treefmt-nix"
+      }
+    },
+    "rust-overlay": {
+      "inputs": {
+        "flake-utils": "flake-utils_5",
+        "nixpkgs": [
+          "preprocess-cancellation",
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1706235145,
+        "narHash": "sha256-3jh5nahTlcsX6QFcMPqxtLn9p9CgT9RSce5GLqjcpi4=",
+        "owner": "oxalica",
+        "repo": "rust-overlay",
+        "rev": "3a57c4e29cb2beb777b2e6ae7309a680585b8b2f",
+        "type": "github"
+      },
+      "original": {
+        "owner": "oxalica",
+        "repo": "rust-overlay",
+        "type": "github"
       }
     },
     "sops-nix": {
