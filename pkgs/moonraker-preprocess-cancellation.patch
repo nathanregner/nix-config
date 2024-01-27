@@ -1,0 +1,37 @@
+diff --git a/moonraker/components/file_manager/metadata.py b/moonraker/components/file_manager/metadata.py
+index 5fed236..1cb4c57 100644
+--- a/moonraker/components/file_manager/metadata.py
++++ b/moonraker/components/file_manager/metadata.py
+@@ -939,16 +939,12 @@ SUPPORTED_DATA = [
+     'thumbnails']
+
+ def process_objects(file_path: str, slicer: BaseSlicer, name: str) -> bool:
+-    try:
+-        from preprocess_cancellation import (
+-            preprocess_slicer,
+-            preprocess_cura,
+-            preprocess_ideamaker,
+-            preprocess_m486
+-        )
+-    except ImportError:
+-        logger.info("Module 'preprocess-cancellation' failed to load")
+-        return False
++    from preprocess_cancellation import (
++        preprocess_slicer,
++        preprocess_cura,
++        preprocess_ideamaker,
++        preprocess_m486
++    )
+     fname = os.path.basename(file_path)
+     logger.info(
+         f"Performing Object Processing on file: {fname}, "
+@@ -973,8 +969,7 @@ def process_objects(file_path: str, slicer: BaseSlicer, name: str) -> bool:
+                             "not supported"
+                         )
+                         return False
+-                    for line in processor(in_file):
+-                        out_file.write(line)
++                    processor(in_file, out_file):
+                 except Exception as e:
+                     logger.info(f"Object processing failed: {e}")
+                     return False
