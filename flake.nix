@@ -80,6 +80,10 @@
       url = "github:nathanregner/orangepi-nix";
       # inputs.nixpkgs.follows = "nixpkgs";
     };
+    preprocess-cancellation = {
+      url = "github:nathanregner/preprocess_cancellation";
+      inputs.nixpkgs.follows = "nixpkgs-unstable";
+    };
   };
 
   outputs =

@@ -1,8 +1,8 @@
-{ config, ... }: {
+{ config, pkgs, ... }: {
   services.moonraker = {
     enable = true;
+    package = pkgs.moonraker-develop;
     allowSystemControl = true;
-
     settings = {
       authorization = {
         cors_domains =
@@ -23,7 +23,4 @@
 
   # required for allowSystemControl
   security.polkit.enable = true;
-
-  # use bleeding edge
-  nixpkgs.overlays = [ (final: prev: { inherit (final.unstable) moonraker; }) ];
 }

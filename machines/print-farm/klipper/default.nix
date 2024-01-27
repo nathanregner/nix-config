@@ -19,9 +19,6 @@ in {
   };
 
   config = lib.mkIf cfg.enable {
-    nixpkgs.overlays =
-      [ (final: prev: { inherit (final.unstable) moonraker klipper; }) ];
-
     networking.firewall = let ports = [ 80 81 7125 ];
     in {
       allowedTCPPorts = ports;
@@ -31,6 +28,7 @@ in {
     # klipper
     services.klipper = {
       enable = true;
+      package = pkgs.unstable.klipper;
       user = "moonraker";
       group = "moonraker";
       configFile = pkgs.writeText "printer.cfg" ''
@@ -55,6 +53,7 @@ in {
     # moonraker
     services.moonraker = {
       enable = true;
+      package = pkgs.moonraker-develop;
       allowSystemControl = true;
       address = "0.0.0.0";
       settings = {

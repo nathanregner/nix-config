@@ -16,6 +16,20 @@
 
   mainsail-develop = pkgs.callPackage ./mainsail.nix { inherit inputs; };
 
+  moonraker-develop = (pkgs.unstable.moonraker.override (prev: rec {
+    python3 = prev.python3.override {
+      packageOverrides = self: super:
+        let
+          preprocess-cancellation =
+            inputs.preprocess-cancellation.packages.${pkgs.stdenv.hostPlatform.system}.default;
+        in assert prev.python3.pkgs.hasPythonModule preprocess-cancellation; {
+          inherit preprocess-cancellation;
+        };
+      self = python3;
+    };
+  })).overrideAttrs
+    (oldAttrs: { patches = [ ./moonraker-preprocess-cancellation.patch ]; });
+
   prepare-sd-card = pkgs.writeShellApplication {
     name = "prepare-sd-card";
     runtimeInputs = with pkgs; [ gnutar zstd ];
