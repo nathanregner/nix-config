@@ -23,10 +23,6 @@
   boot.supportedFilesystems =
     lib.mkForce [ "vfat" "fat32" "exfat" "ext4" "btrfs" ];
 
-  users.users.root = {
-    password = "root"; # ssh password auth disabled, so whatever :)
-  };
-
   virtualisation.docker = {
     enable = true;
     package = pkgs.unstable.docker_24;

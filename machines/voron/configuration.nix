@@ -1,4 +1,4 @@
-{ inputs, lib, modulesPath, pkgs, ... }: {
+{ inputs, modulesPath, config, lib, pkgs, ... }: {
   imports = [
     "${modulesPath}/installer/sd-card/sd-image-aarch64.nix"
     "${modulesPath}/profiles/minimal.nix"
@@ -16,10 +16,6 @@
 
   time.timeZone = "America/Boise";
 
-  users.users.root = {
-    password = "root"; # ssh password auth disabled, so whatever :)
-  };
-
   boot = {
     kernelPackages = pkgs.linuxPackagesFor
       (pkgs.callPackage ./kernel { src = inputs.linux-rockchip; });
@@ -33,6 +29,8 @@
 
     initrd.includeDefaultModules = false;
   };
+
+  environment.systemPackages = [ config.boot.kernelPackages.perf ];
 
   powerManagement.cpuFreqGovernor = "ondemand";
 

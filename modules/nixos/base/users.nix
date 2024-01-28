@@ -1,18 +1,18 @@
-{ config, ... }:
+{ config, lib, ... }:
 let
   ifTheyExist = groups:
     builtins.filter (group: builtins.hasAttr group config.users.groups) groups;
 in {
-  users = {
-    mutableUsers = true;
-    users.nregner = {
-      isNormalUser = true;
-      extraGroups = [ "wheel" "dialout" ]
-        ++ ifTheyExist [ "docker" "libvirtd" "networkmanager" ];
-      openssh.authorizedKeys.keys = [
-        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDk7uVEehfyhAZUvZbvH5Kw85MzLyYqVdTOMBXsmBeLx"
-      ];
-    };
+  users.users.root.password = "root";
+  services.openssh.settings.PasswordAuthentication = lib.mkForce false;
+
+  users.users.nregner = {
+    isNormalUser = true;
+    extraGroups = [ "wheel" "dialout" ]
+      ++ ifTheyExist [ "docker" "libvirtd" "networkmanager" ];
+    openssh.authorizedKeys.keys = [
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDk7uVEehfyhAZUvZbvH5Kw85MzLyYqVdTOMBXsmBeLx"
+    ];
   };
 
   nix.settings.trusted-users = [ "nregner" ];

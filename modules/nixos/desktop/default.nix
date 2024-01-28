@@ -1,1 +1,4 @@
-{ imports = [ ../base ./nix.nix ]; }
+{
+  imports = [ ../base ./nix.nix ];
+  users.mutableUsers = true;
+}
