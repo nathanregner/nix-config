@@ -4,7 +4,7 @@ index 5fed236..1cb4c57 100644
 +++ b/moonraker/components/file_manager/metadata.py
 @@ -939,16 +939,12 @@ SUPPORTED_DATA = [
      'thumbnails']
- 
+
  def process_objects(file_path: str, slicer: BaseSlicer, name: str) -> bool:
 -    try:
 -        from preprocess_cancellation import (
@@ -31,7 +31,7 @@ index 5fed236..1cb4c57 100644
                          return False
 -                    for line in processor(in_file):
 -                        out_file.write(line)
-+                    processor(in_file, out_file):
++                    processor(in_file, out_file)
                  except Exception as e:
                      logger.info(f"Object processing failed: {e}")
                      return False
