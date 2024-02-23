@@ -58,6 +58,13 @@
 
   zramSwap.enable = true;
 
+  # https://nixos.wiki/wiki/CCache#Derivation_CCache_2
+  # man tmpfiles.d
+  programs.ccache.enable = true;
+  nix.settings.extra-sandbox-paths = [ config.programs.ccache.cacheDir ];
+  systemd.tmpfiles.rules =
+    [ "d ${config.programs.ccache.cacheDir} 0770 root nixbld" ];
+
   environment.systemPackages = [
     config.boot.kernelPackages.perf
     pkgs.virt-manager
