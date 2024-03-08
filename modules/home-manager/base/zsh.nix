@@ -20,17 +20,18 @@
     shellAliases =
       let
         nixRebuild = if pkgs.stdenv.isDarwin then "darwin-rebuild" else "nixos-rebuild";
+        flakeRef = ''"git+file://$(pwd)?submodules=1"'';
       in
       rec {
         jqless = "jq -C | less -r";
 
-        nr = "${nixRebuild} --flake .";
+        nr = "${nixRebuild} --flake ${flakeRef}";
         nrb = "${nr} build";
         snr = "sudo ${nr}";
         snrs = "sudo ${nr} switch";
         snrt = "sudo ${nr} test";
 
-        hm = "home-manager --flake .";
+        hm = "home-manager --flake ${flakeRef}";
         hmb = "${hm} build";
         hms = "${hm} switch";
 
