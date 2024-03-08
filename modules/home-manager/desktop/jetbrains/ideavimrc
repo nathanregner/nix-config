@@ -5,6 +5,7 @@ set number relativenumber
 
 set ideajoin
 set incsearch
+set ic
 set smartcase
 set surround
 
@@ -28,6 +29,12 @@ nnoremap <leader>ca :action ShowIntentionActions<CR>
 noremap gcc :action CommentByLineComment<CR>
 " nnoremap <C-q> :action FindUsages<CR>
 
+" Editing
+nnoremap <leader>ca :action ShowIntentionActions<CR>
+noremap gcc :action CommentByLineComment<CR>
+vnoremap v :action EditorSelectWord<CR>
+vnoremap V :action EditorUnSelectWord<CR>
+
 " nnoremap ]C :action Diff.NextChange<CR>
 " nnoremap [C :action Diff.PreviousChange<CR>
 " map <Tab> :action Diff.NextChange<CR>
@@ -37,3 +44,4 @@ nnoremap hr :action Vcs.RollbackChangedLines<CR>
 
 " Debugging
 nnoremap <leader>b :action ToggleLineBreakpoint<CR>
+
