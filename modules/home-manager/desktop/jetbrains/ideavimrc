@@ -38,8 +38,8 @@ nnoremap <leader>rn :action RenameElement<CR>
 " Navigation
 nnoremap ]c :action VcsShowNextChangeMarker<CR>
 nnoremap [c :action VcsShowPrevChangeMarker<CR>
-nnoremap ]c :action NextDiff<CR>
-nnoremap [c :action PreviousDiff<CR>
+" nnoremap ]c :action NextDiff<CR>
+" nnoremap [c :action PreviousDiff<CR>
 nnoremap ]d :action GotoNextError<CR>
 nnoremap [d :action GotoPreviousError<CR>
 nnoremap <leader>ft :action SelectInProjectView<CR>

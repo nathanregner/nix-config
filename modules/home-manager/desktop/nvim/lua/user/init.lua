@@ -27,6 +27,38 @@ require("lazy").setup({
   },
 
   {
+    "mfussenegger/nvim-jdtls",
+    ft = { "java" },
+    config = function()
+      local project_name = vim.fn.fnamemodify(vim.fn.getcwd(), ":p:h:t")
+      local workspace_dir = "/tmp/workspace/" .. project_name
+      local config = {
+        cmd = { "jdtls", "-data", workspace_dir },
+        root_dir = vim.fs.dirname(vim.fs.find({ "gradlew", ".git", "mvnw" }, { upward = true })[1]),
+        settiings = {
+          java = {
+            home = vim.g.java_home,
+            configuration = {
+              -- runtimes = vim.g.java_runtimes,
+              runtimes = {
+                {
+                  name = "JavaSE-11",
+                  path = "/nix/store/s57xi82dq9a3vwrdxdpkp15ywmdhpsi6-zulu-ca-jdk-11.0.22",
+                },
+                {
+                  name = "JavaSE-17",
+                  path = "/nix/store/kfmkczf4h268yax8bg5nlyapbms6zcav-zulu-ca-jdk-17.0.10",
+                },
+              },
+            },
+          },
+        },
+      }
+      require("jdtls").start_or_attach(config)
+    end,
+  },
+
+  {
     "/chentoast/marks.nvim",
     config = true,
   },

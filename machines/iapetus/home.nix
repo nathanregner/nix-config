@@ -44,7 +44,7 @@
     nixfmt
     nix-du # nix-du -s=500MB | xdot -
     hydra-cli
-    pkgs.xdot-darwin
+    xdot
 
     # rc
     betaflight-configurator

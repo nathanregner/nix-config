@@ -5,6 +5,17 @@
     extraConfig = builtins.readFile ./init.vim;
     extraLuaConfig = ''
       vim.g.copilot_node_command = '${pkgs.unstable.nodejs_20}/bin/node'
+      vim.g.java_home = '${pkgs.jdk21_headless}'
+      vim.g.java_runtimes = {
+        {
+          name = "JavaSE-11",
+          path = "${pkgs.jdk11_headless}",
+        },
+        {
+          name = "JavaSE-17",
+          path = "${pkgs.jdk17_headless}",
+        },
+      }
       require('user')
     '';
 
@@ -61,4 +72,17 @@
     loadingText = "opening diffview.nvim";
     subprocess = true;
   }];
+
+  home.packages = [
+    (pkgs.unstable.jdt-language-server.overrideAttrs rec {
+      version = "1.30.0";
+      src = let timestamp = "202311301503";
+      in pkgs.unstable.fetchurl {
+        url =
+          "https://download.eclipse.org/jdtls/milestones/${version}/jdt-language-server-${version}-${timestamp}.tar.gz";
+        hash = "sha256-V5gJ8n319OU1ZiF/cnP6Jc1Foi04cMCq/U+EzdTJes0=";
+      };
+    })
+  ];
+
 }

@@ -64,4 +64,16 @@
       go generate ./...
     '';
   });
+
+  jdtls = pkgs.unstable.jdt-language-server.overrideAttrs {
+    pname = "jdtls";
+    version = "v1.33.0";
+    src = pkgs.unstable.fetchFromGitHub {
+      owner = "eclipse-jdtls";
+      repo = "eclipse.jdt.ls";
+      rev = "v1.33.0";
+      fetchSubmodules = false;
+      sha256 = "sha256-wChyVZ3tY/rTemZYmfdsedRZFL6Y0RGyEvzyIp3HEgk=";
+    };
+  };
 }

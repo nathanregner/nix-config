@@ -14,6 +14,11 @@
       ];
     });
 
+    # disable xvfb-run tests
+    xdot = (prev.xdot.overridePythonAttrs
+      (oldAttrs: { nativeCheckInputs = [ ]; })).overrideAttrs
+      (oldAttrs: { doInstallCheck = false; });
+
     # FIXME: hack to bypass "FATAL: Module ahci not found" error
     # https://github.com/NixOS/nixpkgs/issues/154163#issuecomment-1350599022
     makeModulesClosure = x:
