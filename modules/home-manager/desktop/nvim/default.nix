@@ -17,6 +17,21 @@
             };
             settings = {
               java = {
+                home = "${pkgs.jdk21_headless}";
+                configuration.runtimes = [
+                  {
+                    name = "JavaSE-11";
+                    path = "${pkgs.jdk11_headless}";
+                  }
+                  {
+                    name = "JavaSE-17";
+                    path = "${pkgs.jdk17_headless}";
+                  }
+                  {
+                    name = "JavaSE-21";
+                    path = "${pkgs.jdk21_headless}";
+                  }
+                ];
                 format.settings.url = "file://${config.xdg.configHome}/nvim/lsp/jdtls/formatter.xml";
               };
             };
@@ -74,7 +89,6 @@
   ];
 
   xdg.configFile = {
-    "nvim/lua".source = config.lib.file.mkFlakeSymlink ./lua;
     "nvim/after".source = config.lib.file.mkFlakeSymlink ./after;
     "nvim/lazy-lock.json".source = config.lib.file.mkFlakeSymlink ./lazy-lock.json;
     "nvim/lsp".source = config.lib.file.mkFlakeSymlink ./lsp;
