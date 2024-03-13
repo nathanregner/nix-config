@@ -67,6 +67,11 @@ require("lazy").setup({
     config = true,
   },
 
+  {
+    "mfussenegger/nvim-jdtls",
+    ft = { "java" },
+  },
+
   -- {
   --   "NeogitOrg/neogit",
   --   dependencies = {
