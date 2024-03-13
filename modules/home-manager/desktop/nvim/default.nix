@@ -6,6 +6,17 @@
     extraConfig = builtins.readFile ./init.vim;
     extraLuaConfig = ''
       vim.g.copilot_node_command = '${pkgs.unstable.nodejs_20}/bin/node'
+      vim.g.java_home = '${pkgs.jdk21_headless}'
+      vim.g.java_runtimes = {
+        {
+          name = "JavaSE-11",
+          path = "${pkgs.jdk11_headless}",
+        },
+        {
+          name = "JavaSE-17",
+          path = "${pkgs.jdk17_headless}",
+        },
+      }
       require('user')
     '';
 
