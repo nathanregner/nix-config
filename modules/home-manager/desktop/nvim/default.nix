@@ -6,9 +6,26 @@
     enable = true;
     defaultEditor = true;
     extraConfig = builtins.readFile ./init.vim;
-    extraLuaConfig = ''
-      require('user')
-    '';
+    extraLuaConfig =
+      let
+        globals = {
+          jdtls = {
+            lombok = pkgs.fetchurl {
+              url = "https://repo1.maven.org/maven2/org/projectlombok/lombok/1.18.36/lombok-1.18.36.jar";
+              sha256 = "sha256-c7awW2otNltwC6sI0w+U3p0zZJC8Cszlthgf70jL8Y4=";
+            };
+            settings = {
+              java = {
+                format.settings.url = "file://${config.xdg.configHome}/nvim/lsp/jdtls/formatter.xml";
+              };
+            };
+          };
+        };
+      in
+      ''
+        vim.g.nix = vim.fn.json_decode('${builtins.toJSON globals}')
+        require('user')
+      '';
 
     plugins = with pkgs.unstable.vimPlugins; [ lazy-nvim ];
 
@@ -21,6 +38,7 @@
       graphql-language-service-cli
       harper-ls
       helm-ls
+      jdt-language-server
       libclang
       lua-language-server
       nil
@@ -55,9 +73,10 @@
   ];
 
   xdg.configFile = {
-    "nvim/lua".source = config.lib.file.mkFlakeSymlink ./lua;
     "nvim/after".source = config.lib.file.mkFlakeSymlink ./after;
     "nvim/lazy-lock.json".source = config.lib.file.mkFlakeSymlink ./lazy-lock.json;
+    "nvim/lsp".source = config.lib.file.mkFlakeSymlink ./lsp;
+    "nvim/lua".source = config.lib.file.mkFlakeSymlink ./lua;
   };
 
   programs.zsh.shellAliases.vimdiff = "nvim -d";
