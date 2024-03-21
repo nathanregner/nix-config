@@ -15,6 +15,14 @@
     sessionVariables = { TMPDIR = "/Volumes/tmp"; };
   };
 
+  programs.zsh.shellAliases = {
+    "vm-load" =
+      "sudo launchctl load -w /Library/LaunchDaemons/org.nixos.linux-builder.plist";
+    "vm-unload" =
+      "sudo launchctl load -w /Library/LaunchDaemons/org.nixos.linux-builder.plist";
+    "vm-logs" = "tail -f /var/log/darwin-builder.log";
+  };
+
   home.packages = with pkgs.unstable; [
     # apps
     rectangle
