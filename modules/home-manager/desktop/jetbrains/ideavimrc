@@ -9,6 +9,27 @@ set ic
 set smartcase
 set surround
 
+" https://github.com/JetBrains/ideavim/blob/master/doc/sethandler.md
+sethandler <C-A> a:vim
+sethandler <C-B> a:vim
+sethandler <C-D> a:vim
+sethandler <C-E> a:vim
+sethandler <C-F> a:vim
+sethandler <C-G> a:vim
+sethandler <C-H> a:vim
+sethandler <C-I> a:vim
+sethandler <C-J> a:vim
+sethandler <C-K> a:vim
+sethandler <C-M> a:vim
+sethandler <C-N> a:vim
+sethandler <C-O> a:vim
+sethandler <C-P> a:vim
+sethandler <C-Q> a:ide
+sethandler <C-R> a:vim
+sethandler <C-S> a:vim
+sethandler <C-T> a:vim
+sethandler <C-V> a:vim
+
 let mapleader = " "
 
 " Refactoring
@@ -38,9 +59,11 @@ vnoremap V :action EditorUnSelectWord<CR>
 " nnoremap ]C :action Diff.NextChange<CR>
 " nnoremap [C :action Diff.PreviousChange<CR>
 " map <Tab> :action Diff.NextChange<CR>
+nnoremap <leader>co :action Diff.ApplyLeftSide<CR>
+nnoremap <leader>ct :action Diff.ApplyRightSide<CR>
 
 " VCS
-nnoremap hr :action Vcs.RollbackChangedLines<CR>
+nnoremap <leader>hr :action Vcs.RollbackChangedLines<CR>
 
 " Debugging
 nnoremap <leader>b :action ToggleLineBreakpoint<CR>
