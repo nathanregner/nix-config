@@ -1,0 +1,11 @@
+<application>
+  <component name="ProjectManager">
+    <defaultProject>
+      <component name="PrettierConfiguration">
+        <option name="myConfigurationMode" value="AUTOMATIC" />
+        <option name="myRunOnSave" value="true" />
+      </component>
+      <component name="PropertiesComponent"><![CDATA[{}]]></component>
+    </defaultProject>
+  </component>
+</application>

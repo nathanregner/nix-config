@@ -1,0 +1,17 @@
+<templateSet group="JavaScript">
+  <template name="logv" value="console.log(&quot;$EXPR_COPY$ = &quot; + $EXPR$);" description="console.log()" toReformat="true" toShortenFQNames="true">
+    <variable name="EXPR_COPY" expression="" defaultValue="" alwaysStopAt="true" />
+    <variable name="EXPR" expression="" defaultValue="" alwaysStopAt="true" />
+    <context>
+      <option name="JS_STATEMENT" value="true" />
+      <option name="TS_STATEMENT" value="true" />
+    </context>
+  </template>
+  <template name="logp" value="console.log($FORMAT$)" description="console.log()" toReformat="true" toShortenFQNames="true">
+    <variable name="FORMAT" expression="" defaultValue="" alwaysStopAt="true" />
+    <context>
+      <option name="JS_STATEMENT" value="true" />
+      <option name="TS_STATEMENT" value="true" />
+    </context>
+  </template>
+</templateSet>
