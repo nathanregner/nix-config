@@ -23,6 +23,17 @@
         }"
       else
         path);
+
+    #     lib.file.mkFlakeSymlinkRec = (path:
+    #       assert lib.assertMsg (builtins.isPath path)
+    #         "Argument is of type ${builtins.typeOf path}, but a path was expected'";
+    #
+    # builtins.listToAttrs (
+    # builtins.map (path: {
+    # name = path;
+    # })
+    #         ( lib.listFilesRecursive path
+    #  ))
   };
 }
 
