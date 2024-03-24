@@ -12,9 +12,7 @@ use secrecy::SecretString;
 use serde_json::Value;
 use std::borrow::Cow;
 use tokio::net::TcpListener;
-
 use tower_http::trace::{DefaultMakeSpan, TraceLayer};
-
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
 #[tokio::main]

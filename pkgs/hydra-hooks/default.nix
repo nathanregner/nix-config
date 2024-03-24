@@ -23,7 +23,10 @@ let
     passthru.devenv = pkg.overrideAttrs (old: {
       nativeBuildInputs = old.nativeBuildInputs or [ ]
         ++ (with buildPackages; [ openapi-generator-cli rustfmt ]);
+
       env = old.env or { } // {
+        RUST_SRC_PATH = "${rustPlatform.rustLibSrc}";
+
         HYDRA_API = "${buildPackages.hydra_unstable.src}/hydra-api.yaml";
         GENERATE_HYDRA =
           "openapi-generator-cli generate -i $HYDRA_API -g rust -o hydra-client --library hyper";
