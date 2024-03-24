@@ -1,4 +1,4 @@
-use hydra_client::apis::{configuration::Configuration, default_api::api_push_put};
+use crate::hydra::apis::{configuration::Configuration, default_api::api_push_put};
 
 #[tokio::test]
 async fn hydra() {

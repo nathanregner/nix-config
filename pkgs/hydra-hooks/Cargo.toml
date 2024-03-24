@@ -7,13 +7,13 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-hydra-client.path = "./hydra-client"
 anyhow = "1.0.81"
 axum = { version = "0.7.5", features = ["ws", "http2", "macros"] }
 axum-extra = { version = "0.9.3", features = ["typed-header", "tracing"] }
 hex = "0.4.3"
 hmac = "0.12.1"
 listenfd = "1.0.1"
+reqwest = "0.12.1"
 secrecy = "0.8.0"
 serde = { version = "1.0.197", features = ["derive"] }
 serde_json = "1.0.114"
