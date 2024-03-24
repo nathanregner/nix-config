@@ -1,0 +1,32 @@
+diff --git a/direnvrc b/direnvrc
+index 50a84cf..266f391 100644
+--- a/direnvrc
++++ b/direnvrc
+@@ -272,7 +272,6 @@ use_flake() {
+   layout_dir=$(direnv_layout_dir)
+   profile="${layout_dir}/flake-profile$(_nix_argsum_suffix "$flake_expr")"
+   local profile_rc="${profile}.rc"
+-  local flake_inputs="${layout_dir}/flake-inputs/"
+ 
+   local need_update=0
+   local watches
+@@ -303,19 +302,6 @@ use_flake() {
+         _nix_add_gcroot "$tmp_profile" "$profile"
+         rm -f "$tmp_profile" "$tmp_profile"*
+ 
+-        # also add garbage collection root for source
+-        local flake_input_paths
+-        mkdir -p "$flake_inputs"
+-        flake_input_paths=$(_nix flake archive \
+-          --json --no-write-lock-file \
+-          "$flake_dir")
+-
+-        while [[ $flake_input_paths =~ /nix/store/[^\"]+ ]]; do
+-          local store_path="${BASH_REMATCH[0]}"
+-          _nix_add_gcroot "${store_path}" "${flake_inputs}/${store_path##*/}"
+-          flake_input_paths="${flake_input_paths/${store_path}/}"
+-        done
+-
+         _nix_direnv_info "renewed cache"
+       fi
+     fi

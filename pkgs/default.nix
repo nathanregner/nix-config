@@ -6,6 +6,7 @@
     nix-fast-build;
 
   gitea-github-mirror = pkgs.unstable.callPackage ./gitea-github-mirror { };
+  gitea-github-mirror2 = pkgs.unstable.callPackage ./gitea-github-mirror2 { };
 
   route53-ddns = pkgs.unstable.callPackage ./route53-ddns { };
 
@@ -64,4 +65,20 @@
       go generate ./...
     '';
   });
+
+  writeBabashkaApplication =
+    { name, text, runtimeInputs ? [ ], checkPhase ? null }:
+    let
+      inherit (pkgs.unstable)
+        babashka clj-kondo writeShellApplication writeText;
+      script = writeText "script.clj" text;
+    in writeShellApplication {
+      inherit name runtimeInputs;
+      text = ''
+        exec ${babashka}/bin/bb ${script} $@
+      '';
+      checkPhase = ''
+        ${clj-kondo}/bin/clj-kondo --config '{:linters {:namespace-name-mismatch {:level :off}}}' --lint ${script}
+      '';
+    };
 }
