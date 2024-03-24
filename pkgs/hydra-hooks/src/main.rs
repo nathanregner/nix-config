@@ -8,6 +8,7 @@ use axum::{
     Json, Router,
 };
 use listenfd::ListenFd;
+use secrecy::SecretString;
 use serde_json::Value;
 use std::borrow::Cow;
 use tokio::net::TcpListener;
@@ -32,7 +33,10 @@ async fn main() -> anyhow::Result<()> {
         // logging so we can see whats going on
         .route(
             "/webhook",
-            post(webhook).route_layer(middleware::from_fn(webhook::print_request_body)),
+            post(webhook).layer(middleware::from_fn_with_state(
+                SecretString::new("secret".to_string()),
+                webhook::validate_signature,
+            )),
         )
         .layer(TraceLayer::new_for_http().make_span_with(DefaultMakeSpan::default()));
 
