@@ -1,3 +1,6 @@
+[workspace]
+members = [ "hydra-client" ]
+
 [package]
 name = "hydra-builder"
 version = "0.1.0"
