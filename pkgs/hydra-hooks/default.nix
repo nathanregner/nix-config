@@ -25,11 +25,12 @@ let
         ++ (with buildPackages; [ openapi-generator-cli rustfmt ]);
 
       env = old.env or { } // {
+        LD_LIBRARY_PATH = lib.makeLibraryPath [ openssl ];
         RUST_SRC_PATH = "${rustPlatform.rustLibSrc}";
 
         HYDRA_API = "${buildPackages.hydra_unstable.src}/hydra-api.yaml";
         GENERATE_HYDRA =
-          "openapi-generator-cli generate -i $HYDRA_API -g rust -o hydra-client --library hyper";
+          "openapi-generator-cli generate -i $HYDRA_API -g rust -o hydra-client --library reqwest";
 
         GH_API = fetchgit {
           url = "https://github.com/github/rest-api-description";

@@ -7,6 +7,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+hydra-client.path = "./hydra-client"
 anyhow = "1.0.81"
 axum = { version = "0.7.5", features = ["ws", "http2", "macros"] }
 axum-extra = { version = "0.9.3", features = ["typed-header", "tracing"] }
