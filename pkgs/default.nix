@@ -9,6 +9,8 @@
 
   route53-ddns = pkgs.unstable.callPackage ./route53-ddns { };
 
+  hydra-hooks = pkgs.unstable.callPackage ./hydra-hooks { };
+
   netdata-latest = pkgs.unstable.callPackage ./netdata.nix { };
 
   # disable xvfb-run tests

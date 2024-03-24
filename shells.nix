@@ -1,5 +1,5 @@
 { inputs, pkgs }: {
-  default = pkgs.mkShell { packages = with pkgs.unstable; [ sops terraform ]; };
+  default = pkgs.mkShell { packages = with pkgs.unstable; [ sops ]; };
 
   bootstrap = pkgs.mkShell {
     # Enable experimental features without having to specify the argument
