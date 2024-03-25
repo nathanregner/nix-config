@@ -372,8 +372,8 @@ require("lazy").setup({
           end, { "i", "s" }),
         }),
         sources = {
-          { name = "luasnip", keyword_length = 2 },
-          { name = "nvim_lsp", keyword_length = 3 },
+          { name = "luasnip" },
+          { name = "nvim_lsp" },
           {
             name = "buffer",
             keyword_length = 5,
