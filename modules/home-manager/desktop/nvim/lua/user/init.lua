@@ -815,13 +815,33 @@ require("lazy").setup({
 
   { -- REPL
     "Olical/conjure",
-    ft = { "clojure" },
+    ft = { "clojure", "lua" },
     dependencies = {
       -- https://github.com/guns/vim-sexp
       "guns/vim-sexp",
       -- https://github.com/tpope/vim-sexp-mappings-for-regular-people
       "tpope/vim-sexp-mappings-for-regular-people",
+      {
+        "PaterJason/cmp-conjure",
+        config = function()
+          local cmp = require("cmp")
+          local config = cmp.get_config()
+          table.insert(config.sources, {
+            name = "buffer",
+            option = {
+              sources = {
+                { name = "conjure" },
+              },
+            },
+          })
+          cmp.setup(config)
+        end,
+      },
     },
+    config = function(_)
+      require("conjure.main").main()
+      require("conjure.mapping")["on-filetype"]()
+    end,
     init = function()
       vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
         pattern = { "conjure-log-*.cljc" },
@@ -829,6 +849,7 @@ require("lazy").setup({
           vim.diagnostic.disable(ev.buf)
         end,
       })
+      vim.g["conjure#extract#tree_sitter#enabled"] = true
     end,
   },
 }, {})
