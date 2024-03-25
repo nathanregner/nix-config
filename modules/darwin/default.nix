@@ -1,10 +1,15 @@
-{ self, pkgs, ... }: {
+{ self, pkgs, lib, ... }: {
   imports = [ ./nix.nix ];
 
   environment.systemPackages = with pkgs.unstable; [
     util-linux
     coreutils-full
   ];
+
+  nix.settings = {
+    # https://github.com/NixOS/nix/issues/7273
+    auto-optimise-store = lib.mkForce false;
+  };
 
   # Auto upgrade nix package and the daemon service.
   services.nix-daemon.enable = true;
