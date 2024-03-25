@@ -3,8 +3,10 @@ mod github;
 mod hydra;
 mod webhook;
 
+use std::net::SocketAddr;
+
 use crate::hydra::HydraClient;
-use axum::Router;
+use axum::{routing::get, Router};
 use listenfd::ListenFd;
 use secrecy::SecretString;
 use tokio::net::TcpListener;
@@ -31,6 +33,7 @@ async fn main() -> anyhow::Result<()> {
             "/webhook",
             github::webhook::handler(SecretString::new("secret".to_string())),
         )
+        .route("/ws", get(hydra::websocket::handler))
         .layer(TraceLayer::new_for_http().make_span_with(DefaultMakeSpan::default()))
         .with_state(client);
 
@@ -46,6 +49,10 @@ async fn main() -> anyhow::Result<()> {
     };
 
     tracing::debug!("listening on {}", listener.local_addr()?);
-    axum::serve(listener, app).await?;
+    axum::serve(
+        listener,
+        app.into_make_service_with_connect_info::<SocketAddr>(),
+    )
+    .await?;
     Ok(())
 }
