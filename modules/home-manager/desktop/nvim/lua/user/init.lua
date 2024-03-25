@@ -206,7 +206,7 @@ require("lazy").setup({
 
       -- nvim-cmp supports additional completion capabilities, so broadcast that to servers
       local capabilities = vim.lsp.protocol.make_client_capabilities()
-      capabilities = require("cmp_nvim_lsp").default_capabilities(capabilities)
+      capabilities = vim.tbl_deep_extend("force", capabilities, require("cmp_nvim_lsp").default_capabilities())
 
       for server_name, server_config in pairs(servers) do
         require("lspconfig")[server_name].setup({
@@ -740,6 +740,7 @@ require("lazy").setup({
       local view_width_max = 30
       return {
         update_cwd = true,
+        sync_root_with_cwd = true,
         hijack_cursor = true,
         view = {
           width = {
@@ -750,6 +751,8 @@ require("lazy").setup({
         },
         on_attach = function(bufnr)
           local api = require("nvim-tree.api")
+          local git = require("nvim-tree.git")
+          local utils = require("nvim-tree.utils")
 
           local function opts(desc)
             return {
@@ -763,7 +766,7 @@ require("lazy").setup({
 
           api.config.mappings.default_on_attach(bufnr)
 
-          vim.keymap.set("n", "A", function()
+          local function toggle_adaptive_width()
             print("view_width_max", view_width_max)
             if view_width_max == -1 then
               view_width_max = 30
@@ -771,7 +774,41 @@ require("lazy").setup({
               view_width_max = -1
             end
             api.tree.reload()
-          end, opts("Toggle Adaptive Width"))
+          end
+
+          vim.keymap.set("n", "A", toggle_adaptive_width, opts("Toggle [A]daptive Width"))
+
+          local function cd_git_root()
+            local node = api.tree.get_node_under_cursor()
+            if node then
+              if node.type == "file" then
+                node = node.parent
+              end
+              local toplevel = git.get_toplevel(node.absolute_path)
+              api.tree.change_root(toplevel)
+            end
+            api.tree.reload()
+          end
+
+          vim.keymap.set("n", "~", cd_git_root, opts("CD to Git Root"))
+
+          local function edit_or_open()
+            local node = api.tree.get_node_under_cursor()
+            if node.nodes ~= nil then
+              api.node.open.edit()
+              if node.nodes[1] then
+                utils.focus_file(node.nodes[1].absolute_path)
+              end
+            else
+              api.node.open.edit()
+            end
+            api.tree.focus()
+          end
+
+          vim.keymap.set("n", "l", edit_or_open, opts("Edit Or Open"))
+
+          vim.keymap.set("n", "h", api.node.navigate.parent_close, opts("Close"))
+          vim.keymap.set("n", "H", api.tree.collapse_all, opts("Collapse All"))
         end,
       }
     end,
