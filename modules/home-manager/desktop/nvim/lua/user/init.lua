@@ -46,6 +46,14 @@ require("lazy").setup({
   -- Detect tabstop and shiftwidth automatically
   "tpope/vim-sleuth",
 
+  -- Autoclose/Autoescape
+  {
+    "altermo/ultimate-autopair.nvim",
+    event = { "InsertEnter", "CmdlineEnter" },
+    branch = "v0.6", --recommended as each new version will have breaking changes
+    opts = {},
+  },
+
   {
     "kevinhwang91/nvim-ufo",
     dependencies = { "kevinhwang91/promise-async" },

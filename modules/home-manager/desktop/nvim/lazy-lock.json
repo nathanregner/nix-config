@@ -32,6 +32,7 @@
   "telescope-helpgrep.nvim": { "branch": "main", "commit": "e167aae798765389b3a2300727dc59a29b34883e" },
   "telescope.nvim": { "branch": "master", "commit": "1e591885751d255b12c3649253cb6c2838e2c724" },
   "tree-sitter-nu": { "branch": "main", "commit": "c5b7816043992b1cdc1462a889bc74dc08576fa6" },
+  "ultimate-autopair.nvim": { "branch": "v0.6", "commit": "6ecf7461d44513af89f8257f057fcc99e9297612" },
   "undotree": { "branch": "master", "commit": "aa93a7e5890dbbebbc064cd22260721a6db1a196" },
   "vim-fugitive": { "branch": "master", "commit": "193ba9b393931bad768c1d2eed688b0bcc240858" },
   "vim-repeat": { "branch": "master", "commit": "24afe922e6a05891756ecf331f39a1f6743d3d5a" },
