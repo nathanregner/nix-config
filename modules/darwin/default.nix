@@ -13,6 +13,7 @@
     ../nixos/desktop/nix.nix
     ./hydra-builder.nix
     ./nix.nix
+    ./preferences.nix
   ];
 
   environment.systemPackages = with pkgs.unstable; [
@@ -20,9 +21,16 @@
     coreutils-full
   ];
 
-  nix.settings = {
-    # https://github.com/NixOS/nix/issues/7273
-    auto-optimise-store = lib.mkForce false;
+  nix = {
+    settings = {
+      # https://github.com/NixOS/nix/issues/7273
+      auto-optimise-store = lib.mkForce false;
+    };
+    gc = {
+      automatic = true;
+      options = "--delete-older-than 7d";
+      user = "root";
+    };
   };
 
   # Auto upgrade nix package and the daemon service.
