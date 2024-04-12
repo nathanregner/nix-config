@@ -1463,6 +1463,29 @@ else
   end
 end
 
+-- Indentation
+vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
+  pattern = {
+    "*.js",
+    "*.jsx",
+    "*.ts",
+    "*.tsx",
+    "*.json",
+    "*.graphql",
+    "*.gql",
+    "*.html",
+    "*.css",
+    "*.scss",
+    "*.sass",
+    "*.less",
+  },
+  callback = function()
+    vim.bo.tabstop = 2
+    vim.bo.softtabstop = 2
+    vim.bo.shiftwidth = 2
+  end,
+})
+
 -- URL handling
 vim.keymap.set("", "gx", function()
   open(vim.fn.expand("<cfile>"))
