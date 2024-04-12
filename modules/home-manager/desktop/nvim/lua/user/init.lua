@@ -1592,6 +1592,29 @@ elseif vim.fn.has("unix") == 1 then
   vim.g.open_cmd = "xdg-open"
 end
 
+-- Indentation
+vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
+  pattern = {
+    "*.js",
+    "*.jsx",
+    "*.ts",
+    "*.tsx",
+    "*.json",
+    "*.graphql",
+    "*.gql",
+    "*.html",
+    "*.css",
+    "*.scss",
+    "*.sass",
+    "*.less",
+  },
+  callback = function()
+    vim.bo.tabstop = 2
+    vim.bo.softtabstop = 2
+    vim.bo.shiftwidth = 2
+  end,
+})
+
 -- for GBrowse, now that netrw is disabled
 vim.api.nvim_create_user_command("Browse", function(opts)
   vim.fn.jobstart(vim.g.open_cmd .. " " .. vim.fn.shellescape(opts.fargs[1]), { detach = true })
