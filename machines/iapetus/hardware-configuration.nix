@@ -69,9 +69,15 @@
     # Enable the nvidia settings menu
     nvidiaSettings = true;
 
+    # Fix issues with suspend/resume on wayland
+    powerManagement.enable = true;
+
     # Optionally, you may need to select the appropriate driver version for your specific GPU.
     package = config.boot.kernelPackages.nvidiaPackages.stable;
   };
+
+  # Fix issues with suspend/resume on wayland
+  boot.kernelParams = [ "nvidia.NVreg_PreserveVideoMemoryAllocations=1" ];
 
   hardware.opengl = {
     enable = true;

@@ -1,43 +1,41 @@
 {
-    "joker": {
-        "cargoLocks": null,
-        "date": null,
-        "extract": null,
-        "name": "joker",
-        "passthru": null,
-        "pinned": false,
-        "src": {
-            "deepClone": false,
-            "fetchSubmodules": false,
-            "leaveDotGit": false,
-            "name": null,
-            "owner": "candid82",
-            "repo": "joker",
-            "rev": "v1.3.5",
-            "sha256": "sha256-aBZ0KlXWKAF70xFxc+WWXucLPnxyaCxu97IYkPuKcCA=",
-            "type": "github"
-        },
-        "version": "v1.3.5"
+  "elasticsearch": {
+    "cargoLocks": null,
+    "date": null,
+    "extract": null,
+    "name": "elasticsearch",
+    "passthru": null,
+    "pinned": false,
+    "src": {
+      "arch": null,
+      "finalImageName": null,
+      "finalImageTag": null,
+      "imageDigest": "sha256:2479cc342a6414a920b7fb3c2f55232a174f53e10612c8f15eece7e66eb7c97e",
+      "imageName": "library/elasticsearch",
+      "imageTag": "7.17.20",
+      "os": null,
+      "sha256": "sha256-DyjQ8oewT8F4L22Rsxxy4/Noj24d5JgEgjK5KgA9ADk=",
+      "tlsVerify": null
     },
-    "kamp": {
-        "cargoLocks": null,
-        "date": null,
-        "extract": null,
-        "name": "kamp",
-        "passthru": null,
-        "pinned": false,
-        "src": {
-            "deepClone": false,
-            "fetchSubmodules": false,
-            "leaveDotGit": false,
-            "name": null,
-            "owner": "kyleisah",
-            "repo": "Klipper-Adaptive-Meshing-Purging",
-            "rev": "v1.1.2",
-            "sha256": "sha256-anBGjLtYlyrxeNVy1TEMcAGTVUFrGClLuoJZuo3xlDM=",
-            "type": "github"
-        },
-        "version": "v1.1.2"
+    "version": "7.17.20"
+  },
+  "filebeat": {
+    "cargoLocks": null,
+    "date": null,
+    "extract": null,
+    "name": "filebeat",
+    "passthru": null,
+    "pinned": false,
+    "src": {
+      "arch": null,
+      "finalImageName": null,
+      "finalImageTag": null,
+      "imageDigest": "sha256:e78123162c038cd86855bc631b003e60bbd6d35881dc042775db0c92dff861ae",
+      "imageName": "elastic/filebeat",
+      "imageTag": "7.17.20",
+      "os": null,
+      "sha256": "sha256-0nEJ9rt42bTaTCxLCdSIyZze8p2YXN/NSIfLUDlAnbc=",
+      "tlsVerify": null
     },
     "kibana": {
         "cargoLocks": null,

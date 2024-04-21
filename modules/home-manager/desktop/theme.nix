@@ -7,11 +7,11 @@
   };
 
   fonts.fontconfig.enable = true;
-  home.packages = with pkgs.unstable;
-    [
-      # nerdfonts is large - just use a subset
-      (nerdfonts.override { fonts = [ "JetBrainsMono" ]; })
-    ];
+  home.packages = [
+    # nerdfonts is large - just use a subset
+    (pkgs.unstable.nerdfonts.override { fonts = [ "JetBrainsMono" ]; })
+    pkgs.sf-mono-nerd-font
+  ];
 
   gtk = {
     enable = pkgs.hostPlatform.isLinux;

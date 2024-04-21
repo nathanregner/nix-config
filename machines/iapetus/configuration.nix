@@ -1,6 +1,10 @@
-{ config, pkgs, lib, ... }: {
-  imports =
-    [ ../../modules/nixos/desktop ./hardware-configuration.nix ./windows-vm ];
+{ inputs, config, lib, pkgs, ... }: {
+  imports = [
+    inputs.hyprland.nixosModules.default
+    ../../modules/nixos/desktop
+    ./hardware-configuration.nix
+    ./windows-vm
+  ];
 
   # Networking
   networking.hostName = "iapetus";
@@ -12,13 +16,18 @@
     enable = true;
     videoDrivers = [ "nvidia" ];
 
-    displayManager.gdm.enable = true;
-    displayManager.gdm.wayland = false;
-    desktopManager.gnome.enable = true;
-
     layout = "us";
     xkbVariant = "";
   };
+
+  programs.hyprland = {
+    enable = true;
+    package = inputs.hyprland.packages.${pkgs.system}.hyprland;
+  };
+  # https://wiki.hyprland.org/0.20.1beta/Getting-Started/Installation/
+  services.xserver.displayManager.sddm.enable = true;
+
+  security.pam.services.swaylock = { };
 
   services.xserver.displayManager.autoLogin.enable = true;
   services.xserver.displayManager.autoLogin.user = "nregner";
@@ -29,9 +38,15 @@
 
   programs.dconf.enable = true;
 
+  services.logind.powerKey = "suspend";
+
   # Adds to `environment.pathsToLink` the path: `/share/nautilus-python/extensions`
   # needed for nautilus Python extensions to work.
   services.gnome.core-utilities.enable = true;
+
+  services.udisks2.enable = true;
+
+  programs.gnome-disks.enable = true;
 
   # Sound
   sound.enable = true;
@@ -42,7 +57,7 @@
     alsa.enable = true;
     alsa.support32Bit = true;
     pulse.enable = true;
-    # jack.enable = true;
+    jack.enable = true;
   };
 
   # Misc
@@ -60,12 +75,14 @@
   systemd.tmpfiles.rules =
     [ "d ${config.programs.ccache.cacheDir} 0770 root nixbld" ];
 
-  environment.systemPackages = [
-    config.boot.kernelPackages.perf
-    pkgs.virt-manager
-    pkgs.gnome.nautilus-python
-    pkgs.insync-nautilus
-  ];
+  environment.systemPackages = [ config.boot.kernelPackages.perf ]
+    ++ (with pkgs.unstable; [
+      android-file-transfer # aft-mtp-mount ~/mnt
+      gnome.nautilus-python
+      insync-nautilus
+      libmtp
+      virt-manager
+    ]);
 
   # boot.binfmt.emulatedSystems = [ "aarch64-linux" ];
 

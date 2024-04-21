@@ -62,6 +62,15 @@ in {
       dontNpmBuild = true;
     });
 
+  sf-mono-nerd-font = let inherit (sources.sf-mono-nerd-font) pname version src;
+  in pkgs.unstable.runCommand "${pname}-${version}" { } ''
+    mkdir -p $out/share/fonts/${pname}
+    cp ${src}/*.otf $out/share/fonts/${pname}
+  '';
+
   tfautomv =
     pkgs.unstable.callPackage ./tfautomv.nix { source = sources.tfautomv; };
+
+  writeBabashkaApplication =
+    pkgs.unstable.callPackage ./write-babashka-application.nix { };
 }

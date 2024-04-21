@@ -2,12 +2,30 @@
   imports = [
     ../../modules/home-manager/desktop
     ../../modules/home-manager/desktop/gnome
+    ../../modules/home-manager/desktop/hyprland
   ];
 
   home = {
     username = "nregner";
     homeDirectory = "/home/nregner";
     flakePath = "/home/nregner/nix-config/iapetus";
+  };
+
+  hyprland = {
+    enable = true;
+    monitors = [
+      {
+        name = "DP-1";
+        resolution = "1920x1080@144";
+        position = "0x0";
+      }
+      {
+        name = "DP-2";
+        resolution = "1920x1080@144";
+        position = "1920x0";
+      }
+    ];
+    wallpaper = ../../assets/planet-rise.png;
   };
 
   programs.zsh.initExtra = ''
@@ -18,12 +36,14 @@
   home.packages = with pkgs.unstable; [
     # apps
     discord
+    evince
     firefox
     jetbrains-toolbox
     openrgb
     pkgs.insync
 
     awscli2
+    babashka
     gh
     jq
     nushellFull
@@ -45,12 +65,25 @@
     nix-output-monitor
     nixfmt
     nix-du # nix-du -s=500MB | xdot -
+    nvfetcher
     hydra-cli
     xdot
 
     # rc
     betaflight-configurator
   ];
+
+  xdg.desktopEntries.discord = {
+    type = "Application";
+    name = "Discord";
+    comment =
+      "All-in-one voice and text chat for gamers that's free, secure, and works on both your desktop and phone.";
+    genericName = "Internet Messenger";
+    # exec = "discord --enable-features=UseOzonePlatform --ozone-platform=wayland";
+    exec = "discord --disable-gpu";
+    icon = "discord";
+    categories = [ "Network" "InstantMessaging" ];
+  };
 
   # rustc -Z unstable-options --print target-spec-json | jq '.["llvm-target"]' -r
   # https://github.com/rui314/mold?tab=readme-ov-file#how-to-use

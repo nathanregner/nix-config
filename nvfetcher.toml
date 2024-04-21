@@ -1,4 +1,7 @@
 # https://github.com/berberman/nvfetcher?tab=readme-ov-file#keyfile
+[hyprland-workspaces]
+src.github = "FieldofClay/hyprland-workspaces"
+fetch.github = "FieldofClay/hyprland-workspaces"
 
 [joker]
 src.github_tag = "candid82/joker"
@@ -7,6 +10,11 @@ fetch.github = "candid82/joker"
 [kamp]
 src.github_tag = "kyleisah/Klipper-Adaptive-Meshing-Purging"
 fetch.github = "kyleisah/Klipper-Adaptive-Meshing-Purging"
+
+[linux-rockchip]
+src.git = "https://github.com/armbian/linux-rockchip.git"
+src.branch = "rk-5.10-rkr6"
+fetch.github = "armbian/linux-rockchip"
 
 [kibana]
 src.container = "library/kibana"
@@ -21,7 +29,11 @@ fetch.github = "armbian/linux-rockchip"
 [pin-github-action]
 src.github_tag = "mheap/pin-github-action"
 fetch.github = "mheap/pin-github-action"
+fetch.github = "busser/tfautomv"
+
+[sf-mono-nerd-font]
+src.github = "epk/SF-Mono-Nerd-Font"
+fetch.github = "epk/SF-Mono-Nerd-Font"
 
 [tfautomv]
 src.github_tag = "busser/tfautomv"
-fetch.github = "busser/tfautomv"

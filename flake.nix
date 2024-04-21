@@ -18,7 +18,6 @@
     };
 
     # Tools
-    catppuccin-nix.url = "github:catppuccin/nix";
     disko = {
       url = "github:nix-community/disko";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -47,6 +46,17 @@
       url = "github:Mic92/sops-nix";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
       inputs.nixpkgs-stable.follows = "nixpkgs";
+    };
+
+    # Desktop
+    catppuccin-nix.url = "github:catppuccin/nix";
+    hyprland = {
+      url = "github:hyprwm/Hyprland";
+      # inputs.nixpkgs.follows = "nixpkgs";
+    };
+    nixpkgs-wayland = {
+      url = "github:nix-community/nixpkgs-wayland";
+      # inputs.nixpkgs.follows = "nixpkgs";
     };
 
     # 3d printing
