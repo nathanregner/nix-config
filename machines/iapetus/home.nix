@@ -12,7 +12,7 @@
 
   programs.zsh.initExtra = ''
     export PATH="$PATH:$HOME/.cargo/bin"
-    #export PATH="$PATH:$HOME/.local/share/JetBrains/Toolbox/scripts"
+    export PATH="$PATH:$HOME/.local/share/JetBrains/Toolbox/scripts"
   '';
 
   home.packages = with pkgs.unstable; [
