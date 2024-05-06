@@ -232,19 +232,21 @@ require("lazy").setup({
     "stevearc/conform.nvim",
     opts = {
       formatters_by_ft = {
+        bash = { "shfmt" },
         clojure = { "joker" },
         css = { "prettier", "prettierd" },
         gitcommit = { "prettier", "injected" }, -- FIXME: prettierd erroring out
         go = { "gofmt" },
+        graphql = { "prettier", "prettierd" },
         html = { "prettier", "prettierd" },
         javascript = { "prettier", "prettierd" },
         javascriptreact = { "prettier", "prettierd" },
-        graphql = { "prettier", "prettierd" },
         json = { "prettier", "prettierd" },
         lua = { "stylua" },
         markdown = { { "prettier", "prettierd" }, "injected" },
         nix = { "nixfmt" },
         rust = { "rustfmt" },
+        sh = { "shfmt" },
         terraform = { "terraform_fmt" },
         typescript = { "prettier", "prettierd" },
         typescriptreact = { "prettier", "prettierd" },

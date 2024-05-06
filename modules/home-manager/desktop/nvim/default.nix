@@ -26,9 +26,10 @@
 
       # formatters/linters
       codespell
-      prettierd
-      stylua
       pkgs.joker
+      prettierd
+      shfmt
+      stylua
 
       # test runners
       cargo-nextest # for rouge8/neotest-rust
