@@ -123,8 +123,7 @@ require("lazy").setup({
 
   -- NOTE: This is where your plugins related to LSP can be installed.
   --  The configuration is done below. Search for lspconfig to find it below.
-  {
-    -- LSP Configuration & Plugins
+  { -- LSP Configuration & Plugins
     "neovim/nvim-lspconfig",
     dependencies = {
       { "j-hui/fidget.nvim", opts = {} },
@@ -185,6 +184,7 @@ require("lazy").setup({
         rust_analyzer = {
           -- https://rust-analyzer.github.io/manual.html#configuration
           ["rust-analyzer"] = {
+            cargo = { allFeatures = true },
             completion = {
               autoimport = { enable = true },
             },
@@ -225,6 +225,14 @@ require("lazy").setup({
           filetypes = (server_config or {}).filetypes,
         })
       end
+    end,
+  },
+
+  { -- LSP output panel
+    "mhanberg/output-panel.nvim",
+    event = "VeryLazy",
+    config = function()
+      require("output_panel").setup()
     end,
   },
 
