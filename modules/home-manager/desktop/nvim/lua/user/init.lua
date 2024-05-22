@@ -20,6 +20,7 @@ require("lazy").setup({
   -- https://github.com/sindrets/diffview.nvim#configuration
   {
     "sindrets/diffview.nvim",
+    dev = true,
     opts = {
       view = {
         merge_tool = {
@@ -1301,7 +1302,11 @@ require("lazy").setup({
       vim.g["conjure#extract#tree_sitter#enabled"] = true
     end,
   },
-}, {})
+}, {
+  dev = {
+    path = "~/dev/github/",
+  },
+})
 
 -- https://trstringer.com/neovim-auto-reopen-files/
 vim.api.nvim_create_autocmd("VimLeavePre", {
