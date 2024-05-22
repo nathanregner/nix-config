@@ -1304,18 +1304,8 @@ require("lazy").setup({
   },
 }, {
   dev = {
-    path = "~/dev/github/",
+    path = "~/dev/nvim-plugins/",
   },
-})
-
--- https://trstringer.com/neovim-auto-reopen-files/
-vim.api.nvim_create_autocmd("VimLeavePre", {
-  pattern = "*",
-  callback = function()
-    if vim.g.savesession then
-      vim.api.nvim_command("mks!")
-    end
-  end,
 })
 
 -- https://trstringer.com/neovim-auto-reopen-files/
