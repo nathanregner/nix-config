@@ -1466,16 +1466,6 @@ vim.api.nvim_create_autocmd("VimLeavePre", {
   end,
 })
 
--- https://trstringer.com/neovim-auto-reopen-files/
-vim.api.nvim_create_autocmd("VimLeavePre", {
-  pattern = "*",
-  callback = function()
-    if vim.g.savesession then
-      vim.api.nvim_command("mks!")
-    end
-  end,
-})
-
 -- [[ Setting options ]]
 -- See `:help vim.o`
 -- NOTE: You can change these options as you wish!
