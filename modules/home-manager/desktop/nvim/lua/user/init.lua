@@ -20,6 +20,7 @@ require("lazy").setup({
   -- https://github.com/sindrets/diffview.nvim#configuration
   {
     "sindrets/diffview.nvim",
+    dev = true,
     opts = {
       view = {
         merge_tool = {
