@@ -1,4 +1,4 @@
-{ inputs, config, lib, pkgs, ... }: {
+{ inputs, config, pkgs, ... }: {
   imports = [
     inputs.hyprland.nixosModules.default
     ../../modules/nixos/desktop
@@ -38,8 +38,6 @@
 
   programs.dconf.enable = true;
 
-  services.logind.powerKey = "suspend";
-
   # Adds to `environment.pathsToLink` the path: `/share/nautilus-python/extensions`
   # needed for nautilus Python extensions to work.
   services.gnome.core-utilities.enable = true;
@@ -66,15 +64,11 @@
     motherboard = "amd";
   };
 
+  services.logind.powerKey = "suspend";
+
   services.nregner.hydra-builder.enable = true;
 
   # https://nixos.wiki/wiki/CCache#Derivation_CCache_2
-  # man tmpfiles.d
-  programs.ccache.enable = true;
-  nix.settings.extra-sandbox-paths = [ config.programs.ccache.cacheDir ];
-  systemd.tmpfiles.rules =
-    [ "d ${config.programs.ccache.cacheDir} 0770 root nixbld" ];
-
   environment.systemPackages = [ config.boot.kernelPackages.perf ]
     ++ (with pkgs.unstable; [
       android-file-transfer # aft-mtp-mount ~/mnt
