@@ -1,9 +1,11 @@
 { inputs, config, pkgs, lib, ... }: {
   imports = [
     inputs.hyprland.homeManagerModules.default
-    ./waybar
-    ./mako.nix
-    ./tofi.nix
+    # TODO: opt-in to individual components options
+    ./bar/waybar
+    ./launcher/tofi.nix
+    ./lock/swaylock.nix
+    ./notification/mako.nix
   ];
 
   options = let inherit (lib) types mkOption;
@@ -50,89 +52,6 @@
       '';
     };
 
-    services.swayidle = let
-      inherit (lib) getExe getExe';
-
-      hyprctl = ''
-        exec "${
-          getExe' config.wayland.windowManager.hyprland.package "hyprctl"
-        }"'';
-      displayOff = "${hyprctl} dispatch dpms off";
-      displayOn = "${hyprctl} dispatch dpms on";
-      lockPackage = getExe config.programs.swaylock.package;
-      lock = "${lockPackage}";
-      lockDisplayOff = getExe (pkgs.writeShellApplication {
-        name = "lock-display-off";
-        runtimeInputs = [ pkgs.procps ];
-        text = ''
-          if pgrep -x ${lockPackage} || pgrep -x swaylock;
-            then ${displayOff};
-          fi
-        '';
-      });
-      lockAfter = 5 * 60;
-      lockDisplayOffAfter = 5;
-    in {
-      enable = true;
-
-      timeouts = [
-        # auto-lock
-        {
-          timeout = lockAfter;
-          command = "${lock} --grace 15";
-          resumeCommand = displayOn;
-        }
-        # turn off display after locking manually
-        # {
-        #   timeout = lockDisplayOffAfter;
-        #   command = lockDisplayOff;
-        #   resumeCommand = displayOn;
-        # }
-        # turn off display after locking automatically
-        {
-          timeout = lockAfter + lockDisplayOffAfter;
-          command = lockDisplayOff;
-          resumeCommand = displayOn;
-        }
-        # auto-sleep
-        # {
-        #   timeout = 15 * 60;
-        #   command = "/run/current-system/sw/bin/systemctl suspend";
-        # }
-      ];
-
-      events = [
-        {
-          event = "lock";
-          command = lock;
-        }
-        {
-          event = "before-sleep";
-          command = lock;
-        }
-        {
-          event = "after-resume";
-          command = displayOn;
-        }
-      ];
-    };
-
-    programs.swaylock = {
-      enable = true;
-      package = pkgs.unstable.swaylock-effects;
-      catppuccin.enable = true;
-      settings = {
-        daemonize = true;
-        grace = 5;
-
-        clock = true;
-        effect-blur = "10x3";
-        image = "~/.config/hypr/assets/wallpaper.png";
-        indicator = true;
-        show-failed-attempts = true;
-      };
-    };
-
     xdg.configFile = {
       "hypr/user.conf".source = config.lib.file.mkFlakeSymlink ./hyprland.conf;
 
@@ -156,6 +75,7 @@
       import-env
     ];
 
+    # auto mount disks
     services.udiskie.enable = true;
   };
 }
