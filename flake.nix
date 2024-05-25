@@ -52,11 +52,11 @@
     catppuccin-nix.url = "github:catppuccin/nix";
     hyprland = {
       url = "github:hyprwm/Hyprland";
-      # inputs.nixpkgs.follows = "nixpkgs";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
     nixpkgs-wayland = {
       url = "github:nix-community/nixpkgs-wayland";
-      # inputs.nixpkgs.follows = "nixpkgs";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
 
     # 3d printing
