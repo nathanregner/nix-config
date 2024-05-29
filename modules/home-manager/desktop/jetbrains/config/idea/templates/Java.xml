@@ -1,0 +1,14 @@
+<templateSet group="Java">
+  <template name="mfc" value="return reactor.core.publisher.Mono.fromCallable(() -&gt; { $SELECTION$ })&#10;        .subscribeOn(reactor.core.scheduler.Schedulers.boundedElastic());" description="Surround with Mono.fromCallable" toReformat="true" toShortenFQNames="true">
+    <context>
+      <option name="JAVA_EXPRESSION" value="true" />
+      <option name="JAVA_STATEMENT" value="true" />
+    </context>
+  </template>
+  <template name="mfr" value="return reactor.core.publisher.Mono.fromRunnable(() -&gt; { $SELECTION$ })&#10;    .subscribeOn(reactor.core.scheduler.Schedulers.boundedElastic())&#10;    .then();" description="Surround with Mono.fromRunnable" toReformat="true" toShortenFQNames="true">
+    <context>
+      <option name="JAVA_EXPRESSION" value="true" />
+      <option name="JAVA_STATEMENT" value="true" />
+    </context>
+  </template>
+</templateSet>
