@@ -1,0 +1,11 @@
+<application>
+  <component name="PostfixTemplates">
+    <template id="mfc@userDefined" key=".mfc" provider="builtin.java" language-level="1.3" topmost="false">
+      <conditions>
+        <condition id="non void" />
+      </conditions>
+      <template name="fakeKey" value="reactor.core.publisher.Mono.fromCallable(() -&gt; $EXPR$)&#10;    .subscribeOn(reactor.core.scheduler.Schedulers.boundedElastic())" description="" toReformat="true" toShortenFQNames="true" />
+    </template>
+  </component>
+</application>
+
