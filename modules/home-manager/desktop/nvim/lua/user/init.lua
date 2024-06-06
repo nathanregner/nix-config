@@ -1149,6 +1149,12 @@ require("lazy").setup({
       keywords = {
         TEST = nil,
       },
+      highlight = {
+        -- TODO
+        -- TODO: asdf
+        -- TODO (v2): asdf
+        pattern = [[.*<(KEYWORDS)(.*:.*|\(.*\)$|$)]],
+      },
     },
   },
 
