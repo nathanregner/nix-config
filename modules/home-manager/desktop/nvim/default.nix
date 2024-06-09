@@ -50,6 +50,22 @@
 
   programs.zsh.shellAliases.vimdiff = "nvim -d";
 
+  programs.zsh.initExtra = ''
+    unset -f nvim
+    _nvim=$(which nvim)
+    nvim () {
+      if [[ -z "$@" ]]; then
+        if [[ -f "./Session.vim" ]]; then
+          $_nvim -S Session.vim -c 'lua vim.g.savesession = true'
+        else
+          $_nvim -c 'lua vim.g.savesession = true'
+        fi
+      else
+        $_nvim "$@"
+      fi
+    }
+  '';
+
   # https://github.com/jesseduffield/lazygit/wiki/Custom-Commands-Compendium
   programs.lazygit.settings.customCommands = [
     {
