@@ -24,7 +24,7 @@
       };
       difftool = {
         prompt = false;
-        difftastic.cmd = ''difft --display=inline "$LOCAL" "$REMOTE"'';
+        difftastic.cmd = ''difft "$LOCAL" "$REMOTE"'';
       };
       pager.difftool = true;
       rerere.enabled = true;
