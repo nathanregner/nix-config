@@ -295,6 +295,7 @@ require("lazy").setup({
         javascript = { "prettierd" },
         javascriptreact = { "prettierd" },
         json = { "prettierd" },
+        jsonc = { "prettierd" },
         lua = { "stylua" },
         markdown = { "prettierd", "injected" },
         nix = { "nixfmt" },
@@ -320,7 +321,7 @@ require("lazy").setup({
         if vim.g.disable_autoformat or vim.b[bufnr].disable_autoformat then
           return
         end
-        return { timeout_ms = 500, lsp_fallback = true }
+        return { timeout_ms = 500, lsp_format = "fallback" }
       end,
     },
     config = function(_, opts)
