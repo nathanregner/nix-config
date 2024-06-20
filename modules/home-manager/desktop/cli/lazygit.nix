@@ -35,8 +35,6 @@
         nerdFontsVersion = "3";
       };
 
-      git.paging.externalDiffCommand = "difft --display=inline --color=always";
-
       keybinding = {
         universal = {
           quit = "<c-c>";
