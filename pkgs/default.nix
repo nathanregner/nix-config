@@ -27,6 +27,14 @@ in
 
   moonraker-develop = (pkgs.unstable.callPackage ./moonraker { inherit inputs; });
 
+  mvnd = pkgs.unstable.callPackage ./mvnd.nix { source = sources.mvnd; };
+
+  # mvnd = pkgs.unstable.callPackage ./mvnd {
+  #   inherit (inputs.mvn2nix.legacyPackages.${pkgs.system}) buildMavenRepositoryFromLockFile;
+  #   inherit inputs;
+  #   source = sources.mvnd;
+  # };
+
   pin-github-action = pkgs.unstable.buildNpmPackage (
     sources.pin-github-action
     // {

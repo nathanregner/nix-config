@@ -21,6 +21,11 @@ src.git = "https://github.com/armbian/linux-rockchip.git"
 src.branch = "rk-5.10-rkr6"
 fetch.github = "armbian/linux-rockchip"
 
+[mvnd]
+src.github_tag = "apache/maven-mvnd"
+src.include_regex = "1\\..*"
+fetch.github = "apache/maven-mvnd"
+
 [pin-github-action]
 src.github_tag = "mheap/pin-github-action"
 fetch.github = "mheap/pin-github-action"

@@ -56,6 +56,17 @@
     };
     date = "2024-06-20";
   };
+  mvnd = {
+    pname = "mvnd";
+    version = "1.0.1";
+    src = fetchFromGitHub {
+      owner = "apache";
+      repo = "maven-mvnd";
+      rev = "1.0.1";
+      fetchSubmodules = false;
+      sha256 = "sha256-93WmyIYmJAyuU1kmZlv1HKIv7KNquOe8vkWUvHpgTFU=";
+    };
+  };
   pin-github-action = {
     pname = "pin-github-action";
     version = "v1.9.1";
