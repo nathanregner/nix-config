@@ -2,6 +2,11 @@
 vim.g.loaded_netrw = 1
 vim.g.loaded_netrwPlugin = 1
 
+-- for GBrowse, now that netrw is disabled
+vim.api.nvim_create_user_command("Browse", function(opts)
+  vim.fn.system({ "open", opts.fargs[1] })
+end, { nargs = 1 })
+
 -- https://github.com/folke/lazy.nvim#-plugin-spec
 require("lazy").setup({
   -- Git
