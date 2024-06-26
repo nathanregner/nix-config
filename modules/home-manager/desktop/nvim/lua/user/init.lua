@@ -34,17 +34,17 @@ require("lazy").setup({
     config = true,
   },
 
-  {
-    "NeogitOrg/neogit",
-    dependencies = {
-      "nvim-lua/plenary.nvim", -- required
-      "sindrets/diffview.nvim", -- optional - Diff integration
-
-      -- Only one of these is needed, not both.
-      "nvim-telescope/telescope.nvim",
-    },
-    config = true,
-  },
+  -- {
+  --   "NeogitOrg/neogit",
+  --   dependencies = {
+  --     "nvim-lua/plenary.nvim", -- required
+  --     "sindrets/diffview.nvim", -- optional - Diff integration
+  --
+  --     -- Only one of these is needed, not both.
+  --     "nvim-telescope/telescope.nvim",
+  --   },
+  --   config = true,
+  -- },
 
   -- Detect tabstop and shiftwidth automatically
   "tpope/vim-sleuth",
@@ -1410,19 +1410,30 @@ local first_quickfix, last_quickfix = ts_repeat_move.make_repeatable_move_pair(v
 vim.keymap.set("n", "[Q", first_quickfix, { desc = "Go to first quickfix item" })
 vim.keymap.set("n", "]Q", last_quickfix, { desc = "Go to last quickfix item" })
 
--- URL handling
--- source: https://sbulav.github.io/vim/neovim-opening-urls/
+local open
 if vim.fn.has("mac") == 1 then
-  vim.keymap.set("", "gx", function()
-    vim.fn.jobstart("open " .. vim.fn.shellescape(vim.fn.expand("<cfile>")), { detach = true })
-  end)
+  open = function(arg)
+    vim.fn.jobstart("open " .. vim.fn.shellescape(arg), { detach = true })
+  end
 elseif vim.fn.has("unix") == 1 then
-  vim.keymap.set("", "gx", function()
-    vim.fn.jobstart("xdg-open " .. vim.fn.shellescape(vim.fn.expand("<cfile>")), { detach = true })
-  end)
+  open = function(arg)
+    vim.fn.jobstart("xdg-open " .. vim.fn.shellescape(arg), { detach = true })
+  end
 else
-  vim.keymap.set("", "gx", '<Cmd>lua print("Error: gx is not supported on this OS!")<CR>')
+  open = function()
+    vim.notify("open not supported", vim.log.levels.WARN)
+  end
 end
+
+-- URL handling
+vim.keymap.set("", "gx", function()
+  open(vim.fn.expand("<cfile>"))
+end)
+
+-- for GBrowse, now that netrw is disabled
+vim.api.nvim_create_user_command("Browse", function(opts)
+  open(opts.fargs[1])
+end, { nargs = 1 })
 
 -- [[ Highlight on yank ]]
 -- See `:help vim.highlight.on_yank()`
