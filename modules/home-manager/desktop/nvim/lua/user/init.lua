@@ -2,11 +2,6 @@
 vim.g.loaded_netrw = 1
 vim.g.loaded_netrwPlugin = 1
 
--- for GBrowse, now that netrw is disabled
-vim.api.nvim_create_user_command("Browse", function(opts)
-  vim.fn.system({ "open", opts.fargs[1] })
-end, { nargs = 1 })
-
 -- https://github.com/folke/lazy.nvim#-plugin-spec
 require("lazy").setup({
   -- Git
@@ -1422,6 +1417,21 @@ vim.keymap.set("n", "[q", prev_quickfix, { desc = "Go to previous quickfix item"
 local last_quickfix, first_quickfix = ts_repeat_move.make_repeatable_move_pair(vim.cmd.clast, vim.cmd.cfirst)
 vim.keymap.set("n", "]Q", last_quickfix, { desc = "Go to last quickfix item" })
 vim.keymap.set("n", "[Q", first_quickfix, { desc = "Go to first quickfix item" })
+
+local open
+if vim.fn.has("mac") == 1 then
+  open = function(arg)
+    vim.fn.jobstart("open " .. vim.fn.shellescape(arg), { detach = true })
+  end
+elseif vim.fn.has("unix") == 1 then
+  open = function(arg)
+    vim.fn.jobstart("xdg-open " .. vim.fn.shellescape(arg), { detach = true })
+  end
+else
+  open = function()
+    vim.notify("open not supported", vim.log.levels.WARN)
+  end
+end
 
 local open
 if vim.fn.has("mac") == 1 then
