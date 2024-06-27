@@ -27,6 +27,8 @@ in
 
   moonraker-develop = (pkgs.unstable.callPackage ./moonraker { inherit inputs; });
 
+  mvnd = pkgs.unstable.callPackage ./mvnd.nix { };
+
   pin-github-action = pkgs.unstable.buildNpmPackage (
     sources.pin-github-action
     // {
