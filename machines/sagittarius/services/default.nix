@@ -7,6 +7,7 @@
     ./hydra.nix
     ./k8s.nix
     ./mealie.nix
+    ./nexus.nix
     ./nginx.nix
     ./nix-serve.nix
     ./qbittorrent.nix
