@@ -52,6 +52,7 @@ maven.buildMavenPackage (
       "-pl"
       "!integration-tests"
 
+      "-Dmaven.buildNumber.skip=true" # skip build number generation; requires git and we're building a tag
       "-Drat.skip=true" # skip license checks; they require manaul approval and should have already been run upstream
       "-Dspotless.skip=true" # skip formatting checks
 
