@@ -1,4 +1,13 @@
-{ fetchzip, stdenv }:
+{
+  lib,
+  stdenvNoCC,
+  fetchzip,
+  jdk,
+  makeWrapper,
+}:
+
+assert jdk != null;
+
 let
   version = "1.0.1";
   sources = {
@@ -12,18 +21,44 @@ let
     };
     aarch64-darwin = {
       url = "https://downloads.apache.org/maven/mvnd/${version}/maven-mvnd-${version}-darwin-aarch64.zip";
-      hash = "sha256-hhd8MnwKWpvG7UebkeEoztS45SJVnpvvJ9Zy+y5swik=";
+      hash = "sha256-0Vecksvecqw10kXc0yMK2Hafxwk19dVYChi17ZDQP8M=";
     };
   };
 in
-stdenv.mkDerivation {
+stdenvNoCC.mkDerivation (finalAttrs: {
   pname = "mvnd";
   inherit version;
   src = fetchzip {
-    inherit (sources.${stdenv.system} or (throw "Unsupported system: ${stdenv.system}")) url hash;
+    inherit (sources.${stdenvNoCC.system} or (throw "Unsupported system: ${stdenvNoCC.system}"))
+      url
+      hash
+      ;
   };
 
-  buildPhase = ''
-    cp -r $src $out
+  sourceRoot = ".";
+
+  nativeBuildInputs = [ makeWrapper ];
+
+  installPhase = ''
+    runHook preInstall
+
+    mkdir -p $out/bin
+    mkdir -p $out/nix-support
+    cp -r $src/* $out/nix-support/
+
+    makeWrapper $out/nix-support/bin/mvnd $out/bin/mvnd \
+      --set-default JAVA_HOME "${jdk}" \
+      --set-default MVND_HOME "$out/nix-support/mvnd"
+
+    runHook postInstall
   '';
-}
+
+  meta = with lib; {
+    mainProgram = "mvnd";
+    description = "Build automation tool (used primarily for Java projects)";
+    homepage = "https://maven.apache.org/";
+    license = licenses.asl20;
+    platforms = platforms.unix;
+    # maintainers = with maintainers; [ cko ];
+  };
+})
