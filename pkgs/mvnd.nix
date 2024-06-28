@@ -12,29 +12,23 @@
 assert jdk != null;
 
 let
-  systemDist = {
+  targets = {
     "aarch64-darwin" = "darwin-aarch64";
     "aarch64-linux" = "linux-aarch64";
-    "x86_64-darwin" = "darwin-x86_64";
-    "x86_64-linux" = "linux-x86_64";
+    "x86_64-darwin" = "darwin-amd64";
+    "x86_64-linux" = "linux-amd64";
   };
 in
 
 maven.buildMavenPackage (
   source
   // {
-
     nativeBuildInputs = [
       graalvmCEPackages.graalvm-ce
       makeWrapper
     ] ++ lib.optionals stdenv.isDarwin [ darwin.apple_sdk.frameworks.Foundation ];
 
-    # postgis config directory assumes /include /lib from the same root for json-c library
-    # env.NIX_LDFLAGS = "-L${lib.getLib json_c}/lib";
-    # NIX_DEBUG = 7;
-
     # build in the deps phase... deps plugin doesn't download everything it needs for offline mode
-    # https://github.com/qaware/go-offline-maven-plugin/issues/23
     # https://issues.apache.org/jira/browse/MDEP-82
     # https://github.com/NixOS/nixpkgs/issues/135907
     mvnDepsParameters = "-s ${./mvnd/settings.xml} -Daether.dependencyCollector.impl=bf -Dmaven.artifact.threads=32";
@@ -42,6 +36,8 @@ maven.buildMavenPackage (
 
     buildOffline = true;
 
+    # some plugins not fetched
+    # https://github.com/qaware/go-offline-maven-plugin/issues/23
     manualMvnArtifacts = [
       "org.apache.apache.resources:apache-jar-resource-bundle:1.5"
       "org.apache.maven:apache-maven:3.9.8:tar.gz:bin"
@@ -51,21 +47,20 @@ maven.buildMavenPackage (
     ];
 
     mvnParameters = lib.concatStringsSep " " [
-      "-B"
-      "-Pnative"
-      # skip these goals so we don't need to include more manual artifacts
+      # skip tests; they require network acccess
       "-DskipTests=true"
-      "-Dmaven.buildNumber.skip=true"
-      "-Drat.skip=true"
-      # "-Denforcer.skip=true"
-      "-Dspotless.skip=true"
-      # Stolen from `buildGraalvmNativeImage`:
-      # > Pass the whole environment to the native-image build process by
-      # > generating a -E option for every environment variable.
-      # Required to passthrough linker args for the darwin build
-      ''-Dgraalvm-native-static-opt="-H:-CheckToolchain $(export -p | sed -n 's/^declare -x \([^=]\+\)=.*$/ -E\1/p' | tr -d \\n)"''
       "-pl"
       "!integration-tests"
+
+      "-Drat.skip=true" # skip license checks; they require manaul approval and should have already been run upstream
+      "-Dspotless.skip=true" # skip formatting checks
+
+      "-Pnative"
+      # Propagate linker args required by the darwin build
+      # > Pass the whole environment to the native-image build process by
+      # > generating a -E option for every environment variable.
+      # source: `buildGraalvmNativeImage`
+      ''-Dgraalvm-native-static-opt="-H:-CheckToolchain $(export -p | sed -n 's/^declare -x \([^=]\+\)=.*$/ -E\1/p' | tr -d \\n)"''
     ];
 
     installPhase = ''
@@ -74,7 +69,7 @@ maven.buildMavenPackage (
       mkdir -p $out/bin
       mkdir -p $out/mvnd-home
 
-      cp -r dist/target/maven-mvnd-1.0.1-${systemDist.${stdenv.system}}/* $out/mvnd-home
+      cp -r dist/target/maven-mvnd-1.0.1-${targets.${stdenv.system}}/* $out/mvnd-home
       makeWrapper $out/mvnd-home/bin/mvnd $out/bin/mvnd \
         --set-default JAVA_HOME "${jdk}" \
         --set-default MVND_HOME $out/mvnd-home
