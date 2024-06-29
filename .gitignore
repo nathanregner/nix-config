@@ -4,6 +4,6 @@ result-*
 .direnv/
 
 ### Editors
-.idea/*
 .clj-kondo/
 .lsp/
+.nrepl-port

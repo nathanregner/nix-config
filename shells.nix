@@ -7,7 +7,7 @@
   default = pkgs.mkShell {
     packages = with pkgs.unstable; [
       sops
-      terraform
+      tenv
       treefmt
     ];
   };
