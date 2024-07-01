@@ -44,6 +44,16 @@
       include = {
         path = "${config.xdg.configHome}/git/local";
       };
+
+      # https://www.anthonygonzales.dev/blog/how-to-improve-git-monorepo-performance.html#create-a-custom-git-config-file-at-gitconfigmonorepo
+      # git update-index --index-version 4
+      # git fsmonitor--daemon start
+      core = {
+        commitgraph = true;
+        fsmonitor = true;
+        writeCommitGraph = true;
+      };
+      feature.manyFiles = true;
     };
     ignores = [ "Session.vim" ];
   };
