@@ -52,4 +52,8 @@ in
   writeBabashkaApplication = pkgs.unstable.callPackage ./write-babashka-application.nix { };
 
   vtsls = pkgs.unstable.callPackage ./vtsls { };
+
+  webrtc-streamer = pkgs.unstable.callPackage ./webrtc-streamer.nix {
+    inherit (sources) live555 webrtc webrtc-streamer;
+  };
 }

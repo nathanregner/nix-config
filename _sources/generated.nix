@@ -56,6 +56,18 @@
     };
     date = "2024-07-10";
   };
+  live555 = {
+    pname = "live555";
+    version = "2c92a57ca04b83b2038ab2ab701d05a54be06a85";
+    src = fetchFromGitHub {
+      owner = "rgaufman";
+      repo = "live555";
+      rev = "2c92a57ca04b83b2038ab2ab701d05a54be06a85";
+      fetchSubmodules = false;
+      sha256 = "sha256-lfw5Ycm0jGAkSrh5So+hhtLlTnC9/cj8GfoMDPeCGSo=";
+    };
+    date = "2023-06-15";
+  };
   pin-github-action = {
     pname = "pin-github-action";
     version = "v1.9.1";
@@ -87,6 +99,30 @@
       rev = "v0.6.2";
       fetchSubmodules = false;
       sha256 = "sha256-qUeIbHJqxGkt2esMm4w6fM52ZE16jWnxugVXxqBh1Qc=";
+    };
+  };
+  webrtc = {
+    pname = "webrtc";
+    version = "38e34668379ed705f3221160652165dc5d610444";
+    src = fetchgit {
+      url = "https://webrtc.googlesource.com/src";
+      rev = "38e34668379ed705f3221160652165dc5d610444";
+      fetchSubmodules = false;
+      deepClone = false;
+      leaveDotGit = false;
+      sha256 = "sha256-dMUEnaHr2vJ9/w9MKnnaXZVA1/blyt6QRYjans1pets=";
+    };
+    date = "2024-07-09";
+  };
+  webrtc-streamer = {
+    pname = "webrtc-streamer";
+    version = "v0.8.6";
+    src = fetchFromGitHub {
+      owner = "mpromonet";
+      repo = "webrtc-streamer";
+      rev = "v0.8.6";
+      fetchSubmodules = true;
+      sha256 = "sha256-TIeXHm7jvooCqyQa69mdNo7mQaEnEmuL5+mmkhOYWuk=";
     };
   };
 }

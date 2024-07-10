@@ -32,3 +32,16 @@ fetch.github = "epk/SF-Mono-Nerd-Font"
 [tfautomv]
 src.github_tag = "busser/tfautomv"
 fetch.github = "busser/tfautomv"
+
+[live555]
+src.git = "https://github.com/rgaufman/live555"
+fetch.github = "rgaufman/live555"
+
+[webrtc-streamer]
+src.github = "mpromonet/webrtc-streamer"
+fetch.github = "mpromonet/webrtc-streamer"
+git.fetchSubmodules = true
+
+[webrtc]
+src.git = "https://webrtc.googlesource.com/src"
+fetch.git = "https://webrtc.googlesource.com/src"

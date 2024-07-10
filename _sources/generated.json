@@ -99,6 +99,26 @@
         },
         "version": "709c51c64e1652d4f8c87b1815db86f56d188268"
     },
+    "live555": {
+        "cargoLocks": null,
+        "date": "2023-06-15",
+        "extract": null,
+        "name": "live555",
+        "passthru": null,
+        "pinned": false,
+        "src": {
+            "deepClone": false,
+            "fetchSubmodules": false,
+            "leaveDotGit": false,
+            "name": null,
+            "owner": "rgaufman",
+            "repo": "live555",
+            "rev": "2c92a57ca04b83b2038ab2ab701d05a54be06a85",
+            "sha256": "sha256-lfw5Ycm0jGAkSrh5So+hhtLlTnC9/cj8GfoMDPeCGSo=",
+            "type": "github"
+        },
+        "version": "2c92a57ca04b83b2038ab2ab701d05a54be06a85"
+    },
     "pin-github-action": {
         "cargoLocks": null,
         "date": null,
@@ -158,5 +178,44 @@
             "type": "github"
         },
         "version": "v0.6.2"
+    },
+    "webrtc": {
+        "cargoLocks": null,
+        "date": "2024-07-09",
+        "extract": null,
+        "name": "webrtc",
+        "passthru": null,
+        "pinned": false,
+        "src": {
+            "deepClone": false,
+            "fetchSubmodules": false,
+            "leaveDotGit": false,
+            "name": null,
+            "rev": "38e34668379ed705f3221160652165dc5d610444",
+            "sha256": "sha256-dMUEnaHr2vJ9/w9MKnnaXZVA1/blyt6QRYjans1pets=",
+            "type": "git",
+            "url": "https://webrtc.googlesource.com/src"
+        },
+        "version": "38e34668379ed705f3221160652165dc5d610444"
+    },
+    "webrtc-streamer": {
+        "cargoLocks": null,
+        "date": null,
+        "extract": null,
+        "name": "webrtc-streamer",
+        "passthru": null,
+        "pinned": false,
+        "src": {
+            "deepClone": false,
+            "fetchSubmodules": true,
+            "leaveDotGit": false,
+            "name": null,
+            "owner": "mpromonet",
+            "repo": "webrtc-streamer",
+            "rev": "v0.8.6",
+            "sha256": "sha256-TIeXHm7jvooCqyQa69mdNo7mQaEnEmuL5+mmkhOYWuk=",
+            "type": "github"
+        },
+        "version": "v0.8.6"
     }
 }

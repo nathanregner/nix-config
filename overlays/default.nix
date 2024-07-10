@@ -69,7 +69,7 @@ let
               install -m 444 -D ${appimageContents}/usr/share/icons/hicolor/192x192/apps/OrcaSlicer.png \
                 $out/share/icons/hicolor/192x192/apps/OrcaSlicer.png
               substituteInPlace $out/share/applications/OrcaSlicer.desktop \
-                --replace-fail 'Exec=AppRun' 'Exec=env WEBKIT_DISABLE_DMABUF_RENDERER=1 ${pname}'
+                --replace-fail 'Exec=AppRun' 'Exec=env WEBKIT_DISABLE_DMABUF_RENDERER=1 ${pname}\nTryExec=${pname}'
             '';
             passthru = {
               inherit appimageContents;
