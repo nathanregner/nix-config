@@ -1010,6 +1010,11 @@ require("lazy").setup({
   },
 
   {
+    "bennypowers/template-literal-comments.nvim",
+    dependencies = "nvim-treesitter/nvim-treesitter",
+  },
+
+  {
     "nvim-tree/nvim-tree.lua",
     lazy = false,
     dependencies = {
@@ -1554,6 +1559,9 @@ vim.api.nvim_create_autocmd("VimLeavePre", {
 -- [[ Setting options ]]
 -- See `:help vim.o`
 -- NOTE: You can change these options as you wish!
+
+-- Set highlight on search
+vim.o.hlsearch = false
 
 -- Make line numbers default
 vim.wo.number = true
