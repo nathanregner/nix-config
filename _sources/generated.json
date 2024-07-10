@@ -188,7 +188,7 @@
         "pinned": false,
         "src": {
             "deepClone": false,
-            "fetchSubmodules": false,
+            "fetchSubmodules": true,
             "leaveDotGit": false,
             "name": null,
             "rev": "38e34668379ed705f3221160652165dc5d610444",

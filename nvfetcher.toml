@@ -45,3 +45,4 @@ git.fetchSubmodules = true
 [webrtc]
 src.git = "https://webrtc.googlesource.com/src"
 fetch.git = "https://webrtc.googlesource.com/src"
+git.fetchSubmodules = true
