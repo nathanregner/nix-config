@@ -1013,6 +1013,7 @@ require("lazy").setup({
       },
     },
     config = function(_, opts)
+      require("user.plugin.template-literal-comments").setup()
       require("nvim-treesitter.configs").setup(opts)
       require("treesitter-context").setup({
         max_lines = 10,
