@@ -19,6 +19,8 @@
       nix
       git
     ];
-    packages = [ inputs'.home-manager.packages.home-manager ];
+    packages = [
+      inputs'.home-manager.packages.home-manager
+    ] ++ pkgs.lib.optionals pkgs.stdenv.isDarwin [ inputs'.nix-darwin.packages.darwin-rebuild ];
   };
 }
