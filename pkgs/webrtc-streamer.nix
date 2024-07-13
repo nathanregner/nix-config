@@ -1,15 +1,25 @@
 {
   abseil-cpp,
+  clangStdenv,
   cmake,
+  fetchgit,
+  gn,
   jsoncpp,
   libyuv,
   live555,
+  ninja,
   openssl,
-  stdenv,
-  webrtc,
   webrtc-streamer,
 }:
-stdenv.mkDerivation (
+let
+  webrtc = fetchgit {
+    url = "https://webrtc.googlesource.com/src";
+    rev = "33e6e80acc43e6563334d9cafc523896a29bf8fb";
+    fetchSubmodules = true;
+    sha256 = "sha256-HvS7JPiiGj6xcoyQ0Tk+tIph/SU6iDdusshMPPwoPeY=";
+  };
+in
+clangStdenv.mkDerivation (
   webrtc-streamer
   // {
 
@@ -17,7 +27,7 @@ stdenv.mkDerivation (
     # set (WEBRTCINCLUDE ${WEBRTCROOT}/src ${WEBRTCROOT}/src/third_party/abseil-cpp ${WEBRTCROOT}/src/third_party/jsoncpp/source/include  ${WEBRTCROOT}/src/third_party/jsoncpp/generated ${WEBRTCROOT}/src/third_party/libyuv/include)
     postUnpack = ''
       mkdir -p ./webrtc/src
-      cp -r ${webrtc.src}/* ./webrtc/src
+      cp -r ${webrtc}/* ./webrtc/src
       mkdir -p ./webrtc/src/third_party/abseil-cpp
       cp -r ${abseil-cpp.src}/* ./webrtc/src/third_party/abseil-cpp
       mkdir -p ./webrtc/src/third_party/jsoncpp/source
@@ -25,7 +35,6 @@ stdenv.mkDerivation (
       mkdir -p ./webrtc/src/third_party/libyuv
       cp -r ${libyuv.src}/* ./webrtc/src/third_party/libyuv
       export WEBRTCROOT=$(pwd)/webrtc
-      export LIVE=${live555.src}
     '';
 
     postPatch = ''
@@ -47,12 +56,22 @@ stdenv.mkDerivation (
     nativeBuildInputs = [
       abseil-cpp
       cmake
+      gn
+      ninja
     ];
 
     enableParallelBuilding = true;
 
     passthru = {
       webrtc = webrtc.src;
+      jank = ''
+        mkdir -p ./third_party/abseil-cpp
+        cp -r ${abseil-cpp.src}/* ./third_party/abseil-cpp
+        mkdir -p ./third_party/jsoncpp/source
+        cp -r ${jsoncpp.src}/* ./third_party/jsoncpp/source
+        mkdir -p ./third_party/libyuv
+        cp -r ${libyuv.src}/* ./third_party/libyuv
+      '';
     };
 
     buildInputs = [ openssl ];

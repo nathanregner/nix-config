@@ -1,0 +1,6 @@
+services:
+  webrtc:
+    build: .
+    command: bash
+    volumes:
+      - ~/dev/github/webrtc-streamer:/webrtc-streamer

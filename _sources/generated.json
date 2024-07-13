@@ -179,28 +179,9 @@
         },
         "version": "v0.6.2"
     },
-    "webrtc": {
-        "cargoLocks": null,
-        "date": "2024-07-09",
-        "extract": null,
-        "name": "webrtc",
-        "passthru": null,
-        "pinned": false,
-        "src": {
-            "deepClone": false,
-            "fetchSubmodules": true,
-            "leaveDotGit": false,
-            "name": null,
-            "rev": "38e34668379ed705f3221160652165dc5d610444",
-            "sha256": "sha256-dMUEnaHr2vJ9/w9MKnnaXZVA1/blyt6QRYjans1pets=",
-            "type": "git",
-            "url": "https://webrtc.googlesource.com/src"
-        },
-        "version": "38e34668379ed705f3221160652165dc5d610444"
-    },
     "webrtc-streamer": {
         "cargoLocks": null,
-        "date": null,
+        "date": "2024-06-08",
         "extract": null,
         "name": "webrtc-streamer",
         "passthru": null,
@@ -212,10 +193,10 @@
             "name": null,
             "owner": "mpromonet",
             "repo": "webrtc-streamer",
-            "rev": "v0.8.6",
-            "sha256": "sha256-TIeXHm7jvooCqyQa69mdNo7mQaEnEmuL5+mmkhOYWuk=",
+            "rev": "5dddc1760460dcb714960ca704d94031e466659f",
+            "sha256": "sha256-RqGyCGywkqmvaSDoxHuiPdO5e6F6CZ/NkeBFf7tNnxo=",
             "type": "github"
         },
-        "version": "v0.8.6"
+        "version": "5dddc1760460dcb714960ca704d94031e466659f"
     }
 }

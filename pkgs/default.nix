@@ -54,6 +54,6 @@ in
   vtsls = pkgs.unstable.callPackage ./vtsls { };
 
   webrtc-streamer = pkgs.unstable.callPackage ./webrtc-streamer.nix {
-    inherit (sources) live555 webrtc webrtc-streamer;
+    inherit (sources) live555 webrtc-streamer;
   };
 }

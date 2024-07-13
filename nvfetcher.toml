@@ -11,6 +11,10 @@ fetch.github = "candid82/joker"
 src.github_tag = "kyleisah/Klipper-Adaptive-Meshing-Purging"
 fetch.github = "kyleisah/Klipper-Adaptive-Meshing-Purging"
 
+[live555]
+src.git = "https://github.com/rgaufman/live555"
+fetch.github = "rgaufman/live555"
+
 [kibana]
 src.container = "library/kibana"
 src.include_regex = "7\\..*"
@@ -33,16 +37,13 @@ fetch.github = "epk/SF-Mono-Nerd-Font"
 src.github_tag = "busser/tfautomv"
 fetch.github = "busser/tfautomv"
 
-[live555]
-src.git = "https://github.com/rgaufman/live555"
-fetch.github = "rgaufman/live555"
+# [webrtc]
+# src.git = "https://webrtc.googlesource.com/src"
+# fetch.git = "https://webrtc.googlesource.com/src"
+# git.fetchSubmodules = true
 
 [webrtc-streamer]
-src.github = "mpromonet/webrtc-streamer"
+src.git = "https://github.com/mpromonet/webrtc-streamer"
 fetch.github = "mpromonet/webrtc-streamer"
 git.fetchSubmodules = true
 
-[webrtc]
-src.git = "https://webrtc.googlesource.com/src"
-fetch.git = "https://webrtc.googlesource.com/src"
-git.fetchSubmodules = true
