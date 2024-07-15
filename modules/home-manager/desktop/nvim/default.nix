@@ -19,6 +19,7 @@
       clojure-lsp
       emmet-language-server
       gopls
+      helm-ls
       lua-language-server
       nil
       terraform-ls
