@@ -1,0 +1,17 @@
+{
+  "manifest_version": 2,
+  "name": "AWS CLI SSO",
+  "version": "1.0",
+
+  "description": "Auto-click the AWS SSO accept button when invoked from the CLI",
+
+  "content_scripts": [
+    {
+      "matches": [
+        "https://device.sso.us-west-2.amazonaws.com/*",
+        "https://*.awsapps.com/*"
+      ],
+      "js": ["aws-cli-sso.js"]
+    }
+  ]
+}
