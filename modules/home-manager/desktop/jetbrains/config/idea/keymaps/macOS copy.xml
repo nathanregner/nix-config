@@ -76,6 +76,14 @@
     <keyboard-shortcut first-keystroke="f1" />
   </action>
   <action id="GotoLine" />
+  <action id="GotoNextError">
+    <keyboard-shortcut first-keystroke="f2" />
+    <keyboard-shortcut first-keystroke="close_bracket" second-keystroke="d" />
+  </action>
+  <action id="GotoPreviousError">
+    <keyboard-shortcut first-keystroke="shift f2" />
+    <keyboard-shortcut first-keystroke="open_bracket" second-keystroke="d" />
+  </action>
   <action id="GotoRow" />
   <action id="GuiDesigner.QuickJavadoc">
     <keyboard-shortcut first-keystroke="ctrl j" />
@@ -178,3 +186,4 @@
   <action id="copilot.disposeInlays" />
   <action id="tasks.goto" />
 </keymap>
+
