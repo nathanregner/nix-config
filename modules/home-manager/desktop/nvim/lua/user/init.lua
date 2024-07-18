@@ -495,6 +495,7 @@ require("lazy").setup({
         "L3MON4D3/LuaSnip",
         build = "CC=clang make install_jsregexp",
         dependencies = {
+          "nvim-treesitter/nvim-treesitter",
           -- https://github.com/rafamadriz/friendly-snippets
           {
             "rafamadriz/friendly-snippets",
@@ -503,6 +504,22 @@ require("lazy").setup({
             end,
           },
         },
+        config = function()
+          local ls = require("luasnip")
+
+          -- TODO
+          -- ls.setup({
+          --   load_ft_func = require("luasnip.extras.filetype_functions").extend_load_ft({
+          --     javascript = { "ecma" },
+          --     typescript = { "javascript", "ecma" },
+          --     javascriptreact = { "javascript", "ecma" },
+          --     typescriptreact = { "typescript", "ecma" },
+          --   }),
+          -- })
+
+          require("user.snippets.ecma")
+          require("user.snippets.typescriptreact")
+        end,
       },
       "saadparwaiz1/cmp_luasnip",
       "hrsh7th/cmp-nvim-lsp",
