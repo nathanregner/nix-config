@@ -35,80 +35,84 @@ local k = require("luasnip.nodes.key_indexer").new_key
 
 local treesitter_postfix = require("luasnip.extras.treesitter_postfix").treesitter_postfix
 
-local ecma = {
-  "javascript",
-  "typescript",
-  -- "javascriptreact", "typescriptreact"
-}
-
 local expression = [[
   [
-    (call_expression)
-    (identifier)
-    (subscript_expression)
-    (array)
-    (number)
-    (string)
-    (member_expression)
-    (parenthesized_expression)
+    (expression)
   ] @prefix
 ]]
 
 -- require("luasnip.session.snippet_collection").clear_snippets("javascript") -- TODO
 
--- ls.filetype_extend("ecma", { "javascript", "typescript", "javascriptreact", "typescriptreact" })
-ls.filetype_extend("javascript", { "ecma" })
-ls.filetype_extend("javascriptreact", { "ecma" })
-ls.filetype_extend("typescript", { "ecma" })
-ls.filetype_extend("typescriptreact", { "ecma" })
+-- -- ls.filetype_extend("ecma", { "javascript", "typescript", "javascriptreact", "typescriptreact" })
+-- ls.filetype_extend("javascript", { "ecma" })
+ls.filetype_extend("javascriptreact", { "javascript" })
+-- ls.filetype_extend("typescript", { "ecma" })
+ls.filetype_extend("typescriptreact", { "typescript" })
 
-ls.add_snippets("ecma", {
-  -- s("el", fmt("<%= {} %>{}", { i(1), i(0) })),
-  -- s("log", fmt("console.log({})"), { i(1) }),
-  treesitter_postfix({
-    trig = ".clv",
-    matchTSNode = {
-      query = [[
+local snippets = {
+  typescript = {},
+  javascript = {},
+}
+
+local create_postfix = function(opts)
+  for _, lang in ipairs(opts.langs or { "javascript", "typescript" }) do
+    local snippet = treesitter_postfix({
+      trig = opts.trig,
+      matchTSNode = {
+        query = opts.query,
+        query_lang = lang,
+      },
+      reparseBuffer = "live",
+    }, {
+      d(1, function(_, parent)
+        local match = parent.snippet.env.LS_TSMATCH
+        return opts.expand(match)
+      end),
+    })
+    table.insert(snippets[lang], snippet)
+  end
+end
+
+create_postfix({
+  trig = ".clv",
+  query = [[
         [
           (identifier)
+          (member_expression)
         ] @prefix
       ]],
-      query_lang = "javascript",
-    },
-    reparseBuffer = "live",
-  }, {
-    d(1, function(_, parent)
-      local match = parent.snippet.env.LS_TSMATCH
-      return sn(nil, fmt("console.log('{1}', {1});", { t(match) }))
-    end),
-  }),
-  treesitter_postfix({
-    trig = ".cl",
-    matchTSNode = {
-      query = expression,
-      query_lang = "javascript",
-    },
-    reparseBuffer = "live",
-  }, {
-    d(1, function(_, parent)
-      local match = parent.snippet.env.LS_TSMATCH
-      return sn(nil, fmt("console.log({});", { t(match) }))
-    end),
-  }),
-  treesitter_postfix({
-    trig = ".forof",
-    matchTSNode = {
-      query = expression,
-      query_lang = "javascript",
-    },
-    reparseBuffer = "live",
-  }, {
-    d(1, function(_, parent)
-      local match = parent.snippet.env.LS_TSMATCH
-      return sn(nil, fmt("for (const {} of {}) {{\n  {}\n}}", { i(1, "iterator"), t(match), i(2, {}, "") }))
-    end), -- nil
-  }),
-}, {
-  key = "custom/ecma",
-  default_priority = 1000,
+  expand = function(match)
+    return sn(nil, fmt("console.log('{1}', {1});", { t(match) }))
+  end,
 })
+
+create_postfix({
+  trig = ".cl",
+  query = expression,
+  expand = function(match)
+    return sn(nil, fmt("console.log({1});", { t(match) }))
+  end,
+})
+
+create_postfix({
+  trig = ".forof",
+  query = expression,
+  expand = function(match)
+    return sn(nil, fmt("for (const {} of {}) {{\n  {}\n}}", { i(1, "iterator"), t(match), i(2, {}, "") }))
+  end,
+})
+
+create_postfix({
+  trig = ".json",
+  query = expression,
+  expand = function(match)
+    return sn(nil, fmt("JSON.stringify({}, undefined, 2)", { t(match) }))
+  end,
+})
+
+for lang, lang_snippets in pairs(snippets) do
+  ls.add_snippets(lang, lang_snippets, {
+    key = lang .. "/custom",
+    default_priority = 1000,
+  })
+end
