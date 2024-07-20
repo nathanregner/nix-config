@@ -58,6 +58,7 @@ local expression = [[
 
 -- ls.filetype_extend("ecma", { "javascript", "typescript", "javascriptreact", "typescriptreact" })
 ls.filetype_extend("javascript", { "ecma" })
+ls.filetype_extend("typescript", { "ecma" })
 
 ls.add_snippets("ecma", {
   -- s("el", fmt("<%= {} %>{}", { i(1), i(0) })),
