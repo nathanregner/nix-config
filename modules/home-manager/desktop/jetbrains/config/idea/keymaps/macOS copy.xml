@@ -186,4 +186,3 @@
   <action id="copilot.disposeInlays" />
   <action id="tasks.goto" />
 </keymap>
-
