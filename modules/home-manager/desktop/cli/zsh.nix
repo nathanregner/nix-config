@@ -33,6 +33,7 @@
           [[ ! "$TERM" =~ screen ]] &&
           [[ ! "$TERM" =~ tmux ]] &&
           [ -z "$TMUX" ] &&
+          [[ ! "$(tty)" =~ dev/tty ]] &&
           [[ ! "$TERMINAL_EMULATOR" =~ "JetBrains" ]]; then
           $_tmux attach >&/dev/null
         fi
