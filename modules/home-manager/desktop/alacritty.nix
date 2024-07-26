@@ -23,6 +23,19 @@
       env = {
         TERM = "alacritty";
       };
+      # https://stackoverflow.com/questions/16359878/how-to-map-shift-enter#comment124634141_42461580
+      keyboard.bindings = [
+        {
+          mods = "Control";
+          key = "Return";
+          chars = "\\u001B[13;5u";
+        }
+        {
+          mods = "Shift";
+          key = "Return";
+          chars = "\\u001B[13;2u";
+        }
+      ];
     };
   };
 }
