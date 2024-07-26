@@ -11,6 +11,12 @@
 
       # https://github.com/NixOS/nixpkgs/issues/275770
       complete -C aws_completer aws
+
+      showkey() {
+        # show the escape codes for the keys pressed until 5 seconds of inactivity
+        # https://unix.stackexchange.com/questions/674816/how-can-i-find-out-what-the-escape-codes-my-terminal-are-sending-for-certain-spe
+        STTY='raw -echo min 0 time 50' cat -vte
+      }
     '';
     # defaultKeymap = "viins";
     oh-my-zsh = {
