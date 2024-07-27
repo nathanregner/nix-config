@@ -120,8 +120,6 @@ in
     settings.output.elasticsearch.hosts = [ elasticsearchHost ];
   };
 
-  virtualisation.oci-containers.backend = "docker";
-
   virtualisation.oci-containers.containers.kibana = rec {
     imageFile = sources.kibana.src;
     image = "${imageFile.imageName}:${imageFile.imageDigest}";

@@ -14,16 +14,22 @@ in
     };
     ports = [ "${toString hostPort}:9000" ];
     volumes = [ "${dataDir}:${dataDir}" ];
-    user = "mealie:mealie";
+    # user = "mealie:mealie";
+    extraOptions = [ "--userns keep-id" ];
   };
 
-  users = {
-    users.mealie = {
-      group = "mealie";
-      isSystemUser = true;
-    };
-    groups.mealie = { };
+  systemd.services.podman-mealie.serviceConfig = {
+    User = "mealie";
+    StateDirectory = "mealie";
   };
+
+  # users = {
+  #   users.mealie = {
+  #     group = "mealie";
+  #     isSystemUser = true;
+  #   };
+  #   groups.mealie = { };
+  # };
 
   nginx.subdomain.mealie = {
     "/".proxyPass = "http://127.0.0.1:${toString hostPort}/";
