@@ -10,6 +10,8 @@ in
 {
   inherit (node2nixPkgs) typescript;
 
+  aws-cli-sso = pkgs.unstable.callPackage ./aws-cli-sso { };
+
   emmet-language-server = node2nixPkgs."@olrtg/emmet-language-server";
 
   generate-sops-keys = pkgs.unstable.callPackage ./generate-sops-keys.nix { };
@@ -61,7 +63,6 @@ in
     pkgs.unstable.runCommand "${pname}-${version}" { } ''
       mkdir -p $out/share/fonts/${pname}
       cp ${src}/*.otf $out/share/fonts/${pname}
-
     '';
 
   vtsls = node2nixPkgs."@vtsls/language-server";

@@ -1,20 +1,28 @@
+{ config, pkgs, ... }:
 {
   programs.firefox = {
-    profiles.default = {
-
-      # extensions = [
-      #   (pkgs.stdenv.mkDerivation {
-      #     name = "firefox-extension-ublock-origin";
-      #     src = ./extensions;
-      #     dontBuild = true;
-      #     installPhase = ''
-      #     '';
-      #   })
-      # ];
-
+    enable = true;
+    package = if pkgs.stdenv.isDarwin then null else pkgs.unstable.firefox-devedition;
+    # name must start with "dev-edition-"? https://github.com/nix-community/home-manager/issues/4703
+    profiles.dev-edition-default = {
+      # FIXME: doesn't auto-install
+      extensions = [ pkgs.aws-cli-sso ];
       settings = {
-        extensions.autoDisableScopes = 0;
+        "browser.aboutConfig.showWarning" = false;
+
+        "extensions.autoDisableScopes" = 0;
+        "xpinstall.signatures.required" = false;
       };
     };
   };
+
+  home.packages = [
+    (pkgs.writeShellApplication {
+      name = "firefox";
+      runtimeInputs = [ config.programs.firefox.package ];
+      text = ''
+        firefox-devedition "$@"
+      '';
+    })
+  ];
 }
