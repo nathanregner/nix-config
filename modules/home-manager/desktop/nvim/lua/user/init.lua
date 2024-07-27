@@ -1370,7 +1370,6 @@ require("lazy").setup({
 
   { -- REPL
     "Olical/conjure",
-    ft = { "clojure" },
     dependencies = {
       -- https://github.com/guns/vim-sexp
       "guns/vim-sexp",
@@ -1406,7 +1405,9 @@ require("lazy").setup({
       })
       vim.g["conjure#extract#tree_sitter#enabled"] = true
       vim.g["conjure#client#clojure#nrepl#refresh#backend"] = "clj-reload"
-      -- https://github.com/Olical/conjure/issues/406
+      -- Rebind from K
+      vim.g["conjure#mapping#doc_word"] = "gk"
+      -- Fix Babashka pprint: https://github.com/Olical/conjure/issues/406
       vim.g["conjure#client#clojure#nrepl#eval#print_function"] = "cider.nrepl.pprint/pprint"
     end,
   },
