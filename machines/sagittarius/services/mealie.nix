@@ -14,6 +14,15 @@ in
     };
     ports = [ "${toString hostPort}:9000" ];
     volumes = [ "${dataDir}:${dataDir}" ];
+    user = "mealie:mealie";
+  };
+
+  users = {
+    users.mealie = {
+      group = "mealie";
+      isSystemUser = true;
+    };
+    groups.mealie = { };
   };
 
   nginx.subdomain.mealie = {
