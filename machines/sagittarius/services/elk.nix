@@ -124,7 +124,7 @@ in
 
   virtualisation.oci-containers.containers.kibana = rec {
     imageFile = sources.kibana.src;
-    image = "${imageFile.imageName}:${imageFile.imageTag}";
+    image = "${imageFile.imageName}:${imageFile.imageDigest}";
     volumes = [
       (
         let

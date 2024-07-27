@@ -99,6 +99,26 @@
         },
         "version": "709c51c64e1652d4f8c87b1815db86f56d188268"
     },
+    "mealie": {
+        "cargoLocks": null,
+        "date": null,
+        "extract": null,
+        "name": "mealie",
+        "passthru": null,
+        "pinned": false,
+        "src": {
+            "arch": null,
+            "finalImageName": null,
+            "finalImageTag": null,
+            "imageDigest": "sha256:54a976880161c3c96de30b63cd0092d1f069aa8b23686669b726558ddf112724",
+            "imageName": "hkotel/mealie",
+            "imageTag": "latest",
+            "os": null,
+            "sha256": "sha256-LsnvoHhztvn/OrMLdyiLUwhkFn9OmVt2fWOUcK2QisY=",
+            "tlsVerify": null
+        },
+        "version": "latest"
+    },
     "pin-github-action": {
         "cargoLocks": null,
         "date": null,
