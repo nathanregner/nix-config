@@ -409,6 +409,20 @@ require("lazy").setup({
         }),
       })
 
+      local buffer = {
+        name = "buffer",
+        option = {
+          get_bufnrs = function()
+            -- local bufs = {}
+            -- for _, win in ipairs(vim.api.nvim_list_wins()) do
+            --   bufs[vim.api.nvim_win_get_buf(win)] = true
+            -- end
+            -- return vim.tbl_keys(bufs)
+            return vim.api.nvim_list_bufs()
+          end,
+        },
+      }
+
       cmp.setup({
         snippet = {
           expand = function(args)
@@ -430,7 +444,7 @@ require("lazy").setup({
                 config = {
                   sources = {
                     { name = "nvim_lsp" },
-                    { name = "buffer" },
+                    buffer,
                   },
                 },
               })
@@ -476,19 +490,7 @@ require("lazy").setup({
         sources = {
           { name = "luasnip" },
           { name = "nvim_lsp" },
-          {
-            name = "buffer",
-            keyword_length = 5,
-            -- option = {
-            --   get_bufnrs = function()
-            --     local bufs = {}
-            --     for _, win in ipairs(vim.api.nvim_list_wins()) do
-            --       bufs[vim.api.nvim_win_get_buf(win)] = true
-            --     end
-            --     return vim.tbl_keys(bufs)
-            --   end,
-            -- },
-          },
+          buffer,
           { name = "path" },
         },
         -- sorting = {
