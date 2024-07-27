@@ -4,6 +4,7 @@
     ../base
     ./alacritty.nix
     ./cli
+    ./firefox
     ./jetbrains
     ./nvfetcher.nix
     ./nvim

@@ -63,7 +63,6 @@
     # apps
     discord
     evince
-    firefox
     insync
     jetbrains-toolbox
     openrgb

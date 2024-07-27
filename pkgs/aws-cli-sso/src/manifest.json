@@ -17,7 +17,7 @@
         "https://device.sso.us-west-2.amazonaws.com/*",
         "https://*.awsapps.com/*"
       ],
-      "js": ["aws-cli-sso.js"]
+      "js": ["main.js"]
     }
   ]
 }

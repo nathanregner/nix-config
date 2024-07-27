@@ -8,13 +8,7 @@ let
   };
 in
 {
-  inherit (node2nixPkgs) typescript;
-
-  btrfs-snapshot-diff = pkgs.unstable.callPackage ./btrfs-snapshot-diff { inherit sources; };
-
-  emmet-language-server = node2nixPkgs."@olrtg/emmet-language-server";
-
-  generate-sops-keys = pkgs.unstable.callPackage ./generate-sops-keys.nix { };
+  aws-cli-sso = pkgs.unstable.callPackage ./aws-cli-sso { };
 
   gitea-github-mirror = pkgs.unstable.callPackage ./gitea-github-mirror { };
 
@@ -63,7 +57,6 @@ in
     pkgs.unstable.runCommand "${pname}-${version}" { } ''
       mkdir -p $out/share/fonts/${pname}
       cp ${src}/*.otf $out/share/fonts/${pname}
-
     '';
 
   vtsls = node2nixPkgs."@vtsls/language-server";
