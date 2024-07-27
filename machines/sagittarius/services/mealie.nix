@@ -6,7 +6,7 @@ in
 {
   virtualisation.oci-containers.containers.mealie = rec {
     imageFile = sources.mealie.src;
-    image = "${imageFile.imageName}@${imageFile.imageDigest}";
+    image = "${imageFile.imageName}@${imageFile.imageTag}"; # pinned image will be loaded from store
     # https://docs.mealie.io/documentation/getting-started/installation/sqlite/
     environment = {
       BASE_URL = "https://mealie.nregner.net";
@@ -14,22 +14,25 @@ in
     };
     ports = [ "${toString hostPort}:9000" ];
     volumes = [ "${dataDir}:${dataDir}" ];
-    # user = "mealie:mealie";
-    extraOptions = [ "--userns keep-id" ];
+    extraOptions = [
+      "--userns"
+      "keep-id"
+    ];
   };
 
   systemd.services.podman-mealie.serviceConfig = {
+    # DynamicUser = true;
     User = "mealie";
     StateDirectory = "mealie";
   };
 
-  # users = {
-  #   users.mealie = {
-  #     group = "mealie";
-  #     isSystemUser = true;
-  #   };
-  #   groups.mealie = { };
-  # };
+  users = {
+    users.mealie = {
+      group = "mealie";
+      isSystemUser = true;
+    };
+    groups.mealie = { };
+  };
 
   nginx.subdomain.mealie = {
     "/".proxyPass = "http://127.0.0.1:${toString hostPort}/";
