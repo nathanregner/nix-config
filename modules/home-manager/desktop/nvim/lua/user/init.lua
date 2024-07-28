@@ -212,6 +212,9 @@ require("lazy").setup({
         },
         nil_ls = {},
         nushell = {},
+        omnisharp = {
+          cmd = { "OmniSharp" },
+        },
         rust_analyzer = {
           -- https://rust-analyzer.github.io/manual.html#configuration
           ["rust-analyzer"] = {
@@ -261,6 +264,7 @@ require("lazy").setup({
 
       for server_name, server_config in pairs(servers) do
         require("lspconfig")[server_name].setup({
+          cmd = server_config.cmd,
           capabilities = capabilities,
           on_attach = on_attach,
           settings = server_config,
