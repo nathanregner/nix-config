@@ -3,7 +3,7 @@
   programs.zsh = {
     enable = true;
     initExtra = ''
-      bindkey -M viins 'jk' vi-cmd-mode
+      export ZVM_VI_INSERT_ESCAPE_BINDKEY=jk
 
       flakify() {
         nix flake new -t github:NixOS/templates#''${1:-"utils-generic"} .
@@ -18,11 +18,14 @@
         STTY='raw -echo min 0 time 50' cat -vte
       }
     '';
-    # defaultKeymap = "viins";
-    oh-my-zsh = {
-      enable = true;
-      plugins = [ "vi-mode" ];
-    };
+    # https://github.com/jeffreytse/zsh-vi-mode?tab=readme-ov-file#-usage
+    plugins = [
+      {
+        name = "zsh-vi-mode";
+        src = pkgs.unstable.zsh-vi-mode;
+        file = "share/zsh-vi-mode/zsh-vi-mode.plugin.zsh";
+      }
+    ];
     shellAliases =
       let
         nixRebuild = if pkgs.stdenv.isDarwin then "darwin-rebuild" else "nixos-rebuild";
