@@ -8,6 +8,9 @@
       flakify() {
         nix flake new -t github:NixOS/templates#''${1:-"utils-generic"} .
       }
+
+      # https://github.com/NixOS/nixpkgs/issues/275770
+      complete -C aws_completer aws
     '';
     # defaultKeymap = "viins";
     oh-my-zsh = {
