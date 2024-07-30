@@ -28,10 +28,10 @@
       lua-language-server
       nil
       nodePackages_latest.graphql-language-service-cli
+      nodePackages_latest.tsserver
       terraform-ls
       vscode-langservers-extracted
       yaml-language-server
-      pkgs.vtsls
 
       # formatters/linters
       codespell
