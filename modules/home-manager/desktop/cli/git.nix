@@ -15,7 +15,6 @@
         autoSetupRemote = true;
       };
       pull.rebase = true;
-      rebase.updateRefs = true;
       rebase.autostash = true;
       diff = {
         # use difftastic as difftool: https://difftastic.wilfred.me.uk/git.html
