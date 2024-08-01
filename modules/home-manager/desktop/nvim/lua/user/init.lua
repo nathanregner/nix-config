@@ -642,13 +642,11 @@ require("lazy").setup({
     end,
   },
 
-  {
-    -- https://github.com/lewis6991/gitsigns.nvim
-    -- Adds git related signs to the gutter, as well as utilities for managing changes
+  { -- gitsigns
     "lewis6991/gitsigns.nvim",
     opts = {
       on_attach = function(bufnr)
-        local gs = package.loaded.gitsigns
+        local gs = require("gitsigns")
 
         local function map(mode, l, r, opts)
           opts = opts or {}
@@ -679,27 +677,29 @@ require("lazy").setup({
         map("n", "<leader>htd", gs.toggle_deleted, { desc = "[H]unk [T]oggle [D]eleted" })
 
         local ts_repeat_move = require("nvim-treesitter.textobjects.repeatable_move")
-        local next_hunk_repeat, prev_hunk_repeat = ts_repeat_move.make_repeatable_move_pair(gs.next_hunk, gs.prev_hunk)
 
-        -- don't override the built-in and fugitive keymaps
-        map({ "n", "v" }, "]c", function()
+        local next_hunk = function()
           if vim.wo.diff then
-            return "]c"
+            -- don't override the built-in and fugitive keymaps
+            vim.api.nvim_feedkeys("]c", "n", false)
+          else
+            gs.nav_hunk("next")
           end
-          vim.schedule(function()
-            next_hunk_repeat()
-          end)
-          return "<Ignore>"
-        end, { expr = true, desc = "Jump to next hunk" })
-        map({ "n", "v" }, "[c", function()
+        end
+
+        local prev_hunk = function()
           if vim.wo.diff then
-            return "[c"
+            -- don't override the built-in and fugitive keymaps
+            vim.api.nvim_feedkeys("[c", "n", false)
+          else
+            gs.nav_hunk("prev")
           end
-          vim.schedule(function()
-            prev_hunk_repeat()
-          end)
-          return "<Ignore>"
-        end, { expr = true, desc = "Jump to previous hunk" })
+        end
+
+        local next_hunk_repeat, prev_hunk_repeat = ts_repeat_move.make_repeatable_move_pair(next_hunk, prev_hunk)
+
+        map({ "n", "v" }, "]c", next_hunk_repeat, { desc = "Jump to next hunk" })
+        map({ "n", "v" }, "[c", prev_hunk_repeat, { desc = "Jump to previous hunk" })
       end,
     },
   },
