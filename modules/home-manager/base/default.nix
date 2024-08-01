@@ -8,6 +8,7 @@
   imports = [
     ../lib
     ./fzf.nix
+    ./spaceship.nix
     ./tmux.nix
     ./vim.nix
     ./zsh.nix
