@@ -645,7 +645,7 @@ require("lazy").setup({
         map("n", "<leader>hS", gs.stage_buffer, { desc = "[H]unk [S]tage buffer" })
         map("n", "<leader>hu", gs.undo_stage_hunk, { desc = "[H]unk [U]ndo stage" })
         map("n", "<leader>hR", gs.reset_buffer, { desc = "[H]unk [R]eset buffer" })
-        map("n", "<leader>hp", gs.preview_hunk, { desc = "[H]unk [P]review" })
+        map("n", "<leader>hP", gs.preview_hunk, { desc = "[H]unk [P]review" })
         map("n", "<leader>hb", function()
           gs.blame_line({ full = true })
         end, { desc = "[H]unk [B]lame" })
@@ -1521,6 +1521,11 @@ vim.keymap.set("n", "j", "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = tr
 
 -- Remap record macro to prevent accidental presses
 vim.keymap.set("n", "<leader>q", "q", { noremap = true })
+vim.keymap.set("n", "q", "<nop>", { noremap = true })
+
+-- Diff view
+vim.keymap.set("n", "<leader>hp", "<cmd>diffput<cr>", { noremap = true })
+vim.keymap.set("n", "<leader>hg", "<cmd>diffget<cr>", { noremap = true })
 vim.keymap.set("n", "q", "<nop>", { noremap = true })
 
 -- Diagnostic keymaps
