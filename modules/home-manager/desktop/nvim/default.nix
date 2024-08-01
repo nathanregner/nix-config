@@ -1,15 +1,9 @@
-{
-  inputs,
-  config,
-  pkgs,
-  ...
-}:
+{ config, pkgs, ... }:
 {
   imports = [ ./tools ];
 
   programs.neovim = {
     enable = true;
-    package = inputs.neovim-nightly-overlay.packages.${pkgs.system}.default;
     defaultEditor = true;
     extraConfig = builtins.readFile ./init.vim;
     extraLuaConfig = ''
