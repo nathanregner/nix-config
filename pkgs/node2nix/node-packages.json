@@ -1,1 +1,1 @@
-["graphql-language-service-cli"]
+["@vtsls/language-server", "graphql-language-service-cli"]
