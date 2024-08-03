@@ -96,7 +96,15 @@ in
     };
 
   modifications =
-    final: prev: { hyprland = final.unstable.hyprland; } // sharedModifications final prev;
+    final: prev:
+    {
+      inherit (final.unstable)
+        #
+        hyprland
+        nixci
+        ;
+    }
+    // sharedModifications final prev;
 
   unstable-packages = final: _prev: {
     unstable = import inputs.nixpkgs-unstable {

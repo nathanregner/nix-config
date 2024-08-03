@@ -27,6 +27,8 @@
       url = "github:nathanregner/hydra-sentinel";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
+    github-nix-ci.url = "github:nathanregner/github-nix-ci";
+    # github-nix-ci.url = "path:/home/nregner/dev/github/github-nix-ci/";
     mac-app-util = {
       url = "github:hraban/mac-app-util";
       # inputs.nixpkgs.follows = "nixpkgs-unstable";
@@ -40,7 +42,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     sops-nix = {
-      url = "github:Mic92/sops-nix";
+      url = "github:nathanregner/sops-nix";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
       inputs.nixpkgs-stable.follows = "nixpkgs";
     };
@@ -253,14 +255,16 @@
                     environment.systemPackages = [
                       # copy system closure so we don't have to download/rebuild on the host
                       config.system.build.toplevel
-                      (pkgs.runCommand "install-scripts" { } ''
-                        mkdir -p $out/bin
-                        cp ${config.system.build.formatScript} $out/bin/disko-format
-                        cp ${config.system.build.mountScript} $out/bin/disko-mount
-                        cp ${pkgs.writeShellScript "install" ''
-                          sudo nixos-install --root /mnt --flake ${self.outPath}#${name}
-                        ''} $out/bin/nixos-install-flake
-                      '')
+                      (pkgs.runCommand "install-scripts" { } # go
+                        ''
+                          mkdir -p $out/bin
+                          cp ${config.system.build.formatScript} $out/bin/disko-format
+                          cp ${config.system.build.mountScript} $out/bin/disko-mount
+                          cp ${pkgs.writeShellScript "install" ''
+                            sudo nixos-install --root /mnt --flake ${self.outPath}#${name}
+                          ''} $out/bin/nixos-install-flake
+                        ''
+                      )
                     ];
                     isoImage.squashfsCompression = "zstd -Xcompression-level 1";
                   }
@@ -309,6 +313,8 @@
               ] outputs.devShells
             );
           };
+
+          nixci.hydraJobs = hydraJobs;
         };
     };
 }

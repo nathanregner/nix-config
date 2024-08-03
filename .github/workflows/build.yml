@@ -1,0 +1,27 @@
+name: Build flake outputs
+
+on:
+  push:
+    branches:
+      - main
+      - next
+  # pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.branch }}
+  cancel-in-progress: true
+
+jobs:
+  nix:
+    runs-on: ${{ matrix.system }}
+    strategy:
+      matrix:
+        system:
+          - aaarch64-darwin
+          - aaarch64-linux
+          - x86_64-linux
+      fail-fast: false
+    steps:
+      - uses: actions/checkout@v4
+      - name: nixci
+        run: nixci --extra-access-tokens "github.com=${{ secrets.GH_TOKEN_FOR_UPDATES }}" build --systems "${{ matrix.system }}" .#hydraJobs

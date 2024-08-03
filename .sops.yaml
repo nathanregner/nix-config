@@ -55,3 +55,11 @@ creation_rules:
       - age:
           - *user_nregner
           - *host_iapetus
+  - path_regex: modules/nixos/github-actions/secrets.yaml
+    key_groups:
+      - age:
+          - *user_nregner
+          - *host_iapetus
+          - *host_server
+          - *host_sagittarius
+          - *aarch64_linux_builder
