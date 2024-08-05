@@ -26,6 +26,6 @@ in
       source ${pkgs.unstable.spaceship-prompt}/lib/spaceship-prompt/spaceship.zsh
     '';
 
-    xdg.configFile.".spaceship.zsh".source = cfg.configFile;
+    xdg.configFile."spaceship.zsh".source = cfg.configFile;
   };
 }
