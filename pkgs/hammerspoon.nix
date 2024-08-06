@@ -9,12 +9,12 @@
 
 stdenvNoCC.mkDerivation (finalAttrs: {
   pname = "hammerspoon";
-  version = "0.9.100";
+  version = "1.0.0";
 
   src = fetchurl {
     name = "Hammerspoon-${finalAttrs.version}.zip";
     url = "https://github.com/Hammerspoon/hammerspoon/releases/download/${finalAttrs.version}/Hammerspoon-${finalAttrs.version}.zip";
-    hash = "sha256-bc/IB8fOxpLK87GMNsweo69rn0Jpm03yd3NECOTgc5k=";
+    hash = "sha256-XbcCtV2kfcMG6PWUjZHvhb69MV3fopQoMioK9+1+an4=";
   };
 
   dontPatch = true;
