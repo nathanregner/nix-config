@@ -20,11 +20,12 @@
       emmet-language-server
       gopls
       lua-language-server
-      pkgs.graphql-language-service-cli
       nil
       terraform-ls
       vscode-langservers-extracted
       yaml-language-server
+      pkgs.graphql-language-service-cli
+      pkgs.harper-ls
       pkgs.vtsls
 
       # formatters/linters

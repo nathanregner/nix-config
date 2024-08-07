@@ -205,6 +205,13 @@ require("lazy").setup({
         eslint = {},
         gopls = {},
         graphql = {},
+        harper_ls = {
+          ["harper-ls"] = {
+            linters = {
+              sentence_capitalization = false,
+            },
+          },
+        },
         html = { filetypes = { "html", "twig", "hbs" } },
         jsonls = {
           -- https://github.com/b0o/SchemaStore.nvim?tab=readme-ov-file
