@@ -1375,6 +1375,31 @@ require("lazy").setup({
     },
   },
 
+  { -- coerce.nvim
+    "gregorias/coerce.nvim",
+    -- version = "3.0",
+    config = function()
+      require("coerce").setup()
+      require("coerce").register_case({
+        keymap = "K",
+        description = "Kebab-Case",
+        case = function(str)
+          local cc = require("coerce.case")
+          local cs = require("coerce.string")
+          local parts = cc.split - keyword(str)
+
+          for i = 1, #parts, 1 do
+            local part_graphemes = cs.str2graphemelist(parts[i])
+            part_graphemes[1] = vim.fn.toupper(part_graphemes[1])
+            parts[i] = table.concat(part_graphemes, "")
+          end
+
+          return table.concat(parts, "-")
+        end,
+      })
+    end,
+  },
+
   { -- REPL
     "Olical/conjure",
     dependencies = {
