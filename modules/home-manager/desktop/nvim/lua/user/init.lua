@@ -1375,6 +1375,12 @@ require("lazy").setup({
     },
   },
 
+  { -- toggle.nvim
+    "gregorias/toggle.nvim",
+    -- version = "2.0",
+    config = true,
+  },
+
   { -- coerce.nvim
     "gregorias/coerce.nvim",
     -- version = "3.0",
