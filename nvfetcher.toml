@@ -1,4 +1,8 @@
 # https://github.com/berberman/nvfetcher?tab=readme-ov-file#keyfile
+[flake-registry]
+src.git = "https://github.com/nixos/flake-registry"
+fetch.github = "nixos/flake-registry"
+
 [hyprland-workspaces]
 src.github = "FieldofClay/hyprland-workspaces"
 fetch.github = "FieldofClay/hyprland-workspaces"
