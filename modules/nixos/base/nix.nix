@@ -1,5 +1,6 @@
 {
   outputs,
+  sources,
   config,
   lib,
   pkgs,
@@ -19,6 +20,10 @@
         "nix-command"
         "flakes"
       ];
+      # https://github.com/NixOS/nix/issues/9087
+      flake-registry = pkgs.runCommandLocal "flake-registry.json" { } ''
+        cp ${sources.flake-registry.src}/flake-registry.json $out
+      '';
       trusted-users = [
         "@wheel"
         "nregner"

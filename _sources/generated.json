@@ -1,4 +1,24 @@
 {
+    "flake-registry": {
+        "cargoLocks": null,
+        "date": "2024-06-03",
+        "extract": null,
+        "name": "flake-registry",
+        "passthru": null,
+        "pinned": false,
+        "src": {
+            "deepClone": false,
+            "fetchSubmodules": false,
+            "leaveDotGit": false,
+            "name": null,
+            "owner": "nixos",
+            "repo": "flake-registry",
+            "rev": "895a65f8d5acf848136ee8fe8e8f736f0d27df96",
+            "sha256": "sha256-HKvoLGZUsBpjkxWkdtctGYj6RH0bl6vcw0OjTOqyzJk=",
+            "type": "github"
+        },
+        "version": "895a65f8d5acf848136ee8fe8e8f736f0d27df96"
+    },
     "hyprland-workspaces": {
         "cargoLocks": null,
         "date": null,
@@ -98,26 +118,6 @@
             "type": "github"
         },
         "version": "709c51c64e1652d4f8c87b1815db86f56d188268"
-    },
-    "pin-github-action": {
-        "cargoLocks": null,
-        "date": null,
-        "extract": null,
-        "name": "pin-github-action",
-        "passthru": null,
-        "pinned": false,
-        "src": {
-            "deepClone": false,
-            "fetchSubmodules": false,
-            "leaveDotGit": false,
-            "name": null,
-            "owner": "mheap",
-            "repo": "pin-github-action",
-            "rev": "v1.9.1",
-            "sha256": "sha256-FBNdK+d1gXvC7uxARZrM7RHdwiPX/Vi1bp84R78t6wI=",
-            "type": "github"
-        },
-        "version": "v1.9.1"
     },
     "sf-mono-nerd-font": {
         "cargoLocks": null,
