@@ -1,12 +1,4 @@
-{
-  config,
-  pkgs,
-  lib,
-  ...
-}:
-let
-  inherit (config.lib.file) mkFlakeSymlink;
-in
+{ pkgs, lib, ... }:
 {
   programs.zsh = {
     enable = true;
@@ -14,11 +6,6 @@ in
     syntaxHighlighting = {
       enable = true;
       catppuccin.enable = true;
-    };
-
-    prompt.spaceship = {
-      enable = true;
-      configFile = mkFlakeSymlink ./spaceshiprc.zsh;
     };
 
     initExtra =
