@@ -6,6 +6,7 @@
     ./k9s.nix
     ./lazygit.nix
     ./nix.nix
+    ./starship.nix
     ./tmux-sessionizer.nix
     ./zsh.nix
   ];
