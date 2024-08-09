@@ -41,6 +41,8 @@
     '';
   };
 
+  nix.settings.trusted-users = [ "hydra" ];
+
   services.postgresql.identMap = ''
     hydra-users nregner hydra
   '';
