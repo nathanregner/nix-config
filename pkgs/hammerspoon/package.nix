@@ -1,42 +1,52 @@
 # https://github.com/Hammerspoon/hammerspoon/tags
 # https://github.com/NixOS/nixpkgs/pull/292296/files#diff-26375f4272499181f94d00c4f7cebcf92d12c67bc97f1b220ccf28ea79aed805
 {
-  fetchurl,
   lib,
-  nix-update-script,
+  coreutils-prefixed,
+  fetchFromGitHub,
+  getopt,
   stdenvNoCC,
   unzip,
+  which,
+  xcbuild,
+  ...
 }:
 
 stdenvNoCC.mkDerivation (finalAttrs: {
   pname = "hammerspoon";
   version = "1.0.0";
-  src = fetchurl {
-    url = "https://github.com/Hammerspoon/hammerspoon/releases/download/${finalAttrs.version}/Hammerspoon-${finalAttrs.version}.zip";
-    sha256 = "sha256-XbcCtV2kfcMG6PWUjZHvhb69MV3fopQoMioK9+1+an4=";
+  src = fetchFromGitHub {
+    owner = "Hammerspoon";
+    repo = "hammerspoon";
+    rev = "v${version}";
+    hash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
   };
 
-  dontPatch = true;
-  dontConfigure = true;
-  dontBuild = true;
-  dontFixup = true;
+  nativeBuildInputs = [
+    coreutils-prefixed
+    getopt
+    unzip
+    which
+    xcbuild
+  ];
 
-  nativeBuildInputs = [ unzip ];
+  patchPhase = ''
+    patchShebangs ./scripts
+    substituteInPlace ./scripts/build.sh \
+      --replace-fail 'HAMMERSPOON_HOME="$(greadlink -f "''${SCRIPT_HOME}/../")"' 'HAMMERSPOON_HOME="$out"' \
+      --replace-fail 'WEBSITE_HOME="$(greadlink -f "''${HAMMERSPOON_HOME}/../website")"' 'WEBSITE_HOME="$out/website"'
+  '';
 
-  sourceRoot = "Hammerspoon.app";
+  buildPhase = ''
+    IS_CI=1 \
+      bash -x -o pipefail ./scripts/build.sh release -s Release -c Release
+  '';
 
   installPhase = ''
     runHook preInstall
 
-    mkdir -p "$out/Applications/${finalAttrs.sourceRoot}"
-    cp -R . "$out/Applications/${finalAttrs.sourceRoot}"
-
     runHook postInstall
   '';
-
-  passthru = {
-    updateScript = nix-update-script { };
-  };
 
   meta = with lib; {
     description = "Tool for powerful automation of macOS";
@@ -47,8 +57,9 @@ stdenvNoCC.mkDerivation (finalAttrs: {
     homepage = "http://www.hammerspoon.org";
     changelog = "http://www.hammerspoon.org/releasenotes/${finalAttrs.version}.html";
     license = with licenses; [ mit ];
-    sourceProvenance = with sourceTypes; [ binaryNativeCode ];
-    maintainers = with maintainers; [ afh ];
+    # maintainers = with maintainers; [ afh ];
     platforms = lib.platforms.darwin;
   };
-})
+}
+
+)
