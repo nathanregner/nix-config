@@ -81,7 +81,7 @@
       repo = "linux-rockchip";
       rev = "709c51c64e1652d4f8c87b1815db86f56d188268";
       fetchSubmodules = false;
-      sha256 = "sha256-YZdWNhLopRyaEBojqMLMYEMKV6V0HcFgFmDbRSbBhRo=";
+      sha256 = "sha256-RfJMzqpL6M6emyaZxudMIk+bwOhMsGgHrgfUf5xdDiE=";
     };
     date = "2024-07-10";
   };
