@@ -1075,6 +1075,7 @@ require("lazy").setup({
         sync_root_with_cwd = true,
         hijack_cursor = true,
         hijack_unnamed_buffer_when_opening = true,
+        select_prompts = true,
         actions = {
           change_dir = {
             enable = true,
@@ -1571,6 +1572,19 @@ require("lazy").setup({
           vim.diagnostic.enable(false, { bufnr = ev.buf })
         end,
       })
+      vim.g["conjure#filetypes"] = {
+        "clojure",
+        "fennel",
+        "janet",
+        "hy",
+        "julia",
+        "racket",
+        "scheme",
+        "lua",
+        "lisp",
+        "python",
+        "sql",
+      }
       vim.g["conjure#extract#tree_sitter#enabled"] = true
       vim.g["conjure#client#clojure#nrepl#refresh#backend"] = "clj-reload"
       -- Rebind from K
@@ -1628,8 +1642,11 @@ vim.o.completeopt = "menuone,noselect"
 -- NOTE: You should make sure your terminal supports this
 vim.o.termguicolors = true
 
+-- Don't wrap by default
+vim.o.wrap = false
+
 vim.o.foldcolumn = "0"
-vim.o.foldlevel = 99 -- ufo needs a large value
+vim.o.foldlevel = 99 -- UFO needs a large value
 vim.o.foldlevelstart = 99
 vim.o.foldenable = true
 
