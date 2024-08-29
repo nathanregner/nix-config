@@ -8,7 +8,11 @@ let
   };
 in
 {
-  inherit (node2nixPkgs) "@olrtg/emmet-language-server";
+  inherit (node2nixPkgs)
+    "@olrtg/emmet-language-server"
+    graphql-cli
+    pin-github-action
+    ;
 
   cura5 = pkgs.unstable.callPackage ./cura { };
 
@@ -57,8 +61,6 @@ in
   klipper-flash-rp2040 = pkgs.callPackage ./klipper/rp2040.nix { };
 
   moonraker-develop = (pkgs.unstable.callPackage ./moonraker { inherit inputs; });
-
-  inherit (node2nixPkgs) pin-github-action;
 
   route53-ddns = pkgs.unstable.callPackage ./route53-ddns { };
 
