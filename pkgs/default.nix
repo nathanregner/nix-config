@@ -8,7 +8,11 @@ let
   };
 in
 {
-  inherit (node2nixPkgs) "@olrtg/emmet-language-server" typescript;
+  inherit (node2nixPkgs)
+    "@olrtg/emmet-language-server"
+    graphql-cli
+    pin-github-action
+    ;
 
   cura5 = pkgs.unstable.callPackage ./cura { inherit sources; };
 
