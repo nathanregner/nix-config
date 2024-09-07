@@ -59,14 +59,14 @@
     ];
   };
 
-  # rustc -Z unstable-options --print target-spec-json | jq '.["llvm-target"]' -r
-  # https://github.com/rui314/mold?tab=readme-ov-file#how-to-use
-  # https://discourse.nixos.org/t/create-nix-develop-shell-for-rust-with-mold/35894/6
-  home.file.".cargo/config.toml".source = pkgs.writeText "config.toml" ''
-    [target.aarch64-apple-darwin]
-    linker = "${(lib.getExe' ((pkgs.unstable.stdenvAdapters.useMoldLinker pkgs.unstable.clangStdenv).cc) "clang")}"
-    rustflags = ["-C", "link-arg=-undefined", "-C", "link-arg=dynamic_lookup", "-C", "target-cpu=native"]
-  '';
+  # # rustc -Z unstable-options --print target-spec-json | jq '.["llvm-target"]' -r
+  # # https://github.com/rui314/mold?tab=readme-ov-file#how-to-use
+  # # https://discourse.nixos.org/t/create-nix-develop-shell-for-rust-with-mold/35894/6
+  # home.file.".cargo/config.toml".source = pkgs.writeText "config.toml" ''
+  #   [target.aarch64-apple-darwin]
+  #   linker = "${(lib.getExe' ((pkgs.unstable.stdenvAdapters.useMoldLinker pkgs.unstable.clangStdenv).cc) "clang")}"
+  #   rustflags = ["-C", "link-arg=-undefined", "-C", "link-arg=dynamic_lookup", "-C", "target-cpu=native"]
+  # '';
 
   # https://nixos.wiki/wiki/FAQ/When_do_I_update_stateVersion
   home.stateVersion = "23.05";
