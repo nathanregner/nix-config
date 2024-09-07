@@ -9,13 +9,14 @@
   ...
 }:
 {
-  imports = [ inputs.hydra-sentinel.nixosModules.server ];
+  imports = [
+    inputs.hydra-sentinel.nixosModules.server
+    inputs.hydra.nixosModules.hydra
+  ];
 
-  services.hydra = {
+  services.hydra-dev = {
     enable = true;
-    package = pkgs.unstable.hydra_unstable.overrideAttrs {
-      nix = config.nix.package;
-    };
+    package = pkgs.hydra-dev;
     hydraURL = "https://hydra.nregner.net";
     notificationSender = "hydra@nregner.net";
     useSubstitutes = true;
@@ -41,6 +42,9 @@
   };
 
   nix.settings.trusted-users = [ "hydra" ];
+  services.hydra = {
+    inherit (config.services.hydra-dev) buildMachinesFiles port;
+  };
 
   services.postgresql.identMap = ''
     hydra-users nregner hydra
@@ -119,7 +123,7 @@
     '';
 
   nginx.subdomain.hydra = {
-    "/".proxyPass = "http://127.0.0.1:${toString config.services.hydra.port}/";
+    "/".proxyPass = "http://127.0.0.1:${toString config.services.hydra-dev.port}/";
     "/github/webhook".proxyPass =
       "http://127.0.0.1:${toString config.services.hydra-sentinel-server.listenPort}/webhook";
   };
