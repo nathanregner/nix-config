@@ -20,14 +20,6 @@ let
       # https://github.com/NixOS/nixpkgs/issues/154163#issuecomment-1350599022
       makeModulesClosure = x: prev.makeModulesClosure (x // { allowMissing = true; });
 
-      hydra_unstable = prev.hydra_unstable.overrideAttrs (oldAttrs: {
-        patches = (oldAttrs.patches or [ ]) ++ [
-          ./hydra/fix-restrict-eval-does-not-allow-access-to-git-flake.patch
-          ./hydra/feat-add-always_supported_system_types-option.patch
-        ];
-        checkPhase = "";
-      });
-
       # FIXME: https://github.com/NixOS/nixpkgs/issues/357979
       moonraker = warnIfOutdated prev.moonraker (final.callPackage ./moonraker { });
 
