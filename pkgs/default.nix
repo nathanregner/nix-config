@@ -24,6 +24,14 @@ in
 
   hammerspoon = pkgs.unstable.callPackage ./hammerspoon.nix { };
 
+  hydra-dev = inputs.hydra.packages.x86_64-linux.hydra.overrideAttrs (oldAttrs: {
+    patches = (oldAttrs.patches or [ ]) ++ [
+      ../../../overlays/hydra/fix-restrict-eval-does-not-allow-access-to-git-flake.patch
+      ../../../overlays/hydra/feat-add-always_supported_system_types-option.patch
+    ];
+    checkPhase = "";
+  });
+
   insync = pkgs.unstable.callPackage ./insync.nix { };
 
   insync-nautilus = pkgs.unstable.callPackage ./insync-nautilus { };
