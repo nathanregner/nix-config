@@ -1,4 +1,4 @@
-{ pkgs, lib, ... }:
+{ pkgs, ... }:
 {
   services.mainsail = {
     enable = true;
@@ -29,29 +29,44 @@
   services.mediamtx = {
     enable = true;
     allowVideoAccess = true;
-    package = pkgs.unstable.mediamtx;
+    # package = pkgs.mediamtx-v0_2;
     settings = {
       paths.cam = {
-        runOnInit =
-          let
-            ffmpeg = pkgs.unstable.ffmpeg-headless;
-          in
-          "${lib.getExe ffmpeg} -f v4l2 -i /dev/video0 -pix_fmt yuv420p -preset ultrafast -b:v 600k -f rtsp rtsp://localhost:$RTSP_PORT/$MTX_PATH";
+        # runOnInit = "ffmpeg -f v4l2 -i /dev/video0 -c:v libx264 -preset ultrafast -b:v 600k -f rtsp rtsp://localhost:$RTSP_PORT/$MTX_PATH";
+        runOnInit = "bash -c 'GST_V4L2_USE_LIBV4L2=1 gst-launch-1.0 v4l2src device=/dev/video0 ! x264enc ! rtspclientsink location=rtsp://localhost:$RTSP_PORT/$MTX_PATH'";
         runOnInitRestart = true;
       };
       # https://github.com/bluenviron/mediamtx#webrtc-specific-features
-      webrtcAdditionalHosts = [
-        "voron"
-        "voron.nregner.net"
-      ];
+      # webrtcAdditionalHosts = [
+      #   "voron"
+      #   "voron.nregner.net"
+      # ];
     };
   };
 
+  systemd.services.mediamtx = {
+    # environment = {
+    #   GST_V4L2_USE_LIBV4L2 = "1";
+    # };
+    path = with pkgs.unstable; [
+      bash
+      gst_all_1.gstreamer
+      gst_all_1.gst-rtsp-server
+      gst_all_1.gst-plugins-base
+      # Specialized plugins separated by quality
+      gst_all_1.gst-plugins-good
+      gst_all_1.gst-plugins-bad
+      gst_all_1.gst-plugins-ugly
+      # Plugins to reuse ffmpeg to play almost every video format
+      gst_all_1.gst-libav
+      # Support the Video Audio (Hardware) Acceleration API
+      gst_all_1.gst-vaapi
+    ];
+  };
+
   environment.systemPackages = with pkgs.unstable; [
-    ffmpeg-headless
-    # Video/Audio data composition framework tools like "gst-inspect", "gst-launch" ...
     gst_all_1.gstreamer
-    # Common plugins like "filesrc" to combine within e.g. gst-launch
+    gst_all_1.gst-rtsp-server
     gst_all_1.gst-plugins-base
     # Specialized plugins separated by quality
     gst_all_1.gst-plugins-good
@@ -60,7 +75,7 @@
     # Plugins to reuse ffmpeg to play almost every video format
     gst_all_1.gst-libav
     # Support the Video Audio (Hardware) Acceleration API
-    # gst_all_1.gst-vaapi
+    gst_all_1.gst-vaapi
   ];
 
   networking.firewall =

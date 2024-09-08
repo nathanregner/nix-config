@@ -44,6 +44,9 @@ in
 
   klipper-flash-rp2040 = pkgs.callPackage ./klipper/rp2040.nix { };
 
+  # TODO: Upgrade after https://github.com/bluenviron/mediamtx/issues/2758
+  mediamtx-v0_2 = pkgs.unstable.callPackage ./mediamtx { };
+
   moonraker-develop = (pkgs.unstable.callPackage ./moonraker { inherit inputs; });
 
   inherit (node2nixPkgs) pin-github-action;
@@ -58,7 +61,7 @@ in
       mkdir -p $out/share/fonts/${pname}
       cp ${src}/*.otf $out/share/fonts/${pname}
 
-'';
+    '';
 
   vtsls = node2nixPkgs."@vtsls/language-server";
 

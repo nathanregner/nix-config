@@ -17,6 +17,7 @@ in
         "docker"
         "libvirtd"
         "networkmanager"
+        "video"
       ];
     openssh.authorizedKeys.keys = [
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDk7uVEehfyhAZUvZbvH5Kw85MzLyYqVdTOMBXsmBeLx"
