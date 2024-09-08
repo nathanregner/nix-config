@@ -36,7 +36,7 @@
           let
             ffmpeg = pkgs.unstable.ffmpeg-headless;
           in
-          "${lib.getExe ffmpeg} -f v4l2 -i /dev/video0 -pix_fmt yuv420p -s:v 1920x1080 -r 25 -c:v libx264 -bf 0 -f rtsp rtsp://localhost:$RTSP_PORT/$MTX_PATH";
+          "${lib.getExe ffmpeg} -f v4l2 -i /dev/video0 -pix_fmt yuv420p -preset ultrafast -b:v 600k -f rtsp rtsp://localhost:$RTSP_PORT/$MTX_PATH";
         runOnInitRestart = true;
       };
       # https://github.com/bluenviron/mediamtx#webrtc-specific-features
