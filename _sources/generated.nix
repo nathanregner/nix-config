@@ -73,6 +73,17 @@
       sha256 = "sha256-anBGjLtYlyrxeNVy1TEMcAGTVUFrGClLuoJZuo3xlDM=";
     };
   };
+  launchk = {
+    pname = "launchk";
+    version = "xpc-sys-0.5.1";
+    src = fetchFromGitHub {
+      owner = "mach-kernel";
+      repo = "launchk";
+      rev = "xpc-sys-0.5.1";
+      fetchSubmodules = false;
+      sha256 = "sha256-+KVo9bozVuDxDUPuRSyrY4OHHO49J43dZSbvcKAG/e0=";
+    };
+  };
   linux-rockchip = {
     pname = "linux-rockchip";
     version = "709c51c64e1652d4f8c87b1815db86f56d188268";

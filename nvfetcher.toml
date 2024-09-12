@@ -28,6 +28,10 @@ fetch.github = "candid82/joker"
 src.github_tag = "kyleisah/Klipper-Adaptive-Meshing-Purging"
 fetch.github = "kyleisah/Klipper-Adaptive-Meshing-Purging"
 
+[launchk]
+src.github = "mach-kernel/launchk"
+fetch.github = "mach-kernel/launchk"
+
 [linux-rockchip]
 src.git = "https://github.com/armbian/linux-rockchip.git"
 src.branch = "rk-5.10-rkr6"
