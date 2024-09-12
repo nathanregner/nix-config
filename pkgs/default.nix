@@ -56,6 +56,8 @@ in
     };
   };
 
+  launchk = pkgs.unstable.callPackage ./launchk { inherit sources; };
+
   klipper-calibrate-shaper = pkgs.callPackage ./klipper/calibrate-shaper.nix { };
 
   klipper-flash-rp2040 = pkgs.callPackage ./klipper/rp2040.nix { };
@@ -72,7 +74,7 @@ in
       mkdir -p $out/share/fonts/${pname}
       cp ${src}/*.otf $out/share/fonts/${pname}
 
-'';
+    '';
 
   vtsls = node2nixPkgs."@vtsls/language-server";
 

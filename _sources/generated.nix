@@ -57,6 +57,17 @@
       sha256 = "sha256-anBGjLtYlyrxeNVy1TEMcAGTVUFrGClLuoJZuo3xlDM=";
     };
   };
+  launchk = {
+    pname = "launchk";
+    version = "xpc-sys-0.5.1";
+    src = fetchFromGitHub {
+      owner = "mach-kernel";
+      repo = "launchk";
+      rev = "xpc-sys-0.5.1";
+      fetchSubmodules = false;
+      sha256 = "sha256-+KVo9bozVuDxDUPuRSyrY4OHHO49J43dZSbvcKAG/e0=";
+    };
+  };
   linux-rockchip = {
     pname = "linux-rockchip";
     version = "709c51c64e1652d4f8c87b1815db86f56d188268";
@@ -74,8 +85,8 @@
     version = "latest";
     src = dockerTools.pullImage {
       imageName = "hkotel/mealie";
-      imageDigest = "sha256:54a976880161c3c96de30b63cd0092d1f069aa8b23686669b726558ddf112724";
-      sha256 = "sha256-LsnvoHhztvn/OrMLdyiLUwhkFn9OmVt2fWOUcK2QisY=";
+      imageDigest = "sha256:88e8e12542e9a2733c07f175682dc69e7360becb6137d604bb087a71ab33c5fe";
+      sha256 = "sha256-zRNYvxWwVxWTXZbgffeCtAtDed1lyD+dIjf5RtU23/I=";
       finalImageTag = "latest";
     };
   };
