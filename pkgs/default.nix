@@ -12,6 +12,5 @@ lib.recurseIntoAttrs (
   packages
   // {
     klipper-pkgs = lib.recurseIntoAttrs packages.klipper-pkgs;
-    # klipper-pkgs = lib.makeScope pkgs.newScope (_: packages.klipper-pkgs);
   }
 )
