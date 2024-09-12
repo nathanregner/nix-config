@@ -58,6 +58,8 @@ in
     };
   };
 
+  launchk = pkgs.unstable.callPackage ./launchk { inherit sources; };
+
   klipper-calibrate-shaper = pkgs.callPackage ./klipper/calibrate-shaper.nix { };
 
   klipper-flash-rp2040 = pkgs.callPackage ./klipper/rp2040.nix { };

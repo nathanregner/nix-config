@@ -129,6 +129,26 @@
         },
         "version": "v1.1.2"
     },
+    "launchk": {
+        "cargoLocks": null,
+        "date": null,
+        "extract": null,
+        "name": "launchk",
+        "passthru": null,
+        "pinned": false,
+        "src": {
+            "deepClone": false,
+            "fetchSubmodules": false,
+            "leaveDotGit": false,
+            "name": null,
+            "owner": "mach-kernel",
+            "repo": "launchk",
+            "rev": "xpc-sys-0.5.1",
+            "sha256": "sha256-+KVo9bozVuDxDUPuRSyrY4OHHO49J43dZSbvcKAG/e0=",
+            "type": "github"
+        },
+        "version": "xpc-sys-0.5.1"
+    },
     "linux-rockchip": {
         "cargoLocks": null,
         "date": "2024-07-10",
@@ -144,7 +164,7 @@
             "owner": "armbian",
             "repo": "linux-rockchip",
             "rev": "709c51c64e1652d4f8c87b1815db86f56d188268",
-            "sha256": "sha256-YZdWNhLopRyaEBojqMLMYEMKV6V0HcFgFmDbRSbBhRo=",
+            "sha256": "sha256-RfJMzqpL6M6emyaZxudMIk+bwOhMsGgHrgfUf5xdDiE=",
             "type": "github"
         },
         "version": "709c51c64e1652d4f8c87b1815db86f56d188268"
