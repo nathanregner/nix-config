@@ -1273,7 +1273,7 @@ require("lazy").setup({
       neotest.setup({
         adapters = {
           require("neotest-rust")({
-            args = { "--no-capture", "--cargo-quiet", "--cargo-quiet" },
+            args = { "--no-capture", "--cargo-quiet" },
           }),
           require("neotest-jest")({}),
           require("neotest-vitest"),
