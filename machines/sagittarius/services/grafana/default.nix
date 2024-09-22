@@ -8,6 +8,17 @@
         http_port = 3004;
         domain = "grafana.nregner.net";
       };
+      users = {
+        allow_sign_up = false;
+      };
+      auth = {
+        disable_login_form = true;
+      };
+      "auth.proxy" = {
+        header_name = "X-Forwarded-Email";
+        header_property = "email";
+        auto_sign_up = true;
+      };
     };
 
     provision = {
