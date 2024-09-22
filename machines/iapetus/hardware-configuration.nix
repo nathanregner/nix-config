@@ -37,58 +37,6 @@
     extraModulePackages = [ ];
   };
 
-  fileSystems."/boot" = {
-    device = "/dev/disk/by-uuid/3E8C-7A71";
-    fsType = "vfat";
-    neededForBoot = true;
-  };
-
-  fileSystems."/" = {
-    device = "/dev/disk/by-uuid/432fbe74-ed01-4696-aecb-59028c69531b";
-    fsType = "btrfs";
-    options = [
-      "subvol=root"
-      "noatime"
-    ];
-  };
-
-  fileSystems."/home" = {
-    device = "/dev/disk/by-uuid/432fbe74-ed01-4696-aecb-59028c69531b";
-    fsType = "btrfs";
-    options = [
-      "subvol=home"
-      "noatime"
-    ];
-  };
-
-  fileSystems."/nix" = {
-    device = "/dev/disk/by-uuid/432fbe74-ed01-4696-aecb-59028c69531b";
-    fsType = "btrfs";
-    options = [
-      "subvol=nix"
-      "noatime"
-    ];
-  };
-
-  fileSystems."/var/lib" = {
-    device = "/dev/disk/by-uuid/432fbe74-ed01-4696-aecb-59028c69531b";
-    fsType = "btrfs";
-    options = [
-      "subvol=var-lib"
-      "noatime"
-    ];
-  };
-
-  fileSystems."/var/log" = {
-    device = "/dev/disk/by-uuid/432fbe74-ed01-4696-aecb-59028c69531b";
-    fsType = "btrfs";
-    options = [
-      "subvol=var-log"
-      "noatime"
-    ];
-    neededForBoot = true;
-  };
-
   swapDevices = [ ];
   zramSwap.enable = true;
 

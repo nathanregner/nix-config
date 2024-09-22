@@ -1,0 +1,164 @@
+{
+  "/": {
+    "autoFormat": false,
+    "autoResize": false,
+    "depends": [],
+    "device": "/dev/disk/by-uuid/432fbe74-ed01-4696-aecb-59028c69531b",
+    "encrypted": {
+      "blkDev": null,
+      "enable": false,
+      "keyFile": null,
+      "label": null
+    },
+    "formatOptions": null,
+    "fsType": "btrfs",
+    "label": null,
+    "mountPoint": "/",
+    "neededForBoot": false,
+    "noCheck": false,
+    "options": ["x-initrd.mount", "noatime", "subvol=root"],
+    "overlay": {
+      "lowerdir": null,
+      "upperdir": null,
+      "workdir": null
+    },
+    "stratis": {
+      "poolUuid": null
+    }
+  },
+  "/boot": {
+    "autoFormat": false,
+    "autoResize": false,
+    "depends": [],
+    "device": "/dev/disk/by-uuid/3E8C-7A71",
+    "encrypted": {
+      "blkDev": null,
+      "enable": false,
+      "keyFile": null,
+      "label": null
+    },
+    "formatOptions": null,
+    "fsType": "vfat",
+    "label": null,
+    "mountPoint": "/boot",
+    "neededForBoot": true,
+    "noCheck": false,
+    "options": ["x-initrd.mount"],
+    "overlay": {
+      "lowerdir": null,
+      "upperdir": null,
+      "workdir": null
+    },
+    "stratis": {
+      "poolUuid": null
+    }
+  },
+  "/home": {
+    "autoFormat": false,
+    "autoResize": false,
+    "depends": [],
+    "device": "/dev/disk/by-uuid/432fbe74-ed01-4696-aecb-59028c69531b",
+    "encrypted": {
+      "blkDev": null,
+      "enable": false,
+      "keyFile": null,
+      "label": null
+    },
+    "formatOptions": null,
+    "fsType": "btrfs",
+    "label": null,
+    "mountPoint": "/home",
+    "neededForBoot": false,
+    "noCheck": false,
+    "options": ["noatime", "subvol=home"],
+    "overlay": {
+      "lowerdir": null,
+      "upperdir": null,
+      "workdir": null
+    },
+    "stratis": {
+      "poolUuid": null
+    }
+  },
+  "/nix": {
+    "autoFormat": false,
+    "autoResize": false,
+    "depends": [],
+    "device": "/dev/disk/by-uuid/432fbe74-ed01-4696-aecb-59028c69531b",
+    "encrypted": {
+      "blkDev": null,
+      "enable": false,
+      "keyFile": null,
+      "label": null
+    },
+    "formatOptions": null,
+    "fsType": "btrfs",
+    "label": null,
+    "mountPoint": "/nix",
+    "neededForBoot": false,
+    "noCheck": false,
+    "options": ["x-initrd.mount", "noatime", "subvol=nix"],
+    "overlay": {
+      "lowerdir": null,
+      "upperdir": null,
+      "workdir": null
+    },
+    "stratis": {
+      "poolUuid": null
+    }
+  },
+  "/var/lib": {
+    "autoFormat": false,
+    "autoResize": false,
+    "depends": [],
+    "device": "/dev/disk/by-uuid/432fbe74-ed01-4696-aecb-59028c69531b",
+    "encrypted": {
+      "blkDev": null,
+      "enable": false,
+      "keyFile": null,
+      "label": null
+    },
+    "formatOptions": null,
+    "fsType": "btrfs",
+    "label": null,
+    "mountPoint": "/var/lib",
+    "neededForBoot": false,
+    "noCheck": false,
+    "options": ["x-initrd.mount", "noatime", "subvol=var-lib"],
+    "overlay": {
+      "lowerdir": null,
+      "upperdir": null,
+      "workdir": null
+    },
+    "stratis": {
+      "poolUuid": null
+    }
+  },
+  "/var/log": {
+    "autoFormat": false,
+    "autoResize": false,
+    "depends": [],
+    "device": "/dev/disk/by-uuid/432fbe74-ed01-4696-aecb-59028c69531b",
+    "encrypted": {
+      "blkDev": null,
+      "enable": false,
+      "keyFile": null,
+      "label": null
+    },
+    "formatOptions": null,
+    "fsType": "btrfs",
+    "label": null,
+    "mountPoint": "/var/log",
+    "neededForBoot": true,
+    "noCheck": false,
+    "options": ["x-initrd.mount", "noatime", "subvol=var-log"],
+    "overlay": {
+      "lowerdir": null,
+      "upperdir": null,
+      "workdir": null
+    },
+    "stratis": {
+      "poolUuid": null
+    }
+  }
+}
