@@ -76,6 +76,10 @@
     <keyboard-shortcut first-keystroke="ctrl j" />
     <mouse-shortcut keystroke="control button2" />
   </action>
+  <action id="Jdbc.OpenConsole.New.Generate">
+    <keyboard-shortcut first-keystroke="shift meta l" />
+    <keyboard-shortcut first-keystroke="shift meta alt n" />
+  </action>
   <action id="LocalHistory">
     <keyboard-shortcut first-keystroke="shift meta l" second-keystroke="shift meta h" />
   </action>
@@ -164,4 +168,3 @@
   <action id="copilot.disposeInlays" />
   <action id="tasks.goto" />
 </keymap>
-
