@@ -14,6 +14,8 @@ let
       stable = inputs.nixpkgs.legacyPackages.${final.system};
     in
     {
+      inherit (inputs.clojure-lsp.packages.${final.system}) clojure-lsp;
+
       # FIXME: hack to bypass "FATAL: Module ahci not found" error
       # https://github.com/NixOS/nixpkgs/issues/154163#issuecomment-1350599022
       makeModulesClosure = x: prev.makeModulesClosure (x // { allowMissing = true; });
