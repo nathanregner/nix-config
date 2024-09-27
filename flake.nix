@@ -69,6 +69,12 @@
       url = "github:nathanregner/preprocess_cancellation";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
+
+    # misc
+    clojure-lsp = {
+      url = "github:clojure-lsp/clojure-lsp";
+      # inputs.nixpkgs.follows = "nixpkgs-unstable";
+    };
   };
 
   outputs =
