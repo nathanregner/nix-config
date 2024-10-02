@@ -10,6 +10,7 @@
     ./mealie.nix
     ./nexus.nix
     ./nginx.nix
+    ./ntfy.nix
     ./prometheus.nix
     ./qbittorrent.nix
     ./silverbullet.nix
