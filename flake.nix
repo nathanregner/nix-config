@@ -61,6 +61,13 @@
     # };
 
     # 3d printing
+    nixos-rk3588 = {
+      url = "github:ryan4yin/nixos-rk3588";
+      inputs = {
+        nixpkgs.follows = "nixpkgs-unstable";
+        nixos-generators.follows = "nixos-generators";
+      };
+    };
     orangepi-nix = {
       url = "github:nathanregner/orangepi-nix";
       # inputs.nixpkgs.follows = "nixpkgs";
