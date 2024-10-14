@@ -10,7 +10,7 @@
     userName = "Nathan Regner";
     userEmail = "nathanregner@gmail.com";
     lfs.enable = true;
-    maintenance.enable = true;
+    # maintenance.enable = true;
     extraConfig = {
       commit.verbose = true;
       push = {
