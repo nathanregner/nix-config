@@ -36,16 +36,6 @@ in
 
   insync-nautilus = pkgs.unstable.callPackage ./insync-nautilus { };
 
-  joker = pkgs.unstable.buildGoModule (
-    sources.joker
-    // {
-      vendorHash = "sha256-t/28kTJVgVoe7DgGzNgA1sYKoA6oNC46AeJSrW/JetU=";
-      preBuild = ''
-        go generate ./...
-      '';
-    }
-  );
-
   jdtls = pkgs.jdt-language-server.overrideAttrs {
     pname = "jdtls";
     version = "v1.33.0";
@@ -58,11 +48,23 @@ in
     };
   };
 
-  launchk = pkgs.unstable.callPackage ./launchk { inherit sources; };
+  joker = pkgs.unstable.buildGoModule (
+    sources.joker
+    // {
+      vendorHash = "sha256-t/28kTJVgVoe7DgGzNgA1sYKoA6oNC46AeJSrW/JetU=";
+      preBuild = ''
+        go generate ./...
+      '';
+    }
+  );
 
   klipper-calibrate-shaper = pkgs.callPackage ./klipper/calibrate-shaper.nix { };
 
   klipper-flash-rp2040 = pkgs.callPackage ./klipper/rp2040.nix { };
+
+  krr = pkgs.unstable.callPackage ./krr { inherit inputs; };
+
+  launchk = pkgs.unstable.callPackage ./launchk { inherit sources; };
 
   orca-slicer = (pkgs.unstable.callPackage ./orca-slicer { inherit sources; });
 
