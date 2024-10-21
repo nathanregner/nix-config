@@ -117,6 +117,9 @@
     <keyboard-shortcut first-keystroke="ctrl q" />
     <keyboard-shortcut first-keystroke="alt q" />
   </action>
+  <action id="RecentProjectListGroup">
+    <keyboard-shortcut first-keystroke="shift ctrl meta comma" />
+  </action>
   <action id="RerunFailedTests">
     <keyboard-shortcut first-keystroke="shift ctrl meta r" />
   </action>
