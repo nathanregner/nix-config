@@ -1,4 +1,4 @@
-{ pkgs }:
+{ inputs, pkgs }:
 let
   sources = pkgs.callPackage ../_sources/generated.nix { };
   nodePkgs = pkgs.unstable.nodePackages_latest;
@@ -65,6 +65,8 @@ in
   klipper-calibrate-shaper = pkgs.callPackage ./klipper/calibrate-shaper.nix { };
 
   klipper-flash-rp2040 = pkgs.callPackage ./klipper/rp2040.nix { };
+
+  krr = pkgs.unstable.callPackage ./krr { inherit inputs; };
 
   orca-slicer = (pkgs.unstable.callPackage ./orca-slicer { inherit sources; });
 
