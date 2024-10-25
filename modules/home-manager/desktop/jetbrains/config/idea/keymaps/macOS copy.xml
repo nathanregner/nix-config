@@ -79,14 +79,6 @@
     <keyboard-shortcut first-keystroke="f1" />
   </action>
   <action id="GotoLine" />
-  <action id="GotoNextError">
-    <keyboard-shortcut first-keystroke="f2" />
-    <keyboard-shortcut first-keystroke="close_bracket" second-keystroke="d" />
-  </action>
-  <action id="GotoPreviousError">
-    <keyboard-shortcut first-keystroke="shift f2" />
-    <keyboard-shortcut first-keystroke="open_bracket" second-keystroke="d" />
-  </action>
   <action id="GotoRow" />
   <action id="GuiDesigner.QuickJavadoc">
     <keyboard-shortcut first-keystroke="ctrl j" />
@@ -175,12 +167,10 @@
   <action id="VcsShowNextChangeMarker">
     <keyboard-shortcut first-keystroke="shift ctrl alt down" />
     <keyboard-shortcut first-keystroke="shift ctrl meta j" />
-    <keyboard-shortcut first-keystroke="close_bracket" second-keystroke="c" />
   </action>
   <action id="VcsShowPrevChangeMarker">
     <keyboard-shortcut first-keystroke="shift ctrl alt up" />
     <keyboard-shortcut first-keystroke="shift ctrl meta k" />
-    <keyboard-shortcut first-keystroke="open_bracket" second-keystroke="c" />
   </action>
   <action id="copilot.applyInlays">
     <keyboard-shortcut first-keystroke="tab" />
