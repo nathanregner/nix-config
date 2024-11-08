@@ -1,5 +1,12 @@
 # https://github.com/berberman/nvfetcher?tab=readme-ov-file#keyfile
 
+[authbind]
+# src.git = "https://github.com/Castaglia/MacOSX-authbind"
+# fetch.github = "Castaglia/MacOSX-authbind"
+src.git = "https://github.com/tmm1/MacOSX-authbind"
+src.branch = "el-capitan"
+fetch.github = "tmm1/MacOSX-authbind"
+
 [cura-x86_64-linux]
 src.github = "Ultimaker/Cura"
 fetch.url = "https://github.com/Ultimaker/Cura/releases/download/$ver/UltiMaker-Cura-$ver-linux-X64.AppImage"

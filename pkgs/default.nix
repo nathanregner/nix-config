@@ -14,6 +14,8 @@ in
     pin-github-action
     ;
 
+  authbind = pkgs.unstable.callPackage ./authbind { inherit sources; };
+
   cura5 = pkgs.unstable.callPackage ./cura { inherit sources; };
 
   generate-sops-keys = pkgs.unstable.callPackage ./generate-sops-keys.nix { };
