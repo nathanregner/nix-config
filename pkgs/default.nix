@@ -10,6 +10,8 @@ in
 {
   inherit (node2nixPkgs) typescript;
 
+  authbind = pkgs.unstable.callPackage ./authbind { inherit sources; };
+
   cura5 = pkgs.unstable.callPackage ./cura { inherit sources; };
 
   emmet-language-server = node2nixPkgs."@olrtg/emmet-language-server";
