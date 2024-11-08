@@ -10,6 +10,8 @@ in
 {
   inherit (node2nixPkgs) pin-github-action typescript;
 
+  authbind = pkgs.unstable.callPackage ./authbind { inherit sources; };
+
   aws-cli-sso = pkgs.unstable.callPackage ./aws-cli-sso { };
 
   blink-cmp = pkgs.unstable.callPackage ./blink { inherit sources; };
