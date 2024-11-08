@@ -35,7 +35,7 @@ creation_rules:
       - age:
           - *user_nregner
           - *host_print_farm
-  - path_regex: machines/sagittarius/secrets.yaml
+  - path_regex: machines/sagittarius/(.*/)?secrets.yaml
     key_groups:
       - age:
           - *user_nregner

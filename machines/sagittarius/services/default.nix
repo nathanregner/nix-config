@@ -4,6 +4,7 @@
     ./docker.nix
     ./gitea.nix
     ./github-actions.nix
+    ./gitlab
     ./grafana
     ./hydra.nix
     ./k8s.nix
