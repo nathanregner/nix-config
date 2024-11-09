@@ -27,4 +27,6 @@
     "!craigslist"
     "!factorio"
   ];
+
+  systemd.package = pkgs.unstable.systemd;
 }
