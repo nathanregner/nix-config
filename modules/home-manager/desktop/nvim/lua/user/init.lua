@@ -276,56 +276,62 @@ require("lazy").setup({
           filetypes = { "graphql", "javascript", "javascriptreact", "typescript", "typescriptreact" },
         },
         harper_ls = {
-          ["harper-ls"] = {
-            linters = {
-              sentence_capitalization = false,
-              spaces = false,
+          settings = {
+            ["harper-ls"] = {
+              linters = {
+                sentence_capitalization = false,
+                spaces = false,
+              },
             },
           },
         },
         helm_ls = {
-          ["helm-ls"] = {
-            valuesFiles = {
-              -- mainValuesFile = "values.yaml",
-              -- lintOverlayValuesFile = "values.lint.yaml",
-              additionalValuesFilesGlobPattern = "*values*.yaml",
-            },
-            yamlls = {
-              enabled = true,
-              diagnosticsLimit = 50,
-              showDiagnosticsDirectly = false,
-              path = "yaml-language-server",
-              config = {
-                schemas = {
-                  kubernetes = "templates/**",
+          settings = {
+            ["helm-ls"] = {
+              valuesFiles = {
+                -- mainValuesFile = "values.yaml",
+                -- lintOverlayValuesFile = "values.lint.yaml",
+                additionalValuesFilesGlobPattern = "*values*.yaml",
+              },
+              yamlls = {
+                enabled = true,
+                diagnosticsLimit = 50,
+                showDiagnosticsDirectly = false,
+                path = "yaml-language-server",
+                config = {
+                  schemas = {
+                    kubernetes = "templates/**",
+                  },
+                  completion = true,
+                  hover = true,
+                  -- any other config from https://github.com/redhat-developer/yaml-language-server#language-server-settings
                 },
-                completion = true,
-                hover = true,
-                -- any other config from https://github.com/redhat-developer/yaml-language-server#language-server-settings
               },
             },
           },
         },
         html = { filetypes = { "html", "twig", "hbs" } },
         jsonls = {
-          -- https://github.com/b0o/SchemaStore.nvim?tab=readme-ov-file
-          json = {
-            schemas = require("schemastore").json.schemas(),
-            validate = { enable = true },
+          settings = { -- https://github.com/b0o/SchemaStore.nvim?tab=readme-ov-file
+            json = {
+              schemas = require("schemastore").json.schemas(),
+              validate = { enable = true },
+            },
           },
         },
         nil_ls = {},
         nushell = {},
         pyright = {},
         rust_analyzer = {
-          -- https://rust-analyzer.github.io/manual.html#configuration
-          ["rust-analyzer"] = {
-            cargo = { allFeatures = true },
-            completion = {
-              autoimport = { enable = true },
-            },
-            files = {
-              excludeDirs = { ".direnv", ".git" },
+          settings = { -- https://rust-analyzer.github.io/manual.html#configuration
+            ["rust-analyzer"] = {
+              cargo = { allFeatures = true },
+              completion = {
+                autoimport = { enable = true },
+              },
+              files = {
+                excludeDirs = { ".direnv", ".git" },
+              },
             },
           },
         },
@@ -333,34 +339,38 @@ require("lazy").setup({
           root_dir = util.root_pattern(".terraform", ".terraform.lock.hcl", ".git"),
         },
         tflint = {
-          root_dir = util.root_pattern(".terraform", ".terraform.lock.hcl", ".git", ".tflint.hcl"),
+          root_dir = util.root_pattern(".tflint.hcl", ".terraform", ".terraform.lock.hcl", ".git"),
         },
         vtsls = {
           settings = require("vtsls").lspconfig.settings,
         },
         yamlls = {
-          yaml = {
-            -- https://github.com/b0o/SchemaStore.nvim?tab=readme-ov-file
-            schemaStore = {
-              -- You must disable built-in schemaStore support if you want to use
-              -- this plugin and its advanced options like `ignore`.
-              enable = false,
-              -- Avoid TypeError: Cannot read properties of undefined (reading 'length')
-              url = "",
+          settings = {
+            yaml = {
+              -- https://github.com/b0o/SchemaStore.nvim?tab=readme-ov-file
+              schemaStore = {
+                -- You must disable built-in schemaStore support if you want to use
+                -- this plugin and its advanced options like `ignore`.
+                enable = false,
+                -- Avoid TypeError: Cannot read properties of undefined (reading 'length')
+                url = "",
+              },
+              schemas = require("schemastore").yaml.schemas(),
             },
-            schemas = require("schemastore").yaml.schemas(),
           },
         },
 
         lua_ls = {
-          Lua = {
-            workspace = {
-              checkThirdParty = false,
-              ignoreDir = { ".direnv", ".git" },
+          settings = {
+            Lua = {
+              workspace = {
+                checkThirdParty = false,
+                ignoreDir = { ".direnv", ".git" },
+              },
+              telemetry = { enable = false },
+              -- NOTE: toggle below to ignore Lua_LS's noisy `missing-fields` warnings
+              -- diagnostics = { disable = { 'missing-fields' } },
             },
-            telemetry = { enable = false },
-            -- NOTE: toggle below to ignore Lua_LS's noisy `missing-fields` warnings
-            -- diagnostics = { disable = { 'missing-fields' } },
           },
         },
       }
@@ -374,7 +384,7 @@ require("lazy").setup({
           cmd = server_config.cmd,
           capabilities = capabilities,
           on_attach = on_attach,
-          settings = server_config,
+          settings = server_config.settings,
           filetypes = server_config.filetypes,
           root_dir = server_config.root_dir,
         })
@@ -919,7 +929,7 @@ require("lazy").setup({
       vim.keymap.set("n", "<leader>fh", builtin.help_tags, { desc = "[F]ind [H]elp" })
       vim.keymap.set("n", "<leader>fk", builtin.keymaps, { desc = "[F]ind [K]eymaps" })
       vim.keymap.set("n", "<leader>ff", function()
-        builtin.git_files({ show_untracked = true })
+        builtin.find_files({})
       end, { desc = "[F]ind [F]iles" })
       vim.keymap.set("n", "<leader>fs", builtin.builtin, { desc = "[F]ind [S]elect Telescope" })
       vim.keymap.set("n", "<leader>fw", builtin.grep_string, { desc = "[F]ind current [W]ord" })
@@ -1624,6 +1634,9 @@ require("lazy").setup({
       })
     end,
   },
+
+  -- TODO
+  -- :let g:conjure#log#hud#ignore_low_priority = v:true
 
   { -- REPL
     "Olical/conjure",
