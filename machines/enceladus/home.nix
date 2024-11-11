@@ -35,7 +35,6 @@
     # tools
     awscli2
     gh
-    nushell
     sops
 
     # nix

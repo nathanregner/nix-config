@@ -72,7 +72,6 @@
     babashka
     gh
     jq
-    nushell
     pv
     rclone
     restic
