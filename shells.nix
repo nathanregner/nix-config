@@ -9,6 +9,7 @@
       age
       inputs'.deploy-rs.packages.default
       node2nix
+      nvfetcher
       sops
       ssh-to-age
       tenv
