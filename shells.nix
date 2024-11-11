@@ -8,6 +8,7 @@
     packages = with pkgs.unstable; [
       age
       node2nix
+      nvfetcher
       sops
       ssh-to-age
       tenv
