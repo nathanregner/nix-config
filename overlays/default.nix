@@ -68,6 +68,7 @@ rec {
       system = stableFinal.system;
       config.allowUnfree = true;
       overlays = [
+        inputs.fenix.overlays.default
         (
           final: prev:
           builtins.mapAttrs

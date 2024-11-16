@@ -13,6 +13,8 @@ lib.recurseIntoAttrs {
 
   gitea-github-mirror = pkgs.unstable.callPackage ./gitea-github-mirror { };
 
+  github-backup = pkgs.unstable.callPackage ./github-backup { };
+
   hammerspoon = pkgs.unstable.callPackage ./hammerspoon { };
 
   hydra-auto-upgrade = pkgs.unstable.callPackage ./hydra-auto-upgrade { };
@@ -22,6 +24,8 @@ lib.recurseIntoAttrs {
   klipper-calibrate-shaper = pkgs.callPackage ./klipper/calibrate-shaper.nix { };
 
   klipper-flash-rp2040 = pkgs.callPackage ./klipper/rp2040.nix { };
+
+  openapi-tools = pkgs.unstable.callPackage ./openapi-tools { };
 
   pin-github-action = pkgs.unstable.callPackage ./pin-github-action { };
 
