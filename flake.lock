@@ -117,6 +117,27 @@
         "type": "github"
       }
     },
+    "fenix": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ],
+        "rust-analyzer-src": "rust-analyzer-src"
+      },
+      "locked": {
+        "lastModified": 1731738660,
+        "narHash": "sha256-tIXhc9lX1b030v812yVJanSR37OnpTb/OY5rU3TbShA=",
+        "owner": "nix-community",
+        "repo": "fenix",
+        "rev": "e10ba121773f754a30d31b6163919a3e404a434f",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nix-community",
+        "repo": "fenix",
+        "type": "github"
+      }
+    },
     "flake-compat": {
       "flake": false,
       "locked": {
@@ -660,6 +681,7 @@
         "catppuccin-nix": "catppuccin-nix",
         "clojure-lsp": "clojure-lsp",
         "disko": "disko",
+        "fenix": "fenix",
         "flake-parts": "flake-parts_2",
         "home-manager": "home-manager",
         "home-manager-unstable": "home-manager-unstable",
@@ -675,6 +697,23 @@
         "preprocess-cancellation": "preprocess-cancellation",
         "sops-nix": "sops-nix",
         "treefmt-nix": "treefmt-nix_2"
+      }
+    },
+    "rust-analyzer-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1731693936,
+        "narHash": "sha256-uHUUS1WPyW6ohp5Bt3dAZczUlQ22vOn7YZF8vaPKIEw=",
+        "owner": "rust-lang",
+        "repo": "rust-analyzer",
+        "rev": "1b90e979aeee8d1db7fe14603a00834052505497",
+        "type": "github"
+      },
+      "original": {
+        "owner": "rust-lang",
+        "ref": "nightly",
+        "repo": "rust-analyzer",
+        "type": "github"
       }
     },
     "rust-overlay": {

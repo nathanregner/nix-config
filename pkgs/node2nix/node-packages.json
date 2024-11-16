@@ -1,4 +1,5 @@
 [
+  "@apiture/openapi-down-convert",
   "@olrtg/emmet-language-server",
   "@vtsls/language-server",
   "graphql-language-service-cli",

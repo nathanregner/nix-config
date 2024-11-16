@@ -1,18 +1,21 @@
 { inputs, pkgs }:
 let
   sources = pkgs.callPackage ../_sources/generated.nix { };
+  fenix = inputs.fenix.packages.${pkgs.stdenv.system};
   nodePkgs = pkgs.unstable.nodePackages_latest;
   node2nixPkgs = import ./node2nix {
     pkgs = pkgs.unstable;
     nodejs = nodePkgs.nodejs;
   };
 in
-{
+rec {
   inherit (node2nixPkgs) "@olrtg/emmet-language-server";
 
   cura5 = pkgs.unstable.callPackage ./cura { inherit sources; };
 
   gitea-github-mirror = pkgs.unstable.callPackage ./gitea-github-mirror { };
+
+  github-backup = pkgs.unstable.callPackage ./github-backup { inherit fenix openapi-tools; };
 
   graphql-language-service-cli = node2nixPkgs.graphql-language-service-cli.override {
     nativeBuildInputs = [ pkgs.unstable.makeWrapper ];
@@ -51,6 +54,8 @@ in
   moonraker-develop = (pkgs.unstable.callPackage ./moonraker { inherit inputs; });
 
   orca-slicer = (pkgs.unstable.callPackage ./orca-slicer { inherit sources; });
+
+  openapi-tools = (pkgs.unstable.callPackage ./openapi-tools { });
 
   inherit (node2nixPkgs) pin-github-action;
 
