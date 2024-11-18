@@ -33,7 +33,6 @@
 
       # language servers
       clojure-lsp
-      gopls
       libclang
       helm-ls
       jdt-language-server
