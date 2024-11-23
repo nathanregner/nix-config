@@ -16,9 +16,10 @@
 
       # language servers
       clojure-lsp
+      efm-langserver
       gopls
-      libclang
       helm-ls
+      libclang
       lua-language-server
       nil
       pkgs."@olrtg/emmet-language-server"
@@ -35,6 +36,7 @@
       nixfmt-rfc-style
       pkgs.joker
       prettierd
+      shellcheck
       shfmt
       stylua
 
