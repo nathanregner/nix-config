@@ -269,6 +269,17 @@ require("lazy").setup({
         clojure_lsp = {
           root_dir = util.root_pattern("project.clj", "deps.edn", "bb.edn", ".git"),
         },
+        efm = {
+          filetypes = { "sh", "bash", "zsh" },
+          settings = {
+            rootMarkers = { ".git/" },
+            languages = {
+              sh = {
+                require("efmls-configs.linters.shellcheck"),
+              },
+            },
+          },
+        },
         -- https://github.com/olrtg/emmet-language-server
         emmet_language_server = {
           filetypes = {
