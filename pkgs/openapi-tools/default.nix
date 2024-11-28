@@ -1,8 +1,10 @@
 # https://github.com/NixOS/nixpkgs/blob/master/doc/languages-frameworks/rust.section.md
 {
+  fenix,
   fetchurl,
   installShellFiles,
   lib,
+  makeRustPlatform,
   mkShell,
   nvd,
   remarshal,
@@ -12,6 +14,12 @@
   rustfmt,
 }:
 let
+  rustPlatform = makeRustPlatform rec {
+    inherit (fenix.minimal) toolchain;
+    rustc = toolchain;
+    cargo = toolchain;
+  };
+
   pkg = rustPlatform.buildRustPackage {
     pname = "openapi-tools";
     version = "0.0.1";
@@ -40,7 +48,8 @@ let
     '';
 
     passthru.devShell = mkShell {
-      RUST_SRC_PATH = "${rustPlatform.rustcSrc}/library";
+      RUST_SRC_PATH = "${fenix.complete.rust-src}/lib/rustlib/src/rust/library";
+
       SWAGGER_PETSTORE = runCommand "swagger-petstore.json" { nativeBuildInputs = [ remarshal ]; } ''
         remarshal ${
           fetchurl {
@@ -50,13 +59,15 @@ let
         } -of json -o $out --json-indent 2
       '';
 
-      packages =
-        pkg.nativeBuildInputs
-        ++ pkg.buildInputs
-        ++ [
-          rust-analyzer
-          rustfmt
-        ];
+      packages = [
+        (fenix.complete.withComponents [
+          "cargo"
+          "clippy"
+          "rust-analyzer"
+          "rust-src"
+          "rustfmt"
+        ])
+      ];
     };
   };
 in

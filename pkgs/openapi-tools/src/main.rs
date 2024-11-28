@@ -1,3 +1,5 @@
+#![feature(associated_type_defaults)]
+
 mod cli;
 mod ext;
 mod visitor;
@@ -94,30 +96,38 @@ struct ComponentRefVisitor<'s> {
 }
 
 impl<'s> Visitor<'s> for ComponentRefVisitor<'s> {
-    fn visit_ref(&mut self, r: &str) {
+    fn visit_ref<T>(&mut self, r: &str) -> Option<ReferenceOr<T>> {
         let cr: ComponentRef = match r.parse() {
             Ok(r) => r,
             Err(err) => {
                 eprintln!("Invalid ref {r}: {err}");
-                return;
+                return None;
             }
         };
 
         let Some(component) = ComponentRef::get(cr, &self.source) else {
             eprintln!("Component does not exist: {r}");
-            return;
+            return None;
         };
 
-        if !component.insert(&mut self.components) {
-            return;
+        if component.insert(&mut self.components) {
+            match component.ty {
+                ComponentType::Schema(c) => {
+                    Visit::visit(c, self)?;
+                }
+                ComponentType::Response(c) => {
+                    Visit::visit(c, self)?;
+                }
+                ComponentType::Parameter(c) => {
+                    Visit::visit(c, self)?;
+                }
+                ComponentType::RequestBody(c) => {
+                    Visit::visit(c, self)?;
+                }
+            };
         }
 
-        match component.ty {
-            ComponentType::Schema(c) => Visit::visit(c, self),
-            ComponentType::Response(c) => Visit::visit(c, self),
-            ComponentType::Parameter(c) => Visit::visit(c, self),
-            ComponentType::RequestBody(c) => Visit::visit(c, self),
-        }
+        return Some(ReferenceOr::ref_(r));
     }
 
     fn visit_operation<'o: 's>(&mut self, (path, method, operation): OperationPath<'o>) {

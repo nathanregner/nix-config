@@ -55,7 +55,7 @@ rec {
 
   orca-slicer = (pkgs.unstable.callPackage ./orca-slicer { inherit sources; });
 
-  openapi-tools = (pkgs.unstable.callPackage ./openapi-tools { });
+  openapi-tools = (pkgs.unstable.callPackage ./openapi-tools { inherit fenix; });
 
   inherit (node2nixPkgs) pin-github-action;
 
