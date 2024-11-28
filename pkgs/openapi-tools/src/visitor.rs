@@ -1,5 +1,6 @@
+use indexmap::IndexMap;
 use openapiv3::{
-    AdditionalProperties, ArrayType, MediaType, ObjectType, Operation, Parameter,
+    AdditionalProperties, ArrayType, MediaType, ObjectType, Operation, Parameter, ParameterData,
     ParameterSchemaOrContent, PathItem, ReferenceOr, RequestBody, Response, Responses, Schema,
     SchemaKind, Type,
 };
@@ -165,14 +166,43 @@ pub trait Visitor<'s>: Sized {
     }
 
     fn visit_parameter(&mut self, parameter: &Parameter) {
-        let parameter = match parameter {
+        let parameter_data = match parameter {
             Parameter::Query { parameter_data, .. }
             | Parameter::Header { parameter_data, .. }
             | Parameter::Path { parameter_data, .. }
             | Parameter::Cookie { parameter_data, .. } => parameter_data,
         };
-        if let ParameterSchemaOrContent::Schema(schema) = &parameter.format {
-            schema.visit(self)
+        let format = match &parameter_data.format {
+            ParameterSchemaOrContent::Schema(schema) => schema.visit(self),
+            ParameterSchemaOrContent::Content(content) => content
+                .iter()
+                .filter_map(|(name, media_type)| Some((name.to_string(), media_type.visit(self)?)))
+                .collect(),
+        };
+
+        match parameter {
+            Parameter::Query {
+                parameter_data,
+                allow_reserved,
+                style,
+                allow_empty_value,
+            } => todo!(),
+            Parameter::Header {
+                parameter_data,
+                style,
+            } => todo!(),
+            Parameter::Path {
+                parameter_data,
+                style,
+            } => todo!(),
+            Parameter::Cookie {
+                parameter_data,
+                style,
+            } => todo!(),
+        }
+        Parameter {
+            format,
+            ..parameter_data.clone()
         }
     }
 
@@ -200,10 +230,37 @@ pub trait Visitor<'s>: Sized {
 
     fn visit_media_type(&mut self, media_type: &MediaType) -> Option<MediaType> {
         Some(MediaType {
-            schema: media_type.schema.and_then(|schema| schema.visit(self)),
+            schema: media_type
+                .schema
+                .as_ref()
+                .and_then(|schema| schema.visit(self)),
             ..media_type.clone()
         })
     }
+}
+
+fn visit_parameter_data<'s>(
+    visitor: &mut impl Visitor<'s>,
+    parameter_data: &ParameterData,
+) -> ParameterData {
+    use ParameterSchemaOrContent::*;
+    let format = match &parameter_data.format {
+        Schema(schema) => Schema(schema.visit(visitor)?),
+        Content(content) => Content(visit_content(visitor, content)),
+    };
+    ParameterData {
+        format,
+        ..parameter_data.clone()
+    }
+}
+fn visit_content<'s>(
+    visitor: &mut impl Visitor<'s>,
+    content: &IndexMap<String, MediaType>,
+) -> IndexMap<String, MediaType> {
+    content
+        .iter()
+        .filter_map(|(name, media_type)| Some((name.to_string(), media_type.visit(visitor)?)))
+        .collect()
 }
 
 pub fn visit_operation<'s>(
@@ -216,19 +273,25 @@ pub fn visit_operation<'s>(
             .iter()
             .filter_map(|parameter| parameter.visit(visitor))
             .collect(),
-        request_body: operation.request_body.and_then(|body| body.visit(visitor)),
+        request_body: operation
+            .request_body
+            .as_ref()
+            .and_then(|body| body.visit(visitor)),
         responses: Responses {
             default: operation
                 .responses
                 .default
+                .as_ref()
                 .and_then(|response| response.visit(visitor)),
             responses: operation
                 .responses
                 .responses
                 .iter()
-                .filter_map(|(status, response)| Some((status, response.visit(visitor)?)))
+                .filter_map(|(status, response)| {
+                    Some((status.to_owned(), response.visit(visitor)?))
+                })
                 .collect(),
-            extensions: operation.responses.extensions,
+            extensions: operation.responses.extensions.clone(),
         },
         ..operation.clone()
     }
