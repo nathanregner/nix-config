@@ -4,6 +4,7 @@ use openapiv3::{
     ParameterSchemaOrContent, PathItem, ReferenceOr, RequestBody, Response, Responses, Schema,
     SchemaKind, Type,
 };
+use strum::VariantArray;
 
 use crate::ext::Method;
 
@@ -21,17 +22,21 @@ impl<'s> Visit<'s> for Schema {
 
 impl<'s> Visit<'s> for Box<Schema> {
     fn visit(&self, visitor: &mut impl Visitor<'s>) -> <Self as Visit<'s>>::Output {
-        Box::new(Schema::visit(self, visitor))
+        Some(Box::new(Schema::visit(self, visitor)?))
     }
 }
 
 impl<'s> Visit<'s> for ObjectType {
+    type Output = Option<Type>;
+
     fn visit(&self, visitor: &mut impl Visitor<'s>) -> <Self as Visit<'s>>::Output {
         visitor.visit_object_type(&self)
     }
 }
 
 impl<'s> Visit<'s> for ArrayType {
+    type Output = Option<Type>;
+
     fn visit(&self, visitor: &mut impl Visitor<'s>) -> <Self as Visit<'s>>::Output {
         visitor.visit_array_type(self)
     }
@@ -106,104 +111,78 @@ pub trait Visitor<'s>: Sized {
             ..path_item.clone()
         };
 
-        macro_rules! visit_methods {
-            ($($method: ident),+) => {
-                $({
-                let method = Method::$method;
-                if let Some(operation) = method.get(&path_item) {
-                    let operation = (path, method, operation).visit(self);
-                    *method.get_mut(&mut result) = operation;
-                }
-                })+
-            };
+        for &method in Method::VARIANTS {
+            if let Some(operation) = method.get(&path_item) {
+                let operation = (path, method, operation).visit(self);
+                *method.get_mut(&mut result) = operation;
+            }
         }
-
-        visit_methods!(Get, Put, Post, Delete, Options, Head, Patch, Trace);
 
         Some(result)
     }
 
     fn visit_schema(&mut self, schema: &Schema) -> Option<Schema> {
-        match &schema.schema_kind {
-            SchemaKind::Type(t) => match t {
-                Type::Object(object) => self.visit_object_type(object),
-                Type::Array(array) => self.visit_array_type(array),
-                Type::String(_) | Type::Number(_) | Type::Integer(_) | Type::Boolean(_) => {}
-            },
-            SchemaKind::OneOf { one_of: schemas }
-            | SchemaKind::AllOf { all_of: schemas }
-            | SchemaKind::AnyOf { any_of: schemas } => {
-                for schema in schemas {
-                    schema.visit(self)
-                }
-            }
-            SchemaKind::Not { not } => not.visit(self),
-            SchemaKind::Any(_) => {}
-        }
+        visit_schema(self, schema)
     }
 
     fn visit_ref<T>(&mut self, reference: &str) -> Option<ReferenceOr<T>>;
 
-    fn visit_object_type(&mut self, schema: &ObjectType) {
-        for (_, property) in &schema.properties {
-            property.visit(self)
-        }
-        if let Some(AdditionalProperties::Schema(additional_properties)) =
-            &schema.additional_properties
-        {
-            (**additional_properties).visit(self)
-        }
+    fn visit_object_type(&mut self, schema: &ObjectType) -> Option<Type> {
+        use AdditionalProperties::*;
+        Some(Type::Object(ObjectType {
+            properties: schema
+                .properties
+                .iter()
+                .filter_map(|(name, property)| Some((name.to_string(), property.visit(self)?)))
+                .collect(),
+            additional_properties: schema.additional_properties.as_ref().and_then(
+                |additional_properties| {
+                    Some(match additional_properties {
+                        Schema(additional_properties) => {
+                            Schema(Box::new(additional_properties.visit(self)?))
+                        }
+                        _ => additional_properties.clone(),
+                    })
+                },
+            ),
+            ..schema.clone()
+        }))
     }
 
-    fn visit_array_type(&mut self, schema: &ArrayType) {
-        if let Some(items) = &schema.items {
-            items.visit(self)
-        }
+    fn visit_array_type(&mut self, schema: &ArrayType) -> Option<Type> {
+        let schema = visit_array(self, schema);
+        Some(Type::Array(schema))
     }
 
     fn visit_operation<'o: 's>(&mut self, operation: OperationPath<'o>) -> Option<Operation> {
         Some(visit_operation(self, operation))
     }
 
-    fn visit_parameter(&mut self, parameter: &Parameter) {
-        let parameter_data = match parameter {
-            Parameter::Query { parameter_data, .. }
-            | Parameter::Header { parameter_data, .. }
-            | Parameter::Path { parameter_data, .. }
-            | Parameter::Cookie { parameter_data, .. } => parameter_data,
-        };
-        let format = match &parameter_data.format {
-            ParameterSchemaOrContent::Schema(schema) => schema.visit(self),
-            ParameterSchemaOrContent::Content(content) => content
-                .iter()
-                .filter_map(|(name, media_type)| Some((name.to_string(), media_type.visit(self)?)))
-                .collect(),
-        };
+    fn visit_parameter(&mut self, parameter: &Parameter) -> Option<Parameter> {
+        use Parameter::*;
+        use ParameterSchemaOrContent::*;
 
-        match parameter {
-            Parameter::Query {
-                parameter_data,
-                allow_reserved,
-                style,
-                allow_empty_value,
-            } => todo!(),
-            Parameter::Header {
-                parameter_data,
-                style,
-            } => todo!(),
-            Parameter::Path {
-                parameter_data,
-                style,
-            } => todo!(),
-            Parameter::Cookie {
-                parameter_data,
-                style,
-            } => todo!(),
+        let mut parameter = parameter.clone();
+        match &mut parameter {
+            Query { parameter_data, .. }
+            | Header { parameter_data, .. }
+            | Path { parameter_data, .. }
+            | Cookie { parameter_data, .. } => {
+                let format = match &parameter_data.format {
+                    Schema(schema) => Schema(schema.visit(self)?),
+                    Content(content) => Content(
+                        content
+                            .iter()
+                            .filter_map(|(name, media_type)| {
+                                Some((name.to_string(), media_type.visit(self)?))
+                            })
+                            .collect(),
+                    ),
+                };
+                parameter_data.format = format;
+            }
         }
-        Parameter {
-            format,
-            ..parameter_data.clone()
-        }
+        Some(parameter)
     }
 
     fn visit_response(&mut self, response: &Response) -> Option<Response> {
@@ -239,21 +218,30 @@ pub trait Visitor<'s>: Sized {
     }
 }
 
-fn visit_parameter_data<'s>(
+fn visit_array<'s>(visitor: &mut impl Visitor<'s>, schema: &ArrayType) -> ArrayType {
+    let mut schema = schema.clone();
+    if let Some(items) = &schema.items {
+        schema.items = items.visit(visitor);
+    }
+    schema
+}
+
+pub fn visit_parameter_data<'s>(
     visitor: &mut impl Visitor<'s>,
     parameter_data: &ParameterData,
-) -> ParameterData {
+) -> Option<ParameterData> {
     use ParameterSchemaOrContent::*;
     let format = match &parameter_data.format {
         Schema(schema) => Schema(schema.visit(visitor)?),
         Content(content) => Content(visit_content(visitor, content)),
     };
-    ParameterData {
+    Some(ParameterData {
         format,
         ..parameter_data.clone()
-    }
+    })
 }
-fn visit_content<'s>(
+
+pub fn visit_content<'s>(
     visitor: &mut impl Visitor<'s>,
     content: &IndexMap<String, MediaType>,
 ) -> IndexMap<String, MediaType> {
@@ -295,4 +283,33 @@ pub fn visit_operation<'s>(
         },
         ..operation.clone()
     }
+}
+
+pub fn visit_schema<'s>(visitor: &mut impl Visitor<'s>, schema: &Schema) -> Option<Schema> {
+    use openapiv3::{SchemaKind::*, Type::*};
+
+    let schema_kind = match &schema.schema_kind {
+        Type(t) => Type(match t {
+            Object(object) => visitor.visit_object_type(object)?,
+            Array(array) => visitor.visit_array_type(array)?,
+            t @ String(_) | t @ Number(_) | t @ Integer(_) | t @ Boolean(_) => t.clone(),
+        }),
+        OneOf { one_of } => OneOf {
+            one_of: one_of.iter().filter_map(|s| s.visit(visitor)).collect(),
+        },
+        AllOf { all_of } => AllOf {
+            all_of: all_of.iter().filter_map(|s| s.visit(visitor)).collect(),
+        },
+        AnyOf { any_of } => AnyOf {
+            any_of: any_of.iter().filter_map(|s| s.visit(visitor)).collect(),
+        },
+        Not { not } => Not {
+            not: Box::new(not.visit(visitor)?),
+        },
+        any @ Any(_) => any.clone(),
+    };
+    Some(Schema {
+        schema_kind,
+        ..schema.clone()
+    })
 }

@@ -1,13 +1,12 @@
+use color_eyre::eyre;
 use core::{fmt::Display, str::FromStr};
 use indexmap::IndexMap;
-use strum::EnumString;
-
-use color_eyre::eyre;
 use openapiv3::{
     Components, Operation, Parameter, PathItem, ReferenceOr, RequestBody, Response, Schema,
 };
+use strum::{EnumString, VariantArray};
 
-#[derive(Hash, Eq, PartialEq, Copy, Clone, Debug)]
+#[derive(VariantArray, Hash, Eq, PartialEq, Copy, Clone, Debug)]
 pub enum Method {
     Get,
     Put,

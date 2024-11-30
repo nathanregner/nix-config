@@ -13,7 +13,7 @@ use core::{
 };
 use ext::{ComponentRef, ComponentType, Method};
 use indexmap::IndexMap;
-use openapiv3::{Components, OpenAPI, PathItem, Paths, ReferenceOr};
+use openapiv3::{Components, OpenAPI, Operation, PathItem, Paths, ReferenceOr};
 use regex::Regex;
 use std::{
     fs::{self},
@@ -130,12 +130,16 @@ impl<'s> Visitor<'s> for ComponentRefVisitor<'s> {
         return Some(ReferenceOr::ref_(r));
     }
 
-    fn visit_operation<'o: 's>(&mut self, (path, method, operation): OperationPath<'o>) {
+    fn visit_operation<'o: 's>(
+        &mut self,
+        (path, method, operation): OperationPath<'o>,
+    ) -> Option<Operation> {
         visitor::visit_operation(self, (path, method, operation));
         let path = self
             .paths
             .entry(path.to_string())
             .or_insert_with(PathItem::default);
-        *method.get_mut(path) = Some(operation.clone());
+        // *method.get_mut(path) = Some(operation.clone());
+        Some(operation.clone())
     }
 }
