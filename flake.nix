@@ -79,14 +79,14 @@
 
   outputs =
     {
-      self,
+      deploy-rs,
       flake-parts,
-      nixpkgs,
-      nixpkgs-unstable,
-      nix-darwin,
       home-manager,
       home-manager-unstable,
-      deploy-rs,
+      nix-darwin,
+      nixpkgs,
+      nixpkgs-unstable,
+      self,
       ...
     }@inputs:
     let
@@ -129,8 +129,8 @@
             shells
             // {
               _aggregate = pkgs.releaseTools.aggregate {
-                name = "devshell-${system}";
                 constituents = lib.attrValues shells;
+                name = "devshell-${system}";
               };
             };
 
