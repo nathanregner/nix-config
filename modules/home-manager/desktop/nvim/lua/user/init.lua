@@ -1035,6 +1035,61 @@ require("lazy").setup({
   },
 
   {
+    "mtrajano/tssorter.nvim",
+    keys = function()
+      return {
+        { "<leader>st", require("tssorter").sort, desc = "[S]ort [t]ree" },
+      }
+    end,
+    opts = {
+      sortables = {
+        nix = {
+          attrset = { node = { "binding" } },
+          formal = {
+            node = { "formal" },
+            order_by = function(node1, node2)
+              local line1 = require("tssorter.tshelper").get_text(node1)
+              local line2 = require("tssorter.tshelper").get_text(node2)
+              local overrides = {}
+              for index, value in ipairs({
+                "self",
+                "inputs",
+                "inputs'",
+                "sources",
+                "config",
+                "pkgs",
+                "lib",
+              }) do
+                overrides[value] = index
+              end
+
+              local index1 = overrides[line1]
+              local index2 = overrides[line2]
+              if index1 and index2 then
+                return index1 < index2
+              elseif index1 then
+                return true
+              elseif index2 then
+                return false
+              else
+                return line1 < line2
+              end
+            end,
+          },
+          list = { node = { "element" } },
+        },
+        toml = {
+          table = { node = { "table" } },
+        },
+      },
+      logger = {
+        level = vim.log.levels.TRACE, -- log on warn level and above
+        -- outfile = "~/tssorter.log", -- nil prints to messages, or add a path to a file to output logs there
+      },
+    },
+  },
+
+  {
     "nvim-tree/nvim-tree.lua",
     lazy = false,
     dependencies = {

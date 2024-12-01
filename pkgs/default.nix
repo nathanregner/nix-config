@@ -12,6 +12,8 @@ in
 
   cura5 = pkgs.unstable.callPackage ./cura { inherit sources; };
 
+  generate-sops-keys = pkgs.unstable.callPackage ./generate-sops-keys.nix { };
+
   gitea-github-mirror = pkgs.unstable.callPackage ./gitea-github-mirror { };
 
   graphql-language-service-cli = node2nixPkgs.graphql-language-service-cli.override {
@@ -24,15 +26,13 @@ in
 
   hammerspoon = pkgs.unstable.callPackage ./hammerspoon.nix { inherit sources; };
 
-  insync = pkgs.unstable.callPackage ./insync.nix { };
-
-  insync-nautilus = pkgs.unstable.callPackage ./insync-nautilus { };
-
   harper-ls = pkgs.unstable.callPackage ./harper-ls { inherit sources; };
 
   hydra-auto-upgrade = pkgs.unstable.callPackage ./hydra-auto-upgrade { };
 
-  generate-sops-keys = pkgs.unstable.callPackage ./generate-sops-keys.nix { };
+  insync = pkgs.unstable.callPackage ./insync.nix { };
+
+  insync-nautilus = pkgs.unstable.callPackage ./insync-nautilus { };
 
   joker = pkgs.unstable.buildGoModule (
     sources.joker
