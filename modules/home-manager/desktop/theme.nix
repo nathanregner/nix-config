@@ -13,7 +13,7 @@
   fonts.fontconfig.enable = true;
   home.packages = [
     # nerdfonts package is large; use a subset
-    (pkgs.unstable.nerdfonts.override { fonts = [ "JetBrainsMono" ]; })
+    pkgs.unstable.nerd-fonts.jetbrains-mono
     pkgs.sf-mono-nerd-font
   ];
 }
