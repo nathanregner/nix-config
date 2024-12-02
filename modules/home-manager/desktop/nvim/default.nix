@@ -6,26 +6,41 @@
     enable = true;
     defaultEditor = true;
     extraConfig = builtins.readFile ./init.vim;
-    extraLuaConfig = ''
-      vim.g.lombok_jar = '${
-        pkgs.fetchurl {
-          url = "https://repo1.maven.org/maven2/org/projectlombok/lombok/1.18.34/lombok-1.18.34.jar";
-          sha256 = "06mqsj33x0hxxd73gxw05i1np7khhfqwdg7w0wdis92nzwm6nzf2";
-        }
-      }'
-      vim.g.java_home = '${pkgs.jdk21_headless}'
-      vim.g.java_runtimes = {
-        {
-          name = "JavaSE-11",
-          path = "${pkgs.jdk11_headless}",
-        },
-        {
-          name = "JavaSE-17",
-          path = "${pkgs.jdk17_headless}",
-        },
-      }
-      require('user')
-    '';
+    extraLuaConfig =
+      let
+        globals = {
+          jdtls = {
+            lombok = pkgs.fetchurl {
+              url = "https://repo1.maven.org/maven2/org/projectlombok/lombok/1.18.36/lombok-1.18.36.jar";
+              sha256 = "sha256-c7awW2otNltwC6sI0w+U3p0zZJC8Cszlthgf70jL8Y4=";
+            };
+            settings = {
+              java = {
+                home = "${pkgs.jdk21_headless}";
+                configuration.runtimes = [
+                  {
+                    name = "JavaSE-11";
+                    path = "${pkgs.jdk11_headless}";
+                  }
+                  {
+                    name = "JavaSE-17";
+                    path = "${pkgs.jdk17_headless}";
+                  }
+                  {
+                    name = "JavaSE-21";
+                    path = "${pkgs.jdk21_headless}";
+                  }
+                ];
+                format.settings.url = "file://${config.xdg.configHome}/nvim/lsp/jdtls/formatter.xml";
+              };
+            };
+          };
+        };
+      in
+      ''
+        vim.g.nix = vim.fn.json_decode('${builtins.toJSON globals}')
+        require('user')
+      '';
 
     plugins = with pkgs.unstable.vimPlugins; [ lazy-nvim ];
 
@@ -73,9 +88,10 @@
   ];
 
   xdg.configFile = {
-    "nvim/lua".source = config.lib.file.mkFlakeSymlink ./lua;
     "nvim/after".source = config.lib.file.mkFlakeSymlink ./after;
     "nvim/lazy-lock.json".source = config.lib.file.mkFlakeSymlink ./lazy-lock.json;
+    "nvim/lsp".source = config.lib.file.mkFlakeSymlink ./lsp;
+    "nvim/lua".source = config.lib.file.mkFlakeSymlink ./lua;
   };
 
   programs.zsh.shellAliases.vimdiff = "nvim -d";
