@@ -39,14 +39,14 @@
   networking.wireless = {
     enable = true;
     userControlled.enable = true;
-    environmentFile = config.sops.secrets.wireless.path;
+    secretsFile = config.sops.secrets.wireless.path;
     networks."4Cosands" = {
       priority = 1;
-      psk = "@Cosands@";
+      psk = "ext:Cosands";
     };
     networks."REGNERD" = {
       priority = 2;
-      psk = "@REGNERD@";
+      psk = "ext:REGNERD";
     };
   };
 

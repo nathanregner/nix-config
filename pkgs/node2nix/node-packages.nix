@@ -220,13 +220,13 @@ let
         sha512 = "IqRuJtQff7YHHBk4G8YZ45uB9BaAGcwQeVzgj/zj8/UdOhtQpEIupUhSk8dys6spFIWVZVeK20CzGEnqR5SbqA==";
       };
     };
-    "@graphql-tools/batch-execute-9.0.6" = {
+    "@graphql-tools/batch-execute-9.0.8" = {
       name = "_at_graphql-tools_slash_batch-execute";
       packageName = "@graphql-tools/batch-execute";
-      version = "9.0.6";
+      version = "9.0.8";
       src = fetchurl {
-        url = "https://registry.npmjs.org/@graphql-tools/batch-execute/-/batch-execute-9.0.6.tgz";
-        sha512 = "S0mLTUJQJuItGmwouYZyXeFaRWOVmVCAMLi33M5PuZbnsoTwKMB/YPPkAQ72ay3GfclnW66XcO4EClbVynw7eQ==";
+        url = "https://registry.npmjs.org/@graphql-tools/batch-execute/-/batch-execute-9.0.8.tgz";
+        sha512 = "VEwpywG79ZJSwgQGjyIs6t4KzcUet7+O7kNPwimJrnnMm5uS1eIhOQX5C0k/KV6Tkmy2dhRUtAfhRNOzmw5sZw==";
       };
     };
     "@graphql-tools/code-file-loader-8.0.3" = {
@@ -238,58 +238,58 @@ let
         sha512 = "gVnnlWs0Ua+5FkuHHEriFUOI3OIbHv6DS1utxf28n6NkfGMJldC4j0xlJRY0LS6dWK34IGYgD4HelKYz2l8KiA==";
       };
     };
-    "@graphql-tools/delegate-10.2.0" = {
+    "@graphql-tools/delegate-10.2.4" = {
       name = "_at_graphql-tools_slash_delegate";
       packageName = "@graphql-tools/delegate";
-      version = "10.2.0";
+      version = "10.2.4";
       src = fetchurl {
-        url = "https://registry.npmjs.org/@graphql-tools/delegate/-/delegate-10.2.0.tgz";
-        sha512 = "poWeNz4tnZnENopYaXILfqJux8aG7YqfOn/QR1q6tp6Q8PYISgtGZlX02jUPKYySrUgR1zutUB+xsxvPyrUlog==";
+        url = "https://registry.npmjs.org/@graphql-tools/delegate/-/delegate-10.2.4.tgz";
+        sha512 = "9M02yADA4UyuC6ZaR0mRakWhLohUCJkUxHLyUt7agZuA8Y/UxhQ8GJy+Gby0/goRvF3jviF5YX3LCP9zYJDMBQ==";
       };
     };
-    "@graphql-tools/executor-1.3.4" = {
+    "@graphql-tools/executor-1.3.5" = {
       name = "_at_graphql-tools_slash_executor";
       packageName = "@graphql-tools/executor";
-      version = "1.3.4";
+      version = "1.3.5";
       src = fetchurl {
-        url = "https://registry.npmjs.org/@graphql-tools/executor/-/executor-1.3.4.tgz";
-        sha512 = "2XbOp1K8iQiDgExbBTrhjqQX1bh5lHbri3nEaL8pCiiirZTLs4C1a1mizGcQzkeciF41paWEfBu1M1mOewtFAQ==";
+        url = "https://registry.npmjs.org/@graphql-tools/executor/-/executor-1.3.5.tgz";
+        sha512 = "jwbvC9mYr64NBQAV1zpnX1T+3ak+SnmW6z8pS9JBZgbUxQSaL/quxP7ejDTyf5wkAUJ6zt1p0UCIbQ6H9jSKGA==";
       };
     };
-    "@graphql-tools/executor-graphql-ws-1.3.2" = {
+    "@graphql-tools/executor-graphql-ws-1.3.3" = {
       name = "_at_graphql-tools_slash_executor-graphql-ws";
       packageName = "@graphql-tools/executor-graphql-ws";
-      version = "1.3.2";
+      version = "1.3.3";
       src = fetchurl {
-        url = "https://registry.npmjs.org/@graphql-tools/executor-graphql-ws/-/executor-graphql-ws-1.3.2.tgz";
-        sha512 = "m+7+g3dSyaomuJAgDoG/9RcZC5/hGEpDQjmKmbLf/WvGdv5fLJNsuoJ7pIjlT5r7wQJNjEPGoHeh9pD/YykRww==";
+        url = "https://registry.npmjs.org/@graphql-tools/executor-graphql-ws/-/executor-graphql-ws-1.3.3.tgz";
+        sha512 = "EMOgaJHK1xXwVyb0AGyC1Q+pYz4CUE/tDIL8xYWEGZvP2La7cZtDspuAsZyGA8vd5UlqCYrLbsOC70k9vRSQJQ==";
       };
     };
-    "@graphql-tools/executor-http-1.1.9" = {
+    "@graphql-tools/executor-http-1.1.11" = {
       name = "_at_graphql-tools_slash_executor-http";
       packageName = "@graphql-tools/executor-http";
-      version = "1.1.9";
+      version = "1.1.11";
       src = fetchurl {
-        url = "https://registry.npmjs.org/@graphql-tools/executor-http/-/executor-http-1.1.9.tgz";
-        sha512 = "dJRj78QEGNNnlhkhqPUG9z+1uAr7znZ4dzabEVgY5uSXTmUIFcTKpOGYv2/QAuvyqGN40XxbcdVRJta6XHX2BQ==";
+        url = "https://registry.npmjs.org/@graphql-tools/executor-http/-/executor-http-1.1.11.tgz";
+        sha512 = "6A0jy1JxBAGlnzydEZ523bNQddUP/TjpyM/Ql9/eTP2Lu3V0xoLBW1QlhxwALIRp+/PolRYF2VbhWy1cJoruBA==";
       };
     };
-    "@graphql-tools/executor-legacy-ws-1.1.3" = {
+    "@graphql-tools/executor-legacy-ws-1.1.4" = {
       name = "_at_graphql-tools_slash_executor-legacy-ws";
       packageName = "@graphql-tools/executor-legacy-ws";
-      version = "1.1.3";
+      version = "1.1.4";
       src = fetchurl {
-        url = "https://registry.npmjs.org/@graphql-tools/executor-legacy-ws/-/executor-legacy-ws-1.1.3.tgz";
-        sha512 = "rMEMJoAEhDG9mBzphFYSaei3d3Bo1YfC0cW2+/jab9sFeMMslaSNhKCRMEv24SWOforPntFrqPfGl7T3hB0jYg==";
+        url = "https://registry.npmjs.org/@graphql-tools/executor-legacy-ws/-/executor-legacy-ws-1.1.4.tgz";
+        sha512 = "rAeS/UHsrdefAl7svX1D8aJNRcJ8h7fKUpIUpLNd0WSoGxXB8VZLDXDf/mFjy1ri5jmX2VVUegH3Wpk6aKrXJA==";
       };
     };
-    "@graphql-tools/graphql-file-loader-8.0.4" = {
+    "@graphql-tools/graphql-file-loader-8.0.5" = {
       name = "_at_graphql-tools_slash_graphql-file-loader";
       packageName = "@graphql-tools/graphql-file-loader";
-      version = "8.0.4";
+      version = "8.0.5";
       src = fetchurl {
-        url = "https://registry.npmjs.org/@graphql-tools/graphql-file-loader/-/graphql-file-loader-8.0.4.tgz";
-        sha512 = "8FI/dIHOFwFqRse9vFsXKPqjvty6uaB/+eZPZd9/fL//Wyx5I6VQK3VBpONNRhLo9wtHiHfYKEzEjSC2jYRceg==";
+        url = "https://registry.npmjs.org/@graphql-tools/graphql-file-loader/-/graphql-file-loader-8.0.5.tgz";
+        sha512 = "c39Df38Nrt+2ZscPjAFZmCxzfSH98hjxfIzAbB6MOJBSsPCXtze3uVhXxxymxTCe+0MSo+b9LsdvRpVUOGFVSg==";
       };
     };
     "@graphql-tools/graphql-tag-pluck-8.1.0" = {
@@ -301,76 +301,76 @@ let
         sha512 = "kt5l6H/7QxQcIaewInTcune6NpATojdFEW98/8xWcgmy7dgXx5vU9e0AicFZIH+ewGyZzTpwFqO2RI03roxj2w==";
       };
     };
-    "@graphql-tools/import-7.0.4" = {
+    "@graphql-tools/import-7.0.5" = {
       name = "_at_graphql-tools_slash_import";
       packageName = "@graphql-tools/import";
-      version = "7.0.4";
+      version = "7.0.5";
       src = fetchurl {
-        url = "https://registry.npmjs.org/@graphql-tools/import/-/import-7.0.4.tgz";
-        sha512 = "7ZuE5FoyhGudgDL+e9rmcVxFuKBgL7NrFb4veXtUR2t/rA0TUqV2/4boCNbBkAENsiaffOZCUG2wRpDJHK6Btg==";
+        url = "https://registry.npmjs.org/@graphql-tools/import/-/import-7.0.5.tgz";
+        sha512 = "n3CaJfK/6crYCMmHDWUDyVQUjiuI0O4WklF7Mg5AUrOB0Gth97Jz4EC1I85vE8fDJT5VdeMotSiVzFGdT2rMXQ==";
       };
     };
-    "@graphql-tools/json-file-loader-8.0.4" = {
+    "@graphql-tools/json-file-loader-8.0.5" = {
       name = "_at_graphql-tools_slash_json-file-loader";
       packageName = "@graphql-tools/json-file-loader";
-      version = "8.0.4";
-      src = fetchurl {
-        url = "https://registry.npmjs.org/@graphql-tools/json-file-loader/-/json-file-loader-8.0.4.tgz";
-        sha512 = "5lCgJhRWzrXWiCxD8d3FHlgDmIuunsqBrXUK25nnwFQUzJK/c698VA6ocfXYGfSWcwYyZyrLEH2lnY3cnFKt9A==";
-      };
-    };
-    "@graphql-tools/load-8.0.5" = {
-      name = "_at_graphql-tools_slash_load";
-      packageName = "@graphql-tools/load";
       version = "8.0.5";
       src = fetchurl {
-        url = "https://registry.npmjs.org/@graphql-tools/load/-/load-8.0.5.tgz";
-        sha512 = "P58km1PozZviIAEaE8Kxtaxdi4CdNarDeUQVzL48S2XpwBu9z9mIT8A8XUV/m4HzD8n96IGcb/mXIASa3feAKQ==";
+        url = "https://registry.npmjs.org/@graphql-tools/json-file-loader/-/json-file-loader-8.0.5.tgz";
+        sha512 = "UV5R6fq1GRh6vmDN8Qy1le2ua4jV63bp4urx5bU3YrMwlZ/bIStYMwqsX7149Eq9ZkXSQEh0aOh6pAu/bQm/KA==";
       };
     };
-    "@graphql-tools/merge-9.0.10" = {
+    "@graphql-tools/load-8.0.6" = {
+      name = "_at_graphql-tools_slash_load";
+      packageName = "@graphql-tools/load";
+      version = "8.0.6";
+      src = fetchurl {
+        url = "https://registry.npmjs.org/@graphql-tools/load/-/load-8.0.6.tgz";
+        sha512 = "ETRr6O3agJBxKgMlEUmaQVKhgD3VVQ7bBKpUGaq7P4Tzk64cvfLqggp7yuOYQv7GLLiMYsRCtm1jKQhuUuZ9MQ==";
+      };
+    };
+    "@graphql-tools/merge-9.0.11" = {
       name = "_at_graphql-tools_slash_merge";
       packageName = "@graphql-tools/merge";
-      version = "9.0.10";
+      version = "9.0.11";
       src = fetchurl {
-        url = "https://registry.npmjs.org/@graphql-tools/merge/-/merge-9.0.10.tgz";
-        sha512 = "sU+b6ZmKtGnqHq8S+VI5UmjZVHWzT+b+QtCsJUEXckCKdq1P3JmwIT8+8DVxSQlh1dzpiVq37EOcJrEYOBZtBA==";
+        url = "https://registry.npmjs.org/@graphql-tools/merge/-/merge-9.0.11.tgz";
+        sha512 = "AJL0XTozn31HoZN8tULzEkbDXyETA5vAFu4Q65kxJDu027p+auaNFYj/y51HP4BhMR4wykoteWyO7/VxKfdpiw==";
       };
     };
-    "@graphql-tools/schema-10.0.9" = {
+    "@graphql-tools/schema-10.0.10" = {
       name = "_at_graphql-tools_slash_schema";
       packageName = "@graphql-tools/schema";
-      version = "10.0.9";
+      version = "10.0.10";
       src = fetchurl {
-        url = "https://registry.npmjs.org/@graphql-tools/schema/-/schema-10.0.9.tgz";
-        sha512 = "R/sPRLJnEHg/F7owvH1zLbfXxqrEgFyr/qSjsG1q+gWhCrxbo/+c2DVjeZEZ2/AKCLllDHTD5TOU2Y5sZGNxZg==";
+        url = "https://registry.npmjs.org/@graphql-tools/schema/-/schema-10.0.10.tgz";
+        sha512 = "TSdDvwgk1Fq3URDuZBMCPXlWLpRpxwaQ+0KqvycVwoHozYnBRZ2Ql9HVgDKnebkGQKmIk2enSeku+ERKxxSG0g==";
       };
     };
-    "@graphql-tools/url-loader-8.0.16" = {
+    "@graphql-tools/url-loader-8.0.17" = {
       name = "_at_graphql-tools_slash_url-loader";
       packageName = "@graphql-tools/url-loader";
-      version = "8.0.16";
+      version = "8.0.17";
       src = fetchurl {
-        url = "https://registry.npmjs.org/@graphql-tools/url-loader/-/url-loader-8.0.16.tgz";
-        sha512 = "2VhQBkW/nvKwKJ6xrngl2YLuHSsBYH/oEhp0w56ZkNHOiPkLzEYPj74QeGBpCokf61/LrVBWg1KTpGwVh+l0UQ==";
+        url = "https://registry.npmjs.org/@graphql-tools/url-loader/-/url-loader-8.0.17.tgz";
+        sha512 = "4HebDcJLHVediJIzpoqqn6+b2tQzSP3d2YdAmUX+WFUqKmlveKUpyN2vYG5X4yqZ2cpN3jp4b+kRZftjTHo/pg==";
       };
     };
-    "@graphql-tools/utils-10.6.0" = {
+    "@graphql-tools/utils-10.6.1" = {
       name = "_at_graphql-tools_slash_utils";
       packageName = "@graphql-tools/utils";
-      version = "10.6.0";
+      version = "10.6.1";
       src = fetchurl {
-        url = "https://registry.npmjs.org/@graphql-tools/utils/-/utils-10.6.0.tgz";
-        sha512 = "bqSn2ekSNwFVZprY6YsrHkqPA7cPLNKxiPlEzS1djhfvx4q9tx7Uwc5dnLp3SSnKinJ8dJk9FA5sxNcKjCM44w==";
+        url = "https://registry.npmjs.org/@graphql-tools/utils/-/utils-10.6.1.tgz";
+        sha512 = "XHl0/DWkMf/8Dmw1F3RRoMPt6ZwU4J707YWcbPjS+49WZNoTVz6f+prQ4GuwZT8RqTPtrRawnGU93AV73ZLTfQ==";
       };
     };
-    "@graphql-tools/wrap-10.0.18" = {
+    "@graphql-tools/wrap-10.0.22" = {
       name = "_at_graphql-tools_slash_wrap";
       packageName = "@graphql-tools/wrap";
-      version = "10.0.18";
+      version = "10.0.22";
       src = fetchurl {
-        url = "https://registry.npmjs.org/@graphql-tools/wrap/-/wrap-10.0.18.tgz";
-        sha512 = "wK/v8CjmXz9AnbPPC/nMI6jqn5j7Ht3R4wqGWNZSSbqrf8E7EUZAvTWUZbe9dh0nIjUne87I6ndllJCTQ+C3mA==";
+        url = "https://registry.npmjs.org/@graphql-tools/wrap/-/wrap-10.0.22.tgz";
+        sha512 = "DwbEYrxbEV9DBV1UIpxzFecEHdEnR2GvnYm0wlptiBS+UvBnVMwBnwe9gY5seiCemwFUtyG3J6bZlHnZZe/l0A==";
       };
     };
     "@graphql-typed-document-node/core-3.2.0" = {
@@ -607,13 +607,13 @@ let
         sha512 = "AYnb1nQyY49te+VRAVgmzfcgjYS91mY5P0TKUDCLEM+gNnA+3T6rWITXRLYCpahpqSQbN5cE+gHpnPyXjHWxcw==";
       };
     };
-    "@types/node-22.9.3" = {
+    "@types/node-22.10.1" = {
       name = "_at_types_slash_node";
       packageName = "@types/node";
-      version = "22.9.3";
+      version = "22.10.1";
       src = fetchurl {
-        url = "https://registry.npmjs.org/@types/node/-/node-22.9.3.tgz";
-        sha512 = "F3u1fs/fce3FFk+DAxbxc78DF8x0cY09RRL8GnXLmkJ1jvx3TtPdWoTT5/NiYfI5ASqXBmfqJi9dZ3gxMx4lzw==";
+        url = "https://registry.npmjs.org/@types/node/-/node-22.10.1.tgz";
+        sha512 = "qKgsUwfHZV2WCWLAnVP1JqnpE6Im6h3Y0+fYgMTasNQ7V++CBX5OT1as0g0f+OyubbFqhf6XVNIsmN4IIhEgGQ==";
       };
     };
     "@types/ws-8.5.13" = {
@@ -760,6 +760,15 @@ let
         sha512 = "/hnE/qP5ZoGpol0a5mDi45bOd7t3tjYJBjsgCsivow7D48cJeV5l05RD82lPqi7gRiphZM37rnhW1l6ZoCNNnQ==";
       };
     };
+    "@whatwg-node/disposablestack-0.0.5" = {
+      name = "_at_whatwg-node_slash_disposablestack";
+      packageName = "@whatwg-node/disposablestack";
+      version = "0.0.5";
+      src = fetchurl {
+        url = "https://registry.npmjs.org/@whatwg-node/disposablestack/-/disposablestack-0.0.5.tgz";
+        sha512 = "9lXugdknoIequO4OYvIjhygvfSEgnO8oASLqLelnDhkRjgBZhc39shC3QSlZuyDO9bgYSIVa2cHAiN+St3ty4w==";
+      };
+    };
     "@whatwg-node/fetch-0.10.1" = {
       name = "_at_whatwg-node_slash_fetch";
       packageName = "@whatwg-node/fetch";
@@ -769,13 +778,13 @@ let
         sha512 = "gmPOLrsjSZWEZlr9Oe5+wWFBq3CG6fN13rGlM91Jsj/vZ95G9CCvrORGBAxMXy0AJGiC83aYiHXn3JzTzXQmbA==";
       };
     };
-    "@whatwg-node/node-fetch-0.7.3" = {
+    "@whatwg-node/node-fetch-0.7.4" = {
       name = "_at_whatwg-node_slash_node-fetch";
       packageName = "@whatwg-node/node-fetch";
-      version = "0.7.3";
+      version = "0.7.4";
       src = fetchurl {
-        url = "https://registry.npmjs.org/@whatwg-node/node-fetch/-/node-fetch-0.7.3.tgz";
-        sha512 = "mqHYN1JZG0bSnOi6bxYq8zSBLfp02597yb9YNwZ0Zqn3TdC7/YjRWKnnGm49rzIWGaNaHiUjv8KThuhpK7NDLA==";
+        url = "https://registry.npmjs.org/@whatwg-node/node-fetch/-/node-fetch-0.7.4.tgz";
+        sha512 = "rvUtU/xKKl/av5EIwyqfw7w0R+hx+tQrlhpIyFr27MwJRlUb+xcYv97kOmp7FE/WmQ8s+Tb6bcD6W8o/s2pGWw==";
       };
     };
     "acorn-8.14.0" = {
@@ -967,13 +976,13 @@ let
         sha512 = "P8BjAsXvZS+VIDUI11hHCQEv74YT67YUi5JJFNWIqL235sBmjX4+qx9Muvls5ivyNENctx46xQLQ3aTuE7ssaQ==";
       };
     };
-    "caniuse-lite-1.0.30001683" = {
+    "caniuse-lite-1.0.30001685" = {
       name = "caniuse-lite";
       packageName = "caniuse-lite";
-      version = "1.0.30001683";
+      version = "1.0.30001685";
       src = fetchurl {
-        url = "https://registry.npmjs.org/caniuse-lite/-/caniuse-lite-1.0.30001683.tgz";
-        sha512 = "iqmNnThZ0n70mNwvxpEC2nBJ037ZHZUoBI5Gorh1Mw6IlEAZujEoU1tXA628iZfzm7R9FvFzxbfdgml82a3k8Q==";
+        url = "https://registry.npmjs.org/caniuse-lite/-/caniuse-lite-1.0.30001685.tgz";
+        sha512 = "e/kJN1EMyHQzgcMEEgoo+YTCO1NGCmIYHk5Qk8jT6AazWemS5QFKJ5ShCJlH3GZrNIdZofcNCEwZqbMjjKzmnA==";
       };
     };
     "chokidar-3.6.0" = {
@@ -1246,13 +1255,13 @@ let
         sha512 = "2QF/g9/zTaPDc3BjNcVTGoBbXBgYfMTTceLaYcFJ/W9kggFUkhxD/hMEeuLKbugyef9SqAx8cpgwlIP/jinUTA==";
       };
     };
-    "electron-to-chromium-1.5.64" = {
+    "electron-to-chromium-1.5.68" = {
       name = "electron-to-chromium";
       packageName = "electron-to-chromium";
-      version = "1.5.64";
+      version = "1.5.68";
       src = fetchurl {
-        url = "https://registry.npmjs.org/electron-to-chromium/-/electron-to-chromium-1.5.64.tgz";
-        sha512 = "IXEuxU+5ClW2IGEYFC2T7szbyVgehupCWQe5GNh+H065CD6U6IFN0s4KeAMFGNmQolRU4IV7zGBWSYMmZ8uuqQ==";
+        url = "https://registry.npmjs.org/electron-to-chromium/-/electron-to-chromium-1.5.68.tgz";
+        sha512 = "FgMdJlma0OzUYlbrtZ4AeXjKxKPk6KT8WOP8BjcqxWtlg8qyJQjRzPJzUtUn5GBg1oQ26hFs7HOOHJMYiJRnvQ==";
       };
     };
     "emmet-2.4.11" = {
@@ -1507,13 +1516,13 @@ let
         sha512 = "GGTKBX4SD7Wdb8mqeDLni2oaRGYQWjWHGKPQ24ZMnUtKfcsVoiv4uX8+LJr1K6U5VW2Lu1BwJnj7uiori0YtRw==";
       };
     };
-    "graphql-17.0.0-alpha.7.canary.pr.4288.b96419eebb37a65c76964ccd0994ab9d3b4e8215" = {
+    "graphql-17.0.0-alpha.7.canary.pr.4297.42bcd01f7c733e255ff9eab84ec8d7500dfd208a" = {
       name = "graphql";
       packageName = "graphql";
-      version = "17.0.0-alpha.7.canary.pr.4288.b96419eebb37a65c76964ccd0994ab9d3b4e8215";
+      version = "17.0.0-alpha.7.canary.pr.4297.42bcd01f7c733e255ff9eab84ec8d7500dfd208a";
       src = fetchurl {
-        url = "https://registry.npmjs.org/graphql/-/graphql-17.0.0-alpha.7.canary.pr.4288.b96419eebb37a65c76964ccd0994ab9d3b4e8215.tgz";
-        sha512 = "Q0DvTghplAnqYWp94cXgP1iTjcmwvkZzBzGKLw6DTiOcoiRSjnVA1dv+iFWyk5P7mzQGc3s288DG4zTi2vpSrQ==";
+        url = "https://registry.npmjs.org/graphql/-/graphql-17.0.0-alpha.7.canary.pr.4297.42bcd01f7c733e255ff9eab84ec8d7500dfd208a.tgz";
+        sha512 = "WUZ5C9o0SC+JyfWH9mMTgwbpnmIkqutYug1dEid54CNYEpLlkfXGpT9eAg6feajQUeUU8a6VfgJdNUag8IVqsg==";
       };
     };
     "graphql-config-5.0.3" = {
@@ -1840,13 +1849,13 @@ let
         sha512 = "Jo6dJ04CmSjuznwJSS3pUeWmd/H0ffTlkXXgwZi+eq1UCmqQwCh+eLsYOYCwY991i2Fah4h1BEMCx4qThGbsiA==";
       };
     };
-    "magic-string-0.30.13" = {
+    "magic-string-0.30.14" = {
       name = "magic-string";
       packageName = "magic-string";
-      version = "0.30.13";
+      version = "0.30.14";
       src = fetchurl {
-        url = "https://registry.npmjs.org/magic-string/-/magic-string-0.30.13.tgz";
-        sha512 = "8rYBO+MsWkgjDSOvLomYnzhdwEG51olQ4zL5KXnNJWV5MNmrb4rTZdrtkhxjnD/QyZUqR/Z/XDsUs/4ej2nx0g==";
+        url = "https://registry.npmjs.org/magic-string/-/magic-string-0.30.14.tgz";
+        sha512 = "5c99P1WKTed11ZC0HMJOj6CDIue6F8ySu+bJL+85q1zBEIY8IklrJ1eiKC2NDRh3Ct3FcvmJPyQHb9erXMTJNw==";
       };
     };
     "magicast-0.3.5" = {
@@ -1993,13 +2002,13 @@ let
         sha512 = "6FlzubTLZG3J2a/NVCAleEhjzq5oxgHyaCU9yYXvcLsvoVaHJq/s5xXI6/XXP6tz7R9xAOtHnSO/tXtF3WRTlA==";
       };
     };
-    "nanoid-3.3.7" = {
+    "nanoid-3.3.8" = {
       name = "nanoid";
       packageName = "nanoid";
-      version = "3.3.7";
+      version = "3.3.8";
       src = fetchurl {
-        url = "https://registry.npmjs.org/nanoid/-/nanoid-3.3.7.tgz";
-        sha512 = "eSRppjcPIatRIMC1U6UngP8XFcz8MQWGQdt1MTBQ7NaAmvXDfvNxbvWV3x2y6CdEUciCSsDHDQZbhYaB8QEo2g==";
+        url = "https://registry.npmjs.org/nanoid/-/nanoid-3.3.8.tgz";
+        sha512 = "WNLf5Sd8oZxOm+TzppcYk8gVOgP+l58xNy58D0nbUnOxOWRWvlcCV4kUF7ltmI6PsrLl/BgKEyS4mqsGChFN0w==";
       };
     };
     "no-case-3.0.4" = {
@@ -2623,13 +2632,13 @@ let
         sha512 = "UsUk3byDzKd04EyoZ7U4DOlxQaD14JUKQl6/P7wiX4FNvUfm3XL246n9W5AmqwW5RSFJ27NAuM0iLscAOYUiGQ==";
       };
     };
-    "undici-types-6.19.8" = {
+    "undici-types-6.20.0" = {
       name = "undici-types";
       packageName = "undici-types";
-      version = "6.19.8";
+      version = "6.20.0";
       src = fetchurl {
-        url = "https://registry.npmjs.org/undici-types/-/undici-types-6.19.8.tgz";
-        sha512 = "ve2KP6f/JnbPBFyobGHuerC9g1FYGn/F8n1LWTwNxCEzd6IfqTwUQcNXgEtmmQ6DlRrC1hrSrBnCZPokRrDHjw==";
+        url = "https://registry.npmjs.org/undici-types/-/undici-types-6.20.0.tgz";
+        sha512 = "Ny6QZ2Nju20vw1SRHe3d9jVu6gJ+4e3+MMpqu7pqE5HT6WsTSlce++GQmK5UXS8mzV8DSYHrQH+Xrf2jVcuKNg==";
       };
     };
     "universal-user-agent-6.0.1" = {
@@ -3115,7 +3124,7 @@ in
       sources."@babel/template-7.25.9"
       sources."@babel/traverse-7.25.9"
       sources."@babel/types-7.26.0"
-      (sources."@graphql-tools/batch-execute-9.0.6" // {
+      (sources."@graphql-tools/batch-execute-9.0.8" // {
         dependencies = [
           sources."graphql-16.9.0"
         ];
@@ -3125,32 +3134,32 @@ in
           sources."graphql-16.9.0"
         ];
       })
-      (sources."@graphql-tools/delegate-10.2.0" // {
+      (sources."@graphql-tools/delegate-10.2.4" // {
         dependencies = [
           sources."graphql-16.9.0"
         ];
       })
-      (sources."@graphql-tools/executor-1.3.4" // {
+      (sources."@graphql-tools/executor-1.3.5" // {
         dependencies = [
           sources."graphql-16.9.0"
         ];
       })
-      (sources."@graphql-tools/executor-graphql-ws-1.3.2" // {
+      (sources."@graphql-tools/executor-graphql-ws-1.3.3" // {
         dependencies = [
           sources."graphql-16.9.0"
         ];
       })
-      (sources."@graphql-tools/executor-http-1.1.9" // {
+      (sources."@graphql-tools/executor-http-1.1.11" // {
         dependencies = [
           sources."graphql-16.9.0"
         ];
       })
-      (sources."@graphql-tools/executor-legacy-ws-1.1.3" // {
+      (sources."@graphql-tools/executor-legacy-ws-1.1.4" // {
         dependencies = [
           sources."graphql-16.9.0"
         ];
       })
-      (sources."@graphql-tools/graphql-file-loader-8.0.4" // {
+      (sources."@graphql-tools/graphql-file-loader-8.0.5" // {
         dependencies = [
           sources."graphql-16.9.0"
         ];
@@ -3160,43 +3169,43 @@ in
           sources."graphql-16.9.0"
         ];
       })
-      (sources."@graphql-tools/import-7.0.4" // {
+      (sources."@graphql-tools/import-7.0.5" // {
         dependencies = [
           sources."graphql-16.9.0"
           sources."resolve-from-5.0.0"
         ];
       })
-      (sources."@graphql-tools/json-file-loader-8.0.4" // {
+      (sources."@graphql-tools/json-file-loader-8.0.5" // {
         dependencies = [
           sources."graphql-16.9.0"
         ];
       })
-      (sources."@graphql-tools/load-8.0.5" // {
+      (sources."@graphql-tools/load-8.0.6" // {
         dependencies = [
           sources."graphql-16.9.0"
         ];
       })
-      (sources."@graphql-tools/merge-9.0.10" // {
+      (sources."@graphql-tools/merge-9.0.11" // {
         dependencies = [
           sources."graphql-16.9.0"
         ];
       })
-      (sources."@graphql-tools/schema-10.0.9" // {
+      (sources."@graphql-tools/schema-10.0.10" // {
         dependencies = [
           sources."graphql-16.9.0"
         ];
       })
-      (sources."@graphql-tools/url-loader-8.0.16" // {
+      (sources."@graphql-tools/url-loader-8.0.17" // {
         dependencies = [
           sources."graphql-16.9.0"
         ];
       })
-      (sources."@graphql-tools/utils-10.6.0" // {
+      (sources."@graphql-tools/utils-10.6.1" // {
         dependencies = [
           sources."graphql-16.9.0"
         ];
       })
-      (sources."@graphql-tools/wrap-10.0.18" // {
+      (sources."@graphql-tools/wrap-10.0.22" // {
         dependencies = [
           sources."graphql-16.9.0"
         ];
@@ -3218,7 +3227,7 @@ in
       sources."@nodelib/fs.walk-1.2.8"
       sources."@repeaterjs/repeater-3.0.6"
       sources."@types/estree-1.0.6"
-      sources."@types/node-22.9.3"
+      sources."@types/node-22.10.1"
       sources."@types/ws-8.5.13"
       sources."@types/yargs-16.0.5"
       sources."@types/yargs-parser-21.0.3"
@@ -3239,8 +3248,9 @@ in
       sources."@vue/runtime-dom-3.5.13"
       sources."@vue/server-renderer-3.5.13"
       sources."@vue/shared-3.5.13"
+      sources."@whatwg-node/disposablestack-0.0.5"
       sources."@whatwg-node/fetch-0.10.1"
-      sources."@whatwg-node/node-fetch-0.7.3"
+      sources."@whatwg-node/node-fetch-0.7.4"
       sources."acorn-8.14.0"
       sources."ansi-regex-5.0.1"
       sources."ansi-styles-4.3.0"
@@ -3255,7 +3265,7 @@ in
       sources."bufferutil-4.0.8"
       sources."busboy-1.6.0"
       sources."callsites-3.1.0"
-      sources."caniuse-lite-1.0.30001683"
+      sources."caniuse-lite-1.0.30001685"
       sources."cliui-7.0.4"
       (sources."code-red-1.0.4" // {
         dependencies = [
@@ -3279,7 +3289,7 @@ in
       sources."dir-glob-3.0.1"
       sources."dotenv-10.0.0"
       sources."dset-3.1.4"
-      sources."electron-to-chromium-1.5.64"
+      sources."electron-to-chromium-1.5.68"
       sources."emoji-regex-8.0.0"
       sources."encoding-0.1.13"
       sources."entities-4.5.0"
@@ -3299,7 +3309,7 @@ in
       sources."glob-parent-5.1.2"
       sources."globals-11.12.0"
       sources."globby-11.1.0"
-      sources."graphql-17.0.0-alpha.7.canary.pr.4288.b96419eebb37a65c76964ccd0994ab9d3b4e8215"
+      sources."graphql-17.0.0-alpha.7.canary.pr.4297.42bcd01f7c733e255ff9eab84ec8d7500dfd208a"
       (sources."graphql-config-5.0.3" // {
         dependencies = [
           sources."graphql-16.9.0"
@@ -3335,7 +3345,7 @@ in
       sources."locate-character-3.0.0"
       sources."lower-case-2.0.2"
       sources."lru-cache-10.4.3"
-      sources."magic-string-0.30.13"
+      sources."magic-string-0.30.14"
       sources."mdn-data-2.0.30"
       sources."merge2-1.4.1"
       sources."meros-1.3.0"
@@ -3343,7 +3353,7 @@ in
       sources."minimatch-3.1.2"
       sources."mkdirp-1.0.4"
       sources."ms-2.1.3"
-      sources."nanoid-3.3.7"
+      sources."nanoid-3.3.8"
       sources."no-case-3.0.4"
       sources."node-abort-controller-3.1.1"
       sources."node-fetch-2.7.0"
@@ -3395,7 +3405,7 @@ in
       sources."tr46-0.0.3"
       sources."tslib-2.8.1"
       sources."typescript-5.7.2"
-      sources."undici-types-6.19.8"
+      sources."undici-types-6.20.0"
       sources."unixify-1.0.0"
       sources."update-browserslist-db-1.1.1"
       sources."urlpattern-polyfill-10.0.0"

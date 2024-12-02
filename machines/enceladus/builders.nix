@@ -52,7 +52,7 @@
         nixos = nixpkgs.lib.nixosSystem {
           modules =
             [
-              "${nixpkgs}/nixos/modules/profiles/macos-builder.nix"
+              "${nixpkgs}/nixos/modules/profiles/nix-builder-vm.nix"
               ./linux-builder/configuration.nix
             ]
             ++ [

@@ -86,7 +86,7 @@
 
     # 3d printer
     pkgs.orca-slicer
-    super-slicer-beta
+    # super-slicer-beta
     pkgs.cura5
 
     # nix
