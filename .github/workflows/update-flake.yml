@@ -20,7 +20,7 @@ jobs:
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git config user.name "github-actions[bot]"
           git add -A
-          git commit -am "build: update flake.lock"
+          git commit -m "build: update flake.lock"
           git push
   nvfetcher:
     runs-on: [self-hosted]
@@ -30,13 +30,13 @@ jobs:
           token: ${{ secrets.GH_TOKEN_FOR_UPDATES }}
           ref: next
       - name: Run nvfetcher
-        run: nvfetcher -k $NVFETCHER_KEYFILE
+        run: nvfetcher -k $NVFETCHER_KEYFILE --keep-going
       - name: Commit and push
         run: |
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git config user.name "github-actions[bot]"
           git add -A
-          git commit -am "build: update sources"
+          git commit -m "build: update nvfetcher sources"
           git push
   node2nix:
     runs-on: [self-hosted]
@@ -52,5 +52,5 @@ jobs:
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git config user.name "github-actions[bot]"
           git add -A
-          git commit -am "build: update node2nix packages"
+          git commit -m "build: update node2nix packages"
           git push
