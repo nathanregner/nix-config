@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, lib, ... }:
 {
   programs.zsh = {
     enable = true;
@@ -16,6 +16,9 @@
     oh-my-zsh = {
       enable = true;
       plugins = [ "vi-mode" ];
+    };
+    sessionVariables = {
+      BROWSER = lib.mkDefault "firefox";
     };
     shellAliases =
       let
