@@ -90,8 +90,8 @@
     version = "latest";
     src = dockerTools.pullImage {
       imageName = "hkotel/mealie";
-      imageDigest = "sha256:88e8e12542e9a2733c07f175682dc69e7360becb6137d604bb087a71ab33c5fe";
-      sha256 = "sha256-zRNYvxWwVxWTXZbgffeCtAtDed1lyD+dIjf5RtU23/I=";
+      imageDigest = "sha256:54a976880161c3c96de30b63cd0092d1f069aa8b23686669b726558ddf112724";
+      sha256 = "sha256-LsnvoHhztvn/OrMLdyiLUwhkFn9OmVt2fWOUcK2QisY=";
       finalImageTag = "latest";
     };
   };
