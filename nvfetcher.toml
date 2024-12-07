@@ -30,7 +30,7 @@ fetch.github = "kyleisah/Klipper-Adaptive-Meshing-Purging"
 
 [linux-rockchip]
 src.git = "https://github.com/armbian/linux-rockchip.git"
-src.branch = "rk-5.10-rkr6"
+src.branch = "rk-6.1-rkr4.1"
 fetch.github = "armbian/linux-rockchip"
 
 [mealie]
@@ -52,3 +52,4 @@ fetch.url = "https://github.com/pilotmoon/Scroll-Reverser/releases/download/v$ve
 [sf-mono-nerd-font]
 src.github = "epk/SF-Mono-Nerd-Font"
 fetch.github = "epk/SF-Mono-Nerd-Font"
+
