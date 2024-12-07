@@ -44,4 +44,8 @@
       };
     };
   };
+
+  home.sessionVariables = {
+    TERMINFO_DIRS = "${pkgs.alacritty.terminfo.outPath}/share/terminfo";
+  };
 }
