@@ -75,15 +75,12 @@
   };
   linux-rockchip = {
     pname = "linux-rockchip";
-    version = "709c51c64e1652d4f8c87b1815db86f56d188268";
-    src = fetchFromGitHub {
-      owner = "armbian";
-      repo = "linux-rockchip";
-      rev = "709c51c64e1652d4f8c87b1815db86f56d188268";
-      fetchSubmodules = false;
-      sha256 = "sha256-YZdWNhLopRyaEBojqMLMYEMKV6V0HcFgFmDbRSbBhRo=";
+    version = "3165005dc12bff363a990d56ea917fae667dc773";
+    src = fetchurl {
+      url = "https://github.com/armbian/linux-rockchip/archive/3165005dc12bff363a990d56ea917fae667dc773.zip";
+      sha256 = "sha256-NYeB+qh1ZeTug/IzrUxz2XIeyQdmBVJEu0m2U75ktAc=";
     };
-    date = "2024-07-10";
+    date = "2024-11-28";
   };
   mealie = {
     pname = "mealie";
