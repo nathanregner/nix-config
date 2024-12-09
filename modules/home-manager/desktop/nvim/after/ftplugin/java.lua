@@ -10,6 +10,4 @@ local config = {
 	root_dir = vim.fs.dirname(vim.fs.find({ "gradlew", ".git", "mvnw" }, { upward = true })[1]),
 	settings = vim.g.nix.jdtls.settings,
 }
-vim.print(config)
-vim.inspect(config)
 require("jdtls").start_or_attach(config)
