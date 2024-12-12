@@ -31,10 +31,6 @@
     ) { };
     # https://github.com/jesseduffield/lazygit/blob/master/docs/Config.md
     settings = {
-      git = {
-        autoFetch = false;
-      };
-
       gui = {
         nerdFontsVersion = "3";
       };
