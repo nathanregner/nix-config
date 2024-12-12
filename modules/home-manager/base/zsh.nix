@@ -37,7 +37,8 @@
         hmb = "${hm} build";
         hms = "${hm} switch";
 
-        npd = "nix profile diff-closures --profile /nix/var/nix/profiles/system";
+        # https://www.reddit.com/r/NixOS/comments/8m1n3d/comment/dzkfwhl/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button
+        "nix-stray-roots" = ''nix-store --gc --print-roots | egrep -v "^(/nix/var|/run/\w+-system|\{memory)"'';
       };
   };
 }
