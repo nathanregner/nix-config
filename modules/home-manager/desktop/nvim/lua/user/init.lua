@@ -40,17 +40,15 @@ require("lazy").setup({
     ft = { "java" },
   },
 
-  -- {
-  --   "NeogitOrg/neogit",
-  --   dependencies = {
-  --     "nvim-lua/plenary.nvim", -- required
-  --     "sindrets/diffview.nvim", -- optional - Diff integration
-  --
-  --     -- Only one of these is needed, not both.
-  --     "nvim-telescope/telescope.nvim",
-  --   },
-  --   config = true,
-  -- },
+  {
+    "NeogitOrg/neogit",
+    dependencies = {
+      "nvim-lua/plenary.nvim", -- required
+      "sindrets/diffview.nvim", -- optional - Diff integration
+      "nvim-telescope/telescope.nvim",
+    },
+    config = true,
+  },
 
   -- Detect tabstop and shiftwidth automatically
   "tpope/vim-sleuth",
