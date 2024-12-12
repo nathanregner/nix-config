@@ -21,9 +21,6 @@
       enable = true;
       plugins = [ "vi-mode" ];
     };
-    sessionVariables = {
-      BROWSER = lib.mkDefault "firefox";
-    };
     shellAliases =
       let
         nixRebuild = if pkgs.stdenv.isDarwin then "darwin-rebuild" else "nixos-rebuild";
