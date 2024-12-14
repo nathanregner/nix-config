@@ -28,13 +28,11 @@
         layer = "bottom";
         position = "top";
         height = 30;
-        tray = {
-          icon-size = 24;
-        };
 
         modules-left = [ "hyprland/workspaces" ];
         modules-center = [ "hyprland/window" ];
         modules-right = [
+          "tray"
           "custom/weather"
           "custom/storage"
           "backlight"
@@ -158,6 +156,12 @@
           separate-outputs = true;
         };
         "hyprland/workspaces" = { };
+
+        tray = {
+          # show-passive-items = true;
+          icon-size = 18;
+          spacing = 16;
+        };
       };
   };
 
