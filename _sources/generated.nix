@@ -75,15 +75,15 @@
   };
   linux-rockchip = {
     pname = "linux-rockchip";
-    version = "f862d3842fdda80a2d16ac365a04ae4d2f6de489";
+    version = "3165005dc12bff363a990d56ea917fae667dc773";
     src = fetchFromGitHub {
       owner = "armbian";
       repo = "linux-rockchip";
-      rev = "f862d3842fdda80a2d16ac365a04ae4d2f6de489";
+      rev = "3165005dc12bff363a990d56ea917fae667dc773";
       fetchSubmodules = false;
-      sha256 = "sha256-hm2okGKopLczrl7n0FXiMcU1Yeo9DlsfCq4SIiMkftc=";
+      sha256 = "sha256-UQJVpk8jDK1crTiGJrN+z+tSdpnD3DD6bo/2OvL0kf8=";
     };
-    date = "2024-11-28";
+    date = "2024-12-11";
   };
   mealie = {
     pname = "mealie";
