@@ -137,6 +137,11 @@
 
   services.easyeffects.enable = true;
 
+  services.ollama = {
+    enable = true;
+    acceleration = "cuda";
+  };
+
   # Nicely reload system units when changing configs
   systemd.user.startServices = "sd-switch";
 
