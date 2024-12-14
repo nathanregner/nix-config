@@ -139,6 +139,7 @@
       nautilus-python
       networkmanagerapplet
       libmtp
+      nvtopPackages.nvidia
       virt-manager
     ]);
 
@@ -194,6 +195,11 @@
   };
 
   services.udev.extraRules = builtins.readFile ./probe-rs.rules;
+
+  services.ollama = {
+    enable = true;
+  };
+  nixpkgs.config.cudaSupport = true;
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions
