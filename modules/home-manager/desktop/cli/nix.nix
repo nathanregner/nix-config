@@ -26,6 +26,6 @@
 
   # https://discourse.nixos.org/t/nvd-simple-nix-nixos-version-diff-tool/12397/6
   home.activation.report-changes = config.lib.dag.entryAnywhere ''
-    ${pkgs.nvd}/bin/nvd diff $oldGenPath $newGenPath
+    ${pkgs.nvd}/bin/nvd diff $oldGenPath $newGenPath || true
   '';
 }
