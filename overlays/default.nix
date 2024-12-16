@@ -33,7 +33,7 @@ let
           });
     };
 in
-{
+rec {
   additions =
     final: _prev:
     import ../pkgs {
@@ -51,7 +51,10 @@ in
     unstable = import inputs.nixpkgs-unstable {
       system = stableFinal.system;
       config.allowUnfree = true;
-      overlays = [ sharedModifications ];
+      overlays = [
+        additions
+        sharedModifications
+      ];
     };
   };
 }

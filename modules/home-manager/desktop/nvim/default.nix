@@ -15,20 +15,20 @@
     extraPackages = with pkgs.unstable; [
 
       # language servers
+      "@olrtg/emmet-language-server"
       clojure-lsp
       gopls
-      libclang
+      graphql-language-service-cli
+      harper-ls
       helm-ls
+      libclang
       lua-language-server
       nil
-      pkgs."@olrtg/emmet-language-server"
-      pkgs.graphql-language-service-cli
-      pkgs.harper-ls
-      pkgs.typescript
-      pkgs.vtsls
       terraform-ls
       tflint
+      typescript
       vscode-langservers-extracted
+      vtsls
       yaml-language-server
 
       # formatters/linters

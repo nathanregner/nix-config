@@ -64,9 +64,9 @@
     discord
     evince
     firefox
+    insync
     jetbrains-toolbox
     openrgb
-    pkgs.insync
 
     awscli2
     babashka
@@ -85,9 +85,9 @@
     kubernetes-helm
 
     # 3d printer
-    pkgs.orca-slicer
-    # super-slicer-beta
-    pkgs.cura5
+    cura5
+    orca-slicer
+    super-slicer-beta
 
     # nix
     nix-output-monitor
