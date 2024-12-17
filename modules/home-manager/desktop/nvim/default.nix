@@ -1,4 +1,11 @@
-{ config, pkgs, ... }:
+{
+  config,
+  pkgs,
+  ...
+}:
+let
+  parserInstallDir = "nvim/nvim-treesitter";
+in
 {
   imports = [ ./tools ];
 
@@ -9,6 +16,16 @@
     extraLuaConfig =
       let
         globals = {
+          # rtp = pkgs.linkFarm "rtp" builtins.mapAttrs (drv: {
+          #   name = drv.pname;
+          #   path = drv;
+          # }) pkgs.unstable.vimPlugins.nvim-treesitter.withAllGrammars.passthru.dependencies;
+
+          # TODO: https://github.com/nvim-treesitter/nvim-treesitter/blob/master/README.md#changing-the-parser-install-directory
+          nvim_treesitter = {
+            dir = "${pkgs.unstable.vimPlugins.nvim-treesitter.withAllGrammars}";
+            parser_install_dir = "${config.xdg.dataHome}/${parserInstallDir}";
+          };
           blink_cmp.dir = "${pkgs.unstable.blink-cmp}";
           jdtls = {
             lombok = pkgs.fetchurl {
@@ -28,7 +45,9 @@
         require('user')
       '';
 
-    plugins = with pkgs.unstable.vimPlugins; [ lazy-nvim ];
+    plugins = with pkgs.unstable.vimPlugins; [
+      lazy-nvim
+    ];
 
     extraPackages = with pkgs.unstable; [
 
@@ -57,10 +76,6 @@
       shfmt
       stylua
       taplo
-
-      # misc
-      gnumake
-      clang # for compiling tree-sitter parsers
     ];
   };
 
@@ -79,6 +94,22 @@
     "nvim/lsp".source = config.lib.file.mkFlakeSymlink ./lsp;
     "nvim/lua".source = config.lib.file.mkFlakeSymlink ./lua;
   };
+
+  xdg.dataFile = builtins.listToAttrs (
+    builtins.map (
+      grammar:
+      let
+        language = builtins.elemAt (builtins.match "vimplugin-treesitter-grammar-(.*)" grammar.name) 0;
+      in
+      {
+        name = "${parserInstallDir}/parser/${language}.so";
+        value = {
+          source = "${grammar}/parser/${language}.so";
+          force = true;
+        };
+      }
+    ) pkgs.unstable.vimPlugins.nvim-treesitter.withAllGrammars.passthru.dependencies
+  );
 
   programs.zsh.shellAliases.vimdiff = "nvim -d";
 

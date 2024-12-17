@@ -1083,6 +1083,8 @@ require("lazy").setup({
   {
     -- Highlight, edit, and navigate code
     "nvim-treesitter/nvim-treesitter",
+    dir = vim.g.nix.nvim_treesitter.dir,
+    pin = true,
     dependencies = {
       "nvim-treesitter/nvim-treesitter-context",
       "nvim-treesitter/nvim-treesitter-textobjects",
@@ -1100,7 +1102,8 @@ require("lazy").setup({
     },
     lazy = false,
     opts = {
-      auto_install = true,
+      parser_install_dir = vim.g.nix.nvim_treesitter.parser_install_dir,
+      auto_install = false,
       highlight = { enable = true },
       indent = { enable = true },
       disable = function(_lang, buf)
@@ -1827,6 +1830,10 @@ require("lazy").setup({
 }, {
   dev = {
     path = "~/dev/github",
+  },
+  performance = {
+    -- reset_packpath = false,
+    -- rtp = { reset = false },
   },
 })
 
