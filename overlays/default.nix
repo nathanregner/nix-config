@@ -43,6 +43,7 @@ let
       wrapNeovimUnstable =
         args: neovim-unwrapped:
         (prev.wrapNeovimUnstable args neovim-unwrapped).overrideAttrs {
+          dontFixup = true;
           dontStrip = true;
         };
     };
