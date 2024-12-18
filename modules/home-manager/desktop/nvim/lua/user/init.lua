@@ -263,42 +263,48 @@ require("lazy").setup({
           filetypes = { "graphql", "javascript", "javascriptreact", "typescript", "typescriptreact" },
         },
         harper_ls = {
-          ["harper-ls"] = {
-            linters = {
-              sentence_capitalization = false,
-              spaces = false,
+          settings = {
+            ["harper-ls"] = {
+              linters = {
+                sentence_capitalization = false,
+                spaces = false,
+              },
             },
           },
         },
         helm_ls = {
-          ["helm-ls"] = {
-            valuesFiles = {
-              -- mainValuesFile = "values.yaml",
-              -- lintOverlayValuesFile = "values.lint.yaml",
-              additionalValuesFilesGlobPattern = "*values*.yaml",
-            },
-            yamlls = {
-              enabled = true,
-              diagnosticsLimit = 50,
-              showDiagnosticsDirectly = false,
-              path = "yaml-language-server",
-              config = {
-                schemas = {
-                  kubernetes = "templates/**",
+          settings = {
+            ["helm-ls"] = {
+              valuesFiles = {
+                -- mainValuesFile = "values.yaml",
+                -- lintOverlayValuesFile = "values.lint.yaml",
+                additionalValuesFilesGlobPattern = "*values*.yaml",
+              },
+              yamlls = {
+                enabled = true,
+                diagnosticsLimit = 50,
+                showDiagnosticsDirectly = false,
+                path = "yaml-language-server",
+                config = {
+                  schemas = {
+                    kubernetes = "templates/**",
+                  },
+                  completion = true,
+                  hover = true,
+                  -- any other config from https://github.com/redhat-developer/yaml-language-server#language-server-settings
                 },
-                completion = true,
-                hover = true,
-                -- any other config from https://github.com/redhat-developer/yaml-language-server#language-server-settings
               },
             },
           },
         },
         html = { filetypes = { "html", "twig", "hbs" } },
         jsonls = {
-          -- https://github.com/b0o/SchemaStore.nvim?tab=readme-ov-file
-          json = {
-            schemas = require("schemastore").json.schemas(),
-            validate = { enable = true },
+          settings = {
+            -- https://github.com/b0o/SchemaStore.nvim?tab=readme-ov-file
+            json = {
+              schemas = require("schemastore").json.schemas(),
+              validate = { enable = true },
+            },
           },
         },
         nil_ls = {},
@@ -306,18 +312,20 @@ require("lazy").setup({
         pyright = {},
         rust_analyzer = {
           -- https://rust-analyzer.github.io/manual.html#configuration
-          ["rust-analyzer"] = {
-            cargo = {
-              allFeatures = true,
-            },
-            check = {
-              command = "clippy",
-            },
-            completion = {
-              autoimport = { enable = true },
-            },
-            files = {
-              excludeDirs = { ".direnv", ".git" },
+          settings = {
+            ["rust-analyzer"] = {
+              cargo = {
+                allFeatures = true,
+              },
+              check = {
+                command = "clippy",
+              },
+              completion = {
+                autoimport = { enable = true },
+              },
+              files = {
+                excludeDirs = { ".direnv", ".git" },
+              },
             },
           },
         },
@@ -331,16 +339,18 @@ require("lazy").setup({
           settings = require("vtsls").lspconfig.settings,
         },
         yamlls = {
-          yaml = {
-            -- https://github.com/b0o/SchemaStore.nvim?tab=readme-ov-file
-            schemaStore = {
-              -- You must disable built-in schemaStore support if you want to use
-              -- this plugin and its advanced options like `ignore`.
-              enable = false,
-              -- Avoid TypeError: Cannot read properties of undefined (reading 'length')
-              url = "",
+          settings = {
+            yaml = {
+              -- https://github.com/b0o/SchemaStore.nvim?tab=readme-ov-file
+              schemaStore = {
+                -- You must disable built-in schemaStore support if you want to use
+                -- this plugin and its advanced options like `ignore`.
+                enable = false,
+                -- Avoid TypeError: Cannot read properties of undefined (reading 'length')
+                url = "",
+              },
+              schemas = require("schemastore").yaml.schemas(),
             },
-            schemas = require("schemastore").yaml.schemas(),
           },
         },
 
@@ -366,7 +376,7 @@ require("lazy").setup({
           cmd = server_config.cmd,
           capabilities = capabilities,
           on_attach = on_attach,
-          settings = server_config,
+          settings = server_config.settings,
           filetypes = server_config.filetypes,
           root_dir = server_config.root_dir,
         })

@@ -77,7 +77,7 @@
     # misc
     clojure-lsp = {
       # https://github.com/clojure-lsp/clojure-lsp/actions/workflows/nix.yml?query=is%3Asuccess
-      url = "github:clojure-lsp/clojure-lsp/074aed14a4f52d0ce261b54d313ad3eee6cf46d1";
+      url = "github:clojure-lsp/clojure-lsp/3718eb4622b01f24687cbed560ffae7880e65566";
       # inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
   };
