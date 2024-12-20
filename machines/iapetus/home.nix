@@ -16,7 +16,7 @@
     enable = true;
     monitors = [
       {
-        name = "desc:Ancor Communications Inc VG248 J6LMQS041978";
+        name = "desc:Ancor Communications Inc VG248 JBLMQS148602";
         resolution = "1920x1080@144";
         position = "0x0";
         workspaces = [
@@ -28,7 +28,7 @@
         ];
       }
       {
-        name = "desc:Ancor Communications Inc VG248 JBLMQS148602";
+        name = "desc:Ancor Communications Inc VG248 J6LMQS041978";
         resolution = "1920x1080@144";
         position = "1920x0";
         workspaces = [
