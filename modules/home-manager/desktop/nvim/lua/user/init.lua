@@ -2,6 +2,28 @@
 vim.g.loaded_netrw = 1
 vim.g.loaded_netrwPlugin = 1
 
+local function find_git_root()
+  -- Use the current buffer's path as the starting point for the git search
+  local current_file = vim.api.nvim_buf_get_name(0)
+  local current_dir
+  local cwd = vim.fn.getcwd()
+  -- If the buffer is not associated with a file, return nil
+  if current_file == "" then
+    current_dir = cwd
+  else
+    -- Extract the directory from the current file's path
+    current_dir = vim.fn.fnamemodify(current_file, ":h")
+  end
+
+  -- Find the Git root directory from the current file's path
+  local git_root = vim.fn.systemlist("git -C " .. vim.fn.escape(current_dir, " ") .. " rev-parse --show-toplevel")[1]
+  if vim.v.shell_error ~= 0 then
+    print("Not a git repository. Searching on current working directory")
+    return cwd
+  end
+  return git_root
+end
+
 -- https://github.com/folke/lazy.nvim#-plugin-spec
 require("lazy").setup({
   -- Git
@@ -895,7 +917,7 @@ require("lazy").setup({
       require("telescope").load_extension("helpgrep")
 
       local builtin = require("telescope.builtin")
-      vim.keymap.set("n", "<leader>fh", builtin.help_tags, { desc = "[F]ind [H]elp" })
+      vim.keymap.set("n", "<leader>fH", builtin.help_tags, { desc = "[F]ind [H]elp" })
       vim.keymap.set("n", "<leader>fk", builtin.keymaps, { desc = "[F]ind [K]eymaps" })
       vim.keymap.set("n", "<leader>ff", function()
         builtin.git_files({ show_untracked = true })
@@ -917,9 +939,9 @@ require("lazy").setup({
       end, { desc = "[ ] Find existing buffers" })
       vim.keymap.set(
         "n",
-        "<leader>fc",
+        "<leader>fh",
         require("telescope.builtin").command_history,
-        { desc = "[F]ind [C]ommand History" }
+        { desc = "[F]ind Command [H]istory" }
       )
 
       -- Git
@@ -949,6 +971,14 @@ require("lazy").setup({
       vim.keymap.set("n", "<leader>fn", function()
         builtin.find_files({ cwd = vim.fn.stdpath("config") })
       end, { desc = "[F]ind [N]eovim files" })
+
+      local lazy_path = vim.fn.stdpath("data") .. "/lazy"
+      vim.keymap.set("n", "<leader>pf", function()
+        builtin.find_files({ cwd = lazy_path })
+      end, { desc = "[F]ind [p]lugin files" })
+      vim.keymap.set("n", "<leader>pg", function()
+        builtin.live_grep({ cwd = lazy_path })
+      end, { desc = "[G]rep [p]lugin files" })
     end,
   },
 
@@ -1132,109 +1162,109 @@ require("lazy").setup({
     },
   },
 
-  {
-    "nvim-tree/nvim-tree.lua",
-    lazy = false,
-    dependencies = {
-      "nvim-tree/nvim-web-devicons",
-    },
-    keys = {
-      {
-        "<leader>ft",
-        function()
-          require("nvim-tree.api").tree.open({ find_file = true })
-        end,
-        desc = "[F]ind file in [T]ree",
-      },
-    },
-    opts = function()
-      local view_width_max = 30
-      return {
-        update_cwd = true,
-        sync_root_with_cwd = true,
-        hijack_cursor = true,
-        hijack_unnamed_buffer_when_opening = true,
-        actions = {
-          change_dir = {
-            enable = true,
-            global = true,
-            restrict_above_cwd = false,
-          },
-        },
-        view = {
-          width = {
-            max = function()
-              return view_width_max
-            end,
-          },
-        },
-        renderer = {
-          group_empty = true,
-        },
-        on_attach = function(bufnr)
-          local api = require("nvim-tree.api")
-          local git = require("nvim-tree.git")
-          local utils = require("nvim-tree.utils")
-
-          local function opts(desc)
-            return {
-              desc = "nvim-tree: " .. desc,
-              buffer = bufnr,
-              noremap = true,
-              silent = true,
-              nowait = true,
-            }
-          end
-
-          api.config.mappings.default_on_attach(bufnr)
-
-          local function toggle_adaptive_width()
-            print("view_width_max", view_width_max)
-            if view_width_max == -1 then
-              view_width_max = 30
-            else
-              view_width_max = -1
-            end
-            api.tree.reload()
-          end
-
-          vim.keymap.set("n", "A", toggle_adaptive_width, opts("Toggle [A]daptive Width"))
-
-          local function cd_git_root()
-            local node = api.tree.get_node_under_cursor()
-            if node then
-              if node.type == "file" then
-                node = node.parent
-              end
-              local toplevel = git.get_toplevel(node.absolute_path)
-              api.tree.change_root(toplevel)
-            end
-            api.tree.reload()
-          end
-
-          vim.keymap.set("n", "~", cd_git_root, opts("CD to Git Root"))
-
-          local function edit_or_open()
-            local node = api.tree.get_node_under_cursor()
-            if node.nodes ~= nil then
-              api.node.open.edit()
-              if node.nodes[1] then
-                utils.focus_file(node.nodes[1].absolute_path)
-              end
-            else
-              api.node.open.edit()
-            end
-            api.tree.focus()
-          end
-
-          vim.keymap.set("n", "l", edit_or_open, opts("Edit Or Open"))
-
-          vim.keymap.set("n", "h", api.node.navigate.parent_close, opts("Close"))
-          vim.keymap.set("n", "H", api.tree.collapse_all, opts("Collapse All"))
-        end,
-      }
-    end,
-  },
+  -- {
+  --   "nvim-tree/nvim-tree.lua",
+  --   lazy = false,
+  --   dependencies = {
+  --     "nvim-tree/nvim-web-devicons",
+  --   },
+  --   keys = {
+  --     {
+  --       "<leader>ft",
+  --       function()
+  --         require("nvim-tree.api").tree.open({ find_file = true })
+  --       end,
+  --       desc = "[F]ind file in [T]ree",
+  --     },
+  --   },
+  --   opts = function()
+  --     local view_width_max = 30
+  --     return {
+  --       update_cwd = true,
+  --       sync_root_with_cwd = true,
+  --       hijack_cursor = true,
+  --       hijack_unnamed_buffer_when_opening = true,
+  --       actions = {
+  --         change_dir = {
+  --           enable = true,
+  --           global = true,
+  --           restrict_above_cwd = false,
+  --         },
+  --       },
+  --       view = {
+  --         width = {
+  --           max = function()
+  --             return view_width_max
+  --           end,
+  --         },
+  --       },
+  --       renderer = {
+  --         group_empty = true,
+  --       },
+  --       on_attach = function(bufnr)
+  --         local api = require("nvim-tree.api")
+  --         local git = require("nvim-tree.git")
+  --         local utils = require("nvim-tree.utils")
+  --
+  --         local function opts(desc)
+  --           return {
+  --             desc = "nvim-tree: " .. desc,
+  --             buffer = bufnr,
+  --             noremap = true,
+  --             silent = true,
+  --             nowait = true,
+  --           }
+  --         end
+  --
+  --         api.config.mappings.default_on_attach(bufnr)
+  --
+  --         local function toggle_adaptive_width()
+  --           print("view_width_max", view_width_max)
+  --           if view_width_max == -1 then
+  --             view_width_max = 30
+  --           else
+  --             view_width_max = -1
+  --           end
+  --           api.tree.reload()
+  --         end
+  --
+  --         vim.keymap.set("n", "A", toggle_adaptive_width, opts("Toggle [A]daptive Width"))
+  --
+  --         local function cd_git_root()
+  --           local node = api.tree.get_node_under_cursor()
+  --           if node then
+  --             if node.type == "file" then
+  --               node = node.parent
+  --             end
+  --             local toplevel = git.get_toplevel(node.absolute_path)
+  --             api.tree.change_root(toplevel)
+  --           end
+  --           api.tree.reload()
+  --         end
+  --
+  --         vim.keymap.set("n", "~", cd_git_root, opts("CD to Git Root"))
+  --
+  --         local function edit_or_open()
+  --           local node = api.tree.get_node_under_cursor()
+  --           if node.nodes ~= nil then
+  --             api.node.open.edit()
+  --             if node.nodes[1] then
+  --               utils.focus_file(node.nodes[1].absolute_path)
+  --             end
+  --           else
+  --             api.node.open.edit()
+  --           end
+  --           api.tree.focus()
+  --         end
+  --
+  --         vim.keymap.set("n", "l", edit_or_open, opts("Edit Or Open"))
+  --
+  --         vim.keymap.set("n", "h", api.node.navigate.parent_close, opts("Close"))
+  --         vim.keymap.set("n", "H", api.tree.collapse_all, opts("Collapse All"))
+  --       end,
+  --     }
+  --   end,
+  -- },
 
   {
     {
@@ -1267,9 +1297,40 @@ require("lazy").setup({
 
   {
     "stevearc/oil.nvim",
+    dependencies = { { "nvim-tree/nvim-web-devicons", opts = {} } },
+    keys = {
+      {
+        "-",
+        function()
+          require("oil").open()
+        end,
+      },
+    },
+    opts = {
+      keymaps = {
+        ["1"] = function()
+          require("oil").open(find_git_root())
+        end,
+        ["<Esc>"] = function()
+          local oil = require("oil")
+          local was_modified = vim.bo.modified
+          if was_modified then
+            local choice = vim.fn.confirm("Save changes?", "Yes\nNo", 1)
+            if choice == 1 then
+              oil.save()
+            end
+          end
+          oil.close()
+        end,
+      },
+    },
+  },
+
+  {
+    "X3eRo0/dired.nvim",
     opts = {},
     -- Optional dependencies
-    dependencies = { { "echasnovski/mini.icons", opts = {} } },
+    dependencies = { "MunifTanjim/nui.nvim" },
     -- dependencies = { "nvim-tree/nvim-web-devicons" }, -- use if prefer nvim-web-devicons
   },
 
@@ -1812,40 +1873,6 @@ vim.api.nvim_create_autocmd("TextYankPost", {
   group = highlight_group,
   pattern = "*",
 })
-
--- Telescope live_grep in git root
--- Function to find the git root directory based on the current buffer's path
-local function find_git_root()
-  -- Use the current buffer's path as the starting point for the git search
-  local current_file = vim.api.nvim_buf_get_name(0)
-  local current_dir
-  local cwd = vim.fn.getcwd()
-  -- If the buffer is not associated with a file, return nil
-  if current_file == "" then
-    current_dir = cwd
-  else
-    -- Extract the directory from the current file's path
-    current_dir = vim.fn.fnamemodify(current_file, ":h")
-  end
-
-  -- Find the Git root directory from the current file's path
-  local git_root = vim.fn.systemlist("git -C " .. vim.fn.escape(current_dir, " ") .. " rev-parse --show-toplevel")[1]
-  if vim.v.shell_error ~= 0 then
-    print("Not a git repository. Searching on current working directory")
-    return cwd
-  end
-  return git_root
-end
-
--- Custom live_grep function to search in git root
-local function live_grep_git_root()
-  local git_root = find_git_root()
-  if git_root then
-    require("telescope.builtin").live_grep({
-      search_dirs = { git_root },
-    })
-  end
-end
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
