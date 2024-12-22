@@ -1002,8 +1002,8 @@ require("lazy").setup({
             ["ia"] = "@parameter.inner",
             ["af"] = "@function.outer",
             ["if"] = "@function.inner",
-            -- ["ac"] = "@class.outer",
-            -- ["ic"] = "@class.inner",
+            ["at"] = "@class.outer",
+            ["it"] = "@class.inner",
             ["ac"] = "@comment.outer",
             ["ic"] = "@comment.inner",
             ["al"] = "@loop.outer",
@@ -1014,20 +1014,24 @@ require("lazy").setup({
           enable = true,
           set_jumps = true, -- whether to set jumps in the jumplist
           goto_next_start = {
+            ["]a"] = "@parameter.outer",
             ["]f"] = "@function.outer",
             ["]]"] = "@class.outer",
             -- ["]z"] = { query = "@fold", query_group = "folds", desc = "Next fold" },
           },
           goto_next_end = {
+            ["]A"] = "@parameter.outer",
             ["]F"] = "@function.outer",
             ["]["] = "@class.outer",
           },
           goto_previous_start = {
+            ["[a"] = "@parameter.outer",
             ["[f"] = "@function.outer",
             ["[["] = "@class.outer",
             -- ["[z"] = { query = "@fold", query_group = "folds", desc = "Previous fold" },
           },
           goto_previous_end = {
+            ["[A"] = "@parameter.outer",
             ["[F"] = "@function.outer",
             ["[]"] = "@class.outer",
           },
@@ -1039,6 +1043,14 @@ require("lazy").setup({
           },
           swap_previous = {
             ["<leader>A"] = "@parameter.inner",
+          },
+        },
+
+        lsp_interop = {
+          enable = true,
+          peek_definition_code = {
+            ["<leader>kf"] = "@function.outer",
+            ["<leader>dt"] = "@class.outer",
           },
         },
       },
