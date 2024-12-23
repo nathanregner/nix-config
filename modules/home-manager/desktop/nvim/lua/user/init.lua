@@ -864,7 +864,7 @@ require("lazy").setup({
           end,
         },
         lualine_b = { "diagnostics" },
-        lualine_c = { "filename" },
+        lualine_c = { { "filename", path = 1 } },
         lualine_x = { "encoding", "fileformat", "filetype" },
         lualine_y = { "progress" },
         lualine_z = { "location" },
@@ -1030,7 +1030,7 @@ require("lazy").setup({
 
       -- Shortcut for searching your Neovim configuration files
       vim.keymap.set("n", "<leader>fn", function()
-        builtin.find_files({ cwd = vim.fn.stdpath("config") })
+        builtin.find_files({ cwd = vim.fn.stdpath("config"), follow = true })
       end, { desc = "[F]ind [N]eovim files" })
 
       local lazy_path = vim.fn.stdpath("data") .. "/lazy"
