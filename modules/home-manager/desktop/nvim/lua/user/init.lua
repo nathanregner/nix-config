@@ -24,6 +24,43 @@ local function find_git_root()
   return git_root
 end
 
+local function set_proximity_path()
+  require("telescope.state").set_global_key("proximity-sort/context", vim.fn.expand("%:."))
+end
+
+-- https://github.com/jonhoo/proximity-sort/blob/main/src/main.rs
+local function proximity(path, context_path)
+  local context_components = vim.split(context_path, "/")
+  local context_index = 1
+  while context_components[context_index] == "." do
+    context_index = context_index + 1
+  end
+
+  local path_components = vim.split(path, "/")
+  local path_index = 1
+  while path_components[path_index] == "." do
+    path_index = path_index + 1
+  end
+
+  local missed = false
+  local score = 0
+
+  while path_index < #path_components do
+    local path_component = path_components[path_index]
+    local context_component = context_components[context_index]
+    path_index = path_index + 1
+    context_index = context_index + 1
+    if missed or (path_component ~= context_component) then
+      score = score - 1
+      missed = true
+    else
+      score = score + 1
+    end
+  end
+
+  return score
+end
+
 -- https://github.com/folke/lazy.nvim#-plugin-spec
 require("lazy").setup({
   -- Git
@@ -872,6 +909,18 @@ require("lazy").setup({
       local action_state = require("telescope.actions.state")
       require("telescope").setup({
         defaults = {
+          mappings = {
+            i = {
+              ["<c-enter>"] = "to_fuzzy_refine",
+              -- map actions.which_key to <C-h> (default: <C-/>)
+              -- actions.which_key shows the mappings for your picker,
+              -- e.g. git_{create, delete, ...}_branch for the git_branches picker
+              -- ["<C-h>"] = "which_key",
+            },
+            n = {
+              ["d"] = "delete_buffer",
+            },
+          },
           preview = {
             enabled = false,
             -- try to prevent freezes on large files
@@ -879,6 +928,10 @@ require("lazy").setup({
             filesize_limit = 1, -- MB
             highlight_limit = 0.1, -- MB
           },
+          tiebreak = function(curr, prev, prompt)
+            local context_path = require("telescope.state").get_global_key("proximity-sort/context")
+            return proximity(curr[1], context_path) > proximity(prev[1], context_path)
+          end,
           vimgrep_arguments = {
             "rg",
             "--color=never",
@@ -891,18 +944,6 @@ require("lazy").setup({
             "--hidden",
             "-g",
             "!.git",
-          },
-          mappings = {
-            i = {
-              ["<c-enter>"] = "to_fuzzy_refine",
-              -- map actions.which_key to <C-h> (default: <C-/>)
-              -- actions.which_key shows the mappings for your picker,
-              -- e.g. git_{create, delete, ...}_branch for the git_branches picker
-              -- ["<C-h>"] = "which_key",
-            },
-            n = {
-              ["d"] = "delete_buffer",
-            },
           },
         },
         pickers = {
@@ -965,6 +1006,7 @@ require("lazy").setup({
       vim.keymap.set("n", "<leader>fH", builtin.help_tags, { desc = "[F]ind [H]elp" })
       vim.keymap.set("n", "<leader>fk", builtin.keymaps, { desc = "[F]ind [K]eymaps" })
       vim.keymap.set("n", "<leader>ff", function()
+        set_proximity_path()
         builtin.git_files({ show_untracked = true })
       end, { desc = "[F]ind [F]iles" })
       vim.keymap.set("n", "<leader>fs", builtin.builtin, { desc = "[F]ind [S]elect Telescope" })
@@ -1006,6 +1048,7 @@ require("lazy").setup({
       -- It's also possible to pass additional configuration options.
       --  See `:help telescope.builtin.live_grep()` for information about particular keys
       vim.keymap.set("n", "<leader>f/", function()
+        set_proximity_path()
         builtin.live_grep({
           grep_open_files = true,
           prompt_title = "Live Grep in Open Files",
@@ -1014,14 +1057,17 @@ require("lazy").setup({
 
       -- Shortcut for searching your Neovim configuration files
       vim.keymap.set("n", "<leader>fn", function()
+        set_proximity_path()
         builtin.find_files({ cwd = vim.fn.stdpath("config"), follow = true })
       end, { desc = "[F]ind [N]eovim files" })
 
       local lazy_path = vim.fn.stdpath("data") .. "/lazy"
       vim.keymap.set("n", "<leader>pf", function()
+        set_proximity_path()
         builtin.find_files({ cwd = lazy_path })
       end, { desc = "[F]ind [p]lugin files" })
       vim.keymap.set("n", "<leader>pg", function()
+        set_proximity_path()
         builtin.live_grep({ cwd = lazy_path })
       end, { desc = "[G]rep [p]lugin files" })
     end,
