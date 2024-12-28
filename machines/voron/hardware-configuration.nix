@@ -10,7 +10,7 @@
 
   boot = {
     kernelPackages = pkgs.linuxPackagesFor (
-      pkgs.callPackage ./kernel { inherit (sources.linux-rockchip) src; }
+      pkgs.callPackage ./kernel { source = sources.linux-rockchip; }
     );
 
     supportedFilesystems = lib.mkForce [
