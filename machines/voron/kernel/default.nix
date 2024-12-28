@@ -1,18 +1,15 @@
 {
-  src,
   linuxManualConfig,
+  source,
   ubootTools,
   ...
 }:
 (linuxManualConfig {
-  version = "5.10.160-rockchip-rk3588";
-  modDirVersion = "5.10.160";
-
-  inherit src;
+  inherit (source) src version;
+  modDirVersion = "6.1.84";
+  extraMeta.branch = "6.1";
 
   configfile = ./orangepi5_config;
-
-  extraMeta.branch = "5.10";
 
   # nix eval .\#nixosConfigurations.voron.config.system.build.kernel.config > machines/voron/kernel/config.nix
   # allowImportFromDerivation = true;
