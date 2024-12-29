@@ -46,9 +46,6 @@
   services.displayManager.sddm.wayland.enable = true;
   security.pam.services.hyprlock = { };
 
-  # services.xserver.displayManager.gdm.enable = true;
-  services.xserver.desktopManager.gnome.enable = true;
-
   services.displayManager.autoLogin.enable = true;
   services.displayManager.autoLogin.user = "nregner";
 
