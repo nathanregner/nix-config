@@ -19,7 +19,10 @@
     # defaultKeymap = "viins";
     oh-my-zsh = {
       enable = true;
-      plugins = [ "vi-mode" ];
+      plugins = [
+        "vi-mode"
+        "zsh-bash-completions-fallback"
+      ];
     };
     shellAliases =
       let
@@ -41,7 +44,8 @@
         hms = "${hm} switch";
 
         # https://www.reddit.com/r/NixOS/comments/8m1n3d/comment/dzkfwhl/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button
-        "nix-stray-roots" = ''nix-store --gc --print-roots | egrep -v "^(/nix/var|/run/\w+-system|\{memory)"'';
+        "nix-stray-roots" =
+          ''nix-store --gc --print-roots | egrep -v "^(/nix/var|/run/\w+-system|\{memory)"'';
       };
   };
 }
