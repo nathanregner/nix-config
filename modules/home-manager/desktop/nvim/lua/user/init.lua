@@ -1163,42 +1163,6 @@ require("lazy").setup({
             return require("gx.helper").find(line, mode, pattern)
           end,
         },
-        markdown = {
-          name = "markdown",
-          handle = function()
-            local node = vim.treesitter.get_node()
-            if not node then
-              return
-            end
-
-            if node:type() ~= "inline_link" then
-              local parent = node:parent()
-              if parent and parent:type() == "inline_link" then
-                node = parent
-              else
-                while node and node:type() ~= "inline_link" do
-                  print("node", node:type())
-                  node = node:named_child(0)
-                  print("new", node)
-                end
-                if not node or node:type() ~= "inline_link" then
-                  return
-                end
-              end
-            end
-
-            local link_destination = node:named_child(1)
-            vim.print("link: ", link_destination)
-            if not link_destination then
-              return
-            end
-
-            local start_line, start_col, end_line, end_col = link_destination:range()
-
-            local line = vim.api.nvim_buf_get_lines(0, start_line, end_line + 1, false)[1]
-            return line:sub(start_col + 0, end_col - 0)
-          end,
-        },
         jira = {
           name = "jira",
           handle = function(mode, line, _)
