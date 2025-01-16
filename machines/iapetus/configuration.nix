@@ -117,7 +117,7 @@
         "http://100.92.148.118:5000"
       ];
     };
-    storageDriver = "btrfs";
+    storageDriver = "overlay2"; # https://github.com/moby/moby/issues/9939
   };
 
   # virtualisation.docker.rootless = {
