@@ -4,6 +4,9 @@
 src.github = "saghen/blink.cmp"
 fetch.github = "saghen/blink.cmp"
 cargo_locks = ["Cargo.lock"]
+[btrfs-snapshot-diff]
+src.git = "https://github.com/dim-geo/btrfs-snapshot-diff"
+fetch.github = "dim-geo/btrfs-snapshot-diff"
 
 [cura-x86_64-linux]
 src.github = "Ultimaker/Cura"

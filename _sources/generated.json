@@ -27,6 +27,27 @@
         },
         "version": "v0.11.0"
     },
+    "btrfs-snapshot-diff": {
+        "cargoLocks": null,
+        "date": "2023-08-15",
+        "extract": null,
+        "name": "btrfs-snapshot-diff",
+        "passthru": null,
+        "pinned": false,
+        "src": {
+            "deepClone": false,
+            "fetchSubmodules": false,
+            "leaveDotGit": false,
+            "name": null,
+            "owner": "dim-geo",
+            "repo": "btrfs-snapshot-diff",
+            "rev": "35c2018c9e9003593dc71e3e7e92d8f78198e994",
+            "sha256": "sha256-LRsdAftgfGZRb5q62JFSKui+O2W4fESGInkOm84to0I=",
+            "sparseCheckout": [],
+            "type": "github"
+        },
+        "version": "35c2018c9e9003593dc71e3e7e92d8f78198e994"
+    },
     "cura-x86_64-linux": {
         "cargoLocks": null,
         "date": null,

@@ -10,9 +10,7 @@ in
 {
   inherit (node2nixPkgs) typescript;
 
-  aws-cli-sso = pkgs.unstable.callPackage ./aws-cli-sso { };
-
-  blink-cmp = pkgs.unstable.callPackage ./blink { inherit sources; };
+  btrfs-snapshot-diff = pkgs.unstable.callPackage ./btrfs-snapshot-diff { inherit sources; };
 
   emmet-language-server = node2nixPkgs."@olrtg/emmet-language-server";
 
