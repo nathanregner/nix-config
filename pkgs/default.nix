@@ -10,6 +10,8 @@ in
 {
   inherit (node2nixPkgs) typescript;
 
+  btrfs-snapshot-diff = pkgs.unstable.callPackage ./btrfs-snapshot-diff { inherit sources; };
+
   emmet-language-server = node2nixPkgs."@olrtg/emmet-language-server";
 
   generate-sops-keys = pkgs.unstable.callPackage ./generate-sops-keys.nix { };

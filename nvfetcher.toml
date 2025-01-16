@@ -1,5 +1,9 @@
 # https://github.com/berberman/nvfetcher?tab=readme-ov-file#keyfile
 
+[btrfs-snapshot-diff]
+src.git = "https://github.com/dim-geo/btrfs-snapshot-diff"
+fetch.github = "dim-geo/btrfs-snapshot-diff"
+
 [cura-x86_64-linux]
 src.github = "Ultimaker/Cura"
 fetch.url = "https://github.com/Ultimaker/Cura/releases/download/$ver/UltiMaker-Cura-$ver-linux-X64.AppImage"
