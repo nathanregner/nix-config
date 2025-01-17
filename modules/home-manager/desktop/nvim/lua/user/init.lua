@@ -303,6 +303,14 @@ require("lazy").setup({
             "pug",
             "typescriptreact",
           },
+          init_options = {
+            showSuggestionsAsSnippets = true,
+            showExpandedAbbreviation = "inMarkupAndStylesheetFilesOnly",
+            includeLanguages = {
+              javascript = "javascriptreact",
+              typescript = "typescriptreact",
+            },
+          },
         },
         eslint = {},
         gopls = {},
@@ -431,6 +439,7 @@ require("lazy").setup({
           on_attach = on_attach,
           settings = server_config.settings,
           filetypes = server_config.filetypes,
+          init_options = server_config.init_options,
           root_dir = server_config.root_dir,
         })
       end
