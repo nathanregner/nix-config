@@ -30,6 +30,7 @@
             "repo": "flake-registry",
             "rev": "02fe640c9e117dd9d6a34efc7bcb8bd09c08111d",
             "sha256": "sha256-/3gigrEBFORQs6a8LL5twoHs7biu08y/8Xc5aQmk3b0=",
+            "sparseCheckout": [],
             "type": "github"
         },
         "version": "02fe640c9e117dd9d6a34efc7bcb8bd09c08111d"
@@ -63,11 +64,12 @@
             "name": null,
             "owner": "elijah-potter",
             "repo": "harper",
-            "rev": "v0.15.0",
-            "sha256": "sha256-33UMN5OQ0h4HiSwFCIHyHo0oHiTlBfSmMxIQboLVzTY=",
+            "rev": "v0.16.0",
+            "sha256": "sha256-lpaE1yb9Yt1AVpZWBnvDOjTpVeKdTlXDnqNDrF0fCZ8=",
+            "sparseCheckout": [],
             "type": "github"
         },
-        "version": "v0.15.0"
+        "version": "v0.16.0"
     },
     "hyprland-workspaces": {
         "cargoLocks": null,
@@ -85,6 +87,7 @@
             "repo": "hyprland-workspaces",
             "rev": "v2.0.4",
             "sha256": "sha256-a5P99aSqhlZqClXAoaUNv/jmuM5duLDf+OzMeKGwDVI=",
+            "sparseCheckout": [],
             "type": "github"
         },
         "version": "v2.0.4"
@@ -105,6 +108,7 @@
             "repo": "joker",
             "rev": "v1.4.0",
             "sha256": "sha256-Y7FaW3V80mXp3l87srTLyhF45MlNH7QUZ5hrTudPtDU=",
+            "sparseCheckout": [],
             "type": "github"
         },
         "version": "v1.4.0"
@@ -125,6 +129,7 @@
             "repo": "Klipper-Adaptive-Meshing-Purging",
             "rev": "v1.1.2",
             "sha256": "sha256-anBGjLtYlyrxeNVy1TEMcAGTVUFrGClLuoJZuo3xlDM=",
+            "sparseCheckout": [],
             "type": "github"
         },
         "version": "v1.1.2"
@@ -145,6 +150,7 @@
             "repo": "linux-rockchip",
             "rev": "709c51c64e1652d4f8c87b1815db86f56d188268",
             "sha256": "sha256-YZdWNhLopRyaEBojqMLMYEMKV6V0HcFgFmDbRSbBhRo=",
+            "sparseCheckout": [],
             "type": "github"
         },
         "version": "709c51c64e1652d4f8c87b1815db86f56d188268"
@@ -160,11 +166,11 @@
             "arch": null,
             "finalImageName": null,
             "finalImageTag": null,
-            "imageDigest": "sha256:54a976880161c3c96de30b63cd0092d1f069aa8b23686669b726558ddf112724",
+            "imageDigest": "sha256:4c97581d31546fc5cbfeacf00a8fa5f866d0b48cd1a2cd4441e48afe260b317c",
             "imageName": "hkotel/mealie",
             "imageTag": "latest",
             "os": null,
-            "sha256": "sha256-LsnvoHhztvn/OrMLdyiLUwhkFn9OmVt2fWOUcK2QisY=",
+            "sha256": "sha256-wZHcY7A1RCv/v+XazR0odDprF2eGc84B1A1soA9TCM4=",
             "tlsVerify": null
         },
         "version": "latest"
@@ -215,6 +221,7 @@
             "repo": "SF-Mono-Nerd-Font",
             "rev": "v18.0d1e1.0",
             "sha256": "sha256-f5A/vTKCUxdMhCqv0/ikF46tRrx5yZfIkvfExb3/XEQ=",
+            "sparseCheckout": [],
             "type": "github"
         },
         "version": "v18.0d1e1.0"

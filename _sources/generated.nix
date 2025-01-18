@@ -31,13 +31,13 @@
   };
   harper-ls = {
     pname = "harper-ls";
-    version = "v0.15.0";
+    version = "v0.16.0";
     src = fetchFromGitHub {
       owner = "elijah-potter";
       repo = "harper";
-      rev = "v0.15.0";
+      rev = "v0.16.0";
       fetchSubmodules = false;
-      sha256 = "sha256-33UMN5OQ0h4HiSwFCIHyHo0oHiTlBfSmMxIQboLVzTY=";
+      sha256 = "sha256-lpaE1yb9Yt1AVpZWBnvDOjTpVeKdTlXDnqNDrF0fCZ8=";
     };
   };
   hyprland-workspaces = {
@@ -90,8 +90,8 @@
     version = "latest";
     src = dockerTools.pullImage {
       imageName = "hkotel/mealie";
-      imageDigest = "sha256:54a976880161c3c96de30b63cd0092d1f069aa8b23686669b726558ddf112724";
-      sha256 = "sha256-LsnvoHhztvn/OrMLdyiLUwhkFn9OmVt2fWOUcK2QisY=";
+      imageDigest = "sha256:4c97581d31546fc5cbfeacf00a8fa5f866d0b48cd1a2cd4441e48afe260b317c";
+      sha256 = "sha256-wZHcY7A1RCv/v+XazR0odDprF2eGc84B1A1soA9TCM4=";
       finalImageTag = "latest";
     };
   };
