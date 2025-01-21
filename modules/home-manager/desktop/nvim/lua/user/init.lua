@@ -931,7 +931,8 @@ require("lazy").setup({
       -- Git
       vim.keymap.set("n", "<leader>gb", builtin.git_branches, { desc = "[G]it [B]ranches" })
       vim.keymap.set("n", "<leader>gc", builtin.git_commits, { desc = "[G]it [C]ommits" })
-      vim.keymap.set("n", "<leader>gf", builtin.git_bcommits, { desc = "[G]it [F]ile Commits" })
+      vim.keymap.set("n", "<leader>gf", "<CMD>DiffviewFileHistory %<CR>", { desc = "[G]it [F]ile Commits" })
+      vim.keymap.set("v", "<leader>gf", "<CMD>'<,'>DiffviewFileHistory<CR>", { desc = "[G]it [F]ile Commits" })
 
       -- Slightly advanced example of overriding default behavior and theme
       vim.keymap.set("n", "<leader>/", function()
