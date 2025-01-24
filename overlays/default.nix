@@ -30,6 +30,7 @@ let
         args: neovim-unwrapped:
         (prev.wrapNeovimUnstable args neovim-unwrapped).overrideAttrs {
           dontStrip = true;
+          dontFixup = true;
         };
 
       # disable xvfb-run tests to fix build on darwin
