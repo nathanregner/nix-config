@@ -26,6 +26,8 @@ end
 
 vim.g.fugitive_legacy_commands = 0
 
+local leet_arg = "leetcode.nvim"
+
 -- https://github.com/folke/lazy.nvim#-plugin-spec
 require("lazy").setup({
   -- Git
@@ -1810,6 +1812,17 @@ require("lazy").setup({
       -- Fix Babashka pprint: https://github.com/Olical/conjure/issues/406
       vim.g["conjure#client#clojure#nrepl#eval#print_function"] = "cider.nrepl.pprint/pprint"
     end,
+  },
+
+  {
+    "kawre/leetcode.nvim",
+    dependencies = {
+      "nvim-telescope/telescope.nvim",
+      "nvim-lua/plenary.nvim",
+      "MunifTanjim/nui.nvim",
+    },
+    lazy = leet_arg ~= vim.fn.argv(0, -1),
+    opts = { arg = leet_arg, lang = "java" },
   },
 }, {
   dev = {
