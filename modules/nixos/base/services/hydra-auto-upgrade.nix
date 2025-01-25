@@ -43,7 +43,7 @@ in
         config.nix.package
       ];
       script = ''
-        hydra-auto-upgrade system boot
+        hydra-auto-upgrade system -- --boot
       '';
 
       startAt = cfg.dates;
