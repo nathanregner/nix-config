@@ -31,13 +31,13 @@
   };
   harper-ls = {
     pname = "harper-ls";
-    version = "v0.16.0";
+    version = "v0.17.0";
     src = fetchFromGitHub {
       owner = "elijah-potter";
       repo = "harper";
-      rev = "v0.16.0";
+      rev = "v0.17.0";
       fetchSubmodules = false;
-      sha256 = "sha256-lpaE1yb9Yt1AVpZWBnvDOjTpVeKdTlXDnqNDrF0fCZ8=";
+      sha256 = "sha256-cUN7e82CncDzA9m+pcvtrAn10E6AYaMcAuu6hpt85tA=";
     };
   };
   hyprland-workspaces = {

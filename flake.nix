@@ -59,13 +59,7 @@
     # Desktop
     catppuccin-nix = {
       url = "github:catppuccin/nix";
-      inputs = {
-        home-manager-stable.follows = "home-manager";
-        home-manager.follows = "home-manager-unstable";
-        nixpkgs-stable.follows = "nixpkgs";
-        nixpkgs.follows = "nixpkgs-unstable";
-        nuscht-search.follows = "";
-      };
+      inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
     # hyprland = {
     #   url = "github:hyprwm/Hyprland";

@@ -6,7 +6,7 @@ let
     prev: final:
     lib.warnIf (
       (lib.versionOlder final.version prev.version) || (final.version == prev.version)
-    ) "${final.name} overlay can be removed. nixpkgs version: ${prev.version}" final;
+    ) "${prev.pname} overlay can be removed. nixpkgs version: ${prev.version}" final;
 
   sharedModifications =
     final: prev:
@@ -25,16 +25,6 @@ let
       # FIXME: hack to bypass "FATAL: Module ahci not found" error
       # https://github.com/NixOS/nixpkgs/issues/154163#issuecomment-1350599022
       makeModulesClosure = x: prev.makeModulesClosure (x // { allowMissing = true; });
-
-      nvfetcher = final.haskell.lib.compose.overrideCabal (
-        drv:
-        (warnIfOutdated drv {
-          version = "0.7.0.0";
-          sha256 = "U4XyMspXTAhkj4es9tu1QJMNV7vI+H9YRtXl8IZirEU=";
-          revision = null;
-          editedCabalFile = null;
-        })
-      ) prev.nvfetcher;
 
       wrapNeovimUnstable =
         args: neovim-unwrapped:

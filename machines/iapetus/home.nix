@@ -84,9 +84,9 @@
     kubernetes-helm
 
     # 3d printer
-    cura5
+    cura-appimage
     # orca-slicer
-    # super-slicer-beta
+    super-slicer-beta
 
     # nix
     nix-output-monitor

@@ -64,12 +64,12 @@
             "name": null,
             "owner": "elijah-potter",
             "repo": "harper",
-            "rev": "v0.16.0",
-            "sha256": "sha256-lpaE1yb9Yt1AVpZWBnvDOjTpVeKdTlXDnqNDrF0fCZ8=",
+            "rev": "v0.17.0",
+            "sha256": "sha256-cUN7e82CncDzA9m+pcvtrAn10E6AYaMcAuu6hpt85tA=",
             "sparseCheckout": [],
             "type": "github"
         },
-        "version": "v0.16.0"
+        "version": "v0.17.0"
     },
     "hyprland-workspaces": {
         "cargoLocks": null,
