@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <profiles version="21">
-	<profile kind="CodeFormatterProfile" name="Default" version="21">
+	<profile kind="CodeFormatterProfile" name="Project" version="21">
 		<setting id="org.eclipse.jdt.core.formatter.tabulation.char" value="space"/>
 		<setting id="org.eclipse.jdt.core.formatter.use_tabs_only_for_leading_indentations" value="false"/>
 		<setting id="org.eclipse.jdt.core.formatter.indentation.size" value="4"/>
@@ -286,7 +286,7 @@
 		<setting id="org.eclipse.jdt.core.formatter.keep_record_declaration_on_one_line" value="one_line_never"/>
 		<setting id="org.eclipse.jdt.core.formatter.keep_record_constructor_on_one_line" value="one_line_never"/>
 		<setting id="org.eclipse.jdt.core.formatter.keep_annotation_declaration_on_one_line" value="one_line_never"/>
-		<setting id="org.eclipse.jdt.core.formatter.lineSplit" value="80"/>
+		<setting id="org.eclipse.jdt.core.formatter.lineSplit" value="120"/>
 		<setting id="org.eclipse.jdt.core.formatter.continuation_indentation" value="2"/>
 		<setting id="org.eclipse.jdt.core.formatter.continuation_indentation_for_array_initializer" value="2"/>
 		<setting id="org.eclipse.jdt.core.formatter.join_wrapped_lines" value="false"/>
@@ -299,7 +299,7 @@
 		<setting id="org.eclipse.jdt.core.formatter.alignment_for_method_declaration" value="0"/>
 		<setting id="org.eclipse.jdt.core.formatter.alignment_for_throws_clause_in_method_declaration" value="0"/>
 		<setting id="org.eclipse.jdt.core.formatter.alignment_for_parameters_in_method_declaration" value="2"/>
-		<setting id="org.eclipse.jdt.core.formatter.alignment_for_enum_constants" value="0"/>
+		<setting id="org.eclipse.jdt.core.formatter.alignment_for_enum_constants" value="16"/>
 		<setting id="org.eclipse.jdt.core.formatter.alignment_for_arguments_in_enum_constant" value="0"/>
 		<setting id="org.eclipse.jdt.core.formatter.alignment_for_superinterfaces_in_enum_declaration" value="0"/>
 		<setting id="org.eclipse.jdt.core.formatter.alignment_for_record_components" value="18"/>
