@@ -48,19 +48,15 @@ fetch.github = "robusta-dev/krr"
 src.github = "mach-kernel/launchk"
 fetch.github = "mach-kernel/launchk"
 
+[lazygit]
+fetch.github = "jesseduffield/lazygit"
+src.github_tag = "jesseduffield/lazygit"
+src.include_regex = "v0.44.1"
+
 [linux-rockchip]
 src.git = "https://github.com/armbian/linux-rockchip.git"
 src.branch = "rk-5.10-rkr6"
 fetch.github = "armbian/linux-rockchip"
-
-[mealie]
-src.container = "hkotel/mealie"
-src.include_regex = "latest"
-fetch.docker = "hkotel/mealie"
-
-[orca-slicer-x86_64-linux]
-src.github = "SoftFever/OrcaSlicer"
-fetch.url = "https://github.com/SoftFever/OrcaSlicer/releases/download/$ver/OrcaSlicer_Linux_$ver.AppImage"
 
 [scroll-reverser]
 src.github = "pilotmoon/Scroll-Reverser"
