@@ -1012,7 +1012,10 @@ require("lazy").setup({
       vim.keymap.set("n", "<leader>fH", builtin.help_tags, { desc = "[F]ind [H]elp" })
       vim.keymap.set("n", "<leader>fk", builtin.keymaps, { desc = "[F]ind [K]eymaps" })
       vim.keymap.set("n", "<leader>ff", function()
-        builtin.git_files({ show_untracked = true })
+        builtin.find_files({
+          hidden = true,
+          find_command = { "fd", "--exclude", ".git", "--type", "file", "--type", "symlink" },
+        })
       end, { desc = "[F]ind [F]iles" })
       vim.keymap.set("n", "<leader>fs", builtin.builtin, { desc = "[F]ind [S]elect Telescope" })
       vim.keymap.set("n", "<leader>fw", builtin.grep_string, { desc = "[F]ind current [W]ord" })
