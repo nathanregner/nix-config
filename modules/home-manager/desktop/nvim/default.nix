@@ -79,6 +79,9 @@
     "nvim/lua".source = config.lib.file.mkFlakeSymlink ./lua;
   };
 
+  xdg.dataFile."nvim/lazy/blink.cmp/target/release".source =
+    "${pkgs.unstable.vimPlugins.blink-cmp.passthru.blink-fuzzy-lib}/lib";
+
   programs.zsh.shellAliases.vimdiff = "nvim -d";
 
   programs.zsh.initExtra =
