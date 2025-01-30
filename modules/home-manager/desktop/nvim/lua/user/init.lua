@@ -617,6 +617,7 @@ require("lazy").setup({
         }),
         sources = {
           { name = "luasnip" },
+          { name = "codecompanion" },
           { name = "nvim_lsp" },
           buffer,
           { name = "path" },
@@ -727,6 +728,9 @@ require("lazy").setup({
       -- elsewhere in your config, without redefining it, due to `opts_extend`
       sources = {
         default = { "lsp", "path", "snippets", "buffer" },
+        per_filetype = {
+          codecompanion = { "codecompanion" },
+        },
       },
 
       fuzzy = {
@@ -737,6 +741,25 @@ require("lazy").setup({
       },
     },
     opts_extend = { "sources.default" },
+  },
+
+  {
+    "olimorris/codecompanion.nvim",
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+      "nvim-treesitter/nvim-treesitter",
+    },
+    opts = {
+      --Refer to: https://github.com/olimorris/codecompanion.nvim/blob/main/lua/codecompanion/config.lua
+      strategies = {
+        --NOTE: Change the adapter as required
+        chat = { adapter = "ollama" },
+        inline = { adapter = "ollama" },
+      },
+      opts = {
+        log_level = "DEBUG",
+      },
+    },
   },
 
   {
