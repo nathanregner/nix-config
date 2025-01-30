@@ -1,5 +1,10 @@
 # https://github.com/berberman/nvfetcher?tab=readme-ov-file#keyfile
 
+[blink-cmp]
+src.github = "saghen/blink.cmp"
+fetch.github = "saghen/blink.cmp"
+cargo_locks = ["Cargo.lock"]
+
 [cura-x86_64-linux]
 src.github = "Ultimaker/Cura"
 fetch.url = "https://github.com/Ultimaker/Cura/releases/download/$ver/UltiMaker-Cura-$ver-linux-X64.AppImage"

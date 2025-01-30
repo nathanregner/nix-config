@@ -1,4 +1,32 @@
 {
+    "blink-cmp": {
+        "cargoLocks": {
+            "Cargo.lock": [
+                "./blink-cmp-v0.11.0/Cargo.lock",
+                {
+                    "frizbee-0.1.0": "sha256-Gbf6EIdnLVkJlJjJlE4WIwSqyA7q0VVMZpE8njnAGPY="
+                }
+            ]
+        },
+        "date": null,
+        "extract": null,
+        "name": "blink-cmp",
+        "passthru": null,
+        "pinned": false,
+        "src": {
+            "deepClone": false,
+            "fetchSubmodules": false,
+            "leaveDotGit": false,
+            "name": null,
+            "owner": "saghen",
+            "repo": "blink.cmp",
+            "rev": "v0.11.0",
+            "sha256": "sha256-uL1g5zhTpWfdbCqE+JYFH+2uDj9MT86vLTyKEweQesg=",
+            "sparseCheckout": [],
+            "type": "github"
+        },
+        "version": "v0.11.0"
+    },
     "cura-x86_64-linux": {
         "cargoLocks": null,
         "date": null,

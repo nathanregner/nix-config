@@ -9,6 +9,7 @@
     extraLuaConfig =
       let
         globals = {
+          blink_cmp.dir = "${pkgs.unstable.blink-cmp}";
           jdtls = {
             lombok = pkgs.fetchurl {
               url = "https://repo1.maven.org/maven2/org/projectlombok/lombok/1.18.36/lombok-1.18.36.jar";
