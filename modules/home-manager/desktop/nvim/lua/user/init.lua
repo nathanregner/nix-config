@@ -24,6 +24,8 @@ local function find_git_root()
   return git_root
 end
 
+vim.g.fugitive_legacy_commands = 0
+
 -- https://github.com/folke/lazy.nvim#-plugin-spec
 require("lazy").setup({
   -- Git
@@ -39,7 +41,6 @@ require("lazy").setup({
       require("config-local").setup({
         config_files = { ".nvim.lua", ".nvimrc", ".exrc" },
         hashfile = vim.fn.stdpath("data") .. "/nvim-config-local",
-        lookup_parents = true,
       })
     end,
   },
