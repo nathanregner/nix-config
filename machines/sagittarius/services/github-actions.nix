@@ -39,6 +39,16 @@
     group = "github";
   };
 
+  services.github-runners.platformio2nix = {
+    enable = true;
+    name = config.networking.hostName;
+    replace = true;
+    url = "https://github.com/nathanregner/platformio2nix";
+    tokenFile = config.sops.secrets.nix-config-github-runner-pat.path;
+    user = "github";
+    group = "github";
+  };
+
   users = {
     users.github = {
       group = "github";
