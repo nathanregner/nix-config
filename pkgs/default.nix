@@ -8,7 +8,7 @@ let
   };
 in
 {
-  inherit (node2nixPkgs) typescript;
+  inherit (node2nixPkgs) pin-github-action typescript;
 
   aws-cli-sso = pkgs.unstable.callPackage ./aws-cli-sso { };
 
