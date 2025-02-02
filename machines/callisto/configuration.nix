@@ -48,7 +48,6 @@
   programs.dconf.enable = true;
 
   # sound
-  hardware.pulseaudio.enable = false;
   security.rtkit.enable = true;
   services.pipewire = {
     enable = true;
