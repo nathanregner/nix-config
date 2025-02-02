@@ -64,6 +64,7 @@
     discord
     evince
     insync
+    insync-nautilus
     jetbrains-toolbox
     openrgb
 

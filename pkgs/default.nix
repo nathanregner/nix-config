@@ -34,10 +34,6 @@ in
 
   hydra-auto-upgrade = pkgs.unstable.callPackage ./hydra-auto-upgrade { };
 
-  insync = pkgs.unstable.callPackage ./insync.nix { };
-
-  insync-nautilus = pkgs.unstable.callPackage ./insync-nautilus { };
-
   joker = pkgs.unstable.buildGoModule (
     sources.joker
     // {

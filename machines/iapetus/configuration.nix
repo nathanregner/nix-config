@@ -100,7 +100,6 @@
     ++ (with pkgs.unstable; [
       android-file-transfer # aft-mtp-mount ~/mnt
       nautilus-python
-      insync-nautilus
       libmtp
       virt-manager
     ]);
