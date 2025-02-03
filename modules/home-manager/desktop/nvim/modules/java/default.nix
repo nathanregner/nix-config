@@ -21,6 +21,7 @@ in
     programs.neovim = {
       extraPackages = with pkgs.unstable; [
         jdt-language-server
+        spring-javaformat
       ];
 
       lua.globals.jdtls = {
