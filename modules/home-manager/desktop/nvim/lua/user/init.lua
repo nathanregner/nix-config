@@ -464,6 +464,7 @@ require("lazy").setup({
         go = { "gofmt" },
         graphql = { "prettierd" },
         html = { "prettierd" },
+        java = { "spring_javaformat" },
         javascript = { "prettierd" },
         javascriptreact = { "prettierd" },
         json = { "prettierd" },
@@ -491,10 +492,15 @@ require("lazy").setup({
         ["_"] = { "trim_whitespace" },
       },
       formatters = {
-        prettier = { options = { ft_parsers = { gitcommit = "markdown" } } },
         nginxfmt = {
           command = "nginxfmt",
           args = { "--pipe" },
+        },
+        prettier = { options = { ft_parsers = { gitcommit = "markdown" } } },
+        spring_javaformat = {
+          command = "spring-javaformat",
+          args = { "$FILENAME" },
+          stdin = true,
         },
       },
       format_on_save = function(bufnr)
