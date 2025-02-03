@@ -59,6 +59,11 @@
     export PATH="$PATH:$HOME/.local/share/JetBrains/Toolbox/scripts"
   '';
 
+  programs.insync = {
+    enable = true;
+    extensions.nautilus.enable = true;
+  };
+
   home.packages = with pkgs.unstable; [
     # apps
     discord

@@ -5,6 +5,7 @@
     ./alacritty.nix
     ./cli
     ./firefox
+    ./insync.nix
     ./jetbrains
     ./nvfetcher.nix
     ./nvim
