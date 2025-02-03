@@ -5,6 +5,7 @@ vim.g.loaded_netrwPlugin = 1
 local function find_git_root()
   -- Use the current buffer's path as the starting point for the git search
   local current_file = vim.api.nvim_buf_get_name(0)
+  current_file = string.gsub(current_file, "^oil://", "")
   local current_dir
   local cwd = vim.fn.getcwd()
   -- If the buffer is not associated with a file, return nil
