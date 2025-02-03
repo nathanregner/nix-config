@@ -67,6 +67,8 @@ in
       cp ${src}/*.otf $out/share/fonts/${pname}
     '';
 
+  spring-javaformat = pkgs.unstable.callPackage ./spring-javaformat { };
+
   vtsls = node2nixPkgs."@vtsls/language-server";
 
   writeBabashkaApplication = pkgs.unstable.callPackage ./write-babashka-application.nix { };
