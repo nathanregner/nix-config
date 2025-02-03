@@ -66,10 +66,11 @@
       yaml-language-server
 
       # formatters/linters
-      nixfmt-rfc-style
       joker
+      nixfmt-rfc-style
       prettierd
       shfmt
+      spring-javaformat
       stylua
       taplo
 
