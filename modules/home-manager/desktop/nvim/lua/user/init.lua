@@ -1215,7 +1215,15 @@ require("lazy").setup({
     end,
     opts = {
       sortables = {
+        javascript = {
+          keys = { node = "pair" },
+        },
+        javascriptreact = {
+          keys = { node = "pair" },
+        },
         nix = {
+          -- TODO: inherit(a) b c d;
+          -- attr = { node = { "attr" } },
           attrset = { node = { "binding" } },
           formal = {
             node = { "formal" },
@@ -1253,9 +1261,20 @@ require("lazy").setup({
         toml = {
           table = { node = { "table" } },
         },
+        typescript = {
+          keys = { node = "pair" },
+        },
+        typescriptreact = {
+          keys = { node = "pair" },
+          -- TODO: shorthand_property_identifier
+        },
+        yaml = {
+          keys = { node = "block_mapping_pair" },
+          list = { node = "block_sequence_item" },
+        },
       },
       logger = {
-        level = vim.log.levels.TRACE, -- log on warn level and above
+        -- level = vim.log.levels.TRACE,
         -- outfile = "~/tssorter.log", -- nil prints to messages, or add a path to a file to output logs there
       },
     },
