@@ -1061,6 +1061,8 @@ require("lazy").setup({
       lang = "java",
     },
   },
+
+  { import = "user.plugins" },
 }, {
   dev = {
     path = "~/dev/github",
