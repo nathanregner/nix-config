@@ -179,6 +179,7 @@ require("lazy").setup({
     end,
   },
 
+  { "AndrewRadev/bufferize.vim" },
   { -- Notifications + LSP Progress Messages
     "j-hui/fidget.nvim",
     opts = {
