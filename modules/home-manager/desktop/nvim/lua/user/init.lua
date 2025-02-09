@@ -1136,21 +1136,7 @@ require("lazy").setup({
       },
       textobjects = {
         select = {
-          enable = true,
-          lookahead = true, -- Automatically jump forward to textobj, similar to targets.vim
-          keymaps = {
-            -- You can use the capture groups defined in textobjects.scm
-            ["aa"] = "@parameter.outer",
-            ["ia"] = "@parameter.inner",
-            ["af"] = "@function.outer",
-            ["if"] = "@function.inner",
-            ["at"] = "@class.outer",
-            ["it"] = "@class.inner",
-            ["ac"] = "@comment.outer",
-            ["ic"] = "@comment.inner",
-            ["al"] = "@loop.outer",
-            ["il"] = "@loop.inner",
-          },
+          enable = false,
         },
         move = {
           enable = true,
@@ -1159,22 +1145,26 @@ require("lazy").setup({
             ["]a"] = "@parameter.outer",
             ["]f"] = "@function.outer",
             ["]]"] = "@class.outer",
+            ["]t"] = "@tag.outer",
             -- ["]z"] = { query = "@fold", query_group = "folds", desc = "Next fold" },
           },
           goto_next_end = {
             ["]A"] = "@parameter.outer",
             ["]F"] = "@function.outer",
+            ["]T"] = "@tag.outer",
             ["]["] = "@class.outer",
           },
           goto_previous_start = {
             ["[a"] = "@parameter.outer",
             ["[f"] = "@function.outer",
+            ["[t"] = "@tag.outer",
             ["[["] = "@class.outer",
             -- ["[z"] = { query = "@fold", query_group = "folds", desc = "Previous fold" },
           },
           goto_previous_end = {
             ["[A"] = "@parameter.outer",
             ["[F"] = "@function.outer",
+            ["[T"] = "@tag.outer",
             ["[]"] = "@class.outer",
           },
         },
@@ -1450,13 +1440,6 @@ require("lazy").setup({
     },
   },
 
-  {
-    "kylechui/nvim-surround",
-    version = "*", -- Use for stability; omit to use `main` branch for the latest features
-    event = "VeryLazy",
-    opts = {},
-  },
-
   { -- Comment.nvim
     "numToStr/Comment.nvim",
     dependencies = {
@@ -1505,8 +1488,8 @@ require("lazy").setup({
       local ts_repeat_move = require("nvim-treesitter.textobjects.repeatable_move")
       local jump_next, jump_prev = ts_repeat_move.make_repeatable_move_pair(todo.jump_next, todo.jump_prev)
       return {
-        { "]t", jump_next, desc = "Next [T]odo comment" },
-        { "[t", jump_prev, desc = "Previous [T]odo comment" },
+        -- { "]T", jump_next, desc = "Next [T]odo comment" },
+        -- { "[T", jump_prev, desc = "Previous [T]odo comment" },
       }
     end,
     opts = {
