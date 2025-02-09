@@ -1924,6 +1924,7 @@ vim.keymap.set("n", "q", "<nop>", { noremap = true })
 vim.keymap.set("n", "<leader>hp", "<cmd>diffput<cr>", { noremap = true })
 vim.keymap.set("n", "<leader>hg", "<cmd>diffget<cr>", { noremap = true })
 vim.keymap.set("n", "<leader>hG", "<cmd>:1,$+1diffget<cr>", { noremap = true })
+vim.keymap.set("n", "<leader>hP", "<cmd>:1,$+1diffput<cr>", { noremap = true })
 vim.keymap.set("n", "q", "<nop>", { noremap = true })
 
 -- Search highlight
