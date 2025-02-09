@@ -78,17 +78,17 @@ require("lazy").setup({
     ft = { "java" },
   },
 
-  -- {
-  --   "NeogitOrg/neogit",
-  --   dependencies = {
-  --     "nvim-lua/plenary.nvim", -- required
-  --     "sindrets/diffview.nvim", -- optional - Diff integration
-  --
-  --     -- Only one of these is needed, not both.
-  --     "nvim-telescope/telescope.nvim",
-  --   },
-  --   config = true,
-  -- },
+  {
+    "NeogitOrg/neogit",
+    dependencies = {
+      "nvim-lua/plenary.nvim", -- required
+      "sindrets/diffview.nvim", -- optional - Diff integration
+      "nvim-telescope/telescope.nvim",
+    },
+    keys = { { "<leader>n", "<CMD>Neogit<CR>", desc = "Neogit" } },
+    lazy = true,
+    config = true,
+  },
 
   -- Detect tabstop and shiftwidth automatically
   "tpope/vim-sleuth",
@@ -234,12 +234,12 @@ require("lazy").setup({
         nmap("<leader>fci", vim.lsp.buf.incoming_calls, "[F]ind [C]allers [I]ncoming")
         nmap("<leader>fca", vim.lsp.buf.outgoing_calls, "[F]ind [C]allers [O]outgoing")
 
-        nmap("gd", require("telescope.builtin").lsp_definitions, "[G]oto [D]efinition")
-        nmap("gr", require("telescope.builtin").lsp_references, "[G]oto [R]eferences")
-        nmap("gI", require("telescope.builtin").lsp_implementations, "[G]oto [I]mplementation")
-        nmap("<leader>D", require("telescope.builtin").lsp_type_definitions, "Type [D]efinition")
-        nmap("<leader>ds", require("telescope.builtin").lsp_document_symbols, "[D]ocument [S]ymbols")
-        nmap("<leader>ws", require("telescope.builtin").lsp_dynamic_workspace_symbols, "[W]orkspace [S]ymbols")
+        -- nmap("gd", require("telescope.builtin").lsp_definitions, "[G]oto [D]efinition")
+        -- nmap("gr", require("telescope.builtin").lsp_references, "[G]oto [R]eferences")
+        -- nmap("gI", require("telescope.builtin").lsp_implementations, "[G]oto [I]mplementation")
+        -- nmap("<leader>D", require("telescope.builtin").lsp_type_definitions, "Type [D]efinition")
+        -- nmap("<leader>ds", require("telescope.builtin").lsp_document_symbols, "[D]ocument [S]ymbols")
+        -- nmap("<leader>ws", require("telescope.builtin").lsp_dynamic_workspace_symbols, "[W]orkspace [S]ymbols")
 
         -- See `:help K` for why this keymap
         nmap("K", vim.lsp.buf.hover, "Hover Documentation")
@@ -623,6 +623,15 @@ require("lazy").setup({
       styles = {
         conditionals = {}, -- disable italics
       },
+      integrations = {
+        snacks = true,
+      },
+      -- https://github.com/catppuccin/nvim/issues/823
+      custom_highlights = function(colors)
+        return {
+          NormalFloat = { bg = colors.base, fg = colors.text },
+        }
+      end,
     },
     init = function() vim.cmd.colorscheme("catppuccin") end,
   },
@@ -776,24 +785,24 @@ require("lazy").setup({
     },
   },
 
-  { -- Colorizer
-    "norcalli/nvim-colorizer.lua",
-    event = "VeryLazy",
-    cmd = "ColorizerToggle",
-    opts = {
-      "*", -- Highlight all files
-      "!TelescopePrompt", -- Except telescope previews. Seems to result in freezes: https://github.com/nvim-telescope/telescope.nvim/issues/1379
-      RGB = true, -- #RGB hex codes
-      RRGGBB = true, -- #RRGGBB hex codes
-      names = false, -- "Name" codes like Blue
-      RRGGBBAA = true, -- #RRGGBBAA hex codes
-      rgb_fn = true, -- CSS rgb() and rgba() functions
-      hsl_fn = true, -- CSS hsl() and hsla() functions
-      css = true, -- Enable all CSS features: rgb_fn, hsl_fn, names, RGB, RRGGBB
-      css_fn = true, -- Enable all CSS *functions*: rgb_fn, hsl_fn
-    },
-    config = function(_, opts) require("colorizer").setup({ "*" }, opts) end,
-  },
+  -- { -- Colorizer
+  --   "norcalli/nvim-colorizer.lua",
+  --   event = "VeryLazy",
+  --   cmd = "ColorizerToggle",
+  --   opts = {
+  --     "*", -- Highlight all files
+  --     "!TelescopePrompt", -- Except telescope previews. Seems to result in freezes: https://github.com/nvim-telescope/telescope.nvim/issues/1379
+  --     RGB = true, -- #RGB hex codes
+  --     RRGGBB = true, -- #RRGGBB hex codes
+  --     names = false, -- "Name" codes like Blue
+  --     RRGGBBAA = true, -- #RRGGBBAA hex codes
+  --     rgb_fn = true, -- CSS rgb() and rgba() functions
+  --     hsl_fn = true, -- CSS hsl() and hsla() functions
+  --     css = true, -- Enable all CSS features: rgb_fn, hsl_fn, names, RGB, RRGGBB
+  --     css_fn = true, -- Enable all CSS *functions*: rgb_fn, hsl_fn
+  --   },
+  --   config = function(_, opts) require("colorizer").setup({ "*" }, opts) end,
+  -- },
 
   { -- Neotest
     "nvim-neotest/neotest",
