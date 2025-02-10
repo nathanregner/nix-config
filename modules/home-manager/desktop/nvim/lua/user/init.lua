@@ -1516,8 +1516,14 @@ require("lazy").setup({
       highlight = {
         -- TODO
         -- TODO: asdf
-        -- TODO (v2): asdf
-        pattern = [[.*<(KEYWORDS)(.*:.*|\(.*\)$|$)]],
+        -- TODO asdf
+        -- TODO (@someone): asdf
+        pattern = {
+          [[.*<(KEYWORDS)\s*:]],
+          [[.*<(KEYWORDS)\s]],
+          [[.*<(KEYWORDS)\(]],
+          [[.*<(KEYWORDS)$]],
+        },
       },
     },
   },
