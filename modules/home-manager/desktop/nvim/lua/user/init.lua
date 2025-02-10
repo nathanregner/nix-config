@@ -59,6 +59,7 @@ require("lazy").setup({
   -- https://github.com/sindrets/diffview.nvim#configuration
   {
     "sindrets/diffview.nvim",
+    dev = true,
     opts = {
       view = {
         merge_tool = {
@@ -212,10 +213,13 @@ require("lazy").setup({
 
   { "towolf/vim-helm", ft = "helm" },
 
+  { "folke/neoconf.nvim", opts = {} },
+
   { -- LSP Configuration & Plugins
     "neovim/nvim-lspconfig",
     dependencies = {
       "artemave/workspace-diagnostics.nvim",
+      "folke/neoconf.nvim",
       "j-hui/fidget.nvim",
       "yioneko/nvim-vtsls",
     },
@@ -462,6 +466,9 @@ require("lazy").setup({
 
   { -- Autoformat
     "stevearc/conform.nvim",
+    dependencies = {
+      "folke/neoconf.nvim",
+    },
     opts = {
       formatters_by_ft = {
         bash = { "shfmt" },
@@ -512,6 +519,27 @@ require("lazy").setup({
     },
     config = function(_, opts)
       require("conform").setup(opts)
+
+      local defaults = {
+        enabled = true,
+      }
+
+      -- https://github.com/folke/neoconf.nvim/blob/fbe717664a732ab9e62737216bd3d0b6d9f84dbf/lua/neoconf/plugins/lspconfig.lua
+      require("neoconf.plugins").register({
+        name = "conform",
+        on_schema = function(schema)
+          -- this call will create a json schema based on the lua types of your default settings
+          schema:import("myplugin", defaults)
+          -- Optionally update some of the json schema
+          schema:set("myplugin.array", {
+            description = "Special array containing booleans or numbers",
+            anyOf = {
+              { type = "boolean" },
+              { type = "integer" },
+            },
+          })
+        end,
+      })
 
       vim.api.nvim_create_user_command("FormatDisable", function(args)
         if args.bang then
@@ -1392,6 +1420,29 @@ if vim.fn.has("mac") == 1 then
 elseif vim.fn.has("unix") == 1 then
   vim.g.open_cmd = "xdg-open"
 end
+
+-- Indentation
+vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
+  pattern = {
+    "*.js",
+    "*.jsx",
+    "*.ts",
+    "*.tsx",
+    "*.json",
+    "*.graphql",
+    "*.gql",
+    "*.html",
+    "*.css",
+    "*.scss",
+    "*.sass",
+    "*.less",
+  },
+  callback = function()
+    vim.bo.tabstop = 2
+    vim.bo.softtabstop = 2
+    vim.bo.shiftwidth = 2
+  end,
+})
 
 -- for GBrowse, now that netrw is disabled
 vim.api.nvim_create_user_command(
