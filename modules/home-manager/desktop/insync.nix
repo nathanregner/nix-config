@@ -27,14 +27,23 @@ in
       cfg.package
     ] ++ (lib.optional cfg.extensions.nautilus.enable pkgs.insync-nautilus);
 
+    # adapted from https://aur.archlinux.org/packages/insync
     systemd.user.services.insync = {
-      Service = {
-        ExecStart = "${cfg.package}/bin/insync hide || ${cfg.package}/bin/insync start";
-        Restart = "on-failure";
-      };
-
       Install = {
         WantedBy = [ "default.target" ];
+      };
+      Service = {
+        Environment = [ "DISPLAY=:0" ];
+        ExecStart = pkgs.writeShellScript "start-insync" "${cfg.package}/bin/insync hide || ${cfg.package}/bin/insync start";
+        ExecStop = "${cfg.package}/bin/insync quit";
+        RemainAfterExit = "yes";
+        Type = "oneshot";
+      };
+      Unit = {
+        After = [
+          "local-fs.target"
+          "network.target"
+        ];
       };
     };
   };
