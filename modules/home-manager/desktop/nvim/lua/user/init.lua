@@ -729,9 +729,38 @@ require("lazy").setup({
       -- Default list of enabled providers defined so that you can extend it
       -- elsewhere in your config, without redefining it, due to `opts_extend`
       sources = {
-        default = { "lsp", "path", "snippets", "buffer" },
-        per_filetype = {
-          codecompanion = { "codecompanion" },
+        -- add lazydev to your completion providers
+        default = { "lazydev", "lsp", "path", "snippets", "buffer" },
+        providers = {
+          lazydev = {
+            name = "LazyDev",
+            module = "lazydev.integrations.blink",
+            -- make lazydev completions top priority (see `:h blink.cmp`)
+            score_offset = 100,
+          },
+
+          -- disable score offsets
+          lsp = {
+            transform_items = function(_, items)
+              -- filter out text items, since we have the buffer source
+              return vim.tbl_filter(
+                function(item) return item.kind ~= require("blink.cmp.types").CompletionItemKind.Text end,
+                items
+              )
+            end,
+          },
+          snippets = {
+            score_offset = function(ctx)
+              if #ctx.get_keyword() == 0 then return -3 end
+              return 0
+            end,
+          },
+          buffer = {
+            score_offset = function(ctx)
+              if #ctx.get_keyword() == 0 then return -2 end
+              return 0
+            end,
+          },
         },
       },
 
