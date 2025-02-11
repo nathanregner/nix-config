@@ -57,7 +57,7 @@
   "tree-sitter-nu": { "branch": "main", "commit": "755efd545d39e23418ce6f96f2a8600ff1a7e74d" },
   "trouble.nvim": { "branch": "main", "commit": "46cf952fc115f4c2b98d4e208ed1e2dce08c9bf6" },
   "tssorter.nvim": { "branch": "main", "commit": "74fa4102cb3272dcc8fd5696fd3240358f19c090" },
-  "ultimate-autopair.nvim": { "branch": "v0.6", "commit": "9e3209190c22953566ae4e6436ad2b4ff4dabb95" },
+  "ultimate-autopair.nvim": { "branch": "v0.6", "commit": "5835876b57901d81ebbeb3cd6ad71aaed66f82d7" },
   "undotree": { "branch": "master", "commit": "78b5241191852ffa9bb5da5ff2ee033160798c3b" },
   "vim-fugitive": { "branch": "master", "commit": "fcb4db52e7f65b95705aa58f0f2df1312c1f2df2" },
   "vim-helm": { "branch": "master", "commit": "ae1ebc160d2b9b90108477ab10df7a4fc501e358" },
