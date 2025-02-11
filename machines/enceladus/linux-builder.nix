@@ -3,7 +3,6 @@
   inputs,
   outputs,
   config,
-  sources,
   lib,
   ...
 }:
@@ -21,7 +20,6 @@
           self
           inputs
           outputs
-          sources
           ;
         secrets = {
           tailscale-auth-key = config.sops.secrets.tailscale-auth-key.path;

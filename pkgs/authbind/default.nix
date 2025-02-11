@@ -12,30 +12,27 @@ let
     }
     .${stdenv.hostPlatform.system} or throwSystem;
 in
-stdenv.mkDerivation (
-  sources.authbind
-  // {
-    nativeBuildInputs = [
-      installShellFiles
-    ];
+stdenv.mkDerivation ({
+  nativeBuildInputs = [
+    installShellFiles
+  ];
 
-    preBuild = ''
-      makeFlagsArray+=(
-        ARCH="-arch ${arch}"
-        prefix=$out
-        lib_dir=$out/lib
-      )
-    '';
+  preBuild = ''
+    makeFlagsArray+=(
+      ARCH="-arch ${arch}"
+      prefix=$out
+      lib_dir=$out/lib
+    )
+  '';
 
-    installTargets = "";
-    installPhase = ''
-      runHook preInstall
+  installTargets = "";
+  installPhase = ''
+    runHook preInstall
 
-      installBin authbind authbind
-      install -D libauthbind.dylib $out/lib/libauthbind.dylib
-      installManPage authbind.1
+    installBin authbind authbind
+    install -D libauthbind.dylib $out/lib/libauthbind.dylib
+    installManPage authbind.1
 
-      runHook postInstall
-    '';
-  }
-)
+    runHook postInstall
+  '';
+})

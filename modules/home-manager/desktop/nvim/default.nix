@@ -40,7 +40,7 @@ in
         # language servers
         emmet-language-server
         gopls
-        graphql-language-service-cli
+        pkgs.unstable.nodePackages_latest.graphql-language-service-cli
         harper-ls
         helm-ls
         libclang
