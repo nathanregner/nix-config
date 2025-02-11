@@ -1,6 +1,5 @@
 {
   inputs,
-  sources,
   pkgs,
   lib,
   ...
@@ -9,9 +8,7 @@
   imports = [ inputs.nixos-hardware.nixosModules.common-pc-ssd ];
 
   boot = {
-    kernelPackages = pkgs.linuxPackagesFor (
-      pkgs.callPackage ./kernel { inherit (sources.linux-rockchip) src; }
-    );
+    kernelPackages = pkgs.linuxPackagesFor (pkgs.callPackage ./kernel { });
 
     supportedFilesystems = lib.mkForce [
       "vfat"

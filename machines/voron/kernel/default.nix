@@ -1,14 +1,21 @@
 {
-  src,
+  fetchFromGitHub,
   linuxManualConfig,
   ubootTools,
-  ...
 }:
 (linuxManualConfig {
   version = "5.10.160-rockchip-rk3588";
   modDirVersion = "5.10.160";
 
-  inherit src;
+  # TODO: move to 6.1
+  # TODO: nix-update
+  src = fetchFromGitHub {
+    owner = "armbian";
+    repo = "linux-rockchip";
+    rev = "709c51c64e1652d4f8c87b1815db86f56d188268";
+    fetchSubmodules = false;
+    sha256 = "sha256-YZdWNhLopRyaEBojqMLMYEMKV6V0HcFgFmDbRSbBhRo=";
+  };
 
   configfile = ./orangepi5_config;
 

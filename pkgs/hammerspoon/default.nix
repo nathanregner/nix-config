@@ -1,14 +1,20 @@
 # https://github.com/Hammerspoon/hammerspoon/tags
 # https://github.com/NixOS/nixpkgs/pull/292296/files#diff-26375f4272499181f94d00c4f7cebcf92d12c67bc97f1b220ccf28ea79aed805
 {
+  fetchurl,
   lib,
+  nix-update-script,
   stdenvNoCC,
-  sources,
   unzip,
 }:
 
 stdenvNoCC.mkDerivation (finalAttrs: {
-  inherit (sources.hammerspoon) pname version src;
+  pname = "hammerspoon";
+  version = "1.0.0";
+  src = fetchurl {
+    url = "https://github.com/Hammerspoon/hammerspoon/releases/download/${finalAttrs.version}/Hammerspoon-${finalAttrs.version}.zip";
+    sha256 = "sha256-XbcCtV2kfcMG6PWUjZHvhb69MV3fopQoMioK9+1+an4=";
+  };
 
   dontPatch = true;
   dontConfigure = true;
@@ -27,6 +33,10 @@ stdenvNoCC.mkDerivation (finalAttrs: {
 
     runHook postInstall
   '';
+
+  passthru = {
+    updateScript = nix-update-script { };
+  };
 
   meta = with lib; {
     description = "Tool for powerful automation of macOS";
