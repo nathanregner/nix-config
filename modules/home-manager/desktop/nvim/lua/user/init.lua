@@ -1402,7 +1402,6 @@ require("lazy").setup({
     opts = {
       -- Save modified buffer(s) when moving to mux
       auto_save = "all",
-      disable_on_zoom = true,
     },
     init = function()
       vim.keymap.set({ "n", "t" }, "<C-h>", "<CMD>NavigatorLeft<CR>")
