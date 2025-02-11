@@ -7,3 +7,6 @@ result-*
 .clj-kondo/
 .lsp/
 .nrepl-port
+
+# Already included in source: no need to check in. And `_sources/.gitignore` gets deleted by nvfetcher
+_sources/**/Cargo.lock
