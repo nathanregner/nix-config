@@ -110,6 +110,8 @@ require("lazy").setup({
             return not fn.in_node("comment")
           end,
         },
+        filetype = { nft = { "TelescopePrompt", "snacks_picker_input" } },
+      },
       },
     },
   },
