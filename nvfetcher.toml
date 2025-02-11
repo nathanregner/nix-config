@@ -8,7 +8,8 @@ src.branch = "el-capitan"
 fetch.github = "tmm1/MacOSX-authbind"
 
 [blink-cmp]
-src.github = "saghen/blink.cmp"
+# src.github = "saghen/blink.cmp"
+src.git = "https://github.com/saghen/blink.cmp"
 fetch.github = "saghen/blink.cmp"
 cargo_locks = ["Cargo.lock"]
 
