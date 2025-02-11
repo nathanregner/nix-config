@@ -1,0 +1,6 @@
+[
+  "@olrtg/emmet-language-server",
+  "@vtsls/language-server",
+  "pin-github-action",
+  "typescript"
+]

@@ -2,7 +2,6 @@
   fetchFromGitHub,
   linuxManualConfig,
   ubootTools,
-  ...
 }:
 (linuxManualConfig {
   version = "5.10.160-rockchip-rk3588";
