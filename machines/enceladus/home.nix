@@ -46,8 +46,6 @@
     nixos-rebuild
   ];
 
-  programs.nvfetcher.enable = true;
-
   programs.tmux-sessionizer = {
     # fix permission denied errors trying to read /Volumes/dev
     excluded_dirs = [

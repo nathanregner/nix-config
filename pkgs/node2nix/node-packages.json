@@ -1,8 +1,6 @@
 [
   "@olrtg/emmet-language-server",
   "@vtsls/language-server",
-  "graphql-cli",
-  "graphql-language-service-cli",
   "pin-github-action",
   "typescript"
 ]

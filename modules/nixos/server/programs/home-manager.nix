@@ -1,6 +1,5 @@
 {
   self,
-  sources,
   inputs,
   outputs,
   config,
@@ -27,7 +26,6 @@
           self
           inputs
           outputs
-          sources
           ;
       };
       users.nregner = {

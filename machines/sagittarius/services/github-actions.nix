@@ -70,21 +70,10 @@
     !include ${config.sops.templates.nix-config-github-pat.path}
   '';
 
-  # https://github.com/berberman/nvfetcher/issues/86
-  sops.templates.nvfetcher-github-pat = {
-    content = ''
-      [keys]
-      github = "${config.sops.placeholder.nix-config-github-runner-pat}"
-    '';
-    owner = "github";
-  };
   services.github-runners.nix-config = {
     extraPackages = with pkgs.unstable; [
+      nix-update
       node2nix
-      nvfetcher
     ];
-    extraEnvironment = {
-      NVFETCHER_KEYFILE = config.sops.templates.nvfetcher-github-pat.path;
-    };
   };
 }

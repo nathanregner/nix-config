@@ -2,7 +2,6 @@
   self,
   inputs,
   outputs,
-  sources,
 }:
 let
   inherit (inputs) nixpkgs;
@@ -16,7 +15,6 @@ let
           inherit self inputs outputs;
         };
         modules = [
-          sources
           ./configuration.nix
           { networking.hostName = hostname; }
         ] ++ modules;
