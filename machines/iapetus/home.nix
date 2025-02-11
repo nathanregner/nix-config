@@ -105,8 +105,6 @@
     betaflight-configurator
   ];
 
-  programs.nvfetcher.enable = true;
-
   xdg.desktopEntries.discord = {
     type = "Application";
     name = "Discord";

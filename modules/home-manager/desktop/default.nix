@@ -7,7 +7,6 @@
     ./firefox
     ./insync.nix
     ./jetbrains
-    ./nvfetcher.nix
     ./nvim
     ./sops.nix
     ./theme.nix

@@ -116,7 +116,7 @@
           );
 
           # custom packages
-          packages = import ./pkgs { inherit inputs pkgs; };
+          packages = import ./pkgs { inherit inputs pkgs lib; };
 
           # devshells for flake development
           devShells =
@@ -155,7 +155,6 @@
                   inherit self inputs outputs;
                 };
                 modules = [
-                  sources
                   ./machines/iapetus/configuration.nix
                 ];
               };
@@ -166,7 +165,6 @@
                   inherit self inputs outputs;
                 };
                 modules = [
-                  sources
                   ./machines/callisto/configuration.nix
                 ];
               };
@@ -177,7 +175,6 @@
                   inherit self inputs outputs;
                 };
                 modules = [
-                  sources
                   ./machines/sagittarius/configuration.nix
                 ];
               };
@@ -188,7 +185,6 @@
                   inherit self inputs outputs;
                 };
                 modules = [
-                  sources
                   ./machines/voron/configuration.nix
                 ];
                 system = "aarch64-linux";
@@ -205,7 +201,6 @@
                 inherit self inputs outputs;
               };
               modules = [
-                sources
                 ./machines/enceladus/configuration.nix
               ];
             };
@@ -218,7 +213,6 @@
                 inherit self inputs outputs;
               };
               modules = [
-                sources
                 ./machines/iapetus/home.nix
               ];
             };
@@ -228,7 +222,6 @@
                 inherit self inputs outputs;
               };
               modules = [
-                sources
                 ./machines/callisto/home.nix
               ];
             };
@@ -238,7 +231,6 @@
                 inherit self inputs outputs;
               };
               modules = [
-                sources
                 ./machines/enceladus/home.nix
               ];
             };
@@ -328,6 +320,13 @@
                 "aarch64-darwin"
               ] outputs.devShells
             );
+          };
+
+          githubActions = {
+            nixUpdate = import ./pkgs/update.nix {
+              inherit lib;
+              pkgs = self.packages.x86_64-linux;
+            };
           };
         };
     };
