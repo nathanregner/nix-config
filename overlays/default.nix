@@ -12,7 +12,6 @@ let
     final: prev:
     let
       stable = inputs.nixpkgs.legacyPackages.${final.system};
-      sources = final.callPackage ../_sources/generated.nix { };
     in
     rec {
       hydra_unstable = prev.hydra_unstable.overrideAttrs (oldAttrs: {
