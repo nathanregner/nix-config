@@ -743,6 +743,7 @@ require("lazy").setup({
   {
     "stevearc/oil.nvim",
     dependencies = { { "nvim-tree/nvim-web-devicons", opts = {} } },
+    lazy = false, -- https://github.com/stevearc/oil.nvim/issues/409
     keys = {
       {
         "-",
