@@ -71,10 +71,10 @@ in
     }
   );
 
-  programs.neovim.extraPackages = with pkgs.unstable; [
-    clang
-    gnumake
-  ];
+  # programs.neovim.extraPackages = with pkgs.unstable; [
+  #   clang
+  #   gnumake
+  # ];
 
   xdg.dataFile = builtins.listToAttrs (
     builtins.map (
