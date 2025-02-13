@@ -681,12 +681,13 @@ require("lazy").setup({
   {
     -- Highlight, edit, and navigate code
     "nvim-treesitter/nvim-treesitter",
+    dir = vim.g.nix.nvim_treesitter.dir,
+    pin = true,
     dependencies = {
       "nvim-treesitter/nvim-treesitter-context",
       "nvim-treesitter/nvim-treesitter-textobjects",
       "nushell/tree-sitter-nu",
     },
-    build = ":TSUpdate",
     keys = {
       {
         "[C",
@@ -696,6 +697,7 @@ require("lazy").setup({
     },
     lazy = false,
     opts = {
+      parser_install_dir = vim.g.nix.nvim_treesitter.parser_install_dir,
       auto_install = true,
       highlight = { enable = true },
       indent = { enable = true },
