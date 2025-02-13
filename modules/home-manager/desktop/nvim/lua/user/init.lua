@@ -162,6 +162,7 @@ require("lazy").setup({
         return newVirtText
       end
 
+      ---@diagnostic disable-next-line: missing-fields
       require("ufo").setup({
         open_fold_hl_timeout = 150,
         close_fold_kinds_for_ft = {
@@ -557,6 +558,7 @@ require("lazy").setup({
   {
     "folke/which-key.nvim",
     config = function()
+      ---@diagnostic disable-next-line: missing-fields
       require("which-key").setup({})
       require("which-key").register({
         ["<leader>c"] = { name = "[C]ode", _ = "which_key_ignore" },
@@ -772,6 +774,7 @@ require("lazy").setup({
       { "JoosepAlviste/nvim-ts-context-commentstring", opts = { enable_autocmd = false } },
     },
     config = function()
+      ---@diagnostic disable-next-line: missing-fields
       require("Comment").setup({
         pre_hook = require("ts_context_commentstring.integrations.comment_nvim").create_pre_hook(),
       })
@@ -871,6 +874,7 @@ require("lazy").setup({
     },
     config = function()
       local neotest = require("neotest")
+      ---@diagnostic disable-next-line: missing-fields
       neotest.setup({
         adapters = {
           require("neotest-rust")({
@@ -883,6 +887,7 @@ require("lazy").setup({
           enabled = true,
           severity = vim.diagnostic.severity.WARN,
         },
+        ---@diagnostic disable-next-line: missing-fields
         output = {
           open_on_run = true,
           enter = true,
