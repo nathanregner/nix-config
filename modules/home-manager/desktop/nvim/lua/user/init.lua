@@ -660,80 +660,6 @@ require("lazy").setup({
   },
 
   {
-    "mtrajano/tssorter.nvim",
-    keys = function()
-      return {
-        { "<leader>st", require("tssorter").sort, desc = "[S]ort [t]ree" },
-      }
-    end,
-    opts = {
-      sortables = {
-        javascript = {
-          keys = { node = "pair" },
-        },
-        javascriptreact = {
-          keys = { node = "pair" },
-        },
-        nix = {
-          -- TODO: inherit(a) b c d;
-          -- attr = { node = { "attr" } },
-          attrset = { node = { "binding" } },
-          formal = {
-            node = { "formal" },
-            order_by = function(node1, node2)
-              local line1 = require("tssorter.tshelper").get_text(node1)
-              local line2 = require("tssorter.tshelper").get_text(node2)
-              local overrides = {}
-              for index, value in ipairs({
-                "self",
-                "inputs",
-                "inputs'",
-                "sources",
-                "config",
-                "pkgs",
-                "lib",
-              }) do
-                overrides[value] = index
-              end
-
-              local index1 = overrides[line1]
-              local index2 = overrides[line2]
-              if index1 and index2 then
-                return index1 < index2
-              elseif index1 then
-                return true
-              elseif index2 then
-                return false
-              else
-                return line1 < line2
-              end
-            end,
-          },
-          list = { node = { "element" } },
-        },
-        toml = {
-          table = { node = { "table" } },
-        },
-        typescript = {
-          keys = { node = "pair" },
-        },
-        typescriptreact = {
-          keys = { node = "pair" },
-          -- TODO: shorthand_property_identifier
-        },
-        yaml = {
-          keys = { node = "block_mapping_pair" },
-          list = { node = "block_sequence_item" },
-        },
-      },
-      logger = {
-        -- level = vim.log.levels.TRACE,
-        -- outfile = "~/tssorter.log", -- nil prints to messages, or add a path to a file to output logs there
-      },
-    },
-  },
-
-  {
     {
       "antosha417/nvim-lsp-file-operations",
       dependencies = {
@@ -1115,6 +1041,9 @@ require("lazy").setup({
 }, {
   dev = {
     path = "~/dev/github",
+  },
+  performance = {
+    rtp = { paths = vim.g.nix.rtp },
   },
 })
 
