@@ -1,115 +1,136 @@
-{ config, pkgs, ... }:
 {
-  imports = [ ./tools ];
+  config,
+  pkgs,
+  lib,
+  ...
+}:
+let
+  inherit (lib) mkOption types;
+  cfg = config.programs.neovim;
+in
+{
+  imports = [ ./modules ];
 
-  programs.neovim = {
-    enable = true;
-    defaultEditor = true;
-    extraConfig = builtins.readFile ./init.vim;
-    extraLuaConfig =
-      let
-        globals = {
-          blink_cmp.dir = "${pkgs.unstable.blink-cmp}";
-          jdtls = {
-            lombok = pkgs.fetchurl {
-              url = "https://repo1.maven.org/maven2/org/projectlombok/lombok/1.18.36/lombok-1.18.36.jar";
-              sha256 = "sha256-c7awW2otNltwC6sI0w+U3p0zZJC8Cszlthgf70jL8Y4=";
-            };
-            settings = {
-              java = {
-                format.settings.url = "file://${config.xdg.configHome}/nvim/lsp/jdtls/formatter.xml";
-              };
+  options = {
+    programs.neovim = {
+      lua.globals = mkOption {
+        type = types.submodule {
+          freeformType = types.attrsOf types.anything;
+          options = {
+            rtp = mkOption {
+              type = types.listOf types.str;
             };
           };
         };
-      in
-      ''
-        vim.g.nix = vim.fn.json_decode('${builtins.toJSON globals}')
+      };
+    };
+  };
+
+  config = {
+    programs.neovim = {
+      enable = true;
+      defaultEditor = true;
+      extraConfig = builtins.readFile ./init.vim;
+      extraLuaConfig = ''
+        vim.g.nix = vim.fn.json_decode('${builtins.toJSON cfg.lua.globals}')
         require('user')
       '';
 
-    plugins = with pkgs.unstable.vimPlugins; [ lazy-nvim ];
+      plugins = with pkgs.unstable.vimPlugins; [ lazy-nvim ];
 
-    extraPackages = with pkgs.unstable; [
+      lua.globals = {
+        blink_cmp.dir = "${pkgs.unstable.vimPlugins.blink-cmp}";
+        luasnip.dir = "${pkgs.unstable.vimPlugins.luasnip}";
+      };
 
-      # language servers
-      clojure-lsp
-      emmet-language-server
-      gopls
-      pkgs.unstable.nodePackages_latest.graphql-language-service-cli
-      harper
-      helm-ls
-      jdt-language-server
-      libclang
-      lua-language-server
-      nil
-      terraform-ls
-      tflint
-      vscode-langservers-extracted
-      vtsls
-      yaml-language-server
+      extraPackages = with pkgs.unstable; [
 
-      # formatters/linters
-      nixfmt-rfc-style
-      joker
-      prettierd
-      shfmt
-      stylua
-      taplo
+        # language servers
+        emmet-language-server
+        gopls
+        nodejs.pkgs.graphql-language-service-cli
+        harper
+        helm-ls
+        libclang
+        lua-language-server
+        nil
+        terraform-ls
+        tflint
+        vscode-langservers-extracted
+        vtsls
+        yaml-language-server
 
-      # misc
-      gnumake
-      clang # for compiling tree-sitter parsers
-    ];
-  };
+        # formatters/linters
+        nixfmt-rfc-style
+        prettierd
+        shfmt
+        stylua
+        taplo
+      ];
+    };
 
-  home.activation.lazy-sync = config.lib.dag.entryAfter [ "writeBoundary" ] ''
-    ${config.programs.neovim.finalPackage}/bin/nvim --headless "+Lazy! restore" +qa
-  '';
-
-  home.packages = with pkgs.unstable; [
-    # test runners
-    cargo-nextest # for rouge8/neotest-rust
-  ];
-
-  xdg.configFile = {
-    "nvim/after".source = config.lib.file.mkFlakeSymlink ./after;
-    "nvim/lazy-lock.json".source = config.lib.file.mkFlakeSymlink ./lazy-lock.json;
-    "nvim/lsp".source = config.lib.file.mkFlakeSymlink ./lsp;
-    "nvim/lua".source = config.lib.file.mkFlakeSymlink ./lua;
-  };
-
-  programs.zsh.shellAliases.vimdiff = "nvim -d";
-
-  programs.zsh.initExtra =
-    # bash
-    ''
-      if typeset -f nvim >/dev/null; then
-        unset -f nvim
-      fi
-      _nvim=$(which nvim)
-      nvim() {
-        if [[ -z "$@" ]]; then
-          if [[ -f "./Session.vim" ]]; then
-            $_nvim -c ':silent source Session.vim' -c 'lua vim.g.savesession = true'
-          else
-            $_nvim
-          fi
-        else
-          $_nvim "$@"
-        fi
-      }
+    home.activation.lazy-sync = config.lib.dag.entryAfter [ "writeBoundary" ] ''
+      ${config.programs.neovim.finalPackage}/bin/nvim --headless "+Lazy! restore" +qa || echo "Failed to sync plugins"
     '';
 
-  # https://github.com/jesseduffield/lazygit/wiki/Custom-Commands-Compendium
-  programs.lazygit.settings.customCommands = [
-    {
-      key = "M";
-      command = "nvim -c DiffviewOpen";
-      description = "Open diffview.nvim";
-      context = "files";
-      loadingText = "opening diffview.nvim";
-      subprocess = true;
-    }
-  ];
+    home.packages = with pkgs.unstable; [
+      # test runners
+      cargo-nextest # for rouge8/neotest-rust
+    ];
+
+    xdg.configFile =
+      {
+        "nvim/lazy-lock.json" = {
+          source = config.lib.file.mkFlakeSymlink ./lazy-lock.json;
+          force = true;
+        };
+        "nvim/lua" = {
+          source = config.lib.file.mkFlakeSymlink ./lua;
+          force = true;
+        };
+      }
+      // lib.listToAttrs (
+        builtins.map (source: {
+          name = "nvim/after/ftplugin/${builtins.baseNameOf source}";
+          value = {
+            source = config.lib.file.mkFlakeSymlink source;
+            force = true;
+          };
+        }) (lib.filesystem.listFilesRecursive ./after/ftplugin)
+      );
+
+    programs.zsh.shellAliases.vimdiff = "nvim -d";
+
+    programs.zsh.initExtra =
+      # bash
+      ''
+        if typeset -f nvim >/dev/null; then
+          unset -f nvim
+        fi
+        _nvim=$(which nvim)
+        nvim() {
+          if [[ -z "$@" ]]; then
+            if [[ -f "./Session.vim" ]]; then
+              $_nvim -c ':silent source Session.vim' -c 'lua vim.g.savesession = true'
+            else
+              $_nvim
+            fi
+          else
+            $_nvim "$@"
+          fi
+        }
+      '';
+
+    # https://github.com/jesseduffield/lazygit/wiki/Custom-Commands-Compendium
+    programs.lazygit.settings.customCommands = [
+      {
+        key = "M";
+        command = "nvim -c DiffviewOpen";
+        description = "Open diffview.nvim";
+        context = "files";
+        loadingText = "opening diffview.nvim";
+        subprocess = true;
+      }
+    ];
+  };
 }
