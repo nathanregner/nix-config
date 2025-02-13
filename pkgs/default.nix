@@ -12,8 +12,6 @@ in
 
   aws-cli-sso = pkgs.unstable.callPackage ./aws-cli-sso { };
 
-  blink-cmp = pkgs.unstable.callPackage ./blink { inherit sources; };
-
   emmet-language-server = node2nixPkgs."@olrtg/emmet-language-server";
 
   generate-sops-keys = pkgs.unstable.callPackage ./generate-sops-keys.nix { };
