@@ -1854,6 +1854,9 @@ require("lazy").setup({
       vim.g["conjure#mapping#doc_word"] = "gk"
       -- Fix Babashka pprint: https://github.com/Olical/conjure/issues/406
       vim.g["conjure#client#clojure#nrepl#eval#print_function"] = "cider.nrepl.pprint/pprint"
+      -- Disable REPL auto-start
+      vim.g["conjure#client_on_load"] = false
+      vim.g["conjure#log#hud#ignore_low_priority"] = true
     end,
   },
 
