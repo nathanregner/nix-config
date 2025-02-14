@@ -4,7 +4,7 @@
 let mapleader = " "
 let maplocalleader = ","
 
-inoremap jk <esc>
+" inoremap jk <esc>
 
 " _S_ource _V_imrc
 " nnoremap <leader>sv :source $MYVIMRC<CR>
