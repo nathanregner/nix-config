@@ -686,6 +686,20 @@ require("lazy").setup({
   "tpope/vim-repeat",
 
   {
+    "max397574/better-escape.nvim",
+    opts = {
+      default_mappings = true,
+      mappings = {
+        i = { j = { k = "<Esc>" } },
+        c = { j = { k = "<Esc>" } },
+        t = { j = { k = "<C-\\><C-n>" } },
+        v = { j = { k = "<Esc>" } },
+        s = { j = { k = "<Esc>" } },
+      },
+    },
+  },
+
+  {
     "stevearc/oil.nvim",
     dependencies = { { "nvim-tree/nvim-web-devicons", opts = {} } },
     keys = {
