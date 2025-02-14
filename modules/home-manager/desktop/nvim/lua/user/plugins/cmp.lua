@@ -121,12 +121,12 @@ return { -- https://cmp.saghen.dev/installation.html
         download = false,
       },
       -- https://github.com/Saghen/blink.cmp/issues/1098
-      sorts = {
+      --[[ sorts = {
         function(a, b) return source_priority[a.source_id] > source_priority[b.source_id] end,
         -- defaults
         "score",
         "sort_text",
-      },
+      }, ]]
     },
   },
   opts_extend = { "sources.default" },
