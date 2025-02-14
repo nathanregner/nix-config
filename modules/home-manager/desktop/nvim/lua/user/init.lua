@@ -323,8 +323,9 @@ require("lazy").setup({
         },
         harper_ls = {
           settings = {
-            ["harper-ls"] = {
+            ["harper-ls"] = { -- https://writewithharper.com/docs/integrations/neovim
               linters = {
+                long_sentences = false,
                 sentence_capitalization = false,
                 spaces = false,
               },
