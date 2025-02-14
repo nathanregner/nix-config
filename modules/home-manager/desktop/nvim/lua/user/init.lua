@@ -114,7 +114,7 @@ require("lazy").setup({
           },
           filetype = { nft = { "TelescopePrompt", "snacks_picker_input" } },
         },
-        internal_pairs = {
+        --[[ internal_pairs = {
           {
             "''",
             "''",
@@ -128,7 +128,7 @@ require("lazy").setup({
             end,
           },
           unpack(require("ultimate-autopair.default").conf.internal_pairs),
-        },
+        }, ]]
       }
     end,
   },
@@ -1234,30 +1234,43 @@ require("lazy").setup({
     end,
   },
 
+  { "Olical/nfnl" },
+
+  {
+    "julienvincent/nvim-paredit",
+    opts = function()
+      local paredit = require("nvim-paredit")
+      return {
+        keys = {
+          ["<localleader>i"] = {
+            function()
+              local range = paredit.api.wrap_enclosing_form_under_cursor("( ", ")")
+              vim.print(range)
+              if range then
+                vim.api.nvim_win_set_cursor(0, { range[1] + 1, range[2] + 1 })
+                vim.cmd("startinsert")
+              end
+            end,
+            "Wrap form",
+          },
+          ["<localleader>I"] = {
+            function()
+              local range = paredit.api.wrap_element_under_cursor("( ", ")")
+              vim.print(range)
+              if range then
+                vim.api.nvim_win_set_cursor(0, { range[1] + 1, range[2] + 1 })
+                vim.cmd("startinsert")
+              end
+            end,
+            "Wrap element",
+          },
+        },
+      }
+    end,
+  },
+
   { -- REPL
     "Olical/conjure",
-    dependencies = {
-      -- https://github.com/guns/vim-sexp
-      "guns/vim-sexp",
-      -- https://github.com/tpope/vim-sexp-mappings-for-regular-people
-      "tpope/vim-sexp-mappings-for-regular-people",
-      --[[ {
-        "PaterJason/cmp-conjure",
-        config = function()
-          local cmp = require("cmp")
-          local config = cmp.get_config()
-          table.insert(config.sources, {
-            name = "buffer",
-            option = {
-              sources = {
-                { name = "conjure" },
-              },
-            },
-          })
-          cmp.setup(config)
-        end,
-      }, ]]
-    },
     config = function(_)
       require("conjure.main").main()
       require("conjure.mapping")["on-filetype"]()
