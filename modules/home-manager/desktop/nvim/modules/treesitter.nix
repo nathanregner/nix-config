@@ -5,57 +5,7 @@
 }:
 let
   parserPrefix = "nvim/nvim-treesitter";
-
-  package = pkgs.unstable.vimPlugins.nvim-treesitter.withPlugins (
-    plugins: with plugins; [
-      bash
-      c
-      clojure
-      cmake
-      cpp
-      css
-      devicetree
-      diff
-      git_rebase
-      gitcommit
-      gitignore
-      go
-      gomod
-      gosum
-      graphql
-      html
-      hyprlang
-      ini
-      java
-      javascript
-      json
-      kconfig
-      lua
-      make
-      markdown
-      meson
-      nginx
-      nix
-      pem
-      perl
-      python
-      query
-      rst
-      rust
-      sql
-      terraform
-      tmux
-      toml
-      tsx
-      typescript
-      udev
-      vim
-      vimdoc
-      vue
-      xml
-      yaml
-    ]
-  );
+  package = pkgs.unstable.vimPlugins.nvim-treesitter.withAllGrammars;
 in
 {
   programs.neovim.lua.globals = (
