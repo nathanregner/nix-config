@@ -20,20 +20,8 @@ return { -- https://cmp.saghen.dev/installation.html
         },
       },
       config = function()
-        local ls = require("luasnip")
-
-        -- TODO
-        -- ls.setup({
-        --   load_ft_func = require("luasnip.extras.filetype_functions").extend_load_ft({
-        --     javascript = { "ecma" },
-        --     typescript = { "javascript", "ecma" },
-        --     javascriptreact = { "javascript", "ecma" },
-        --     typescriptreact = { "typescript", "ecma" },
-        --   }),
-        -- })
-
-        -- require("user.snippets.ecma")
-        -- require("user.snippets.typescriptreact")
+        require("user.snippets.ecma")
+        require("user.snippets.typescriptreact")
       end,
     },
   },
