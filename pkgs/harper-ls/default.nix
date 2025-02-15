@@ -5,7 +5,7 @@
 }:
 rustPlatform.buildRustPackage rec {
   pname = "harper-ls";
-  version = "0.20.0";
+  version = "0.21.1";
   src = fetchFromGitHub {
     owner = "elijah-potter";
     repo = "harper";
