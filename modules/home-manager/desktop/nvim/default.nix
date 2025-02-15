@@ -40,6 +40,7 @@ in
 
         # language servers
         emmet-language-server
+        fennel-ls
         gopls
         graphql-language-service-cli
         harper-ls
@@ -55,6 +56,7 @@ in
         yaml-language-server
 
         # formatters/linters
+        fnlfmt
         nixfmt-rfc-style
         prettierd
         shfmt
