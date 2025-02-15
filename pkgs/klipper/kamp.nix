@@ -3,13 +3,13 @@
   nix-update-script,
   stdenvNoCC,
 }:
-stdenvNoCC.mkDerivation {
+stdenvNoCC.mkDerivation rec {
   pname = "kamp";
-  version = "v1.1.2";
+  version = "1.1.2";
   src = fetchFromGitHub {
     owner = "kyleisah";
     repo = "Klipper-Adaptive-Meshing-Purging";
-    rev = "v1.1.2";
+    rev = "v${version}";
     fetchSubmodules = false;
     sha256 = "sha256-anBGjLtYlyrxeNVy1TEMcAGTVUFrGClLuoJZuo3xlDM=";
   };
