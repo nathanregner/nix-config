@@ -79,7 +79,8 @@ fn activate(profile: Profile, build: &Build, args: &[String]) -> io::Result<()> 
             command.args(["--profile-name", "home-manager"]);
         }
         Profile::System { .. } => {
-            command.args(["--profile-path", "/run/current-system/"]);
+            command.args(["--profile-user", "root"]);
+            command.args(["--profile-name", "system"]);
         }
     };
 
