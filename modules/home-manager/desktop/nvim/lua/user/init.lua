@@ -475,6 +475,7 @@ require("lazy").setup({
         bash = { "shfmt" },
         clojure = { "joker" },
         css = { "prettierd" },
+        fennel = { "fnlfmt" },
         gitcommit = { "prettier", "injected" }, -- FIXME: prettierd erroring out
         go = { "gofmt" },
         graphql = { "prettierd" },
