@@ -7,7 +7,7 @@
   vimUtils,
 }:
 let
-  version = "0.11.0-unstable-2025-02-15";
+  version = "0.12.2";
   src = fetchFromGitHub {
     owner = "saghen";
     repo = "blink.cmp";
@@ -52,7 +52,7 @@ vimUtils.buildVimPlugin {
   passthru = {
     updateScript = nix-update-script {
       # attrPath = "blink-cmp.blink-fuzzy-lib";
-      extraArgs = [ "--version=branch" ];
+      # extraArgs = [ "--version=branch" ];
     };
 
     # needed for the update script
