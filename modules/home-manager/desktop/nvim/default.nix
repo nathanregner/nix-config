@@ -6,7 +6,7 @@
   ...
 }:
 let
-  inherit (lib) mkOption types;
+  inherit (lib) types options;
   cfg = config.programs.neovim;
 in
 {
@@ -34,11 +34,32 @@ in
       defaultEditor = true;
       extraConfig = builtins.readFile ./init.vim;
       extraLuaConfig = ''
-        vim.g.nix = vim.fn.json_decode('${builtins.toJSON cfg.lua.globals}')
+        vim.g.nix = ${lib.generators.toLua { } cfg.lua.globals}
         require('user')
       '';
 
       plugins = with pkgs.unstable.vimPlugins; [ lazy-nvim ];
+
+      extraLuaPackages =
+        let
+          propagateBuildInputs =
+            drvs:
+            builtins.map (i: i.val) (
+              builtins.genericClosure {
+                startSet = builtins.map (drv: {
+                  key = drv.outPath;
+                  val = drv;
+                }) drvs;
+                operator =
+                  { val, ... }:
+                  builtins.map (drv: {
+                    key = drv.outPath;
+                    val = drv;
+                  }) (val.propagatedBuildInputs or [ ]);
+              }
+            );
+        in
+        ps: propagateBuildInputs [ ps.busted ];
 
       lua.globals = {
         blink_cmp.dir = "${pkgs.unstable.vimPlugins.blink-cmp}";
