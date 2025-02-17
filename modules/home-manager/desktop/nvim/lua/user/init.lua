@@ -260,15 +260,8 @@ require("lazy").setup({
           vim.lsp.buf.format()
         end, { desc = "Format current buffer with LSP" })
 
-        -- FIXME: auto-starting bb repl before files are opened
-        -- FIXME: not reloading externally changed TS files
-        -- if
-        --   client.name ~= "clangd"
-        --   and client.name ~= "harper_ls"
-        --   and client.name ~= "emmet_language_server"
-        --   and client.name ~= "yamlls"
-        --   and client.name ~= "jsonls"
-        -- then
+        -- FIXME: breaks external file reload?
+        -- if client.name == "vtsls" or client.name == "graphql" or client.name == "eslint" then
         --   require("workspace-diagnostics").populate_workspace_diagnostics(client, bufnr)
         -- end
       end
@@ -283,8 +276,6 @@ require("lazy").setup({
           return default_diagnostic_handler(err, result, context, config)
         end
       end
-
-      require("lspconfig.configs").vtsls = require("vtsls").lspconfig -- set default server config, optional but recommended
 
       local util = require("lspconfig.util")
 
@@ -391,9 +382,21 @@ require("lazy").setup({
         tflint = {
           root_dir = util.root_pattern(".terraform", ".terraform.lock.hcl", ".git", ".tflint.hcl"),
         },
-        vtsls = {
-          settings = require("vtsls").lspconfig.settings,
-        },
+        vtsls = vim.tbl_deep_extend("error", require("vtsls").lspconfig.default_config, {
+          settings = {
+            -- https://github.com/microsoft/vscode/issues/13953
+            typescript = { tsserver = { experimental = { enableProjectDiagnostics = true } } },
+          },
+          capabilities = {
+            workspace = {
+              didChangeWorkspaceFolders = {
+                -- https://github.com/neovim/neovim/pull/22405
+                -- https://github.com/neovim/neovim/issues/1380
+                dynamicRegistration = true,
+              },
+            },
+          },
+        }),
         yamlls = {
           settings = {
             yaml = {
