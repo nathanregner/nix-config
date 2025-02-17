@@ -25,18 +25,6 @@ let
       # https://github.com/NixOS/nixpkgs/issues/154163#issuecomment-1350599022
       makeModulesClosure = x: prev.makeModulesClosure (x // { allowMissing = true; });
 
-      nixVersions = prev.nixVersions // {
-        latest = prev.nixVersions.latest.overrideAttrs (old: {
-          patches = old.patches or [ ] ++ [
-            # (prev.fetchpatch {
-            #   url = "https://patch-diff.githubusercontent.com/raw/NixOS/nix/pull/12421.patch";
-            #   sha256 = "sha256-AkBQo4RK+l6bs1C6ZUhjRzyvUicmu2QB1rqZfrsrWUo=";
-            # })
-            ./nix/0001-Add-inputs.self.submodules-flake-attribute.patch
-          ];
-        });
-      };
-
       # TODO: remove once https://github.com/NixOS/nixpkgs/issues/380828
       python3 = prev.python3.override {
         packageOverrides = pyfinal: pyprev: {
