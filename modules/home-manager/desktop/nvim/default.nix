@@ -5,7 +5,7 @@
   ...
 }:
 let
-  inherit (lib) mkOption types;
+  inherit (lib) types options;
   cfg = config.programs.neovim;
 in
 {
@@ -13,8 +13,20 @@ in
 
   options = {
     programs.neovim = {
-      lua.globals = mkOption {
-        type = types.attrs;
+      lua.globals = options.mkOption {
+        type = types.submodule {
+          freeformType = types.attrsOf types.anything;
+          options = {
+            rtp = options.mkOption {
+              type = types.listOf (
+                types.oneOf [
+                  types.path
+                  types.string
+                ]
+              );
+            };
+          };
+        };
       };
     };
   };
@@ -25,14 +37,46 @@ in
       defaultEditor = true;
       extraConfig = builtins.readFile ./init.vim;
       extraLuaConfig = ''
-        vim.g.nix = vim.fn.json_decode('${builtins.toJSON cfg.lua.globals}')
+        vim.g.nix = ${lib.generators.toLua { } cfg.lua.globals}
         require('user')
       '';
 
       plugins = with pkgs.unstable.vimPlugins; [ lazy-nvim ];
 
+      extraLuaPackages =
+        let
+          propagateBuildInputs =
+            drvs:
+            builtins.map (i: i.val) (
+              builtins.genericClosure {
+                startSet = builtins.map (drv: {
+                  key = drv.outPath;
+                  val = drv;
+                }) drvs;
+                operator =
+                  { val, ... }:
+                  builtins.map (drv: {
+                    key = drv.outPath;
+                    val = drv;
+                  }) (val.propagatedBuildInputs or [ ]);
+              }
+            );
+        in
+        ps: propagateBuildInputs [ ps.busted ];
+
       lua.globals = {
         blink_cmp.dir = "${pkgs.unstable.blink-cmp}";
+        # rtp =
+        #   let
+        #     inherit (config.programs.neovim.finalPackage.passthru.unwrapped) lua;
+        #   in
+        #   [
+        #     lua.pkgs.busted
+        #     # (pkgs.runCommand "busted-lua" { } ''
+        #     #   mkdir -p $out/lua
+        #     #   cp -r ${lua.pkgs.busted}/share/lua/*/* $out/lua
+        #     # '')
+        #   ];
       };
 
       extraPackages = with pkgs.unstable; [
