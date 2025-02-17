@@ -64,7 +64,7 @@ lib.recurseIntoAttrs {
 
   update-pkgs = pkgs.unstable.callPackage ./update-pkgs { };
 
-  vtsls = node2nixPkgs."@vtsls/language-server";
+  vtsls = pkgs.unstable.callPackage ./vtsls { inherit node2nixPkgs; };
 
   writeBabashkaApplication = pkgs.unstable.callPackage ./write-babashka-application.nix { };
 }
