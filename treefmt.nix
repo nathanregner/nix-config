@@ -12,7 +12,9 @@
     prettier = {
       enable = true;
       excludes = [
+        "**/*-lock.json"
         "**/secrets.yaml"
+        "dashboards/*.json"
       ];
     };
     shfmt.enable = true;

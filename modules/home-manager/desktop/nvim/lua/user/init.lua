@@ -109,9 +109,7 @@ require("lazy").setup({
         },
         extensions = {
           cond = {
-            cond = function(fn)
-              return not fn.in_node("comment")
-            end,
+            cond = function(fn) return not fn.in_node("comment") end,
           },
           filetype = { nft = { "TelescopePrompt", "snacks_picker_input" } },
         },
@@ -182,9 +180,7 @@ require("lazy").setup({
           },
         },
         fold_virt_text_handler = handler,
-        provider_selector = function()
-          return { "treesitter", "indent" }
-        end,
+        provider_selector = function() return { "treesitter", "indent" } end,
       })
       vim.keymap.set("n", "zR", require("ufo").openAllFolds)
       vim.keymap.set("n", "zM", require("ufo").closeAllFolds)
@@ -192,9 +188,7 @@ require("lazy").setup({
       vim.keymap.set("n", "zm", require("ufo").closeFoldsWith) -- closeAllFolds == closeFoldsWith(0)
       vim.keymap.set("n", "K", function()
         local winid = require("ufo").peekFoldedLinesUnderCursor()
-        if not winid then
-          vim.lsp.buf.hover()
-        end
+        if not winid then vim.lsp.buf.hover() end
       end)
     end,
   },
@@ -220,16 +214,12 @@ require("lazy").setup({
     config = function()
       local on_attach = function(client, bufnr)
         local map = function(mode, keys, func, desc)
-          if desc then
-            desc = "LSP: " .. desc
-          end
+          if desc then desc = "LSP: " .. desc end
 
           vim.keymap.set(mode, keys, func, { buffer = bufnr, desc = desc })
         end
 
-        local nmap = function(keys, func, desc)
-          map("n", keys, func, desc)
-        end
+        local nmap = function(keys, func, desc) map("n", keys, func, desc) end
 
         nmap("<leader>rn", vim.lsp.buf.rename, "[R]e[n]ame")
         map({ "n", "v" }, "<leader>ca", vim.lsp.buf.code_action, "[C]ode [A]ction")
@@ -251,14 +241,19 @@ require("lazy").setup({
         nmap("gD", vim.lsp.buf.declaration, "[G]oto [D]eclaration")
         nmap("<leader>wa", vim.lsp.buf.add_workspace_folder, "[W]orkspace [A]dd Folder")
         nmap("<leader>wr", vim.lsp.buf.remove_workspace_folder, "[W]orkspace [R]emove Folder")
-        nmap("<leader>wl", function()
-          print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
-        end, "[W]orkspace [L]ist Folders")
+        nmap(
+          "<leader>wl",
+          function() print(vim.inspect(vim.lsp.buf.list_workspace_folders())) end,
+          "[W]orkspace [L]ist Folders"
+        )
 
         -- Create a command `:Format` local to the LSP buffer
-        vim.api.nvim_buf_create_user_command(bufnr, "Format", function(_)
-          vim.lsp.buf.format()
-        end, { desc = "Format current buffer with LSP" })
+        vim.api.nvim_buf_create_user_command(
+          bufnr,
+          "Format",
+          function(_) vim.lsp.buf.format() end,
+          { desc = "Format current buffer with LSP" }
+        )
 
         -- FIXME: breaks external file reload?
         -- if client.name == "vtsls" or client.name == "graphql" or client.name == "eslint" then
@@ -270,9 +265,7 @@ require("lazy").setup({
       for _, method in ipairs({ "textDocument/diagnostic", "workspace/diagnostic" }) do
         local default_diagnostic_handler = vim.lsp.handlers[method]
         vim.lsp.handlers[method] = function(err, result, context, config)
-          if err ~= nil and err.code == -32802 then
-            return
-          end
+          if err ~= nil and err.code == -32802 then return end
           return default_diagnostic_handler(err, result, context, config)
         end
       end
@@ -495,9 +488,7 @@ require("lazy").setup({
       },
       format_on_save = function(bufnr)
         -- Disable with a global or buffer-local variable
-        if vim.g.disable_autoformat or vim.b[bufnr].disable_autoformat then
-          return
-        end
+        if vim.g.disable_autoformat or vim.b[bufnr].disable_autoformat then return end
         return { timeout_ms = 500, lsp_format = "fallback" }
       end,
     },
@@ -516,9 +507,7 @@ require("lazy").setup({
         bang = true,
       })
       vim.api.nvim_create_user_command("FormatEnable", function(args)
-        if args.bang then
-          vim.g.disable_autoformat = false
-        end
+        if args.bang then vim.g.disable_autoformat = false end
         ---@diagnostic disable-next-line: inject-field
         vim.b.disable_autoformat = false
       end, {
@@ -699,9 +688,7 @@ require("lazy").setup({
           -- https://github.com/rafamadriz/friendly-snippets
           {
             "rafamadriz/friendly-snippets",
-            config = function()
-              require("luasnip.loaders.from_vscode").lazy_load()
-            end,
+            config = function() require("luasnip.loaders.from_vscode").lazy_load() end,
           },
         },
         config = function()
@@ -812,9 +799,7 @@ require("lazy").setup({
     keys = {
       { "<leader>fu", vim.cmd.UndotreeToggle, desc = "[F]ile [U]ndo Tree" },
     },
-    config = function()
-      vim.g.undotree_WindowLayout = 4
-    end,
+    config = function() vim.g.undotree_WindowLayout = 4 end,
   },
 
   { -- gitsigns
@@ -831,24 +816,26 @@ require("lazy").setup({
 
         map("n", "<leader>hs", gs.stage_hunk, { desc = "[H]unk [S]tage" })
         map("n", "<leader>hr", gs.reset_hunk, { desc = "[H]unk [R]eset" })
-        map("v", "<leader>hs", function()
-          gs.stage_hunk({ vim.fn.line("."), vim.fn.line("v") })
-        end, { desc = "[H]unk [S]tage" })
-        map("v", "<leader>hr", function()
-          gs.reset_hunk({ vim.fn.line("."), vim.fn.line("v") })
-        end, { desc = "[H]unk [R]eset" })
+        map(
+          "v",
+          "<leader>hs",
+          function() gs.stage_hunk({ vim.fn.line("."), vim.fn.line("v") }) end,
+          { desc = "[H]unk [S]tage" }
+        )
+        map(
+          "v",
+          "<leader>hr",
+          function() gs.reset_hunk({ vim.fn.line("."), vim.fn.line("v") }) end,
+          { desc = "[H]unk [R]eset" }
+        )
         map("n", "<leader>hS", gs.stage_buffer, { desc = "[H]unk [S]tage buffer" })
         map("n", "<leader>hu", gs.undo_stage_hunk, { desc = "[H]unk [U]ndo stage" })
         map("n", "<leader>hR", gs.reset_buffer, { desc = "[H]unk [R]eset buffer" })
         map("n", "<leader>hP", gs.preview_hunk, { desc = "[H]unk [P]review" })
-        map("n", "<leader>hb", function()
-          gs.blame_line({ full = true })
-        end, { desc = "[H]unk [B]lame" })
+        map("n", "<leader>hb", function() gs.blame_line({ full = true }) end, { desc = "[H]unk [B]lame" })
         map("n", "<leader>hB", gs.toggle_current_line_blame, { desc = "Git [B]lame" })
         map("n", "<leader>hd", gs.diffthis, { desc = "[H]unk [D]iff" })
-        map("n", "<leader>hD", function()
-          gs.diffthis("~")
-        end, { desc = "[H]unk [D]iff last commit" })
+        map("n", "<leader>hD", function() gs.diffthis("~") end, { desc = "[H]unk [D]iff last commit" })
         map("n", "<leader>htd", gs.toggle_deleted, { desc = "[H]unk [T]oggle [D]eleted" })
 
         local ts_repeat_move = require("nvim-treesitter.textobjects.repeatable_move")
@@ -890,9 +877,7 @@ require("lazy").setup({
         conditionals = {}, -- disable italics
       },
     },
-    init = function()
-      vim.cmd.colorscheme("catppuccin")
-    end,
+    init = function() vim.cmd.colorscheme("catppuccin") end,
   },
 
   -- https://github.com/stevearc/dressing.nvim
@@ -915,9 +900,7 @@ require("lazy").setup({
           "mode",
           function()
             local reg = vim.fn.reg_recording()
-            if reg == "" then
-              return ""
-            end
+            if reg == "" then return "" end
             return "recording to " .. reg
           end,
         },
@@ -1038,12 +1021,17 @@ require("lazy").setup({
       local builtin = require("telescope.builtin")
       vim.keymap.set("n", "<leader>fH", builtin.help_tags, { desc = "[F]ind [H]elp" })
       vim.keymap.set("n", "<leader>fk", builtin.keymaps, { desc = "[F]ind [K]eymaps" })
-      vim.keymap.set("n", "<leader>ff", function()
-        builtin.find_files({
-          hidden = true,
-          find_command = { "fd", "--exclude", ".git", "--type", "file", "--type", "symlink" },
-        })
-      end, { desc = "[F]ind [F]iles" })
+      vim.keymap.set(
+        "n",
+        "<leader>ff",
+        function()
+          builtin.find_files({
+            hidden = true,
+            find_command = { "fd", "--exclude", ".git", "--type", "file", "--type", "symlink" },
+          })
+        end,
+        { desc = "[F]ind [F]iles" }
+      )
       vim.keymap.set("n", "<leader>fs", builtin.builtin, { desc = "[F]ind [S]elect Telescope" })
       vim.keymap.set("n", "<leader>fw", builtin.grep_string, { desc = "[F]ind current [W]ord" })
       vim.keymap.set("n", "<leader>fg", builtin.live_grep, { desc = "[F]ind by [G]rep" })
@@ -1051,14 +1039,20 @@ require("lazy").setup({
         local text = vim.getVisualSelection()
         builtin.grep_string({ search = text })
       end, { desc = "[F]ind by [G]rep" })
-      vim.keymap.set("n", "<leader>fd", function()
-        builtin.diagnostics({ sort_by = "severity" })
-      end, { desc = "[F]ind [D]iagnostics" })
+      vim.keymap.set(
+        "n",
+        "<leader>fd",
+        function() builtin.diagnostics({ sort_by = "severity" }) end,
+        { desc = "[F]ind [D]iagnostics" }
+      )
       vim.keymap.set("n", "<leader>fr", builtin.resume, { desc = "[F]ind [R]esume" })
       vim.keymap.set("n", "<leader>f.", builtin.oldfiles, { desc = '[F]ind Recent Files ("." for repeat)' })
-      vim.keymap.set("n", "<leader><space>", function()
-        require("telescope.builtin").buffers({ sort_lastused = true, ignore_current_buffer = true })
-      end, { desc = "[ ] Find existing buffers" })
+      vim.keymap.set(
+        "n",
+        "<leader><space>",
+        function() require("telescope.builtin").buffers({ sort_lastused = true, ignore_current_buffer = true }) end,
+        { desc = "[ ] Find existing buffers" }
+      )
       vim.keymap.set(
         "n",
         "<leader>fh",
@@ -1083,25 +1077,39 @@ require("lazy").setup({
 
       -- It's also possible to pass additional configuration options.
       --  See `:help telescope.builtin.live_grep()` for information about particular keys
-      vim.keymap.set("n", "<leader>f/", function()
-        builtin.live_grep({
-          grep_open_files = true,
-          prompt_title = "Live Grep in Open Files",
-        })
-      end, { desc = "[F]ind [/] in Open Files" })
+      vim.keymap.set(
+        "n",
+        "<leader>f/",
+        function()
+          builtin.live_grep({
+            grep_open_files = true,
+            prompt_title = "Live Grep in Open Files",
+          })
+        end,
+        { desc = "[F]ind [/] in Open Files" }
+      )
 
       -- Shortcut for searching your Neovim configuration files
-      vim.keymap.set("n", "<leader>fn", function()
-        builtin.find_files({ cwd = vim.fn.stdpath("config"), follow = true })
-      end, { desc = "[F]ind [N]eovim files" })
+      vim.keymap.set(
+        "n",
+        "<leader>fn",
+        function() builtin.find_files({ cwd = vim.fn.stdpath("config"), follow = true }) end,
+        { desc = "[F]ind [N]eovim files" }
+      )
 
       local lazy_path = vim.fn.stdpath("data") .. "/lazy"
-      vim.keymap.set("n", "<leader>pf", function()
-        builtin.find_files({ cwd = lazy_path })
-      end, { desc = "[F]ind [p]lugin files" })
-      vim.keymap.set("n", "<leader>pg", function()
-        builtin.live_grep({ cwd = lazy_path })
-      end, { desc = "[G]rep [p]lugin files" })
+      vim.keymap.set(
+        "n",
+        "<leader>pf",
+        function() builtin.find_files({ cwd = lazy_path }) end,
+        { desc = "[F]ind [p]lugin files" }
+      )
+      vim.keymap.set(
+        "n",
+        "<leader>pg",
+        function() builtin.live_grep({ cwd = lazy_path }) end,
+        { desc = "[G]rep [p]lugin files" }
+      )
     end,
   },
 
@@ -1117,9 +1125,7 @@ require("lazy").setup({
     keys = {
       {
         "[C",
-        function()
-          require("treesitter-context").go_to_context(vim.v.count1)
-        end,
+        function() require("treesitter-context").go_to_context(vim.v.count1) end,
         silent = true,
       },
     },
@@ -1131,12 +1137,8 @@ require("lazy").setup({
       disable = function(_lang, buf)
         local max_filesize = 100 * 1024 -- 100 KB
         local ok, stats = pcall(vim.loop.fs_stat, vim.api.nvim_buf_get_name(buf))
-        if ok and stats and stats.size > max_filesize then
-          return true
-        end
-        if #vim.api.nvim_buf_get_lines(0, 0, 1, false)[1] > 1000 then
-          return true
-        end
+        if ok and stats and stats.size > max_filesize then return true end
+        if #vim.api.nvim_buf_get_lines(0, 0, 1, false)[1] > 1000 then return true end
       end,
       incremental_selection = {
         enable = true,
@@ -1415,9 +1417,7 @@ require("lazy").setup({
         "nvim-lua/plenary.nvim",
         "nvim-tree/nvim-tree.lua",
       },
-      config = function()
-        require("lsp-file-operations").setup()
-      end,
+      config = function() require("lsp-file-operations").setup() end,
     },
   },
 
@@ -1443,24 +1443,18 @@ require("lazy").setup({
     keys = {
       {
         "-",
-        function()
-          require("oil").open()
-        end,
+        function() require("oil").open() end,
       },
     },
     opts = {
       keymaps = {
-        ["1"] = function()
-          require("oil").open(find_git_root())
-        end,
+        ["1"] = function() require("oil").open(find_git_root()) end,
         ["<Esc>"] = function()
           local oil = require("oil")
           local was_modified = vim.bo.modified
           if was_modified then
             local choice = vim.fn.confirm("Save changes?", "Yes\nNo", 1)
-            if choice == 1 then
-              oil.save()
-            end
+            if choice == 1 then oil.save() end
           end
           oil.close()
         end,
@@ -1497,9 +1491,7 @@ require("lazy").setup({
         panel_size = 10,
       },
     },
-    config = function(_, opts)
-      require("litee.lib").setup(opts)
-    end,
+    config = function(_, opts) require("litee.lib").setup(opts) end,
   },
 
   { -- Calltree
@@ -1514,9 +1506,7 @@ require("lazy").setup({
         collapse_all = "H",
       },
     },
-    config = function(_, opts)
-      require("litee.calltree").setup(opts)
-    end,
+    config = function(_, opts) require("litee.calltree").setup(opts) end,
   },
 
   { -- TODO comments
@@ -1567,9 +1557,7 @@ require("lazy").setup({
       css = true, -- Enable all CSS features: rgb_fn, hsl_fn, names, RGB, RRGGBB
       css_fn = true, -- Enable all CSS *functions*: rgb_fn, hsl_fn
     },
-    config = function(_, opts)
-      require("colorizer").setup({ "*" }, opts)
-    end,
+    config = function(_, opts) require("colorizer").setup({ "*" }, opts) end,
   },
 
   { -- Neotest
@@ -1608,13 +1596,9 @@ require("lazy").setup({
       -- :run_current_ns_tests "tn"
       -- :run_alternate_ns_tests "tN"
       -- :run_current_test "tc"
-      local nmap = function(keys, func, desc)
-        vim.keymap.set("n", keys, func, { desc = desc })
-      end
+      local nmap = function(keys, func, desc) vim.keymap.set("n", keys, func, { desc = desc }) end
 
-      local show_summary = function()
-        neotest.summary.open()
-      end
+      local show_summary = function() neotest.summary.open() end
 
       nmap("<localleader>tt", function(args)
         neotest.run.run(args)
@@ -1633,12 +1617,8 @@ require("lazy").setup({
         neotest.watch.watch()
         show_summary()
       end, "[T]est [W]atch [T]his")
-      nmap("<localleader>twq", function()
-        neotest.watch.stop()
-      end, "[T]est [W]atch [Q]uit")
-      nmap("<localleader>tr", function()
-        neotest.output_panel.clear()
-      end, "[T]est [R]eset logs")
+      nmap("<localleader>twq", function() neotest.watch.stop() end, "[T]est [W]atch [Q]uit")
+      nmap("<localleader>tr", function() neotest.output_panel.clear() end, "[T]est [R]eset logs")
     end,
   },
 
@@ -1719,9 +1699,7 @@ require("lazy").setup({
     dependencies = { "nvim-lua/plenary.nvim" },
     keys = { { "gx", "<cmd>Browse<cr>", mode = { "n", "x" } } },
     cmd = { "Browse" },
-    init = function()
-      vim.g.netrw_nogx = 1
-    end,
+    init = function() vim.g.netrw_nogx = 1 end,
     opts = {
       open_browser_app = vim.g.open_cmd,
       handlers = {
@@ -1732,9 +1710,7 @@ require("lazy").setup({
           name = "search",
           handle = function(mode, line, opts)
             -- don't search unless selected
-            if mode == "v" then
-              return require("gx.handlers.search").handle(mode, line, opts)
-            end
+            if mode == "v" then return require("gx.handlers.search").handle(mode, line, opts) end
           end,
         },
         url = {
@@ -1749,14 +1725,10 @@ require("lazy").setup({
           name = "jira",
           handle = function(mode, line, _)
             local jira_domain = vim.g.jira_domain
-            if not jira_domain then
-              return
-            end
+            if not jira_domain then return end
 
             local ticket = require("gx.helper").find(line, mode, "(%u+-%d+)")
-            if ticket and #ticket < 20 then
-              return "https://" .. jira_domain .. "/browse/" .. ticket
-            end
+            if ticket and #ticket < 20 then return "https://" .. jira_domain .. "/browse/" .. ticket end
           end,
         },
         rust = {
@@ -1764,9 +1736,7 @@ require("lazy").setup({
           filename = "Cargo.toml",
           handle = function(mode, line, _)
             local crate = require("gx.helper").find(line, mode, "(%w+)%s-=%s")
-            if crate then
-              return "https://crates.io/crates/" .. crate
-            end
+            if crate then return "https://crates.io/crates/" .. crate end
           end,
         },
       },
@@ -1850,9 +1820,7 @@ require("lazy").setup({
     init = function()
       vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
         pattern = { "conjure-log-*" },
-        callback = function(ev)
-          vim.diagnostic.enable(false, { bufnr = ev.buf })
-        end,
+        callback = function(ev) vim.diagnostic.enable(false, { bufnr = ev.buf }) end,
       })
       vim.g["conjure#extract#tree_sitter#enabled"] = true
       vim.g["conjure#client#clojure#nrepl#refresh#backend"] = "clj-reload"
@@ -1886,9 +1854,7 @@ require("lazy").setup({
 vim.api.nvim_create_autocmd("VimLeavePre", {
   pattern = "*",
   callback = function()
-    if vim.g.savesession then
-      vim.api.nvim_command("mks!")
-    end
+    if vim.g.savesession then vim.api.nvim_command("mks!") end
   end,
 })
 
@@ -1967,9 +1933,7 @@ local function goto_error_diagnostic(f)
     local pos_before = vim.api.nvim_win_get_cursor(0)
     f({ severity = vim.diagnostic.severity.ERROR, wrap = true })
     local pos_after = vim.api.nvim_win_get_cursor(0)
-    if pos_equal(pos_before, pos_after) then
-      f({ wrap = true })
-    end
+    if pos_equal(pos_before, pos_after) then f({ wrap = true }) end
   end
 end
 
@@ -1990,9 +1954,7 @@ vim.keymap.set("n", "<leader>d", vim.diagnostic.setloclist, { desc = "Open diagn
 vim.keymap.set("n", "<leader>sv", function()
   -- source: https://github.com/creativenull
   for name, _ in pairs(package.loaded) do
-    if name:match("^user") then
-      package.loaded[name] = nil
-    end
+    if name:match("^user") then package.loaded[name] = nil end
   end
   dofile(vim.env.MYVIMRC)
   vim.notify("Config reloaded", vim.log.levels.INFO)
@@ -2013,17 +1975,17 @@ elseif vim.fn.has("unix") == 1 then
 end
 
 -- for GBrowse, now that netrw is disabled
-vim.api.nvim_create_user_command("Browse", function(opts)
-  vim.fn.jobstart(vim.g.open_cmd .. " " .. vim.fn.shellescape(opts.fargs[1]), { detach = true })
-end, { nargs = 1 })
+vim.api.nvim_create_user_command(
+  "Browse",
+  function(opts) vim.fn.jobstart(vim.g.open_cmd .. " " .. vim.fn.shellescape(opts.fargs[1]), { detach = true }) end,
+  { nargs = 1 }
+)
 
 -- [[ Highlight on yank ]]
 -- See `:help vim.highlight.on_yank()`
 local highlight_group = vim.api.nvim_create_augroup("YankHighlight", { clear = true })
 vim.api.nvim_create_autocmd("TextYankPost", {
-  callback = function()
-    vim.highlight.on_yank()
-  end,
+  callback = function() vim.highlight.on_yank() end,
   group = highlight_group,
   pattern = "*",
 })
