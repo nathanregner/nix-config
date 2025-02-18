@@ -140,7 +140,7 @@
               };
             };
 
-          treefmt = import ./treefmt.nix;
+          treefmt = import ./treefmt.nix { inherit pkgs; };
         };
 
       flake = rec {
