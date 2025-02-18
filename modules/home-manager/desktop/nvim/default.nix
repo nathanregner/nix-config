@@ -14,7 +14,14 @@ in
   options = {
     programs.neovim = {
       lua.globals = mkOption {
-        type = types.attrs;
+        type = types.submodule {
+          freeformType = types.attrsOf types.anything;
+          options = {
+            rtp = mkOption {
+              type = types.listOf types.str;
+            };
+          };
+        };
       };
     };
   };
@@ -34,6 +41,12 @@ in
       lua.globals = {
         blink_cmp.dir = "${pkgs.unstable.vimPlugins.blink-cmp}";
         luasnip.dir = "${pkgs.unstable.vimPlugins.luasnip}";
+        nvim_test.dir = pkgs.unstable.runCommand "nvim-test" { } ''
+          mkdir -p "$out/nvim"
+          cp -rL ${pkgs.unstable.neovim-unwrapped.src}/test "$out/nvim"
+          ${pkgs.tree}/bin/tree $out
+          find "$out/nvim" -type f -name '*_spec.lua' -exec rm -rf {} \;
+        '';
       };
 
       extraPackages = with pkgs.unstable; [
