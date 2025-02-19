@@ -86,6 +86,8 @@ require("lazy").setup({
       "sindrets/diffview.nvim", -- optional - Diff integration
       "nvim-telescope/telescope.nvim",
     },
+    keys = { { "<leader>n", "<CMD>Neogit<CR>", desc = "Neogit" } },
+    lazy = true,
     config = true,
   },
 

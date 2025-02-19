@@ -28,6 +28,14 @@ return {
       },
     },
     words = { enabled = false },
+    win = {
+      input = {
+        keys = {
+          ["<c-enter>"] = { "toggle_live", mode = { "i", "n" } },
+          ["<c-h>"] = { "toggle_live", mode = { "i", "n" } },
+        },
+      },
+    },
   },
   keys = {
     -- Top Pickers & Explorer
@@ -112,8 +120,17 @@ return {
     { "<leader>Z", function() Snacks.zen.zoom() end, desc = "Toggle Zoom" },
     { "<leader>.", function() Snacks.scratch() end, desc = "Toggle Scratch Buffer" },
     { "<leader>S", function() Snacks.scratch.select() end, desc = "Select Scratch Buffer" },
-    { "<leader>n", function() Snacks.notifier.show_history() end, desc = "Notification History" },
+    { "<leader>N", function() Snacks.notifier.show_history() end, desc = "Notification History" },
     { "<leader>bd", function() Snacks.bufdelete() end, desc = "Delete Buffer" },
+    {
+      "<leader>bD",
+      function()
+        Snacks.bufdelete({
+          filter = function(buf) return #vim.fn.win_findbuf(buf) == 0 end,
+        })
+      end,
+      desc = "Delete Other Buffer",
+    },
     { "<leader>cR", function() Snacks.rename.rename_file() end, desc = "Rename File" },
     { "<leader>gB", function() Snacks.gitbrowse() end, desc = "Git Browse", mode = { "n", "v" } },
     { "<leader>gg", function() Snacks.lazygit() end, desc = "Lazygit" },
@@ -122,6 +139,5 @@ return {
     { "<c-_>", function() Snacks.terminal() end, desc = "which_key_ignore" },
     -- { "]]", function() Snacks.words.jump(vim.v.count1) end, desc = "Next Reference", mode = { "n", "t" } },
     -- { "[[", function() Snacks.words.jump(-vim.v.count1) end, desc = "Prev Reference", mode = { "n", "t" } },
-    { "<leader>n", "<CMD>Neogit<CR>", desc = "Neogit" },
   },
 }
