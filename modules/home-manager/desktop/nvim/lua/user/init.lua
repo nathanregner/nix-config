@@ -1320,6 +1320,7 @@ require("lazy").setup({
 
   { -- REPL
     "Olical/conjure",
+    branch = "main",
     config = function(_)
       require("conjure.main").main()
       require("conjure.mapping")["on-filetype"]()
