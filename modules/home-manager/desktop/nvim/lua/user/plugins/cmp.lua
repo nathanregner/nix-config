@@ -1,10 +1,3 @@
-local source_priority = {
-  snippets = 4,
-  lsp = 3,
-  path = 2,
-  buffer = 1,
-}
-
 ---@module "lazy"
 ---@type LazySpec
 return { -- https://cmp.saghen.dev/installation.html
@@ -85,10 +78,7 @@ return { -- https://cmp.saghen.dev/installation.html
             if #ctx.get_keyword() == 0 then return -3 end
             return 0
           end,
-          should_show_items = function(ctx)
-            vim.print("trigger", ctx.trigger)
-            return ctx.trigger.initial_kind ~= "trigger_character"
-          end,
+          should_show_items = function(ctx) return ctx.trigger.initial_kind ~= "trigger_character" end,
         },
       },
     },
