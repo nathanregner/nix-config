@@ -1293,7 +1293,7 @@ require("lazy").setup({
       local paredit = require("nvim-paredit")
       return {
         keys = {
-          ["<localleader>I"] = {
+          ["<localleader>i"] = {
             function()
               local range = paredit.api.wrap_enclosing_form_under_cursor("( ", ")")
               vim.print(range)
@@ -1304,7 +1304,7 @@ require("lazy").setup({
             end,
             "Wrap form",
           },
-          ["<localleader>i"] = {
+          ["<localleader>I"] = {
             function()
               local range = paredit.api.wrap_element_under_cursor("( ", ")")
               vim.print(range)
