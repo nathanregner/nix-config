@@ -32,18 +32,6 @@ lib.recurseIntoAttrs {
 
   hydra-auto-upgrade = pkgs.unstable.callPackage ./hydra-auto-upgrade { };
 
-  jdtls = pkgs.jdt-language-server.overrideAttrs {
-    pname = "jdtls";
-    version = "v1.33.0";
-    src = pkgs.unstable.fetchFromGitHub {
-      owner = "eclipse-jdtls";
-      repo = "eclipse.jdt.ls";
-      rev = "v1.33.0";
-      fetchSubmodules = false;
-      sha256 = "sha256-wChyVZ3tY/rTemZYmfdsedRZFL6Y0RGyEvzyIp3HEgk=";
-    };
-  };
-
   joker = pkgs.unstable.callPackage ./joker { };
 
   kamp = pkgs.callPackage ./klipper/kamp.nix { };
