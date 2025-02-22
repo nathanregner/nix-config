@@ -48,7 +48,7 @@ in
         # language servers
         emmet-language-server
         gopls
-        nodejs.pkgs.graphql-language-service-cli
+        graphql-language-service-cli
         harper
         helm-ls
         libclang
