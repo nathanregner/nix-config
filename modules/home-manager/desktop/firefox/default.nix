@@ -6,7 +6,7 @@
     # name must start with "dev-edition-"? https://github.com/nix-community/home-manager/issues/4703
     profiles.dev-edition-default = {
       # FIXME: doesn't auto-install
-      extensions = [ pkgs.aws-cli-sso ];
+      extensions.packages = [ pkgs.aws-cli-sso ];
       settings = {
         "browser.aboutConfig.showWarning" = false;
 

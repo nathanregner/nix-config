@@ -1,4 +1,5 @@
 {
+  inputs,
   config,
   pkgs,
   lib,
@@ -43,30 +44,37 @@ in
         luasnip.dir = "${pkgs.unstable.vimPlugins.luasnip}";
       };
 
-      extraPackages = with pkgs.unstable; [
-
+      extraPackages = builtins.attrValues {
         # language servers
-        emmet-language-server
-        gopls
-        nodejs.pkgs.graphql-language-service-cli
-        harper
-        helm-ls
-        libclang
-        lua-language-server
-        nil
-        terraform-ls
-        tflint
-        vscode-langservers-extracted
-        vtsls
-        yaml-language-server
+        inherit (pkgs.unstable)
+          emmet-language-server
+          gopls
+          harper
+          helm-ls
+          libclang
+          lua-language-server
+          nil
+          terraform-ls
+          tflint
+          vscode-langservers-extracted
+          vtsls
+          yaml-language-server
+          ;
+
+        # FIXME https://github.com/NixOS/nixpkgs/commit/776868ce712918511e17fe26abcf2a5254a4a3f9
+        inherit (inputs.nixpkgs.legacyPackages.${pkgs.system}.nodejs.pkgs)
+          graphql-language-service-cli
+          ;
 
         # formatters/linters
-        nixfmt-rfc-style
-        prettierd
-        shfmt
-        stylua
-        taplo
-      ];
+        inherit (pkgs.unstable)
+          nixfmt-rfc-style
+          prettierd
+          shfmt
+          stylua
+          taplo
+          ;
+      };
     };
 
     home.activation.lazy-sync = config.lib.dag.entryAfter [ "writeBoundary" ] ''
