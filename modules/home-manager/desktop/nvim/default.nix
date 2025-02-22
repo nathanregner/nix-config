@@ -37,7 +37,7 @@
       emmet-language-server
       gopls
       pkgs.unstable.nodePackages_latest.graphql-language-service-cli
-      harper-ls
+      harper
       helm-ls
       jdt-language-server
       libclang
@@ -45,7 +45,6 @@
       nil
       terraform-ls
       tflint
-      typescript
       vscode-langservers-extracted
       vtsls
       yaml-language-server
