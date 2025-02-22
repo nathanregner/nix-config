@@ -13,6 +13,8 @@ lib.recurseIntoAttrs {
 
   gitea-github-mirror = pkgs.unstable.callPackage ./gitea-github-mirror { };
 
+  graphql-language-service-cli = pkgs.unstable.callPackage ./graphql-language-service-cli { };
+
   hammerspoon = pkgs.unstable.callPackage ./hammerspoon { };
 
   hydra-auto-upgrade = pkgs.unstable.callPackage ./hydra-auto-upgrade { };
