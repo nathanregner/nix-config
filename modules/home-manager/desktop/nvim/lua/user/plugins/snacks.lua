@@ -44,8 +44,13 @@ return {
     },
     {
       "<leader>fd",
-      function() Snacks.picker.files({ cwd = vim.fn.stdpath("config"), follow = true }) end,
-      desc = "Find Config File",
+      function()
+        Snacks.picker.files({
+          cmd = "fd",
+          args = { "--type", "d", "--type", "l", "--color", "never", "-E", ".git" },
+        })
+      end,
+      desc = "Find Directories",
     },
     { "<leader>ff", function() Snacks.picker.files({ hidden = true }) end, desc = "Find Files" },
     { "<leader>fF", function() Snacks.picker.files({ hidden = true, ignored = true }) end, desc = "Find Files" },
