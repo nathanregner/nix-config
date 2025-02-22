@@ -10,13 +10,13 @@
 
   let clicked = false;
   function clickAllow() {
+    if (clicked) return;
     const button = document.querySelector(
       'button[data-testid="allow-access-button"]',
     );
-    if (button) {
-      clicked = true;
-      button.click();
-    }
+    if (!button) return;
+    button.click();
+    clicked = true;
   }
 
   clickAllow();
