@@ -1,5 +1,4 @@
 {
-  sources,
   inputs,
   lib,
   pkgs,
@@ -18,7 +17,7 @@
   };
 
   environment.etc = {
-    "klipper/KAMP".source = "${sources.kamp.src}/Configuration";
+    "klipper/KAMP".source = "${pkgs.kamp.src}/Configuration";
     "klipper/printer.cfg".source = pkgs.writeText "printer.immutable.cfg" ''
       [include ${./printer.cfg}]
       [include ${./kamp.cfg}]

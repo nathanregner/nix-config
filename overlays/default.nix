@@ -4,15 +4,14 @@ let
 
   warnIfOutdated =
     prev: final:
-    lib.warnIf (
-      (lib.versionOlder final.version prev.version) || (final.version == prev.version)
-    ) "${prev.pname} overlay can be removed. nixpkgs version: ${prev.version}" final;
+    lib.warnIf ((lib.versionOlder final.version prev.version) || (final.version == prev.version))
+      "${final.pname or "???"} overlay can be removed. nixpkgs version: ${final.version} -> ${prev.version}"
+      final;
 
   sharedModifications =
     final: prev:
     let
       stable = inputs.nixpkgs.legacyPackages.${final.system};
-      sources = final.callPackage ../_sources/generated.nix { };
     in
     rec {
       hydra_unstable = prev.hydra_unstable.overrideAttrs (oldAttrs: {
@@ -46,11 +45,18 @@ let
 in
 rec {
   additions =
-    final: _prev:
-    import ../pkgs {
-      inherit inputs;
-      pkgs = final;
-    };
+    final: prev:
+    builtins.mapAttrs
+      (
+        name: pkg:
+        if builtins.hasAttr name prev && lib.isDerivation pkg then warnIfOutdated prev.${name} pkg else pkg
+      )
+      (
+        import ../pkgs {
+          inherit lib;
+          pkgs = final;
+        }
+      );
 
   modifications =
     final: prev:
@@ -58,12 +64,25 @@ rec {
     }
     // sharedModifications final prev;
 
-  unstable-packages = stablePrev: stableFinal: {
+  unstable-packages = stableFinal: stablePrev: {
     unstable = import inputs.nixpkgs-unstable {
       system = stableFinal.system;
       config.allowUnfree = true;
       overlays = [
-        (_: _: additions stablePrev stableFinal)
+        (
+          final: prev:
+          builtins.mapAttrs
+            (
+              name: pkg:
+              if builtins.hasAttr name prev && lib.isDerivation pkg then warnIfOutdated prev.${name} pkg else pkg
+            )
+            (
+              import ../pkgs {
+                inherit lib;
+                pkgs = stableFinal;
+              }
+            )
+        )
         sharedModifications
       ];
     };

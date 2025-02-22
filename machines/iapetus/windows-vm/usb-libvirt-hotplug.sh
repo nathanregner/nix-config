@@ -27,7 +27,6 @@ if [ -z "${DOMAIN}" ]; then
   exit 1
 fi
 
-
 #
 # Do some sanity checking of the udev environment variables.
 #
@@ -38,7 +37,7 @@ if [ -z "${SUBSYSTEM}" ]; then
 fi
 if [ "${SUBSYSTEM}" != "usb" ]; then
   echo "Invalid udev SUBSYSTEM: ${SUBSYSTEM}" >&2
-  echo "You should probably add a SUBSYSTEM=\"USB\" match to your udev rule." >&2
+  echo 'You should probably add a SUBSYSTEM="USB" match to your udev rule.' >&2
   exit 1
 fi
 
@@ -78,7 +77,6 @@ if [ -z "${DEVNUM}" ]; then
   exit 1
 fi
 
-
 #
 # This is a bit ugly. udev passes us the USB bus number and
 # device number with leading zeroes. E.g.:
@@ -104,4 +102,3 @@ virsh "${COMMAND}" "${DOMAIN}" /dev/stdin <<END
   </source>
 </hostdev>
 END
-

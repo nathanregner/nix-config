@@ -39,7 +39,7 @@ return {
       },
       textobjects = {
         select = {
-          enable = false,
+          enable = true,
         },
         move = {
           enable = true,

@@ -2,6 +2,8 @@
 vim.g.loaded_netrw = 1
 vim.g.loaded_netrwPlugin = 1
 
+vim.opt.diffopt = "internal,filler,closeoff,indent-heuristic,linematch:60,algorithm:histogram"
+
 local function find_git_root()
   -- Use the current buffer's path as the starting point for the git search
   local current_file = vim.api.nvim_buf_get_name(0)
@@ -111,7 +113,7 @@ require("lazy").setup({
           },
           filetype = { nft = { "TelescopePrompt", "snacks_picker_input" } },
         },
-        --[[ internal_pairs = {
+        internal_pairs = {
           {
             "''",
             "''",
@@ -125,7 +127,7 @@ require("lazy").setup({
             end,
           },
           unpack(require("ultimate-autopair.default").conf.internal_pairs),
-        }, ]]
+        },
       }
     end,
   },
@@ -262,15 +264,8 @@ require("lazy").setup({
           { desc = "Format current buffer with LSP" }
         )
 
-        -- FIXME: auto-starting bb repl before files are opened
-        -- FIXME: not reloading externally changed TS files
-        -- if
-        --   client.name ~= "clangd"
-        --   and client.name ~= "harper_ls"
-        --   and client.name ~= "emmet_language_server"
-        --   and client.name ~= "yamlls"
-        --   and client.name ~= "jsonls"
-        -- then
+        -- FIXME: breaks external file reload?
+        -- if client.name == "vtsls" or client.name == "graphql" or client.name == "eslint" then
         --   require("workspace-diagnostics").populate_workspace_diagnostics(client, bufnr)
         -- end
       end
@@ -283,8 +278,6 @@ require("lazy").setup({
           return default_diagnostic_handler(err, result, context, config)
         end
       end
-
-      require("lspconfig.configs").vtsls = require("vtsls").lspconfig -- set default server config, optional but recommended
 
       local util = require("lspconfig.util")
 
@@ -399,9 +392,21 @@ require("lazy").setup({
         tflint = {
           root_dir = util.root_pattern(".terraform", ".terraform.lock.hcl", ".git", ".tflint.hcl"),
         },
-        vtsls = {
-          settings = require("vtsls").lspconfig.settings,
-        },
+        vtsls = vim.tbl_deep_extend("error", require("vtsls").lspconfig.default_config, {
+          settings = {
+            -- https://github.com/microsoft/vscode/issues/13953
+            typescript = { tsserver = { experimental = { enableProjectDiagnostics = true } } },
+          },
+          capabilities = {
+            workspace = {
+              didChangeWorkspaceFolders = {
+                -- https://github.com/neovim/neovim/pull/22405
+                -- https://github.com/neovim/neovim/issues/1380
+                dynamicRegistration = true,
+              },
+            },
+          },
+        }),
         yamlls = {
           settings = {
             yaml = {
@@ -677,191 +682,6 @@ require("lazy").setup({
   },
 
   {
-    -- Highlight, edit, and navigate code
-    "nvim-treesitter/nvim-treesitter",
-    dir = vim.g.nix.nvim_treesitter.dir,
-    pin = true,
-    dependencies = {
-      "nvim-treesitter/nvim-treesitter-context",
-      "nvim-treesitter/nvim-treesitter-textobjects",
-      "nushell/tree-sitter-nu",
-    },
-    keys = {
-      {
-        "[C",
-        function() require("treesitter-context").go_to_context(vim.v.count1) end,
-        silent = true,
-      },
-    },
-    lazy = false,
-    opts = {
-      parser_install_dir = vim.g.nix.nvim_treesitter.parser_install_dir,
-      auto_install = true,
-      highlight = { enable = true },
-      indent = { enable = true },
-      disable = function(_lang, buf)
-        local max_filesize = 100 * 1024 -- 100 KB
-        local ok, stats = pcall(vim.loop.fs_stat, vim.api.nvim_buf_get_name(buf))
-        if ok and stats and stats.size > max_filesize then return true end
-        if #vim.api.nvim_buf_get_lines(0, 0, 1, false)[1] > 1000 then return true end
-      end,
-      incremental_selection = {
-        enable = true,
-        keymaps = {
-          node_incremental = "v",
-          node_decremental = "V",
-        },
-      },
-      textobjects = {
-        select = {
-          enable = false,
-        },
-        move = {
-          enable = true,
-          set_jumps = true, -- whether to set jumps in the jumplist
-          goto_next_start = {
-            ["]a"] = "@parameter.outer",
-            ["]f"] = "@function.outer",
-            ["]]"] = "@class.outer",
-            ["]t"] = "@tag.outer",
-            -- ["]z"] = { query = "@fold", query_group = "folds", desc = "Next fold" },
-          },
-          goto_next_end = {
-            ["]A"] = "@parameter.outer",
-            ["]F"] = "@function.outer",
-            ["]T"] = "@tag.outer",
-            ["]["] = "@class.outer",
-          },
-          goto_previous_start = {
-            ["[a"] = "@parameter.outer",
-            ["[f"] = "@function.outer",
-            ["[t"] = "@tag.outer",
-            ["[["] = "@class.outer",
-            -- ["[z"] = { query = "@fold", query_group = "folds", desc = "Previous fold" },
-          },
-          goto_previous_end = {
-            ["[A"] = "@parameter.outer",
-            ["[F"] = "@function.outer",
-            ["[T"] = "@tag.outer",
-            ["[]"] = "@class.outer",
-          },
-        },
-        swap = {
-          enable = true,
-          swap_next = {
-            ["<leader>a"] = "@parameter.inner",
-          },
-          swap_previous = {
-            ["<leader>A"] = "@parameter.inner",
-          },
-        },
-
-        lsp_interop = {
-          enable = true,
-          peek_definition_code = {
-            ["<leader>kf"] = "@function.outer",
-            ["<leader>dt"] = "@class.outer",
-          },
-        },
-      },
-    },
-    config = function(_, opts)
-      require("nvim-treesitter.configs").setup(opts)
-      require("treesitter-context").setup({
-        max_lines = 10,
-        multiline_threshold = 1,
-        -- mode = "topline",
-      })
-
-      local ts_repeat_move = require("nvim-treesitter.textobjects.repeatable_move")
-
-      -- vim way: ; goes to the direction you were moving.
-      vim.keymap.set({ "n", "x", "o" }, ";", ts_repeat_move.repeat_last_move)
-      vim.keymap.set({ "n", "x", "o" }, ",", ts_repeat_move.repeat_last_move_opposite)
-
-      -- Optionally, make builtin f, F, t, T also repeatable with ; and ,
-      vim.keymap.set({ "n", "x", "o" }, "f", ts_repeat_move.builtin_f_expr, { expr = true })
-      vim.keymap.set({ "n", "x", "o" }, "F", ts_repeat_move.builtin_F_expr, { expr = true })
-      vim.keymap.set({ "n", "x", "o" }, "t", ts_repeat_move.builtin_t_expr, { expr = true })
-      vim.keymap.set({ "n", "x", "o" }, "T", ts_repeat_move.builtin_T_expr, { expr = true })
-    end,
-  },
-
-  {
-    "mtrajano/tssorter.nvim",
-    keys = function()
-      return {
-        { "<leader>st", require("tssorter").sort, desc = "[S]ort [t]ree" },
-      }
-    end,
-    opts = {
-      sortables = {
-        javascript = {
-          keys = { node = "pair" },
-        },
-        javascriptreact = {
-          keys = { node = "pair" },
-        },
-        nix = {
-          -- TODO: inherit(a) b c d;
-          -- attr = { node = { "attr" } },
-          attrset = { node = { "binding" } },
-          formal = {
-            node = { "formal" },
-            order_by = function(node1, node2)
-              local line1 = require("tssorter.tshelper").get_text(node1)
-              local line2 = require("tssorter.tshelper").get_text(node2)
-              local overrides = {}
-              for index, value in ipairs({
-                "self",
-                "inputs",
-                "inputs'",
-                "sources",
-                "config",
-                "pkgs",
-                "lib",
-              }) do
-                overrides[value] = index
-              end
-
-              local index1 = overrides[line1]
-              local index2 = overrides[line2]
-              if index1 and index2 then
-                return index1 < index2
-              elseif index1 then
-                return true
-              elseif index2 then
-                return false
-              else
-                return line1 < line2
-              end
-            end,
-          },
-          list = { node = { "element" } },
-        },
-        toml = {
-          table = { node = { "table" } },
-        },
-        typescript = {
-          keys = { node = "pair" },
-        },
-        typescriptreact = {
-          keys = { node = "pair" },
-          -- TODO: shorthand_property_identifier
-        },
-        yaml = {
-          keys = { node = "block_mapping_pair" },
-          list = { node = "block_sequence_item" },
-        },
-      },
-      logger = {
-        -- level = vim.log.levels.TRACE,
-        -- outfile = "~/tssorter.log", -- nil prints to messages, or add a path to a file to output logs there
-      },
-    },
-  },
-
-  {
     {
       "antosha417/nvim-lsp-file-operations",
       dependencies = {
@@ -897,6 +717,32 @@ require("lazy").setup({
         t = { j = { k = "<C-\\><C-n>" } },
         v = { j = { k = "<Esc>" } },
         s = { j = { k = "<Esc>" } },
+      },
+    },
+  },
+
+  {
+    "stevearc/oil.nvim",
+    dependencies = { { "nvim-tree/nvim-web-devicons", opts = {} } },
+    lazy = false,
+    keys = {
+      {
+        "-",
+        function() require("oil").open() end,
+      },
+    },
+    opts = {
+      keymaps = {
+        ["1"] = function() require("oil").open(find_git_root()) end,
+        ["<Esc>"] = function()
+          local oil = require("oil")
+          local was_modified = vim.bo.modified
+          if was_modified then
+            local choice = vim.fn.confirm("Save changes?", "Yes\nNo", 1)
+            if choice == 1 then oil.save() end
+          end
+          oil.close()
+        end,
       },
     },
   },
@@ -971,25 +817,6 @@ require("lazy").setup({
       },
     },
   },
-
-  -- { -- Colorizer
-  --   "norcalli/nvim-colorizer.lua",
-  --   event = "VeryLazy",
-  --   cmd = "ColorizerToggle",
-  --   opts = {
-  --     "*", -- Highlight all files
-  --     "!TelescopePrompt", -- Except telescope previews. Seems to result in freezes: https://github.com/nvim-telescope/telescope.nvim/issues/1379
-  --     RGB = true, -- #RGB hex codes
-  --     RRGGBB = true, -- #RRGGBB hex codes
-  --     names = false, -- "Name" codes like Blue
-  --     RRGGBBAA = true, -- #RRGGBBAA hex codes
-  --     rgb_fn = true, -- CSS rgb() and rgba() functions
-  --     hsl_fn = true, -- CSS hsl() and hsla() functions
-  --     css = true, -- Enable all CSS features: rgb_fn, hsl_fn, names, RGB, RRGGBB
-  --     css_fn = true, -- Enable all CSS *functions*: rgb_fn, hsl_fn
-  --   },
-  --   config = function(_, opts) require("colorizer").setup({ "*" }, opts) end,
-  -- },
 
   { -- Neotest
     "nvim-neotest/neotest",
@@ -1110,24 +937,6 @@ require("lazy").setup({
       },
     },
   },
-
-  --[[ {
-    "smoka7/multicursors.nvim",
-    event = "VeryLazy",
-    dependencies = {
-      "smoka7/hydra.nvim",
-    },
-    opts = {},
-    cmd = { "MCstart", "MCvisual", "MCclear", "MCpattern", "MCvisualPattern", "MCunderCursor" },
-    keys = {
-      {
-        mode = { "v", "n" },
-        "<Leader>m",
-        "<cmd>MCstart<cr>",
-        desc = "Create a selection for selected text or word under the cursor",
-      },
-    },
-  }, ]]
 
   {
     "chrishrb/gx.nvim",
@@ -1267,7 +1076,7 @@ require("lazy").setup({
       -- Rebind from K
       vim.g["conjure#mapping#doc_word"] = "gk"
       -- Fix Babashka pprint: https://github.com/Olical/conjure/issues/406
-      -- vim.g["conjure#client#clojure#nrepl#eval#print_function"] = "cider.nrepl.pprint/pprint"
+      vim.g["conjure#client#clojure#nrepl#eval#print_function"] = "cider.nrepl.pprint/pprint"
       -- Disable REPL auto-start
       vim.g["conjure#client_on_load"] = false
       vim.g["conjure#log#hud#ignore_low_priority"] = true
