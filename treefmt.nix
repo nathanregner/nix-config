@@ -5,9 +5,6 @@
   programs = {
     nixfmt = {
       enable = true;
-      excludes = [
-        "pkgs/node2nix/*"
-      ];
     };
     prettier = {
       enable = true;

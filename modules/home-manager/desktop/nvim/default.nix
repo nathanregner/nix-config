@@ -37,7 +37,7 @@
       emmet-language-server
       gopls
       pkgs.unstable.nodePackages_latest.graphql-language-service-cli
-      harper-ls
+      harper
       helm-ls
       jdt-language-server
       libclang

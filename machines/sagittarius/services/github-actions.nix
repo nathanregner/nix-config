@@ -73,7 +73,6 @@
   services.github-runners.nix-config = {
     extraPackages = with pkgs.unstable; [
       nix-update
-      node2nix
     ];
   };
 }

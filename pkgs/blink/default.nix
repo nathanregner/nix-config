@@ -7,13 +7,13 @@
   vimUtils,
 }:
 let
-  version = "0.12.2";
+  version = "0.12.4";
   src = fetchFromGitHub {
     owner = "saghen";
     repo = "blink.cmp";
-    rev = "f22ca35d06b2210ebc84280be94caa11cf2ffe9f";
+    rev = "v${version}";
     fetchSubmodules = false;
-    sha256 = "sha256-M/Ui7AuIzF5qM2oI4M2Mz8GgecMJ3VXmJFc0DocUa2k=";
+    sha256 = "sha256-ybzEQHvZIiF+B2SIdFX8HJGai50PUw5QRgrL7qJ0sUk=";
   };
   libExt = if stdenv.hostPlatform.isDarwin then "dylib" else "so";
   blink-fuzzy-lib = rustPlatform.buildRustPackage {

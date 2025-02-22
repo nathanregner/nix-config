@@ -1,15 +1,98 @@
 {
-  makeWrapper,
-  node2nixPkgs,
+  stdenv,
+  lib,
+  fetchFromGitHub,
+  nodejs_22,
+  gitMinimal,
+  pnpm_8,
+  nix-update-script,
 }:
-node2nixPkgs."@vtsls/language-server".overrideAttrs {
-  nativeBuildInputs = [ makeWrapper ];
 
-  # default "watchFile" -> "useFsEventsOnParentDirectory"
-  # https://github.com/microsoft/TypeScript/blob/0f4737e0d55363ac40198b33a80fff0d01c1d8cf/src/compiler/sys.ts#L1517
-  # https://github.com/microsoft/vscode/issues/13953
-  postInstall = ''
-    wrapProgram "$out/bin/vtsls" \
-      --set TSC_NONPOLLING_WATCHER true
+stdenv.mkDerivation (finalAttrs: {
+  pname = "vtsls";
+  version = "0.2.8";
+
+  src = fetchFromGitHub {
+    owner = "yioneko";
+    repo = "vtsls";
+    rev = "server-v${finalAttrs.version}";
+    hash = "sha256-Ng+aOBnxFRbMjoUy6+DvIk2yVpvJT+AMsbvDb+IlYpY=";
+    fetchSubmodules = true;
+  };
+
+  nativeBuildInputs = [
+    nodejs_22
+    # patches are applied with git during build
+    gitMinimal
+    pnpm_8.configHook
+  ];
+
+  buildInputs = [ nodejs_22 ];
+
+  pnpmWorkspaces = [ "@vtsls/language-server" ];
+
+  pnpmDeps = pnpm_8.fetchDeps {
+    inherit (finalAttrs)
+      pnpmWorkspaces
+      pname
+      src
+      version
+      ;
+    hash = "sha256-xenPpKsIjEIyVeZDjwjLaBbpWLqWQDBaLLfyzxtrsTI=";
+  };
+
+  # Patches to get submodule sha from file instead of 'git submodule status'
+  patches = [ ./vtsls-build-patch.patch ];
+
+  # Skips manual confirmations during build
+  CI = true;
+
+  buildPhase = ''
+    runHook preBuild
+
+    # During build vtsls needs a working git installation.
+    git config --global user.name nixbld
+    git config --global user.email nixbld@example.com
+
+    # during build this sha is used as a marker to skip applying patches and
+    # copying files, which doesn't matter in this case
+    echo "dummysha" > ./packages/service/HEAD
+
+    # Requires a git repository during build
+    git init packages/service/vscode
+
+    # Depends on the @vtsls/language-service workspace
+    # '--workspace-concurrency=1' helps debug failing builds.
+    pnpm --filter "@vtsls/language-server..." build
+
+    # These trash deterministic builds. During build the whole directory is
+    # copied to another path.
+    rm -rf packages/service/vscode/.git
+    rm -rf packages/service/src/typescript-language-features/.git
+
+    runHook postBuild
   '';
-}
+
+  installPhase = ''
+    runHook preInstall
+
+    mkdir -p $out/{bin,lib/vtsls-language-server}
+    cp -r {packages,node_modules} $out/lib/vtsls-language-server
+    ln -s $out/lib/vtsls-language-server/packages/server/bin/vtsls.js $out/bin/vtsls
+
+    runHook postInstall
+  '';
+
+  passthru = {
+    updateScript = nix-update-script { };
+  };
+
+  meta = {
+    description = "LSP wrapper for typescript extension of vscode.";
+    homepage = "https://github.com/yioneko/vtsls";
+    license = lib.licenses.mit;
+    maintainers = with lib.maintainers; [ kuglimon ];
+    mainProgram = "vtsls";
+    platforms = lib.platforms.all;
+  };
+})
