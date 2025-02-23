@@ -880,6 +880,12 @@ require("lazy").setup({
       },
     }, -- for default options, refer to the configuration section for custom setup.
     cmd = "Trouble",
+    init = function()
+      local ts_repeat_move = require("nvim-treesitter.textobjects.repeatable_move")
+      local next, prev = ts_repeat_move.make_repeatable_move_pair(require("trouble").next, require("trouble").prev)
+      vim.keymap.set("n", "]x", next, { desc = "Trouble next" })
+      vim.keymap.set("n", "[x", prev, { desc = "Trouble prev" })
+    end,
     keys = {
       {
         "<leader>xx",
