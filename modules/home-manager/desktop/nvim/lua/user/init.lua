@@ -366,6 +366,16 @@ require("lazy").setup({
         },
         nil_ls = {},
         nushell = {},
+        omnisharp = {
+          cmd = { "OmniSharp" },
+          settings = {
+            RoslynExtensionsOptions = {
+              EnableDecompilationSupport = true,
+              EnableImportCompletion = true,
+              AnalyzeOpenDocumentsOnly = false,
+            },
+          },
+        },
         pyright = {},
         rust_analyzer = {
           -- https://rust-analyzer.github.io/manual.html#configuration
