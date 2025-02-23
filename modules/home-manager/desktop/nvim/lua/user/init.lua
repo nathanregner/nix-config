@@ -215,7 +215,7 @@ require("lazy").setup({
   { "towolf/vim-helm", ft = "helm" },
 
   { "folke/neoconf.nvim", opts = {} },
-  
+
   { -- Autocompletion
     "hrsh7th/nvim-cmp",
     event = "InsertEnter",
@@ -1144,6 +1144,18 @@ require("lazy").setup({
       },
     }, -- for default options, refer to the configuration section for custom setup.
     cmd = "Trouble",
+    init = function()
+      local ts_repeat_move = require("nvim-treesitter.textobjects.repeatable_move")
+      local trouble = require("trouble")
+      local next, prev = ts_repeat_move.make_repeatable_move_pair(
+        ---@diagnostic disable-next-line: missing-parameter, missing-fields
+        function() trouble.next({ jump = true }) end,
+        ---@diagnostic disable-next-line: missing-parameter, missing-fields
+        function() trouble.prev({ jump = true }) end
+      )
+      vim.keymap.set("n", "]x", next, { desc = "Trouble next" })
+      vim.keymap.set("n", "[x", prev, { desc = "Trouble prev" })
+    end,
     keys = {
       {
         "<leader>xx",
