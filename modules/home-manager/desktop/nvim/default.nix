@@ -78,10 +78,6 @@ in
       };
     };
 
-    home.activation.lazy-sync = config.lib.dag.entryAfter [ "writeBoundary" ] ''
-      ${config.programs.neovim.finalPackage}/bin/nvim --headless "+Lazy! restore" +qa || echo "Failed to sync plugins"
-    '';
-
     home.packages = with pkgs.unstable; [
       # test runners
       cargo-nextest # for rouge8/neotest-rust
