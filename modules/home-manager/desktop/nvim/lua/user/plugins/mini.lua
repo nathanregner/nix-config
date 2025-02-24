@@ -41,7 +41,7 @@ return {
           replace = "cs",
           update_n_lines = "",
         },
-        search_method = "cover_or_nearest",
+        -- search_method = "cover_or_nearest",
       })
 
       -- Remap adding surrounding to Visual mode selection

@@ -1243,6 +1243,8 @@ require("lazy").setup({
       local paredit = require("nvim-paredit")
       return {
         keys = {
+          -- FIXME (test)
+          --       ^
           ["<localleader>i"] = {
             function()
               local range = paredit.api.wrap_enclosing_form_under_cursor("( ", ")")
