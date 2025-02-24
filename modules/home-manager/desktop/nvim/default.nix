@@ -6,7 +6,7 @@
   ...
 }:
 let
-  inherit (lib) types options;
+  inherit (lib) mkOption types;
   cfg = config.programs.neovim;
 in
 {
