@@ -120,6 +120,10 @@ return {
     end,
     opts = {
       sortables = {
+        java = {
+          annotation_array = { node = "class_literal" },
+          annotation_element = { node = "element_value_pair" },
+        },
         javascript = {
           keys = { node = "pair" },
         },
