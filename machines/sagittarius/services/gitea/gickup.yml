@@ -1,0 +1,29 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/cooperspencer/gickup/refs/heads/main/gickup_spec.json
+
+source:
+  github:
+    - token_file: "@@github_token@@"
+      username: nathanregner
+      wiki: true # includes wiki too
+      issues: true # back up issues, works only locally
+      starred: true # includes the user's starred repositories too
+      filter:
+        stars: 100 # only clone repos with 100 stars
+        lastactivity: 1y # only clone repos which had activity during the last year
+        excludearchived: true
+        excludeforks: false
+      gists: true
+
+destination:
+  gitea:
+    - token_file: "@@gitea_token@@"
+      user: nathanregner
+      url: https://git.nregner.net
+      createorg: true # creates an organization if it doesn't exist already, if no user is set it creates an organization with the name of the original author
+      lfs: true
+      mirror:
+        enabled: true
+        mirrorinterval: 8h0m0s
+      visibility:
+        repositories: private
+        organizations: private

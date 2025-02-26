@@ -2,7 +2,7 @@
   imports = [
     ./cache.nix
     ./docker.nix
-    ./gitea.nix
+    ./gitea
     ./github-actions.nix
     ./grafana
     ./hydra.nix

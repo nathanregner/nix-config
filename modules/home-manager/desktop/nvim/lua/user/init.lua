@@ -316,7 +316,7 @@ require("lazy").setup({
         eslint = {},
         gopls = {},
         graphql = {
-          filetypes = { "graphql", "javascript", "javascriptreact", "typescript", "typescriptreact" },
+          filetypes = { "graphql", "javascript", "javascriptreact", "typescript", "typescriptreact", "vue" },
         },
         harper_ls = {
           settings = {
