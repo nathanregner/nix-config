@@ -35,6 +35,7 @@
 
     serviceConfig = {
       EnvironmentFile = config.sops.secrets.gitea-github-mirror.path;
+      User = "gitea";
     };
 
     script = ''
