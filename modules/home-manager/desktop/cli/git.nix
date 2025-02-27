@@ -12,26 +12,7 @@
     lfs.enable = true;
     maintenance.enable = true;
     extraConfig = {
-      commit.verbose = true;
-      push = {
-        autoSetupRemote = true;
-      };
-      pull.rebase = true;
-      rebase.autostash = true;
-      diff = {
-        # use difftastic as difftool: https://difftastic.wilfred.me.uk/git.html
-        tool = lib.mkDefault "difftastic";
-        algorithm = "histogram";
-      };
-      difftool = {
-        prompt = false;
-        difftastic.cmd = ''difft "$LOCAL" "$REMOTE"'';
-      };
-      pager.difftool = true;
-      rerere.enabled = true;
       alias = {
-        difft = "difftool";
-        dlog = "!f() { GIT_EXTERNAL_DIFF=difft git log -p --ext-diff; }; f";
         # https://github.com/orgs/community/discussions/9632#discussioncomment-4702442
         diff-refactor = ''
           -c color.diff.oldMoved='white dim'
@@ -41,9 +22,37 @@
           -c color.diff.newMovedDimmed='white dim'
           -c color.diff.newMovedAlternativeDimmed='white dim'
           diff --ignore-blank-lines --color-moved=dimmed-zebra --color-moved-ws=ignore-all-space --minimal'';
+        difft = "difftool";
+        dlog = "!f() { GIT_EXTERNAL_DIFF=difft git log -p --ext-diff; }; f";
+      };
+      commit = {
+        verbose = true;
+      };
+      diff = {
+        algorithm = "histogram";
+        tool = lib.mkDefault "difftastic"; # https://difftastic.wilfred.me.uk/git.html
+      };
+      difftool = {
+        difftastic.cmd = ''difft "$LOCAL" "$REMOTE"'';
+        prompt = false;
       };
       include = {
         path = "${config.xdg.configHome}/git/local";
+      };
+      pager = {
+        difftool = true;
+      };
+      pull = {
+        rebase = true;
+      };
+      push = {
+        autoSetupRemote = true;
+      };
+      rebase = {
+        autostash = true;
+      };
+      rerere = {
+        enabled = true;
       };
     };
     ignores = [
