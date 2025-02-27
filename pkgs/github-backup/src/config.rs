@@ -66,7 +66,7 @@ fn update_mirror_pat(config: &mut gix_config::File, pat: &str) -> Result<bool> {
         return Ok(true);
     }
 
-    return Ok(false);
+    Ok(false)
 }
 
 #[cfg(test)]

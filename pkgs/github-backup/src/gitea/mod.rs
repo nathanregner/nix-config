@@ -1,9 +1,10 @@
 use color_eyre::eyre;
-use generated::{
-    types::{MigrateRepoOptions, MigrateRepoOptionsService, Repository},
-    Client,
-};
+use generated::{types::MigrateRepoOptions, Client};
 use url::Url;
+
+use crate::github;
+
+pub use generated::types::Repository;
 
 #[allow(dead_code)]
 mod generated {
@@ -12,12 +13,14 @@ mod generated {
 
 pub struct Gitea {
     client: Client,
+    github_pat: String,
 }
 
 impl Gitea {
-    pub fn new(base_url: Url) -> Self {
+    pub fn new(base_url: Url, github_pat: String) -> Self {
         Self {
             client: Client::new(base_url.as_str()),
+            github_pat,
         }
     }
 
@@ -33,7 +36,7 @@ impl Gitea {
                 .await?
                 .into_inner()
                 .data;
-            if response.len() == 0 {
+            if response.is_empty() {
                 break;
             }
             page += 1;
@@ -43,31 +46,17 @@ impl Gitea {
         Ok(repos)
     }
 
-    pub async fn migrate(&self) -> eyre::Result<()> {
+    pub async fn migrate(&self, repo: &github::Repository) -> eyre::Result<()> {
         self.client
             .repo_migrate()
-            .body(MigrateRepoOptions {
-                auth_password: todo!(),
-                auth_token: todo!(),
-                auth_username: todo!(),
-                clone_addr: todo!(),
-                description: todo!(),
-                issues: Some(false),
-                labels: Some(false),
-                lfs: Some(true),
-                lfs_endpoint: None,
-                milestones: Some(false),
-                mirror: Some(true),
-                mirror_interval: None,
-                private: Some(true),
-                pull_requests: Some(false),
-                releases: Some(false),
-                repo_name: todo!(),
-                repo_owner: todo!(),
-                service: Some(MigrateRepoOptionsService::Github),
-                uid: None,
-                wiki: Some(false),
-            })
+            .body(
+                MigrateRepoOptions::builder()
+                    .repo_name(&repo.name)
+                    .clone_addr(&repo.clone_url)
+                    .auth_token(Some(self.github_pat.to_string()))
+                    .mirror(true)
+                    .private(true),
+            )
             .send()
             .await?;
         Ok(())

@@ -7,7 +7,7 @@ fn generate(name: &str) {
     let file = std::fs::File::open(src).unwrap();
     let spec = serde_json::from_reader(file).unwrap();
     let mut generator = progenitor::Generator::new(
-        &GenerationSettings::default().with_interface(InterfaceStyle::Builder),
+        GenerationSettings::default().with_interface(InterfaceStyle::Builder),
     );
 
     let tokens = generator.generate_tokens(&spec).unwrap();

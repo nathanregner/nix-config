@@ -73,6 +73,7 @@ let
               > $out
           '';
 
+      # TODO: nix-update
       GITHUB_OPENAPI =
         let
           openapi = fetchurl {
@@ -89,7 +90,7 @@ let
           }
           ''
             jq 'del(.paths[][].requestBody.content.["application/x-www-form-urlencoded"])' ${openapi} \
-              | openapi-tools filter --path "/search/repositories" > $out
+              | openapi-tools filter --path "/user/repos" > $out
           '';
 
       packages = [
