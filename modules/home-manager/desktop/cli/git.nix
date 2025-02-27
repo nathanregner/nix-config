@@ -14,6 +14,7 @@
     extraConfig = {
       alias = {
         # https://github.com/orgs/community/discussions/9632#discussioncomment-4702442
+        ddiff = "-c diff.external=difft diff";
         diff-refactor = ''
           -c color.diff.oldMoved='white dim'
           -c color.diff.oldMovedAlternative='white dim'
@@ -22,22 +23,36 @@
           -c color.diff.newMovedDimmed='white dim'
           -c color.diff.newMovedAlternativeDimmed='white dim'
           diff --ignore-blank-lines --color-moved=dimmed-zebra --color-moved-ws=ignore-all-space --minimal'';
-        difft = "difftool";
-        dlog = "!f() { GIT_EXTERNAL_DIFF=difft git log -p --ext-diff; }; f";
+        dlog = "-c diff.external=difft log --ext-diff";
+        dshow = "-c diff.external=difft show --ext-diff";
+      };
+      branch = {
+        sort = "-comitterdate";
       };
       commit = {
         verbose = true;
       };
       diff = {
         algorithm = "histogram";
+        colorMoved = "plain";
+        mnemonicPrefix = true;
+        renames = true;
         tool = lib.mkDefault "difftastic"; # https://difftastic.wilfred.me.uk/git.html
       };
       difftool = {
-        difftastic.cmd = ''difft "$LOCAL" "$REMOTE"'';
+        difftastic.cmd = ''difft "$MERGED" "$LOCAL" "abcdef1" "100644" "$REMOTE" "abcdef2" "100644"'';
         prompt = false;
+      };
+      fetch = {
+        all = true;
+        prune = true;
+        pruneTags = true;
       };
       include = {
         path = "${config.xdg.configHome}/git/local";
+      };
+      merge = {
+        conflictStyle = "zdiff3";
       };
       pager = {
         difftool = true;
@@ -52,7 +67,11 @@
         autostash = true;
       };
       rerere = {
+        autoupdate = true;
         enabled = true;
+      };
+      tag = {
+        sort = "version:refname";
       };
     };
     ignores = [
