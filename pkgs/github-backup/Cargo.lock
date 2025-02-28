@@ -382,6 +382,7 @@ dependencies = [
  "chrono",
  "color-eyre",
  "gix-config",
+ "http",
  "prettyplease",
  "progenitor",
  "progenitor-client",
