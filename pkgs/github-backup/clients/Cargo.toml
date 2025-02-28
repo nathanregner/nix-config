@@ -5,13 +5,13 @@ edition = "2024"
 
 [dependencies]
 chrono = { version = "0.4.38", features = ["serde"] }
-progenitor-client = { git = "https://github.com/nathanregner/progenitor" }
+progenitor-client = { version = "0.9.1" }
 reqwest = { version = "0.12", features = ["json", "stream"] }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 
 [build-dependencies]
 prettyplease = "0.2.22"
-progenitor = { git = "https://github.com/nathanregner/progenitor" }
+progenitor = { version = "0.9.1" }
 serde_json = "1.0"
 syn = "2.0"

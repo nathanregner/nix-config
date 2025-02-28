@@ -120,9 +120,9 @@ checksum = "ef657dfab802224e671f5818e9a4935f9b1957ed18e58292690cc39e7a4092a3"
 
 [[package]]
 name = "bytes"
-version = "1.8.0"
+version = "1.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9ac0150caa2ae65ca5bd83f25c7de183dea78d4d366469f148435e2acfbad0da"
+checksum = "f61dac84819c6588b558454b194026eb1f09c293b9036ae9b159e74e73ab6cf9"
 
 [[package]]
 name = "cc"
@@ -725,9 +725,9 @@ dependencies = [
 
 [[package]]
 name = "http"
-version = "1.1.0"
+version = "1.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "21b9ddb458710bc376481b842f5da65cdf31522de232c1ca8146abce2a358258"
+checksum = "f16ca2af56261c99fba8bac40a10251ce8188205a4c448fbb745a2e4daa76fea"
 dependencies = [
  "bytes",
  "fnv",
@@ -1005,9 +1005,9 @@ checksum = "ce23b50ad8242c51a442f3ff322d56b02f08852c77e4c0b4d3fd684abc89c683"
 
 [[package]]
 name = "indexmap"
-version = "2.6.0"
+version = "2.7.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "707907fe3c25f5424cce2cb7e1cbcafee6bdbe735ca90ef77c29e84591e5b9da"
+checksum = "8c9c992b02b5b4c94ea26e32fe5bccb7aa7d9f390ab5c1221ff895bc7ea8b652"
 dependencies = [
  "equivalent",
  "hashbrown 0.15.1",
@@ -1364,8 +1364,9 @@ dependencies = [
 
 [[package]]
 name = "progenitor"
-version = "0.8.0"
-source = "git+https://github.com/nathanregner/progenitor#b330e1688f12983d167802cca861bf3f313b83a8"
+version = "0.9.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "88f54bd2506c3e7b6e45b6ab16500abef551689021264f3be260ef7e295ac327"
 dependencies = [
  "progenitor-client",
  "progenitor-impl",
@@ -1374,8 +1375,9 @@ dependencies = [
 
 [[package]]
 name = "progenitor-client"
-version = "0.8.0"
-source = "git+https://github.com/nathanregner/progenitor#b330e1688f12983d167802cca861bf3f313b83a8"
+version = "0.9.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "fdae8df95f0b2a7d6159a9c43b7380016b8d3b0fc1ece46871ecd2e0087cfaf6"
 dependencies = [
  "bytes",
  "futures-core",
@@ -1388,8 +1390,9 @@ dependencies = [
 
 [[package]]
 name = "progenitor-impl"
-version = "0.8.0"
-source = "git+https://github.com/nathanregner/progenitor#b330e1688f12983d167802cca861bf3f313b83a8"
+version = "0.9.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "37adc80a94c9cae890e82deeeecc9d8f2a5cb153256caaf1bf0f03611e537214"
 dependencies = [
  "heck",
  "http",
@@ -1402,15 +1405,16 @@ dependencies = [
  "serde",
  "serde_json",
  "syn",
- "thiserror 1.0.69",
+ "thiserror 2.0.11",
  "typify",
  "unicode-ident",
 ]
 
 [[package]]
 name = "progenitor-macro"
-version = "0.8.0"
-source = "git+https://github.com/nathanregner/progenitor#b330e1688f12983d167802cca861bf3f313b83a8"
+version = "0.9.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "fc3b2b9f0d5ba58375c5e8e89d5dff949108e234c1d9f22a3336d2be4daaf292"
 dependencies = [
  "openapiv3",
  "proc-macro2",
@@ -2156,7 +2160,8 @@ checksum = "e421abadd41a4225275504ea4d6566923418b7f05506fbc9c0fe86ba7396114b"
 [[package]]
 name = "typify"
 version = "0.3.0"
-source = "git+https://github.com/oxidecomputer/typify#b61e6a3123543a006aa19e3387c532897ecd1594"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e03ba3643450cfd95a1aca2e1938fef63c1c1994489337998aff4ad771f21ef8"
 dependencies = [
  "typify-impl",
  "typify-macro",
@@ -2165,7 +2170,8 @@ dependencies = [
 [[package]]
 name = "typify-impl"
 version = "0.3.0"
-source = "git+https://github.com/oxidecomputer/typify#b61e6a3123543a006aa19e3387c532897ecd1594"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "bce48219a2f3154aaa2c56cbf027728b24a3c8fe0a47ed6399781de2b3f3eeaf"
 dependencies = [
  "heck",
  "log",
@@ -2184,7 +2190,8 @@ dependencies = [
 [[package]]
 name = "typify-macro"
 version = "0.3.0"
-source = "git+https://github.com/oxidecomputer/typify#b61e6a3123543a006aa19e3387c532897ecd1594"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "68b5780d745920ed73c5b7447496a9b5c42ed2681a9b70859377aec423ecf02b"
 dependencies = [
  "proc-macro2",
  "quote",

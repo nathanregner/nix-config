@@ -1,5 +1,5 @@
 use openapiv3::{
-    AdditionalProperties, ArrayType, MediaType, ObjectType, Operation, Parameter,
+    AdditionalProperties, ArrayType, Content, MediaType, ObjectType, Operation, Parameter,
     ParameterSchemaOrContent, PathItem, ReferenceOr, RequestBody, Response, Schema, SchemaKind,
     Type,
 };
@@ -12,7 +12,7 @@ pub trait Visit<'s> {
 
 impl<'s> Visit<'s> for Schema {
     fn visit(&self, visitor: &mut impl Visitor<'s>) {
-        visitor.visit_schema(&self)
+        visitor.visit_schema(self)
     }
 }
 
@@ -24,7 +24,7 @@ impl<'s> Visit<'s> for Box<Schema> {
 
 impl<'s> Visit<'s> for ObjectType {
     fn visit(&self, visitor: &mut impl Visitor<'s>) {
-        visitor.visit_object_type(&self)
+        visitor.visit_object_type(self)
     }
 }
 
@@ -62,9 +62,17 @@ where
     }
 }
 
-impl<'s> Visit<'s> for MediaType {
+impl<'s> Visit<'s> for Content {
     fn visit(&self, visitor: &mut impl Visitor<'s>) {
-        visitor.visit_media_type(self)
+        for (name, media_type) in self {
+            (name.as_str(), media_type).visit(visitor);
+        }
+    }
+}
+
+impl<'v, 's> Visit<'v> for (&'s str, &'s MediaType) {
+    fn visit(&self, visitor: &mut impl Visitor<'v>) {
+        visitor.visit_media_type(self.0, self.1)
     }
 }
 
@@ -155,24 +163,21 @@ pub trait Visitor<'s>: Sized {
             | Parameter::Path { parameter_data, .. }
             | Parameter::Cookie { parameter_data, .. } => parameter_data,
         };
-        if let ParameterSchemaOrContent::Schema(schema) = &parameter.format {
-            schema.visit(self)
+        match &parameter.format {
+            ParameterSchemaOrContent::Schema(schema) => schema.visit(self),
+            ParameterSchemaOrContent::Content(content) => content.visit(self),
         }
     }
 
     fn visit_response(&mut self, response: &Response) {
-        for (_, media_type) in &response.content {
-            media_type.visit(self)
-        }
+        response.content.visit(self);
     }
 
     fn visit_request_body(&mut self, request_body: &RequestBody) {
-        for (_, media_type) in &request_body.content {
-            media_type.visit(self)
-        }
+        request_body.content.visit(self)
     }
 
-    fn visit_media_type(&mut self, media_type: &MediaType) {
+    fn visit_media_type(&mut self, _name: &str, media_type: &MediaType) {
         if let MediaType {
             schema: Some(schema),
             ..

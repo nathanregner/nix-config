@@ -69,7 +69,7 @@ let
               -o openapi
             remarshal -if yaml -i openapi/openapi.yaml -of json \
               | jq 'del(.paths[][].requestBody.content.["text/plain"])' \
-              | openapi-tools filter --path "repos/migrate" --path "/repos/search" \
+              | openapi-tools filter --path "repos/migrate" --path "repos/search" \
               > $out
           '';
 

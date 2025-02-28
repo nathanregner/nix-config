@@ -66,7 +66,7 @@ fn filter_schema(openapi: OpenAPI, filter: cli::Filter) -> OpenAPI {
             let Some(operation_id) = operation.operation_id.as_ref() else {
                 continue;
             };
-            if any_match(&filter.operation_id, &operation_id) {
+            if any_match(&filter.operation_id, operation_id) {
                 visitor.visit_operation((path, method, operation));
             }
         }
@@ -103,7 +103,7 @@ impl<'s> Visitor<'s> for ComponentRefVisitor<'s> {
             }
         };
 
-        let Some(component) = ComponentRef::get(cr, &self.source) else {
+        let Some(component) = ComponentRef::get(cr, self.source) else {
             eprintln!("Component does not exist: {r}");
             return;
         };
@@ -122,10 +122,7 @@ impl<'s> Visitor<'s> for ComponentRefVisitor<'s> {
 
     fn visit_operation<'o: 's>(&mut self, (path, method, operation): OperationPath<'o>) {
         visitor::visit_operation(self, (path, method, operation));
-        let path = self
-            .paths
-            .entry(path.to_string())
-            .or_insert_with(PathItem::default);
+        let path = self.paths.entry(path.to_string()).or_default();
         *method.get_mut(path) = Some(operation.clone());
     }
 }

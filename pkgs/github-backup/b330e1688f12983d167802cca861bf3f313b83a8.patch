@@ -1,0 +1,22 @@
+From b330e1688f12983d167802cca861bf3f313b83a8 Mon Sep 17 00:00:00 2001
+From: Nathan Regner <nathanregner@gmail.com>
+Date: Wed, 27 Nov 2024 13:12:58 -0700
+Subject: [PATCH] disable check
+
+---
+ progenitor-impl/src/method.rs | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/progenitor-impl/src/method.rs b/progenitor-impl/src/method.rs
+index 02bdc945..c0f05ba8 100644
+--- a/progenitor-impl/src/method.rs
++++ b/progenitor-impl/src/method.rs
+@@ -1276,7 +1276,7 @@ impl Generator {
+ 
+         // TODO to deal with multiple response types, we'll need to create an
+         // enum type with variants for each of the response types.
+-        assert!(response_types.len() <= 1, "{:?}, {response_items:?}", method.operation_id);
++        // assert!(response_types.len() <= 1, "{:?}, {response_items:?}", method.operation_id);
+         let response_type = response_types
+             .into_iter()
+             .next()

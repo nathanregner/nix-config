@@ -130,10 +130,7 @@ impl FromStr for ComponentRef {
 }
 
 impl ComponentRef {
-    pub fn get<'s>(
-        ComponentRef { ty, name }: Self,
-        components: &'s Components,
-    ) -> Option<Component<'s>> {
+    pub fn get(ComponentRef { ty, name }: Self, components: &Components) -> Option<Component<'_>> {
         let ty = match ty {
             ComponentRefType::Schemas => ComponentType::Schema(components.schemas.get(&name)?),
             ComponentRefType::Responses => {
@@ -157,7 +154,7 @@ pub struct Component<'s> {
     pub ty: ComponentType<'s>,
 }
 
-impl<'s> Component<'s> {
+impl Component<'_> {
     pub fn insert(&self, components: &mut Components) -> bool {
         fn insert<T: Clone>(
             components: &mut IndexMap<String, T>,

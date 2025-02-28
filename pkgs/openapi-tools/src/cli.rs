@@ -28,6 +28,6 @@ pub struct Filter {
     #[arg(short, long)]
     pub path: Vec<Regex>,
     // TODO /// Regex to match against request/response media types
-    // #[arg(short, long)]
-    // pub media_type: Vec<Regex>,
+    #[arg(short, long)]
+    pub media_type: Vec<Regex>,
 }
