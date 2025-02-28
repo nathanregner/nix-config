@@ -1,27 +1,38 @@
+use crate::github;
+use clients::gitea::{self, types::MigrateRepoOptions};
 use color_eyre::eyre;
-use generated::{types::MigrateRepoOptions, Client};
+use http::{header::AUTHORIZATION, HeaderValue};
+use reqwest::header::HeaderMap;
 use url::Url;
 
-use crate::github;
+pub use gitea::types::Repository;
 
-pub use generated::types::Repository;
-
-#[allow(dead_code)]
-mod generated {
-    include!(concat!(env!("OUT_DIR"), "/gitea.rs"));
+pub struct Client {
+    client: gitea::Client,
+    github_access_token: String,
 }
 
-pub struct Gitea {
-    client: Client,
-    github_pat: String,
-}
-
-impl Gitea {
-    pub fn new(base_url: Url, github_pat: String) -> Self {
-        Self {
-            client: Client::new(base_url.as_str()),
-            github_pat,
-        }
+impl Client {
+    pub fn new(
+        base_url: &str,
+        access_token: String,
+        github_access_token: String,
+    ) -> eyre::Result<Self> {
+        let mut headers = HeaderMap::default();
+        headers.insert(AUTHORIZATION, {
+            let mut bearer = HeaderValue::from_str(&format!("Bearer {access_token}"))?;
+            bearer.set_sensitive(true);
+            bearer
+        });
+        Ok(Self {
+            client: gitea::Client::new_with_client(
+                base_url,
+                reqwest::Client::builder()
+                    .default_headers(headers)
+                    .build()?,
+            ),
+            github_access_token,
+        })
     }
 
     pub async fn list_all(&self) -> eyre::Result<Vec<Repository>> {
@@ -53,7 +64,7 @@ impl Gitea {
                 MigrateRepoOptions::builder()
                     .repo_name(&repo.name)
                     .clone_addr(&repo.clone_url)
-                    .auth_token(Some(self.github_pat.to_string()))
+                    .auth_token(Some(self.github_access_token.to_string()))
                     .mirror(true)
                     .private(true),
             )

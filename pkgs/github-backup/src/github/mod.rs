@@ -1,22 +1,16 @@
+use clients::github::{self, types::ReposListForAuthenticatedUserType};
 use color_eyre::eyre;
-use generated::{types::ReposListForAuthenticatedUserType, Client};
 use http::{header::AUTHORIZATION, HeaderValue};
 use reqwest::header::HeaderMap;
-use url::Url;
 
-#[allow(dead_code)]
-mod generated {
-    include!(concat!(env!("OUT_DIR"), "/github.rs"));
+pub use github::types::Repository;
+
+pub struct Client {
+    client: github::Client,
 }
 
-pub use generated::types::Repository;
-
-pub struct GitHub {
-    client: Client,
-}
-
-impl GitHub {
-    pub fn new(base_url: Url, access_token: String) -> eyre::Result<Self> {
+impl Client {
+    pub fn new(access_token: String) -> eyre::Result<Self> {
         let mut headers = HeaderMap::default();
         headers.insert(AUTHORIZATION, {
             let mut bearer = HeaderValue::from_str(&format!("Bearer {access_token}"))?;
@@ -24,7 +18,7 @@ impl GitHub {
             bearer
         });
         Ok(Self {
-            client: Client::new_with_client(
+            client: github::Client::new_with_client(
                 "https://api.github.com/",
                 reqwest::Client::builder()
                     .default_headers(headers)
