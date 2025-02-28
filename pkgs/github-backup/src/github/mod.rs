@@ -1,6 +1,8 @@
+use std::str::FromStr;
+
 use clients::github::{self, types::ReposListForAuthenticatedUserType};
 use color_eyre::eyre;
-use http::{header::AUTHORIZATION, HeaderValue};
+use http::{header, HeaderName, HeaderValue};
 use reqwest::header::HeaderMap;
 
 pub use github::types::Repository;
@@ -12,14 +14,20 @@ pub struct Client {
 impl Client {
     pub fn new(access_token: String) -> eyre::Result<Self> {
         let mut headers = HeaderMap::default();
-        headers.insert(AUTHORIZATION, {
+        headers.insert(header::AUTHORIZATION, {
             let mut bearer = HeaderValue::from_str(&format!("Bearer {access_token}"))?;
             bearer.set_sensitive(true);
             bearer
         });
+        headers.insert(header::ACCEPT, HeaderValue::from_str("application/json")?);
+        headers.insert(header::USER_AGENT, HeaderValue::from_str("nathanregner")?);
+        headers.insert(
+            HeaderName::from_str("X-GitHub-Api-Version")?,
+            HeaderValue::from_str("2022-11-28")?,
+        );
         Ok(Self {
             client: github::Client::new_with_client(
-                "https://api.github.com/",
+                "https://api.github.com",
                 reqwest::Client::builder()
                     .default_headers(headers)
                     .build()?,

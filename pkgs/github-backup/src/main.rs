@@ -24,7 +24,7 @@ async fn main() -> eyre::Result<()> {
 
     let github = github::Client::new(config.github_token.to_string())?;
     let gitea = gitea::Client::new(
-        "https://git.nregner.net",
+        "https://git.nregner.net/api/v1",
         config.gitea_token,
         config.github_token,
     )?;
