@@ -1,6 +1,6 @@
 ---@module "lazy"
 ---@type LazySpec
-return { -- https://cmp.saghen.dev/installation.html
+return { --[[ -- https://cmp.saghen.dev/installation.html
   "saghen/blink.cmp",
   dir = vim.g.nix.blink_cmp.dir,
   pin = true,
@@ -105,5 +105,5 @@ return { -- https://cmp.saghen.dev/installation.html
       },
     },
   },
-  opts_extend = { "sources.default" },
+  opts_extend = { "sources.default" }, ]]
 }
