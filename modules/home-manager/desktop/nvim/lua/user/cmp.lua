@@ -18,6 +18,8 @@ local buffer = {
 
 local lspkind = require("lspkind")
 
+local compare = cmp.config.compare
+
 cmp.setup({
   completion = { completeopt = "menu,menuone,noinsert" },
 
@@ -94,11 +96,21 @@ cmp.setup({
   sorting = {
     priority_weight = 2,
     comparators = {
-      cmp.config.compare.exact,
-      cmp.config.compare.score,
-      cmp.config.compare.offset,
-      cmp.config.compare.recently_used,
-      cmp.config.compare.kind,
+      -- cmp.config.compare.exact,
+      -- cmp.config.compare.score,
+      -- cmp.config.compare.recently_used,
+      -- cmp.config.compare.offset,
+      -- cmp.config.compare.kind,
+
+      -- compare.score_offset, -- not good at all
+      compare.exact,
+      compare.locality,
+      compare.recently_used,
+      compare.score, -- based on :  score = score + ((#sources - (source_index - 1)) * sorting.priority_weight)
+      compare.offset,
+      -- compare.scopes, -- what?
+      compare.sort_text,
+      -- compare.kind,
     },
   },
   sources = {
