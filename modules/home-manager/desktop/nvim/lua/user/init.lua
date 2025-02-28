@@ -215,6 +215,33 @@ require("lazy").setup({
   { "towolf/vim-helm", ft = "helm" },
 
   { "folke/neoconf.nvim", opts = {} },
+  
+  { -- Autocompletion
+    "hrsh7th/nvim-cmp",
+    event = "InsertEnter",
+    dependencies = {
+      -- Snippet Engine & its associated nvim-cmp source
+      {
+        "L3MON4D3/LuaSnip",
+        dir = vim.g.nix.luasnip.dir,
+        pin = true,
+        dependencies = {
+          -- https://github.com/rafamadriz/friendly-snippets
+          {
+            "rafamadriz/friendly-snippets",
+            config = function() require("luasnip.loaders.from_vscode").lazy_load() end,
+          },
+        },
+      },
+      "saadparwaiz1/cmp_luasnip",
+      "hrsh7th/cmp-nvim-lsp",
+      "hrsh7th/cmp-path",
+      "hrsh7th/cmp-buffer",
+      "hrsh7th/cmp-cmdline",
+      "onsails/lspkind.nvim",
+    },
+    config = function() require("user.cmp") end,
+  },
 
   { -- LSP Configuration & Plugins
     "neovim/nvim-lspconfig",
@@ -437,10 +464,13 @@ require("lazy").setup({
         },
       }
 
+      local capabilities = vim.lsp.protocol.make_client_capabilities()
+      capabilities = vim.tbl_deep_extend("force", capabilities, require("cmp_nvim_lsp").default_capabilities())
+
       for server_name, server_config in pairs(servers) do
         require("lspconfig")[server_name].setup({
           cmd = server_config.cmd,
-          capabilities = require("blink.cmp").get_lsp_capabilities(server_config.capabilities),
+          capabilities = capabilities,
           on_attach = on_attach,
           settings = server_config.settings,
           filetypes = server_config.filetypes,
