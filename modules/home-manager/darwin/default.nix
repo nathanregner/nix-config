@@ -9,6 +9,7 @@
   home.packages = with pkgs.unstable; [
     coreutils-full
     diffutils
+    findutils
     util-linux
   ];
 }
