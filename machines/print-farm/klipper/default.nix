@@ -43,7 +43,7 @@ in
     };
 
     environment.etc = {
-      "klipper/KAMP".source = "${pkgs.kamp}";
+      "klipper/KAMP".source = "${pkgs.klipper-pkgs.kamp}";
       "klipper/adxl.cfg".source = ./adxl.cfg;
       "klipper/printer.cfg".source = pkgs.writeText "printer.immutable.cfg" ''
         [include ${cfg.configFile}]
