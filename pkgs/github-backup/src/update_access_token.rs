@@ -10,13 +10,13 @@ use gix_config::Source;
 use tempdir::TempDir;
 use url::{Host, Url};
 
-pub fn update_mirrors(repositories: PathBuf, pat: &str) -> Result<u32> {
+pub fn update_access_token(repositories: PathBuf, access_token: &str) -> Result<u32> {
     let mut count = 0;
     let mut stack = vec![repositories];
     while let Some(dir) = stack.pop() {
         let config = dir.to_path_buf().join("config");
         if config.is_file() {
-            update_mirror(&config, pat)?;
+            update_repo(&config, access_token)?;
             count += 1;
             continue;
         }
@@ -30,10 +30,10 @@ pub fn update_mirrors(repositories: PathBuf, pat: &str) -> Result<u32> {
     Ok(count)
 }
 
-#[tracing::instrument(err, skip(pat))]
-fn update_mirror(config_path: &Path, pat: &str) -> Result<bool> {
+#[tracing::instrument(err, skip(access_token))]
+fn update_repo(config_path: &Path, access_token: &str) -> Result<bool> {
     let mut config = gix_config::File::from_path_no_includes(config_path.into(), Source::Local)?;
-    if update_mirror_pat(&mut config, &pat)? {
+    if update_remote(&mut config, access_token)? {
         let temp_dir = TempDir::new("git-config")?;
         let temp_config_path = temp_dir.path().join("config");
         let mut temp_file = File::create(&temp_config_path)?;
@@ -45,7 +45,7 @@ fn update_mirror(config_path: &Path, pat: &str) -> Result<bool> {
     Ok(false)
 }
 
-fn update_mirror_pat(config: &mut gix_config::File, pat: &str) -> Result<bool> {
+fn update_remote(config: &mut gix_config::File, access_token: &str) -> Result<bool> {
     let Ok(mut origin) = config.section_mut("remote", Some(b"origin".into())) else {
         return Ok(false);
     };
@@ -59,9 +59,10 @@ fn update_mirror_pat(config: &mut gix_config::File, pat: &str) -> Result<bool> {
     if let Some(Host::Domain("github.com")) = url.host()
         && url.path().starts_with("/nathanregner/")
         && let Some(password) = url.password()
-        && password != pat
+        && password != access_token
     {
-        url.set_password(Some(pat)).expect("should have host");
+        url.set_password(Some(access_token))
+            .expect("should have host");
         origin.set("url".try_into()?, url.to_string().as_bytes().into());
         return Ok(true);
     }
@@ -80,7 +81,7 @@ mod tests {
         let url = "https://github.com/nathanregner/public.git";
         let (repo, config_path) = init(url)?;
 
-        assert!(!update_mirror(&config_path, "github_pat_BBBBB")?);
+        assert!(!update_repo(&config_path, "github_pat_BBBBB")?);
         assert_eq!(
             get_remote(repo.path())?,
             format!("origin\t{url} (fetch)\norigin\t{url} (push)\n")
@@ -93,7 +94,7 @@ mod tests {
         let url = "https://oauth2:github_pat_AAAAA@github.com/nathanregner/test.git";
         let (repo, config_path) = init(url)?;
 
-        assert!(!update_mirror(&config_path, "github_pat_AAAAA")?);
+        assert!(!update_repo(&config_path, "github_pat_AAAAA")?);
         assert_eq!(
             get_remote(repo.path())?,
             format!("origin\t{url} (fetch)\norigin\t{url} (push)\n")
@@ -106,7 +107,7 @@ mod tests {
         let url = "https://oauth2:github_pat_AAAAA@github.com/nathanregner/test.git";
         let (repo, config_path) = init(url)?;
 
-        assert!(update_mirror(&config_path, "github_pat_BBBBB")?);
+        assert!(update_repo(&config_path, "github_pat_BBBBB")?);
         let url = "https://oauth2:github_pat_BBBBB@github.com/nathanregner/test.git";
         assert_eq!(
             get_remote(repo.path())?,
@@ -116,7 +117,7 @@ mod tests {
     }
 
     #[test]
-    fn update_mirrors_finds_repos() -> Result<()> {
+    fn update_access_token_finds_repos() -> Result<()> {
         let repos = TempDir::new("mirror-test")?;
 
         let repo = repos.path().join("owner").join("example");
@@ -136,7 +137,10 @@ mod tests {
             ])
             .output()?;
 
-        assert_eq!(update_mirrors(repos.path().into(), "github_pat_BBBBB")?, 1);
+        assert_eq!(
+            update_access_token(repos.path().into(), "github_pat_BBBBB")?,
+            1
+        );
         let url = "https://oauth2:github_pat_BBBBB@github.com/nathanregner/test.git";
         assert_eq!(
             get_remote(&repo)?,
