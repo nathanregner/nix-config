@@ -88,35 +88,11 @@ impl<'s> Visit<'s> for Response {
 
 pub trait Visitor<'s>: Sized {
     fn visit_path(&mut self, path: &str, path_item: &mut PathItem) {
-        for parameter in path_item.parameters.iter_mut() {
-            parameter.visit(self)
-        }
-
-        use Method::*;
-        for method in [Get, Put, Post, Delete, Options, Head, Patch, Trace] {
-            if let Some(operation) = method.get_mut(path_item) {
-                self.visit_operation(path, method, operation);
-            }
-        }
+        visit_path(self, path, path_item);
     }
 
     fn visit_schema(&mut self, schema: &mut Schema) {
-        match &mut schema.schema_kind {
-            SchemaKind::Type(t) => match t {
-                Type::Object(object) => self.visit_object_type(object),
-                Type::Array(array) => self.visit_array_type(array),
-                Type::String(_) | Type::Number(_) | Type::Integer(_) | Type::Boolean(_) => {}
-            },
-            SchemaKind::OneOf { one_of: schemas }
-            | SchemaKind::AllOf { all_of: schemas }
-            | SchemaKind::AnyOf { any_of: schemas } => {
-                for schema in schemas {
-                    schema.visit(self)
-                }
-            }
-            SchemaKind::Not { not } => not.visit(self),
-            SchemaKind::Any(_) => {}
-        }
+        visit_schema(self, schema);
     }
 
     fn visit_ref(&mut self, reference: &str);
@@ -143,16 +119,7 @@ pub trait Visitor<'s>: Sized {
     }
 
     fn visit_parameter(&mut self, parameter: &mut Parameter) {
-        let parameter = match parameter {
-            Parameter::Query { parameter_data, .. }
-            | Parameter::Header { parameter_data, .. }
-            | Parameter::Path { parameter_data, .. }
-            | Parameter::Cookie { parameter_data, .. } => parameter_data,
-        };
-        match &mut parameter.format {
-            ParameterSchemaOrContent::Schema(schema) => schema.visit(self),
-            ParameterSchemaOrContent::Content(content) => content.visit(self),
-        }
+        visit_parameter(self, parameter);
     }
 
     fn visit_response(&mut self, response: &mut Response) {
@@ -171,6 +138,51 @@ pub trait Visitor<'s>: Sized {
         {
             schema.visit(self)
         }
+    }
+}
+
+fn visit_path<'s>(visitor: &mut impl Visitor<'s>, path: &str, path_item: &mut PathItem) {
+    for parameter in path_item.parameters.iter_mut() {
+        parameter.visit(visitor)
+    }
+
+    use Method::*;
+    for method in [Get, Put, Post, Delete, Options, Head, Patch, Trace] {
+        if let Some(operation) = method.get_mut(path_item) {
+            visitor.visit_operation(path, method, operation);
+        }
+    }
+}
+
+fn visit_schema<'s>(visitor: &mut impl Visitor<'s>, schema: &mut Schema) {
+    match &mut schema.schema_kind {
+        SchemaKind::Type(t) => match t {
+            Type::Object(object) => visitor.visit_object_type(object),
+            Type::Array(array) => visitor.visit_array_type(array),
+            Type::String(_) | Type::Number(_) | Type::Integer(_) | Type::Boolean(_) => {}
+        },
+        SchemaKind::OneOf { one_of: schemas }
+        | SchemaKind::AllOf { all_of: schemas }
+        | SchemaKind::AnyOf { any_of: schemas } => {
+            for schema in schemas {
+                schema.visit(visitor)
+            }
+        }
+        SchemaKind::Not { not } => not.visit(visitor),
+        SchemaKind::Any(_) => {}
+    }
+}
+
+fn visit_parameter<'s>(visitor: &mut impl Visitor<'s>, parameter: &mut Parameter) {
+    let parameter = match parameter {
+        Parameter::Query { parameter_data, .. }
+        | Parameter::Header { parameter_data, .. }
+        | Parameter::Path { parameter_data, .. }
+        | Parameter::Cookie { parameter_data, .. } => parameter_data,
+    };
+    match &mut parameter.format {
+        ParameterSchemaOrContent::Schema(schema) => schema.visit(visitor),
+        ParameterSchemaOrContent::Content(content) => content.visit(visitor),
     }
 }
 
