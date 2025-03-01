@@ -7,46 +7,38 @@ use openapiv3::{
 use crate::ext::Method;
 
 pub trait Visit<'s> {
-    fn visit(&self, visitor: &mut impl Visitor<'s>);
+    fn visit(&mut self, visitor: &mut impl Visitor<'s>);
 }
 
 impl<'s> Visit<'s> for Schema {
-    fn visit(&self, visitor: &mut impl Visitor<'s>) {
+    fn visit(&mut self, visitor: &mut impl Visitor<'s>) {
         visitor.visit_schema(self)
     }
 }
 
 impl<'s> Visit<'s> for Box<Schema> {
-    fn visit(&self, visitor: &mut impl Visitor<'s>) {
+    fn visit(&mut self, visitor: &mut impl Visitor<'s>) {
         Schema::visit(self, visitor)
     }
 }
 
 impl<'s> Visit<'s> for ObjectType {
-    fn visit(&self, visitor: &mut impl Visitor<'s>) {
+    fn visit(&mut self, visitor: &mut impl Visitor<'s>) {
         visitor.visit_object_type(self)
     }
 }
 
 impl<'s> Visit<'s> for ArrayType {
-    fn visit(&self, visitor: &mut impl Visitor<'s>) {
+    fn visit(&mut self, visitor: &mut impl Visitor<'s>) {
         visitor.visit_array_type(self)
     }
 }
 
-pub type Path<'s> = (&'s str, &'s PathItem);
+pub type Path<'a, 'b> = (&'a str, &'b mut PathItem);
 
-impl<'s> Visit<'s> for Path<'s> {
-    fn visit(&self, visitor: &mut impl Visitor<'s>) {
-        visitor.visit_path(*self)
-    }
-}
-
-pub type OperationPath<'s> = (&'s str, Method, &'s Operation);
-
-impl<'s> Visit<'s> for OperationPath<'s> {
-    fn visit(&self, visitor: &mut impl Visitor<'s>) {
-        visitor.visit_operation(*self)
+impl<'s> Visit<'s> for Path<'s, 's> {
+    fn visit(&mut self, visitor: &mut impl Visitor<'s>) {
+        visitor.visit_path(self.0, self.1)
     }
 }
 
@@ -54,7 +46,7 @@ impl<'s, T> Visit<'s> for ReferenceOr<T>
 where
     T: Visit<'s>,
 {
-    fn visit(&self, visitor: &mut impl Visitor<'s>) {
+    fn visit(&mut self, visitor: &mut impl Visitor<'s>) {
         match self {
             ReferenceOr::Reference { reference } => visitor.visit_ref(reference),
             ReferenceOr::Item(item) => item.visit(visitor),
@@ -63,59 +55,53 @@ where
 }
 
 impl<'s> Visit<'s> for Content {
-    fn visit(&self, visitor: &mut impl Visitor<'s>) {
-        for (name, media_type) in self {
+    fn visit(&mut self, visitor: &mut impl Visitor<'s>) {
+        for (name, media_type) in self.iter_mut() {
             (name.as_str(), media_type).visit(visitor);
         }
     }
 }
 
-impl<'v, 's> Visit<'v> for (&'s str, &'s MediaType) {
-    fn visit(&self, visitor: &mut impl Visitor<'v>) {
+impl<'v, 's> Visit<'v> for (&'s str, &'s mut MediaType) {
+    fn visit(&mut self, visitor: &mut impl Visitor<'v>) {
         visitor.visit_media_type(self.0, self.1)
     }
 }
 
 impl<'s> Visit<'s> for Parameter {
-    fn visit(&self, visitor: &mut impl Visitor<'s>) {
+    fn visit(&mut self, visitor: &mut impl Visitor<'s>) {
         visitor.visit_parameter(self)
     }
 }
 
 impl<'s> Visit<'s> for RequestBody {
-    fn visit(&self, visitor: &mut impl Visitor<'s>) {
+    fn visit(&mut self, visitor: &mut impl Visitor<'s>) {
         visitor.visit_request_body(self)
     }
 }
 
 impl<'s> Visit<'s> for Response {
-    fn visit(&self, visitor: &mut impl Visitor<'s>) {
+    fn visit(&mut self, visitor: &mut impl Visitor<'s>) {
         visitor.visit_response(self)
     }
 }
 
 pub trait Visitor<'s>: Sized {
-    fn visit_path(&mut self, (path, path_item): Path<'s>) {
-        for parameter in &path_item.parameters {
+    fn visit_path(&mut self, path: &str, path_item: &mut PathItem) {
+        for parameter in path_item.parameters.iter_mut() {
             parameter.visit(self)
         }
 
-        macro_rules! visit_methods {
-            ($($method: ident),+) => {
-                $({
-                let method = Method::$method;
-                if let Some(operation) = method.get(&path_item) {
-                    (path, method, operation).visit(self);
-                }
-                })+
-            };
+        use Method::*;
+        for method in [Get, Put, Post, Delete, Options, Head, Patch, Trace] {
+            if let Some(operation) = method.get_mut(path_item) {
+                self.visit_operation(path, method, operation);
+            }
         }
-
-        visit_methods!(Get, Put, Post, Delete, Options, Head, Patch, Trace);
     }
 
-    fn visit_schema(&mut self, schema: &Schema) {
-        match &schema.schema_kind {
+    fn visit_schema(&mut self, schema: &mut Schema) {
+        match &mut schema.schema_kind {
             SchemaKind::Type(t) => match t {
                 Type::Object(object) => self.visit_object_type(object),
                 Type::Array(array) => self.visit_array_type(array),
@@ -135,49 +121,49 @@ pub trait Visitor<'s>: Sized {
 
     fn visit_ref(&mut self, reference: &str);
 
-    fn visit_object_type(&mut self, schema: &ObjectType) {
-        for (_, property) in &schema.properties {
+    fn visit_object_type(&mut self, schema: &mut ObjectType) {
+        for (_, property) in schema.properties.iter_mut() {
             property.visit(self)
         }
         if let Some(AdditionalProperties::Schema(additional_properties)) =
-            &schema.additional_properties
+            &mut schema.additional_properties
         {
-            (**additional_properties).visit(self)
+            additional_properties.visit(self)
         }
     }
 
-    fn visit_array_type(&mut self, schema: &ArrayType) {
-        if let Some(items) = &schema.items {
+    fn visit_array_type(&mut self, schema: &mut ArrayType) {
+        if let Some(items) = &mut schema.items {
             items.visit(self)
         }
     }
 
-    fn visit_operation<'o: 's>(&mut self, operation: OperationPath<'o>) {
-        visit_operation(self, operation)
+    fn visit_operation(&mut self, path: &str, method: Method, operation: &mut Operation) {
+        visit_operation(self, path, method, operation)
     }
 
-    fn visit_parameter(&mut self, parameter: &Parameter) {
+    fn visit_parameter(&mut self, parameter: &mut Parameter) {
         let parameter = match parameter {
             Parameter::Query { parameter_data, .. }
             | Parameter::Header { parameter_data, .. }
             | Parameter::Path { parameter_data, .. }
             | Parameter::Cookie { parameter_data, .. } => parameter_data,
         };
-        match &parameter.format {
+        match &mut parameter.format {
             ParameterSchemaOrContent::Schema(schema) => schema.visit(self),
             ParameterSchemaOrContent::Content(content) => content.visit(self),
         }
     }
 
-    fn visit_response(&mut self, response: &Response) {
+    fn visit_response(&mut self, response: &mut Response) {
         response.content.visit(self);
     }
 
-    fn visit_request_body(&mut self, request_body: &RequestBody) {
+    fn visit_request_body(&mut self, request_body: &mut RequestBody) {
         request_body.content.visit(self)
     }
 
-    fn visit_media_type(&mut self, _name: &str, media_type: &MediaType) {
+    fn visit_media_type(&mut self, _name: &str, media_type: &mut MediaType) {
         if let MediaType {
             schema: Some(schema),
             ..
@@ -190,18 +176,20 @@ pub trait Visitor<'s>: Sized {
 
 pub fn visit_operation<'s>(
     visitor: &mut impl Visitor<'s>,
-    (_path, _method, operation): OperationPath,
+    _path: &str,
+    _method: Method,
+    operation: &mut Operation,
 ) {
-    for parameter in &operation.parameters {
+    for parameter in &mut operation.parameters {
         parameter.visit(visitor)
     }
-    if let Some(body) = &operation.request_body {
+    if let Some(body) = &mut operation.request_body {
         body.visit(visitor)
     }
-    if let Some(response) = &operation.responses.default {
+    if let Some(response) = &mut operation.responses.default {
         response.visit(visitor)
     }
-    for (_, response) in &operation.responses.responses {
+    for (_, response) in &mut operation.responses.responses {
         response.visit(visitor)
     }
 }

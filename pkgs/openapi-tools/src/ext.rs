@@ -1,5 +1,4 @@
 use core::{fmt::Display, str::FromStr};
-use indexmap::IndexMap;
 use strum::EnumString;
 
 use color_eyre::eyre;
@@ -35,32 +34,19 @@ impl Display for Method {
 }
 
 impl Method {
-    pub fn iter(path: &PathItem) -> impl Iterator<Item = (Method, &Operation)> {
+    pub fn iter_mut(path: &mut PathItem) -> impl Iterator<Item = (Method, &mut Operation)> {
         [
-            (Method::Get, path.get.as_ref()),
-            (Method::Put, path.put.as_ref()),
-            (Method::Post, path.post.as_ref()),
-            (Method::Delete, path.delete.as_ref()),
-            (Method::Options, path.options.as_ref()),
-            (Method::Head, path.head.as_ref()),
-            (Method::Patch, path.patch.as_ref()),
-            (Method::Trace, path.trace.as_ref()),
+            (Method::Get, path.get.as_mut()),
+            (Method::Put, path.put.as_mut()),
+            (Method::Post, path.post.as_mut()),
+            (Method::Delete, path.delete.as_mut()),
+            (Method::Options, path.options.as_mut()),
+            (Method::Head, path.head.as_mut()),
+            (Method::Patch, path.patch.as_mut()),
+            (Method::Trace, path.trace.as_mut()),
         ]
         .into_iter()
         .filter_map(|(method, operation)| Some((method, operation?)))
-    }
-
-    pub fn get(self, path: &PathItem) -> Option<&Operation> {
-        match self {
-            Method::Get => path.get.as_ref(),
-            Method::Put => path.put.as_ref(),
-            Method::Post => path.post.as_ref(),
-            Method::Delete => path.delete.as_ref(),
-            Method::Options => path.options.as_ref(),
-            Method::Head => path.head.as_ref(),
-            Method::Patch => path.patch.as_ref(),
-            Method::Trace => path.trace.as_ref(),
-        }
     }
 
     pub fn get_mut(self, path: &mut PathItem) -> &mut Option<Operation> {
@@ -130,17 +116,19 @@ impl FromStr for ComponentRef {
 }
 
 impl ComponentRef {
-    pub fn get(ComponentRef { ty, name }: Self, components: &Components) -> Option<Component<'_>> {
+    pub fn get(ComponentRef { ty, name }: Self, components: &Components) -> Option<Component> {
         let ty = match ty {
-            ComponentRefType::Schemas => ComponentType::Schema(components.schemas.get(&name)?),
+            ComponentRefType::Schemas => {
+                ComponentType::Schema(components.schemas.get(&name)?.clone())
+            }
             ComponentRefType::Responses => {
-                ComponentType::Response(components.responses.get(&name)?)
+                ComponentType::Response(components.responses.get(&name)?.clone())
             }
             ComponentRefType::Parameters => {
-                ComponentType::Parameter(components.parameters.get(&name)?)
+                ComponentType::Parameter(components.parameters.get(&name)?.clone())
             }
             ComponentRefType::RequestBodies => {
-                ComponentType::RequestBody(components.request_bodies.get(&name)?)
+                ComponentType::RequestBody(components.request_bodies.get(&name)?.clone())
             }
             _ => return None,
         };
@@ -149,47 +137,18 @@ impl ComponentRef {
 }
 
 #[derive(Clone, Debug)]
-pub struct Component<'s> {
+pub struct Component {
     pub name: String,
-    pub ty: ComponentType<'s>,
+    pub ty: ComponentType,
 }
 
-impl Component<'_> {
-    pub fn insert(&self, components: &mut Components) -> bool {
-        fn insert<T: Clone>(
-            components: &mut IndexMap<String, T>,
-            name: &str,
-            component: &T,
-        ) -> bool {
-            if components.contains_key(name) {
-                return false;
-            }
-            components.insert(name.to_string(), component.clone());
-            true
-        }
-
-        match self.ty {
-            ComponentType::Schema(schema) => insert(&mut components.schemas, &self.name, schema),
-            ComponentType::Response(response) => {
-                insert(&mut components.responses, &self.name, response)
-            }
-            ComponentType::Parameter(parameter) => {
-                insert(&mut components.parameters, &self.name, parameter)
-            }
-            ComponentType::RequestBody(request_body) => {
-                insert(&mut components.request_bodies, &self.name, request_body)
-            }
-        }
-    }
-}
-
-#[derive(Copy, Clone, Debug)]
-pub enum ComponentType<'s> {
-    Schema(&'s ReferenceOr<Schema>),
-    Response(&'s ReferenceOr<Response>),
-    Parameter(&'s ReferenceOr<Parameter>),
+#[derive(Clone, Debug)]
+pub enum ComponentType {
+    Schema(ReferenceOr<Schema>),
+    Response(ReferenceOr<Response>),
+    Parameter(ReferenceOr<Parameter>),
     // Example,
-    RequestBody(&'s ReferenceOr<RequestBody>),
+    RequestBody(ReferenceOr<RequestBody>),
     // Header,
     // SecurityScheme,
     // Link,
@@ -197,8 +156,8 @@ pub enum ComponentType<'s> {
     // Extension,
 }
 
-impl<'s> From<ComponentType<'s>> for ComponentRefType {
-    fn from(ty: ComponentType<'s>) -> Self {
+impl From<ComponentType> for ComponentRefType {
+    fn from(ty: ComponentType) -> Self {
         match ty {
             ComponentType::Schema(_) => Self::Schemas,
             ComponentType::Response(_) => Self::Responses,

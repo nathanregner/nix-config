@@ -11,13 +11,14 @@ use core::{
 };
 use ext::{ComponentRef, ComponentType, Method};
 use indexmap::IndexMap;
-use openapiv3::{Components, OpenAPI, PathItem, Paths, ReferenceOr};
+use openapiv3::{Components, OpenAPI, Operation, PathItem, Paths, ReferenceOr};
 use regex::Regex;
 use std::{
+    collections::HashSet,
     fs::{self},
     io::{self, Read, Write},
 };
-use visitor::{OperationPath, Visit, Visitor};
+use visitor::{Visit, Visitor};
 
 type Result<T> = std::result::Result<T, Box<dyn Error>>;
 
@@ -43,7 +44,7 @@ fn any_match(set: &[Regex], haystack: &str) -> bool {
     set.iter().any(|r| r.is_match(haystack))
 }
 
-fn filter_schema(openapi: OpenAPI, filter: cli::Filter) -> OpenAPI {
+fn filter_schema(mut openapi: OpenAPI, filter: cli::Filter) -> OpenAPI {
     let components = openapi.components.unwrap_or_default();
     let mut visitor = ComponentRefVisitor {
         source: &components,
@@ -51,23 +52,24 @@ fn filter_schema(openapi: OpenAPI, filter: cli::Filter) -> OpenAPI {
             extensions: components.extensions.clone(),
             ..Default::default()
         },
+        visited: HashSet::default(),
         paths: Default::default(),
     };
 
-    for (path, path_item) in &openapi.paths.paths {
+    for (path, path_item) in openapi.paths.paths.iter_mut() {
         let ReferenceOr::Item(path_item) = path_item else {
             continue; // TODO: resolve ref?
         };
-        for (method, operation) in Method::iter(path_item) {
+        for (method, operation) in Method::iter_mut(path_item) {
             if any_match(&filter.path, &format!("{path}:{method}")) {
-                visitor.visit_operation((path, method, operation));
+                visitor.visit_operation(path, method, operation);
                 continue;
             }
             let Some(operation_id) = operation.operation_id.as_ref() else {
                 continue;
             };
             if any_match(&filter.operation_id, operation_id) {
-                visitor.visit_operation((path, method, operation));
+                visitor.visit_operation(path, method, operation);
             }
         }
     }
@@ -89,6 +91,7 @@ fn filter_schema(openapi: OpenAPI, filter: cli::Filter) -> OpenAPI {
 struct ComponentRefVisitor<'s> {
     source: &'s Components,
 
+    visited: HashSet<ComponentRef>,
     components: Components,
     paths: IndexMap<String, PathItem>,
 }
@@ -103,25 +106,38 @@ impl<'s> Visitor<'s> for ComponentRefVisitor<'s> {
             }
         };
 
+        if !self.visited.insert(cr.clone()) {
+            return;
+        }
+
         let Some(component) = ComponentRef::get(cr, self.source) else {
             eprintln!("Component does not exist: {r}");
             return;
         };
 
-        if !component.insert(&mut self.components) {
-            return;
-        }
-
+        let name = component.name;
         match component.ty {
-            ComponentType::Schema(c) => Visit::visit(c, self),
-            ComponentType::Response(c) => Visit::visit(c, self),
-            ComponentType::Parameter(c) => Visit::visit(c, self),
-            ComponentType::RequestBody(c) => Visit::visit(c, self),
-        }
+            ComponentType::Schema(mut schema) => {
+                Visit::visit(&mut schema, self);
+                self.components.schemas.insert(name, schema);
+            }
+            ComponentType::Response(mut response) => {
+                Visit::visit(&mut response, self);
+                self.components.responses.insert(name, response);
+            }
+            ComponentType::Parameter(mut parameter) => {
+                Visit::visit(&mut parameter, self);
+                self.components.parameters.insert(name, parameter);
+            }
+            ComponentType::RequestBody(mut request_body) => {
+                Visit::visit(&mut request_body, self);
+                self.components.request_bodies.insert(name, request_body);
+            }
+        };
     }
 
-    fn visit_operation<'o: 's>(&mut self, (path, method, operation): OperationPath<'o>) {
-        visitor::visit_operation(self, (path, method, operation));
+    fn visit_operation(&mut self, path: &str, method: Method, operation: &mut Operation) {
+        visitor::visit_operation(self, path, method, operation);
         let path = self.paths.entry(path.to_string()).or_default();
         *method.get_mut(path) = Some(operation.clone());
     }
