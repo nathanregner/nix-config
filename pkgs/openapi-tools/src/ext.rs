@@ -34,19 +34,19 @@ impl Display for Method {
 }
 
 impl Method {
-    pub fn iter_mut(path: &mut PathItem) -> impl Iterator<Item = (Method, &mut Operation)> {
+    pub fn iter_mut(path: &mut PathItem) -> impl Iterator<Item = (Method, &mut Option<Operation>)> {
         [
-            (Method::Get, path.get.as_mut()),
-            (Method::Put, path.put.as_mut()),
-            (Method::Post, path.post.as_mut()),
-            (Method::Delete, path.delete.as_mut()),
-            (Method::Options, path.options.as_mut()),
-            (Method::Head, path.head.as_mut()),
-            (Method::Patch, path.patch.as_mut()),
-            (Method::Trace, path.trace.as_mut()),
+            (Method::Get, &mut path.get),
+            (Method::Put, &mut path.put),
+            (Method::Post, &mut path.post),
+            (Method::Delete, &mut path.delete),
+            (Method::Options, &mut path.options),
+            (Method::Head, &mut path.head),
+            (Method::Patch, &mut path.patch),
+            (Method::Trace, &mut path.trace),
         ]
         .into_iter()
-        .filter_map(|(method, operation)| Some((method, operation?)))
+        .map(|(method, operation)| (method, operation))
     }
 
     pub fn get_mut(self, path: &mut PathItem) -> &mut Option<Operation> {

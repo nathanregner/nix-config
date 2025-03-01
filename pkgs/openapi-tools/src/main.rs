@@ -1,24 +1,22 @@
+#![feature(let_chains)]
+
 mod cli;
 mod ext;
 mod visitor;
 
 use clap::Parser;
-use cli::Cmd;
-use core::{
-    error::Error,
-    iter::{IntoIterator, Iterator},
-    option::Option::Some,
-};
-use ext::{ComponentRef, ComponentType, Method};
+use cli::{Cmd, Filter};
+use core::{error::Error, iter::Iterator, option::Option::Some};
+use ext::{ComponentRef, Method};
 use indexmap::IndexMap;
-use openapiv3::{Components, OpenAPI, Operation, PathItem, Paths, ReferenceOr};
+use openapiv3::{Components, OpenAPI, PathItem, Paths, ReferenceOr};
 use regex::Regex;
 use std::{
     collections::HashSet,
     fs::{self},
     io::{self, Read, Write},
 };
-use visitor::{Visit, Visitor};
+use visitor::{visit_paths, Visitor};
 
 type Result<T> = std::result::Result<T, Box<dyn Error>>;
 
@@ -44,59 +42,59 @@ fn any_match(set: &[Regex], haystack: &str) -> bool {
     set.iter().any(|r| r.is_match(haystack))
 }
 
-fn filter_schema(mut openapi: OpenAPI, filter: cli::Filter) -> OpenAPI {
-    let components = openapi.components.unwrap_or_default();
+fn filter_schema(mut open_api: OpenAPI, filter: cli::Filter) -> OpenAPI {
     let mut visitor = ComponentRefVisitor {
-        source: &components,
-        components: Components {
-            extensions: components.extensions.clone(),
-            ..Default::default()
-        },
+        filter,
         visited: HashSet::default(),
         paths: Default::default(),
     };
 
-    for (path, path_item) in openapi.paths.paths.iter_mut() {
-        let ReferenceOr::Item(path_item) = path_item else {
-            continue; // TODO: resolve ref?
-        };
-        for (method, operation) in Method::iter_mut(path_item) {
-            if any_match(&filter.path, &format!("{path}:{method}")) {
-                visitor.visit_operation(path, method, operation);
-                continue;
-            }
-            let Some(operation_id) = operation.operation_id.as_ref() else {
-                continue;
-            };
-            if any_match(&filter.operation_id, operation_id) {
-                visitor.visit_operation(path, method, operation);
-            }
-        }
-    }
-
-    OpenAPI {
-        components: Some(visitor.components),
-        paths: Paths {
-            extensions: openapi.paths.extensions,
-            paths: visitor
-                .paths
-                .into_iter()
-                .map(|(path, path_item)| (path, ReferenceOr::Item(path_item)))
-                .collect(),
-        },
-        ..openapi
-    }
+    visitor.visit_paths(&mut open_api.paths);
+    // if let Some(components) = &mut open_api.components {
+    //     components.extensions
+    // }
+    open_api
 }
 
-struct ComponentRefVisitor<'s> {
-    source: &'s Components,
-
+struct ComponentRefVisitor {
+    filter: Filter, // TODO: just take 2 fields
     visited: HashSet<ComponentRef>,
-    components: Components,
     paths: IndexMap<String, PathItem>,
 }
 
 impl<'s> Visitor<'s> for ComponentRefVisitor<'s> {
+    fn visit_paths(&mut self, paths: &mut Paths) {
+        // filter operations
+        paths.paths.retain(|path, path_item| {
+            let ReferenceOr::Item(path_item) = path_item else {
+                return false; // resolve ref?
+            };
+
+            for (method, method_op) in Method::iter_mut(path_item) {
+                let Some(op) = method_op else {
+                    continue;
+                };
+
+                if any_match(&self.filter.path, &format!("{path}:{method}")) {
+                    continue;
+                }
+
+                if let Some(operation_id) = &op.operation_id
+                    && any_match(&self.filter.operation_id, &operation_id)
+                {
+                    continue;
+                }
+
+                *method_op = None;
+            }
+
+            Method::iter_mut(path_item).any(|(_, method_op)| method_op.is_some())
+        });
+
+        // filter components
+        visit_paths(self, paths)
+    }
+
     fn visit_ref(&mut self, r: &str) {
         let cr: ComponentRef = match r.parse() {
             Ok(r) => r,
@@ -105,40 +103,6 @@ impl<'s> Visitor<'s> for ComponentRefVisitor<'s> {
                 return;
             }
         };
-
-        if !self.visited.insert(cr.clone()) {
-            return;
-        }
-
-        let Some(component) = ComponentRef::get(cr, self.source) else {
-            eprintln!("Component does not exist: {r}");
-            return;
-        };
-
-        let name = component.name;
-        match component.ty {
-            ComponentType::Schema(mut schema) => {
-                Visit::visit(&mut schema, self);
-                self.components.schemas.insert(name, schema);
-            }
-            ComponentType::Response(mut response) => {
-                Visit::visit(&mut response, self);
-                self.components.responses.insert(name, response);
-            }
-            ComponentType::Parameter(mut parameter) => {
-                Visit::visit(&mut parameter, self);
-                self.components.parameters.insert(name, parameter);
-            }
-            ComponentType::RequestBody(mut request_body) => {
-                Visit::visit(&mut request_body, self);
-                self.components.request_bodies.insert(name, request_body);
-            }
-        };
-    }
-
-    fn visit_operation(&mut self, path: &str, method: Method, operation: &mut Operation) {
-        visitor::visit_operation(self, path, method, operation);
-        let path = self.paths.entry(path.to_string()).or_default();
-        *method.get_mut(path) = Some(operation.clone());
+        self.visited.insert(cr);
     }
 }

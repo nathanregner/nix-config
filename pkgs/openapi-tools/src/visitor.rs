@@ -1,13 +1,19 @@
 use openapiv3::{
     AdditionalProperties, ArrayType, Content, MediaType, ObjectType, Operation, Parameter,
-    ParameterSchemaOrContent, PathItem, ReferenceOr, RequestBody, Response, Schema, SchemaKind,
-    Type,
+    ParameterSchemaOrContent, PathItem, Paths, ReferenceOr, RequestBody, Response, Schema,
+    SchemaKind, Type,
 };
 
 use crate::ext::Method;
 
 pub trait Visit<'s> {
     fn visit(&mut self, visitor: &mut impl Visitor<'s>);
+}
+
+impl<'s> Visit<'s> for Paths {
+    fn visit(&mut self, visitor: &mut impl Visitor<'s>) {
+        visitor.visit_paths(self)
+    }
 }
 
 impl<'s> Visit<'s> for Schema {
@@ -18,7 +24,7 @@ impl<'s> Visit<'s> for Schema {
 
 impl<'s> Visit<'s> for Box<Schema> {
     fn visit(&mut self, visitor: &mut impl Visitor<'s>) {
-        Schema::visit(self, visitor)
+        visitor.visit_schema(self)
     }
 }
 
@@ -87,6 +93,10 @@ impl<'s> Visit<'s> for Response {
 }
 
 pub trait Visitor<'s>: Sized {
+    fn visit_paths(&mut self, paths: &mut Paths) {
+        visit_paths(self, paths)
+    }
+
     fn visit_path(&mut self, path: &str, path_item: &mut PathItem) {
         visit_path(self, path, path_item);
     }
@@ -183,6 +193,19 @@ fn visit_parameter<'s>(visitor: &mut impl Visitor<'s>, parameter: &mut Parameter
     match &mut parameter.format {
         ParameterSchemaOrContent::Schema(schema) => schema.visit(visitor),
         ParameterSchemaOrContent::Content(content) => content.visit(visitor),
+    }
+}
+
+pub fn visit_paths<'s>(visitor: &mut impl Visitor<'s>, paths: &mut Paths) {
+    for (path, path_item) in paths.paths.iter_mut() {
+        let ReferenceOr::Item(path_item) = path_item else {
+            continue; // TODO: resolve ref
+        };
+        for (method, operation) in Method::iter_mut(path_item) {
+            if let Some(operation) = operation {
+                visitor.visit_operation(path, method, operation);
+            }
+        }
     }
 }
 
