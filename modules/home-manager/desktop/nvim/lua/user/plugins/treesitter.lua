@@ -120,15 +120,25 @@ return {
     end,
     opts = {
       sortables = {
+        graphql = {
+          argument = { node = "argument", ordinal = "name" },
+          field = { node = "field_definition", ordinal = "name" },
+          fragments = { node = "definition", ordinal = "fragment_definition" },
+          selection = { node = "selection", ordinal = "name" },
+          variable = { node = "variable_definition", ordinal = "name" },
+        },
         java = {
           annotation_array = { node = "class_literal" },
           annotation_element = { node = "element_value_pair" },
         },
         javascript = {
+          -- TODO: merge
           keys = { node = "pair" },
+          shorthand = { node = "shorthand_property_identifier" },
         },
         javascriptreact = {
           keys = { node = "pair" },
+          shorthand = { node = "shorthand_property_identifier" },
         },
         nix = {
           -- TODO: inherit(a) b c d;
