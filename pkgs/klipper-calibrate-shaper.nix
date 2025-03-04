@@ -4,7 +4,7 @@
   writeShellApplication,
 }:
 writeShellApplication {
-  name = "calibrate_shaper";
+  name = "klipper-calibrate-shaper";
   runtimeInputs = [
     (python3.withPackages (ps: [
       ps.numpy

@@ -17,7 +17,7 @@
   };
 
   environment.etc = {
-    "klipper/KAMP".source = "${pkgs.kamp.src}/Configuration";
+    "klipper/KAMP".source = pkgs.klipper-adaptive-meshing-purging;
     "klipper/printer.cfg".source = pkgs.writeText "printer.immutable.cfg" ''
       [include ${./printer.cfg}]
       [include ${./kamp.cfg}]
