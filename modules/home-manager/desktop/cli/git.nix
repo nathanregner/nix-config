@@ -27,7 +27,7 @@
         dshow = "-c diff.external=difft show --ext-diff";
       };
       branch = {
-        sort = "-comitterdate";
+        sort = "-committerdate";
       };
       commit = {
         verbose = true;
