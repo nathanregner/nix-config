@@ -62,7 +62,6 @@ in
         ps: propagateBuildInputs [ ps.busted ];
 
       lua.globals = {
-        blink_cmp.dir = "${pkgs.unstable.blink-cmp}";
         luasnip.dir = "${pkgs.unstable.vimPlugins.luasnip}";
       };
 
