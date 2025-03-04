@@ -8,14 +8,13 @@
 {
   name,
   text,
-  runtimeInputs ? [ ],
-  checkPhase ? null,
-}:
+  ...
+}@args:
 let
   script = writeText "script.clj" text;
 in
 writeShellApplication {
-  inherit name runtimeInputs;
+  inherit name;
   text = ''
     exec ${babashka}/bin/bb ${script} $@
   '';
@@ -23,3 +22,7 @@ writeShellApplication {
     ${clj-kondo}/bin/clj-kondo --config '{:linters {:namespace-name-mismatch {:level :off}}}' --lint ${script}
   '';
 }
+// builtins.removeAttrs args [
+  "name"
+  "text"
+]
