@@ -25,6 +25,9 @@ let
       # https://github.com/NixOS/nixpkgs/issues/154163#issuecomment-1350599022
       makeModulesClosure = x: prev.makeModulesClosure (x // { allowMissing = true; });
 
+      # FIXME: darwin build
+      nodejs_latest = warnIfOutdated prev.nodejs_latest prev.nodejs_22;
+
       # TODO: remove once https://github.com/NixOS/nixpkgs/issues/380828
       python3 = prev.python3.override {
         packageOverrides = pyfinal: pyprev: {
