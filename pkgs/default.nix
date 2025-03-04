@@ -10,7 +10,5 @@ let
 in
 packages
 // {
-  klipper-pkgs = lib.recurseIntoAttrs packages.klipper-pkgs;
-
   update-pkgs = pkgs.unstable.callPackage ./update-pkgs { inherit packages; };
 }
