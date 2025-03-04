@@ -8,10 +8,9 @@ let
     directory = ./.;
   };
 in
-lib.recurseIntoAttrs (
-  packages
-  // {
-    klipper-pkgs = lib.recurseIntoAttrs packages.klipper-pkgs;
-    # klipper-pkgs = lib.makeScope pkgs.newScope (_: packages.klipper-pkgs);
-  }
-)
+packages
+// {
+  klipper-pkgs = lib.recurseIntoAttrs packages.klipper-pkgs;
+
+  update-pkgs = pkgs.unstable.callPackage ./update-pkgs { inherit packages; };
+}
