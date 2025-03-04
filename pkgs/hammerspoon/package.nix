@@ -31,6 +31,9 @@ stdenvNoCC.mkDerivation (finalAttrs: {
     mkdir -p "$out/Applications/${finalAttrs.sourceRoot}"
     cp -R . "$out/Applications/${finalAttrs.sourceRoot}"
 
+    mkdir -p $out/bin
+    ln -s $out/Applications/Hammerspoon.app/Contents/MacOS/Hammerspoon $out/bin/hammerspoon
+
     runHook postInstall
   '';
 
