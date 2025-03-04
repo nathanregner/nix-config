@@ -50,6 +50,7 @@ in
         inherit (pkgs.unstable)
           emmet-language-server
           gopls
+          graphql-language-service-cli
           harper
           helm-ls
           libclang
@@ -60,11 +61,6 @@ in
           vscode-langservers-extracted
           vtsls
           yaml-language-server
-          ;
-
-        # FIXME https://github.com/NixOS/nixpkgs/commit/776868ce712918511e17fe26abcf2a5254a4a3f9
-        inherit (inputs.nixpkgs.legacyPackages.${pkgs.system}.nodejs.pkgs)
-          graphql-language-service-cli
           ;
 
         # formatters/linters
