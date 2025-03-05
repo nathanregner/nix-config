@@ -18,8 +18,8 @@ stdenvNoCC.mkDerivation (finalAttrs: {
   src = fetchFromGitHub {
     owner = "Hammerspoon";
     repo = "hammerspoon";
-    rev = "v${version}";
-    hash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
+    rev = finalAttrs.version;
+    hash = "sha256-Uy6InmbUGcwEVo13yDhfRLX5RO2WM9UF+3EMhP7y4kM=";
   };
 
   nativeBuildInputs = [
@@ -37,9 +37,12 @@ stdenvNoCC.mkDerivation (finalAttrs: {
       --replace-fail 'WEBSITE_HOME="$(greadlink -f "''${HAMMERSPOON_HOME}/../website")"' 'WEBSITE_HOME="$out/website"'
   '';
 
+  env = {
+    IS_CI = "1";
+  };
+
   buildPhase = ''
-    IS_CI=1 \
-      bash -x -o pipefail ./scripts/build.sh release -s Release -c Release
+    bash -x -o pipefail ./scripts/build.sh release -s Release -c Release
   '';
 
   installPhase = ''
@@ -57,7 +60,7 @@ stdenvNoCC.mkDerivation (finalAttrs: {
     homepage = "http://www.hammerspoon.org";
     changelog = "http://www.hammerspoon.org/releasenotes/${finalAttrs.version}.html";
     license = with licenses; [ mit ];
-    # maintainers = with maintainers; [ afh ];
+    maintainers = with maintainers; [ nathanregner ];
     platforms = lib.platforms.darwin;
   };
 }
