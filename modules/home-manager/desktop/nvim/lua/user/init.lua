@@ -280,6 +280,10 @@ require("lazy").setup({
 
       local util = require("lspconfig.util")
 
+      --- @class (partial) LspConfig : vim.lsp.ClientConfig
+      --- @field root_dir? string | function
+      ---
+      --- @type { [string]: LspConfig }
       local servers = {
         clangd = {
           cmd = { -- https://www.reddit.com/r/neovim/comments/12qbcua/multiple_different_client_offset_encodings/
@@ -355,6 +359,14 @@ require("lazy").setup({
             },
           },
         },
+        lua_ls = {
+          Lua = {
+            workspace = { checkThirdParty = false },
+            telemetry = { enable = false },
+            -- NOTE: toggle below to ignore Lua_LS's noisy `missing-fields` warnings
+            -- diagnostics = { disable = { 'missing-fields' } },
+          },
+        },
         nil_ls = {},
         nushell = {},
         pyright = {},
@@ -411,15 +423,6 @@ require("lazy").setup({
               },
               schemas = require("schemastore").yaml.schemas(),
             },
-          },
-        },
-
-        lua_ls = {
-          Lua = {
-            workspace = { checkThirdParty = false },
-            telemetry = { enable = false },
-            -- NOTE: toggle below to ignore Lua_LS's noisy `missing-fields` warnings
-            -- diagnostics = { disable = { 'missing-fields' } },
           },
         },
       }
