@@ -310,6 +310,21 @@ require("lazy").setup({
         end
       end
 
+      local downgrade_js_errors = function(method)
+        local default_diagnostic_handler = vim.lsp.handlers[method]
+        return function(err, result, context, config)
+          -- local log = require("vim.lsp.log")
+          if result.uri:match(".*.js$") then
+            -- log.error(result.diagnostics)
+            for _, value in ipairs(result.diagnostics) do
+              if value.severity == 1 then value.severity = 3 end
+            end
+          end
+
+          return default_diagnostic_handler(err, result, context, config)
+        end
+      end
+
       local util = require("lspconfig.util")
 
       --- @class (partial) LspConfig : vim.lsp.ClientConfig
@@ -436,10 +451,6 @@ require("lazy").setup({
           root_dir = util.root_pattern(".terraform", ".terraform.lock.hcl", ".git", ".tflint.hcl"),
         },
         vtsls = vim.tbl_deep_extend("error", require("vtsls").lspconfig.default_config, {
-          settings = {
-            -- https://github.com/microsoft/vscode/issues/13953
-            typescript = { tsserver = { experimental = { enableProjectDiagnostics = true } } },
-          },
           capabilities = {
             workspace = {
               didChangeWorkspaceFolders = {
@@ -448,6 +459,14 @@ require("lazy").setup({
                 dynamicRegistration = true,
               },
             },
+          },
+          handlers = {
+            ["textDocument/publishDiagnostics"] = downgrade_js_errors("textDocument/publishDiagnostics"),
+            ["workspace/publishDiagnostics"] = downgrade_js_errors("workspace/publishDiagnostics"),
+          },
+          settings = {
+            -- https://github.com/microsoft/vscode/issues/13953
+            typescript = { tsserver = { experimental = { enableProjectDiagnostics = true } } },
           },
         }),
         yamlls = {
@@ -471,15 +490,10 @@ require("lazy").setup({
       capabilities = vim.tbl_deep_extend("force", capabilities, require("cmp_nvim_lsp").default_capabilities())
 
       for server_name, server_config in pairs(servers) do
-        require("lspconfig")[server_name].setup({
-          cmd = server_config.cmd,
+        require("lspconfig")[server_name].setup(vim.tbl_deep_extend("error", {
           capabilities = capabilities,
           on_attach = on_attach,
-          settings = server_config.settings,
-          filetypes = server_config.filetypes,
-          init_options = server_config.init_options,
-          root_dir = server_config.root_dir,
-        })
+        }, server_config))
       end
     end,
   },
