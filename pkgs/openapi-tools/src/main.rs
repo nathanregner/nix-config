@@ -7,9 +7,12 @@ mod visitor;
 use clap::Parser;
 use cli::{Cmd, Filter};
 use core::{error::Error, iter::Iterator, option::Option::Some};
-use ext::{ComponentRef, Method};
-use indexmap::IndexMap;
-use openapiv3::{Components, OpenAPI, PathItem, Paths, ReferenceOr};
+use enum_map::EnumMap;
+use ext::{Component, ComponentRef, ComponentType, Method};
+use openapiv3::{
+    Callback, Components, Example, Header, Link, OpenAPI, Parameter, Paths, ReferenceOr,
+    RequestBody, Response, Schema, SecurityScheme,
+};
 use regex::Regex;
 use std::{
     collections::HashSet,
@@ -42,27 +45,29 @@ fn any_match(set: &[Regex], haystack: &str) -> bool {
     set.iter().any(|r| r.is_match(haystack))
 }
 
-fn filter_schema(mut open_api: OpenAPI, filter: cli::Filter) -> OpenAPI {
+fn filter_schema(mut api: OpenAPI, filter: cli::Filter) -> OpenAPI {
     let mut visitor = ComponentRefVisitor {
         filter,
-        visited: HashSet::default(),
-        paths: Default::default(),
+        visited: EnumMap::default(),
     };
 
-    visitor.visit_paths(&mut open_api.paths);
-    // if let Some(components) = &mut open_api.components {
-    //     components.extensions
-    // }
-    open_api
+    visitor.visit_api(&mut api);
+    api
 }
 
 struct ComponentRefVisitor {
-    filter: Filter, // TODO: just take 2 fields
-    visited: HashSet<ComponentRef>,
-    paths: IndexMap<String, PathItem>,
+    filter: Filter,
+    visited: EnumMap<ComponentType, HashSet<String>>,
 }
 
-impl<'s> Visitor<'s> for ComponentRefVisitor<'s> {
+impl Visitor<'_> for ComponentRefVisitor {
+    fn visit_api(&mut self, api: &mut OpenAPI) {
+        self.visit_paths(&mut api.paths);
+        if let Some(components) = &mut api.components {
+            self.visit_components(components);
+        }
+    }
+
     fn visit_paths(&mut self, paths: &mut Paths) {
         // filter operations
         paths.paths.retain(|path, path_item| {
@@ -80,7 +85,7 @@ impl<'s> Visitor<'s> for ComponentRefVisitor<'s> {
                 }
 
                 if let Some(operation_id) = &op.operation_id
-                    && any_match(&self.filter.operation_id, &operation_id)
+                    && any_match(&self.filter.operation_id, operation_id)
                 {
                     continue;
                 }
@@ -103,6 +108,24 @@ impl<'s> Visitor<'s> for ComponentRefVisitor<'s> {
                 return;
             }
         };
-        self.visited.insert(cr);
+        self.visited[cr.ty].insert(cr.name);
+    }
+
+    fn visit_components(&mut self, components: &mut Components) {
+        self.retain::<Schema>(components);
+        self.retain::<RequestBody>(components);
+        self.retain::<Parameter>(components);
+        self.retain::<Response>(components);
+        self.retain::<Example>(components);
+        self.retain::<Header>(components);
+        self.retain::<SecurityScheme>(components);
+        self.retain::<Link>(components);
+        self.retain::<Callback>(components);
+    }
+}
+
+impl ComponentRefVisitor {
+    fn retain<T: Component>(&mut self, components: &mut Components) {
+        T::get_in_mut(components).retain(|name, _| self.visited[T::COMPONENT_TYPE].contains(name));
     }
 }

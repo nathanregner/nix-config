@@ -1,7 +1,8 @@
+use indexmap::IndexMap;
 use openapiv3::{
-    AdditionalProperties, ArrayType, Content, MediaType, ObjectType, Operation, Parameter,
-    ParameterSchemaOrContent, PathItem, Paths, ReferenceOr, RequestBody, Response, Schema,
-    SchemaKind, Type,
+    AdditionalProperties, ArrayType, Callback, Components, Content, Example, Header, Link,
+    MediaType, ObjectType, OpenAPI, Operation, Parameter, ParameterSchemaOrContent, PathItem,
+    Paths, ReferenceOr, RequestBody, Response, Schema, SchemaKind, SecurityScheme, Type,
 };
 
 use crate::ext::Method;
@@ -25,6 +26,36 @@ impl<'s> Visit<'s> for Schema {
 impl<'s> Visit<'s> for Box<Schema> {
     fn visit(&mut self, visitor: &mut impl Visitor<'s>) {
         visitor.visit_schema(self)
+    }
+}
+
+impl<'s> Visit<'s> for Example {
+    fn visit(&mut self, visitor: &mut impl Visitor<'s>) {
+        visitor.visit_example(self)
+    }
+}
+
+impl<'s> Visit<'s> for Header {
+    fn visit(&mut self, visitor: &mut impl Visitor<'s>) {
+        visitor.visit_header(self)
+    }
+}
+
+impl<'s> Visit<'s> for SecurityScheme {
+    fn visit(&mut self, visitor: &mut impl Visitor<'s>) {
+        visitor.visit_security_scheme(self)
+    }
+}
+
+impl<'s> Visit<'s> for Link {
+    fn visit(&mut self, visitor: &mut impl Visitor<'s>) {
+        visitor.visit_link(self)
+    }
+}
+
+impl<'s> Visit<'s> for Callback {
+    fn visit(&mut self, visitor: &mut impl Visitor<'s>) {
+        visitor.visit_callback(self)
     }
 }
 
@@ -93,6 +124,8 @@ impl<'s> Visit<'s> for Response {
 }
 
 pub trait Visitor<'s>: Sized {
+    fn visit_api(&mut self, api: &mut OpenAPI);
+
     fn visit_paths(&mut self, paths: &mut Paths) {
         visit_paths(self, paths)
     }
@@ -101,8 +134,34 @@ pub trait Visitor<'s>: Sized {
         visit_path(self, path, path_item);
     }
 
+    fn visit_components(&mut self, components: &mut Components) {
+        let _ = components;
+    }
+
     fn visit_schema(&mut self, schema: &mut Schema) {
         visit_schema(self, schema);
+    }
+
+    fn visit_example(&mut self, example: &mut Example) {
+        let _ = example;
+    }
+
+    fn visit_header(&mut self, header: &mut Header) {
+        visit_header(self, header);
+    }
+
+    fn visit_security_scheme(&mut self, security_scheme: &mut SecurityScheme) {
+        let _ = security_scheme;
+    }
+
+    fn visit_callback(&mut self, callback: &mut Callback) {
+        for (path, path_item) in callback.iter_mut() {
+            visit_path(self, path, path_item);
+        }
+    }
+
+    fn visit_link(&mut self, link: &mut Link) {
+        let _ = link; // TODO: default implementation (link.operation)
     }
 
     fn visit_ref(&mut self, reference: &str);
@@ -141,13 +200,39 @@ pub trait Visitor<'s>: Sized {
     }
 
     fn visit_media_type(&mut self, _name: &str, media_type: &mut MediaType) {
-        if let MediaType {
-            schema: Some(schema),
-            ..
-        } = media_type
-        {
-            schema.visit(self)
+        visit_media_type(self, media_type);
+    }
+}
+
+fn visit_header<'s>(visitor: &mut impl Visitor<'s>, header: &mut Header) {
+    match &mut header.format {
+        ParameterSchemaOrContent::Schema(reference_or) => reference_or.visit(visitor),
+        ParameterSchemaOrContent::Content(media_types) => {
+            for (name, media_type) in media_types.iter_mut() {
+                (name.as_str(), media_type).visit(visitor);
+            }
         }
+    }
+    visit_examples(visitor, &mut header.examples);
+}
+
+fn visit_media_type<'s>(visitor: &mut impl Visitor<'s>, media_type: &mut MediaType) {
+    if let MediaType {
+        schema: Some(schema),
+        ..
+    } = media_type
+    {
+        schema.visit(visitor)
+    }
+    visit_examples(visitor, &mut media_type.examples);
+}
+
+fn visit_examples<'s>(
+    visitor: &mut impl Visitor<'s>,
+    examples: &mut IndexMap<String, ReferenceOr<Example>>,
+) {
+    for (_, example) in examples {
+        example.visit(visitor);
     }
 }
 
@@ -194,12 +279,17 @@ fn visit_parameter<'s>(visitor: &mut impl Visitor<'s>, parameter: &mut Parameter
         ParameterSchemaOrContent::Schema(schema) => schema.visit(visitor),
         ParameterSchemaOrContent::Content(content) => content.visit(visitor),
     }
+    visit_examples(visitor, &mut parameter.examples);
 }
 
 pub fn visit_paths<'s>(visitor: &mut impl Visitor<'s>, paths: &mut Paths) {
     for (path, path_item) in paths.paths.iter_mut() {
-        let ReferenceOr::Item(path_item) = path_item else {
-            continue; // TODO: resolve ref
+        let path_item = match path_item {
+            ReferenceOr::Item(path_item) => path_item,
+            ReferenceOr::Reference { reference } => {
+                visitor.visit_ref(reference);
+                continue;
+            }
         };
         for (method, operation) in Method::iter_mut(path_item) {
             if let Some(operation) = operation {
@@ -226,5 +316,8 @@ pub fn visit_operation<'s>(
     }
     for (_, response) in &mut operation.responses.responses {
         response.visit(visitor)
+    }
+    for (_, callback) in &mut operation.callbacks {
+        callback.visit(visitor);
     }
 }
