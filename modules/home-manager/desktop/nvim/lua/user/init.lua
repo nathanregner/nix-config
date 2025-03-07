@@ -729,7 +729,7 @@ require("lazy").setup({
         lualine_b = { "diagnostics" },
         lualine_c = { { "filename", path = 1 } },
         lualine_x = { "encoding", "fileformat", "filetype" },
-        lualine_y = { "progress" },
+        lualine_y = { "progress", "searchcount" },
         lualine_z = { "location", "selectioncount" },
       },
     },
@@ -936,7 +936,7 @@ require("lazy").setup({
     end,
   },
 
-  { "nvim-lua/plenary.nvim", dev = true },
+  -- { "nvim-lua/plenary.nvim", dev = true },
 
   { -- trouble.nvim
     "folke/trouble.nvim",
