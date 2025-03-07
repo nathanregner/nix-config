@@ -214,7 +214,20 @@ require("lazy").setup({
 
   { "towolf/vim-helm", ft = "helm" },
 
-  { "folke/neoconf.nvim", opts = {} },
+  {
+    "folke/neoconf.nvim",
+    opts = {
+      plugins = {
+        jsonls = {
+          configured_servers_only = false,
+        },
+      },
+    },
+    config = function(opts)
+      require("neoconf").setup(opts)
+      require("user.neoconf.conform").register()
+    end,
+  },
 
   { -- Autocompletion
     "hrsh7th/nvim-cmp",
@@ -516,107 +529,8 @@ require("lazy").setup({
 
   { -- Autoformat
     "stevearc/conform.nvim",
-    dependencies = {
-      "folke/neoconf.nvim",
-    },
-    opts = {
-      formatters_by_ft = {
-        bash = { "shfmt" },
-        clojure = { "joker" },
-        css = { "prettierd" },
-        fennel = { "fnlfmt" },
-        gitcommit = { "prettier", "injected" }, -- FIXME: prettierd erroring out
-        go = { "gofmt" },
-        graphql = { "prettierd" },
-        html = { "prettierd" },
-        java = { "spring_javaformat" },
-        javascript = { "prettierd" },
-        javascriptreact = { "prettierd" },
-        json = { "prettierd" },
-        jsonc = { "prettierd" },
-        lua = { "stylua" },
-        markdown = { "prettierd", "injected" },
-        nginx = { "nginxfmt" },
-        nix = {
-          "nixfmt", --[[ "injected" ]]
-        }, -- FIXME: injected bash formatter broken
-        rust = { "rustfmt" },
-        sh = { "shfmt" },
-        terraform = { "terraform_fmt" },
-        toml = { "taplo" },
-        typescript = { "prettierd" },
-        typescriptreact = { "prettierd" },
-        vue = { "prettierd" },
-        yaml = { "prettierd" },
-        zsh = { "shfmt" },
-
-        -- all filetypes
-        ["*"] = { "trim_whitespace" },
-
-        -- unspecified filetypes
-        ["_"] = { "trim_whitespace" },
-      },
-      formatters = {
-        nginxfmt = {
-          command = "nginxfmt",
-          args = { "--pipe" },
-        },
-        prettier = { options = { ft_parsers = { gitcommit = "markdown" } } },
-        spring_javaformat = {
-          command = "spring-javaformat",
-          args = { "$FILENAME" },
-          stdin = true,
-        },
-      },
-      format_on_save = function(bufnr)
-        -- Disable with a global or buffer-local variable
-        if vim.g.disable_autoformat or vim.b[bufnr].disable_autoformat then return end
-        return { timeout_ms = 500, lsp_format = "fallback" }
-      end,
-    },
-    config = function(_, opts)
-      require("conform").setup(opts)
-
-      local defaults = {
-        enabled = true,
-      }
-
-      -- https://github.com/folke/neoconf.nvim/blob/fbe717664a732ab9e62737216bd3d0b6d9f84dbf/lua/neoconf/plugins/lspconfig.lua
-      require("neoconf.plugins").register({
-        name = "conform",
-        on_schema = function(schema)
-          -- this call will create a json schema based on the lua types of your default settings
-          schema:import("myplugin", defaults)
-          -- Optionally update some of the json schema
-          schema:set("myplugin.array", {
-            description = "Special array containing booleans or numbers",
-            anyOf = {
-              { type = "boolean" },
-              { type = "integer" },
-            },
-          })
-        end,
-      })
-
-      vim.api.nvim_create_user_command("FormatDisable", function(args)
-        if args.bang then
-          vim.g.disable_autoformat = true
-        else
-          ---@diagnostic disable-next-line: inject-field
-          vim.b.disable_autoformat = true
-        end
-      end, {
-        desc = "Disable autoformat-on-save",
-        bang = true,
-      })
-      vim.api.nvim_create_user_command("FormatEnable", function(args)
-        if args.bang then vim.g.disable_autoformat = false end
-        ---@diagnostic disable-next-line: inject-field
-        vim.b.disable_autoformat = false
-      end, {
-        desc = "Re-enable autoformat-on-save",
-      })
-    end,
+    dependencies = { "folke/neoconf.nvim" },
+    config = function() require("user.conform") end,
   },
 
   {
