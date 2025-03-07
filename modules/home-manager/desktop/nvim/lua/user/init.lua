@@ -37,6 +37,17 @@ require("lazy").setup({
   "tpope/vim-fugitive",
   "tpope/vim-rhubarb",
 
+  -- Better "s" command
+  {
+    "tpope/vim-abolish",
+    dependencies = {
+      {
+        "markonm/traces.vim",
+        init = function() vim.g.traces_abolish_integration = 1 end,
+      },
+    },
+  },
+
   -- replacement for ":w !sudo tee % > /dev/null" trick
   "lambdalisue/vim-suda",
 
@@ -1082,7 +1093,7 @@ require("lazy").setup({
       -- Fix Babashka pprint: https://github.com/Olical/conjure/issues/406
       vim.g["conjure#client#clojure#nrepl#eval#print_function"] = "cider.nrepl.pprint/pprint"
       -- Disable REPL auto-start
-      vim.g["conjure#client_on_load"] = false
+      -- vim.g["conjure#client_on_load"] = false
       vim.g["conjure#log#hud#ignore_low_priority"] = true
     end,
   },
