@@ -46,7 +46,7 @@ fn any_match(set: &[Regex], haystack: &str) -> bool {
 }
 
 fn filter_schema(mut api: OpenAPI, filter: cli::Filter) -> OpenAPI {
-    let mut visitor = ComponentRefVisitor {
+    let mut visitor = ComponentFilterVisitor {
         filter,
         visiting: vec![],
         visited: EnumMap::default(),
@@ -56,35 +56,33 @@ fn filter_schema(mut api: OpenAPI, filter: cli::Filter) -> OpenAPI {
     api
 }
 
-struct ComponentRefVisitor {
+struct ComponentFilterVisitor {
     filter: Filter,
     visiting: Vec<ComponentRef>,
     visited: EnumMap<ComponentType, HashSet<String>>,
 }
 
-impl Visitor<'_> for ComponentRefVisitor {
+impl Visitor<'_> for ComponentFilterVisitor {
     fn visit_api(&mut self, api: &mut OpenAPI) {
         self.visit_paths(&mut api.paths);
 
         if let Some(components) = &mut api.components {
             while let Some(cr) = self.visiting.pop() {
                 match cr.ty {
-                    ComponentType::Schemas => self.expand_ref::<Schema>(components, &cr.name),
-                    ComponentType::Responses => self.expand_ref::<Response>(components, &cr.name),
-                    ComponentType::Parameters => self.expand_ref::<Parameter>(components, &cr.name),
-                    ComponentType::Examples => self.expand_ref::<Example>(components, &cr.name),
-                    ComponentType::RequestBodies => {
-                        self.expand_ref::<Response>(components, &cr.name)
-                    }
-                    ComponentType::Headers => self.expand_ref::<Header>(components, &cr.name),
+                    ComponentType::Schemas => self.expand_ref::<Schema>(components, &cr),
+                    ComponentType::Responses => self.expand_ref::<Response>(components, &cr),
+                    ComponentType::Parameters => self.expand_ref::<Parameter>(components, &cr),
+                    ComponentType::Examples => self.expand_ref::<Example>(components, &cr),
+                    ComponentType::RequestBodies => self.expand_ref::<Response>(components, &cr),
+                    ComponentType::Headers => self.expand_ref::<Header>(components, &cr),
                     ComponentType::SecuritySchemes => {
-                        self.expand_ref::<SecurityScheme>(components, &cr.name)
+                        self.expand_ref::<SecurityScheme>(components, &cr)
                     }
-                    ComponentType::Links => self.expand_ref::<Link>(components, &cr.name),
-                    ComponentType::Callbacks => self.expand_ref::<Callback>(components, &cr.name),
+                    ComponentType::Links => self.expand_ref::<Link>(components, &cr),
+                    ComponentType::Callbacks => self.expand_ref::<Callback>(components, &cr),
                     ComponentType::Extensions => {
                         // TODO
-                    } // ComponentType::Extensions => self.expand_ref::<Extension>(components, &cr.name),
+                    } // ComponentType::Extensions => self.expand_ref::<Extension>(components, &cr),
                 }
             }
 
@@ -150,17 +148,18 @@ impl Visitor<'_> for ComponentRefVisitor {
     }
 }
 
-impl ComponentRefVisitor {
+impl ComponentFilterVisitor {
     fn retain<T: Component>(&mut self, components: &mut Components) {
         T::get_in_mut(components).retain(|name, _| self.visited[T::COMPONENT_TYPE].contains(name));
     }
 
-    fn expand_ref<'s, T>(&mut self, components: &mut Components, name: &str)
+    fn expand_ref<T>(&mut self, components: &mut Components, cr: &ComponentRef)
     where
-        T: Component + Visit<'s>,
+        T: Component + Visit,
     {
+        assert_eq!(cr.ty, T::COMPONENT_TYPE);
         let components_of_type = T::get_in_mut(components);
-        if let Some(component) = components_of_type.get_mut(name) {
+        if let Some(component) = components_of_type.get_mut(&cr.name) {
             component.visit(self)
         }
     }

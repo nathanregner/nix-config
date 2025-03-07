@@ -7,83 +7,83 @@ use openapiv3::{
 
 use crate::ext::Method;
 
-pub trait Visit<'s> {
-    fn visit(&mut self, visitor: &mut impl Visitor<'s>);
+pub trait Visit {
+    fn visit<'s>(&mut self, visitor: &mut impl Visitor<'s>);
 }
 
-impl<'s> Visit<'s> for Paths {
-    fn visit(&mut self, visitor: &mut impl Visitor<'s>) {
+impl Visit for Paths {
+    fn visit<'s>(&mut self, visitor: &mut impl Visitor<'s>) {
         visitor.visit_paths(self)
     }
 }
 
-impl<'s> Visit<'s> for Schema {
-    fn visit(&mut self, visitor: &mut impl Visitor<'s>) {
+impl Visit for Schema {
+    fn visit<'s>(&mut self, visitor: &mut impl Visitor<'s>) {
         visitor.visit_schema(self)
     }
 }
 
-impl<'s> Visit<'s> for Box<Schema> {
-    fn visit(&mut self, visitor: &mut impl Visitor<'s>) {
+impl Visit for Box<Schema> {
+    fn visit<'s>(&mut self, visitor: &mut impl Visitor<'s>) {
         visitor.visit_schema(self)
     }
 }
 
-impl<'s> Visit<'s> for Example {
-    fn visit(&mut self, visitor: &mut impl Visitor<'s>) {
+impl Visit for Example {
+    fn visit<'s>(&mut self, visitor: &mut impl Visitor<'s>) {
         visitor.visit_example(self)
     }
 }
 
-impl<'s> Visit<'s> for Header {
-    fn visit(&mut self, visitor: &mut impl Visitor<'s>) {
+impl Visit for Header {
+    fn visit<'s>(&mut self, visitor: &mut impl Visitor<'s>) {
         visitor.visit_header(self)
     }
 }
 
-impl<'s> Visit<'s> for SecurityScheme {
-    fn visit(&mut self, visitor: &mut impl Visitor<'s>) {
+impl Visit for SecurityScheme {
+    fn visit<'s>(&mut self, visitor: &mut impl Visitor<'s>) {
         visitor.visit_security_scheme(self)
     }
 }
 
-impl<'s> Visit<'s> for Link {
-    fn visit(&mut self, visitor: &mut impl Visitor<'s>) {
+impl Visit for Link {
+    fn visit<'s>(&mut self, visitor: &mut impl Visitor<'s>) {
         visitor.visit_link(self)
     }
 }
 
-impl<'s> Visit<'s> for Callback {
-    fn visit(&mut self, visitor: &mut impl Visitor<'s>) {
+impl Visit for Callback {
+    fn visit<'s>(&mut self, visitor: &mut impl Visitor<'s>) {
         visitor.visit_callback(self)
     }
 }
 
-impl<'s> Visit<'s> for ObjectType {
-    fn visit(&mut self, visitor: &mut impl Visitor<'s>) {
+impl Visit for ObjectType {
+    fn visit<'s>(&mut self, visitor: &mut impl Visitor<'s>) {
         visitor.visit_object_type(self)
     }
 }
 
-impl<'s> Visit<'s> for ArrayType {
-    fn visit(&mut self, visitor: &mut impl Visitor<'s>) {
+impl Visit for ArrayType {
+    fn visit<'s>(&mut self, visitor: &mut impl Visitor<'s>) {
         visitor.visit_array_type(self)
     }
 }
 
 pub type Path<'a, 'b> = (&'a str, &'b mut PathItem);
 
-impl<'s> Visit<'s> for Path<'s, 's> {
-    fn visit(&mut self, visitor: &mut impl Visitor<'s>) {
+impl Visit for Path<'_, '_> {
+    fn visit<'s>(&mut self, visitor: &mut impl Visitor<'s>) {
         visitor.visit_path(self.0, self.1)
     }
 }
 
-impl<'s, T> Visit<'s> for ReferenceOr<T>
+impl<T> Visit for ReferenceOr<T>
 where
-    T: Visit<'s>,
+    T: Visit,
 {
-    fn visit(&mut self, visitor: &mut impl Visitor<'s>) {
+    fn visit<'s>(&mut self, visitor: &mut impl Visitor<'s>) {
         match self {
             ReferenceOr::Reference { reference } => visitor.visit_ref(reference),
             ReferenceOr::Item(item) => item.visit(visitor),
@@ -91,34 +91,34 @@ where
     }
 }
 
-impl<'s> Visit<'s> for Content {
-    fn visit(&mut self, visitor: &mut impl Visitor<'s>) {
+impl Visit for Content {
+    fn visit<'s>(&mut self, visitor: &mut impl Visitor<'s>) {
         for (name, media_type) in self.iter_mut() {
             (name.as_str(), media_type).visit(visitor);
         }
     }
 }
 
-impl<'v, 's> Visit<'v> for (&'s str, &'s mut MediaType) {
-    fn visit(&mut self, visitor: &mut impl Visitor<'v>) {
+impl Visit for (&str, &mut MediaType) {
+    fn visit<'s>(&mut self, visitor: &mut impl Visitor<'s>) {
         visitor.visit_media_type(self.0, self.1)
     }
 }
 
-impl<'s> Visit<'s> for Parameter {
-    fn visit(&mut self, visitor: &mut impl Visitor<'s>) {
+impl Visit for Parameter {
+    fn visit<'s>(&mut self, visitor: &mut impl Visitor<'s>) {
         visitor.visit_parameter(self)
     }
 }
 
-impl<'s> Visit<'s> for RequestBody {
-    fn visit(&mut self, visitor: &mut impl Visitor<'s>) {
+impl Visit for RequestBody {
+    fn visit<'s>(&mut self, visitor: &mut impl Visitor<'s>) {
         visitor.visit_request_body(self)
     }
 }
 
-impl<'s> Visit<'s> for Response {
-    fn visit(&mut self, visitor: &mut impl Visitor<'s>) {
+impl Visit for Response {
+    fn visit<'s>(&mut self, visitor: &mut impl Visitor<'s>) {
         visitor.visit_response(self)
     }
 }
