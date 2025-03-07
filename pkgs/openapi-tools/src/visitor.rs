@@ -5,7 +5,7 @@ use openapiv3::{
     Paths, ReferenceOr, RequestBody, Response, Schema, SchemaKind, SecurityScheme, Type,
 };
 
-use crate::ext::Method;
+use crate::ext::{Component, Method};
 
 pub trait Visit {
     fn visit<'s>(&mut self, visitor: &mut impl Visitor<'s>);
@@ -134,8 +134,31 @@ pub trait Visitor<'s>: Sized {
         visit_path(self, path, path_item);
     }
 
-    fn visit_components(&mut self, components: &mut Components) {
-        let _ = components;
+    fn visit_all_components(&mut self, components: &mut Components) {
+        fn visit<'s, 'c, C: Component>(
+            visitor: &mut impl Visitor<'s>,
+            components: &'c mut Components,
+        ) {
+            visitor.visit_components(C::get_in_mut(components))
+        }
+        visit::<Schema>(self, components);
+        visit::<RequestBody>(self, components);
+        visit::<Parameter>(self, components);
+        visit::<Response>(self, components);
+        visit::<Example>(self, components);
+        visit::<Header>(self, components);
+        visit::<SecurityScheme>(self, components);
+        visit::<Link>(self, components);
+        visit::<Callback>(self, components);
+    }
+
+    fn visit_components<C: Component>(
+        &mut self,
+        components: &mut IndexMap<String, ReferenceOr<C>>,
+    ) {
+        for (_name, component) in components {
+            component.visit(self);
+        }
     }
 
     fn visit_schema(&mut self, schema: &mut Schema) {
@@ -162,6 +185,7 @@ pub trait Visitor<'s>: Sized {
 
     fn visit_link(&mut self, link: &mut Link) {
         let _ = link; // TODO: default implementation (link.operation)
+        tracing::warn!("visit_link not implemented, skipping: {link:?}")
     }
 
     fn visit_ref(&mut self, reference: &str);

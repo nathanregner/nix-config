@@ -9,9 +9,10 @@ use cli::{Cmd, Filter};
 use core::{error::Error, iter::Iterator, option::Option::Some};
 use enum_map::EnumMap;
 use ext::{Component, ComponentRef, ComponentType, Method};
+use indexmap::IndexMap;
 use openapiv3::{
-    Callback, Components, Example, Header, Link, OpenAPI, Parameter, Paths, ReferenceOr,
-    RequestBody, Response, Schema, SecurityScheme,
+    Callback, Components, Example, Header, Link, OpenAPI, Parameter, Paths, ReferenceOr, Response,
+    Schema, SecurityScheme,
 };
 use regex::Regex;
 use std::{
@@ -24,6 +25,8 @@ use visitor::{visit_paths, Visit, Visitor};
 type Result<T> = std::result::Result<T, Box<dyn Error>>;
 
 fn main() -> Result<()> {
+    tracing_subscriber::fmt().init();
+
     let args = cli::Args::parse();
     let Cmd::Filter(filter) = args.cmd;
     let input: Box<dyn Read> = match args.input {
@@ -81,17 +84,20 @@ impl Visitor<'_> for ComponentFilterVisitor {
                     ComponentType::Links => self.expand_ref::<Link>(components, &cr),
                     ComponentType::Callbacks => self.expand_ref::<Callback>(components, &cr),
                     ComponentType::Extensions => {
+                        tracing::warn!("visit_extensions not implemented, skipping: {}", cr.name)
                         // TODO
-                    } // ComponentType::Extensions => self.expand_ref::<Extension>(components, &cr),
+                        // self.expand_ref::<Extension>(components, &cr)
+                    }
                 }
             }
 
-            self.visit_components(components);
+            self.visit_all_components(components);
         }
     }
 
     fn visit_paths(&mut self, paths: &mut Paths) {
         // filter operations
+        // TODO: filter tags?
         paths.paths.retain(|path, path_item| {
             let ReferenceOr::Item(path_item) = path_item else {
                 return false; // resolve ref?
@@ -118,7 +124,7 @@ impl Visitor<'_> for ComponentFilterVisitor {
             Method::iter_mut(path_item).any(|(_, method_op)| method_op.is_some())
         });
 
-        // filter components
+        // walk component graph
         visit_paths(self, paths)
     }
 
@@ -135,30 +141,18 @@ impl Visitor<'_> for ComponentFilterVisitor {
         }
     }
 
-    fn visit_components(&mut self, components: &mut Components) {
-        self.retain::<Schema>(components);
-        self.retain::<RequestBody>(components);
-        self.retain::<Parameter>(components);
-        self.retain::<Response>(components);
-        self.retain::<Example>(components);
-        self.retain::<Header>(components);
-        self.retain::<SecurityScheme>(components);
-        self.retain::<Link>(components);
-        self.retain::<Callback>(components);
+    fn visit_components<C: Component>(
+        &mut self,
+        components: &mut IndexMap<String, ReferenceOr<C>>,
+    ) {
+        components.retain(|name, _| self.visited[C::TYPE].contains(name));
     }
 }
 
 impl ComponentFilterVisitor {
-    fn retain<T: Component>(&mut self, components: &mut Components) {
-        T::get_in_mut(components).retain(|name, _| self.visited[T::COMPONENT_TYPE].contains(name));
-    }
-
-    fn expand_ref<T>(&mut self, components: &mut Components, cr: &ComponentRef)
-    where
-        T: Component + Visit,
-    {
-        assert_eq!(cr.ty, T::COMPONENT_TYPE);
-        let components_of_type = T::get_in_mut(components);
+    fn expand_ref<C: Component>(&mut self, components: &mut Components, cr: &ComponentRef) {
+        assert_eq!(cr.ty, C::TYPE);
+        let components_of_type = C::get_in_mut(components);
         if let Some(component) = components_of_type.get_mut(&cr.name) {
             component.visit(self)
         }

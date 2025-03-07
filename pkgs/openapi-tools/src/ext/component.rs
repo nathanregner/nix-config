@@ -9,6 +9,8 @@ use openapiv3::{
     Schema, SecurityScheme,
 };
 
+use crate::visitor::Visit;
+
 #[derive(Enum, Hash, Eq, PartialEq, Copy, Clone, Debug, EnumString)]
 pub enum ComponentType {
     #[strum(serialize = "schemas")]
@@ -61,9 +63,8 @@ impl FromStr for ComponentRef {
     }
 }
 
-// TODO: name
-pub trait Component: Sized {
-    const COMPONENT_TYPE: ComponentType;
+pub trait Component: Visit + Sized {
+    const TYPE: ComponentType;
 
     fn get_in_mut(components: &mut Components) -> &mut IndexMap<String, ReferenceOr<Self>>;
 }
@@ -71,7 +72,7 @@ pub trait Component: Sized {
 macro_rules! impl_component {
     ($ty:ty, $variant:ident, $field:ident) => {
         impl Component for $ty {
-            const COMPONENT_TYPE: ComponentType = ComponentType::$variant;
+            const TYPE: ComponentType = ComponentType::$variant;
 
             fn get_in_mut(components: &mut Components) -> &mut IndexMap<String, ReferenceOr<Self>> {
                 &mut components.$field
