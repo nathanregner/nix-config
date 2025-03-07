@@ -19,7 +19,7 @@ use std::{
     fs::{self},
     io::{self, Read, Write},
 };
-use visitor::{visit_paths, Visitor};
+use visitor::{visit_paths, Visit, Visitor};
 
 type Result<T> = std::result::Result<T, Box<dyn Error>>;
 
@@ -48,6 +48,7 @@ fn any_match(set: &[Regex], haystack: &str) -> bool {
 fn filter_schema(mut api: OpenAPI, filter: cli::Filter) -> OpenAPI {
     let mut visitor = ComponentRefVisitor {
         filter,
+        visiting: vec![],
         visited: EnumMap::default(),
     };
 
@@ -57,13 +58,36 @@ fn filter_schema(mut api: OpenAPI, filter: cli::Filter) -> OpenAPI {
 
 struct ComponentRefVisitor {
     filter: Filter,
+    visiting: Vec<ComponentRef>,
     visited: EnumMap<ComponentType, HashSet<String>>,
 }
 
 impl Visitor<'_> for ComponentRefVisitor {
     fn visit_api(&mut self, api: &mut OpenAPI) {
         self.visit_paths(&mut api.paths);
+
         if let Some(components) = &mut api.components {
+            while let Some(cr) = self.visiting.pop() {
+                match cr.ty {
+                    ComponentType::Schemas => self.expand_ref::<Schema>(components, &cr.name),
+                    ComponentType::Responses => self.expand_ref::<Response>(components, &cr.name),
+                    ComponentType::Parameters => self.expand_ref::<Parameter>(components, &cr.name),
+                    ComponentType::Examples => self.expand_ref::<Example>(components, &cr.name),
+                    ComponentType::RequestBodies => {
+                        self.expand_ref::<Response>(components, &cr.name)
+                    }
+                    ComponentType::Headers => self.expand_ref::<Header>(components, &cr.name),
+                    ComponentType::SecuritySchemes => {
+                        self.expand_ref::<SecurityScheme>(components, &cr.name)
+                    }
+                    ComponentType::Links => self.expand_ref::<Link>(components, &cr.name),
+                    ComponentType::Callbacks => self.expand_ref::<Callback>(components, &cr.name),
+                    ComponentType::Extensions => {
+                        // TODO
+                    } // ComponentType::Extensions => self.expand_ref::<Extension>(components, &cr.name),
+                }
+            }
+
             self.visit_components(components);
         }
     }
@@ -108,7 +132,9 @@ impl Visitor<'_> for ComponentRefVisitor {
                 return;
             }
         };
-        self.visited[cr.ty].insert(cr.name);
+        if self.visited[cr.ty].insert(cr.name.clone()) {
+            self.visiting.push(cr);
+        }
     }
 
     fn visit_components(&mut self, components: &mut Components) {
@@ -127,5 +153,15 @@ impl Visitor<'_> for ComponentRefVisitor {
 impl ComponentRefVisitor {
     fn retain<T: Component>(&mut self, components: &mut Components) {
         T::get_in_mut(components).retain(|name, _| self.visited[T::COMPONENT_TYPE].contains(name));
+    }
+
+    fn expand_ref<'s, T>(&mut self, components: &mut Components, name: &str)
+    where
+        T: Component + Visit<'s>,
+    {
+        let components_of_type = T::get_in_mut(components);
+        if let Some(component) = components_of_type.get_mut(name) {
+            component.visit(self)
+        }
     }
 }

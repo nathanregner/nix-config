@@ -9,7 +9,7 @@ use openapiv3::{
     Schema, SecurityScheme,
 };
 
-#[derive(Enum, Hash, Eq, PartialEq, Clone, Debug, EnumString)]
+#[derive(Enum, Hash, Eq, PartialEq, Copy, Clone, Debug, EnumString)]
 pub enum ComponentType {
     #[strum(serialize = "schemas")]
     Schemas,
