@@ -63,6 +63,7 @@ in
         libclang
         lua-language-server
         nil
+        nixd
         terraform-ls
         tflint
         typescript

@@ -432,6 +432,7 @@ require("lazy").setup({
           },
         },
         nil_ls = {},
+        nixd = {},
         nushell = {},
         omnisharp = {
           cmd = { "OmniSharp" },
