@@ -21,6 +21,12 @@ let
         checkPhase = "";
       });
 
+      restic = prev.restic.overrideAttrs (prev: {
+        patches = (prev.patches or [ ]) ++ [
+          ./restic/4227.patch
+        ];
+      });
+
       # TODO: remove https://github.com/NixOS/nixpkgs/issues/387340
       tailscale = warnIfOutdated prev.tailscale stable.tailscale;
 
