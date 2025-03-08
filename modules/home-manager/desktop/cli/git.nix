@@ -74,11 +74,14 @@
         sort = "version:refname";
       };
     };
-    ignores = [
-      "Session.vim"
-      ".direnv"
-    ];
+    ignores =
+      [
+        ".direnv"
+        "Session.vim"
+      ]
+      ++ lib.optionals pkgs.stdenv.isDarwin [
+        ".DS_Store"
+      ];
   };
-
   home.packages = with pkgs.unstable; [ difftastic ];
 }
