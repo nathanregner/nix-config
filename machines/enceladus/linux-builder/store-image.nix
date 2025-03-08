@@ -13,10 +13,7 @@ let
       {
         nativeBuildInputs = [
           pkgs.gnutar
-          (pkgs.erofs-utils.overrideAttrs (prev: {
-            buildInputs = prev.buildInputs ++ [ pkgs.zstd ];
-            configureFlags = prev.configureFlags ++ [ "--with-libzstd" ];
-          }))
+          pkgs.erofs-utils
         ];
       }
       ''
@@ -34,7 +31,6 @@ let
             }
           }/store-paths \
           | mkfs.erofs \
-            -zzstd \
             --quiet \
             --force-uid=0 \
             --force-gid=0 \
