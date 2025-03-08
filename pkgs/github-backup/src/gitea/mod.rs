@@ -7,6 +7,7 @@ use url::Url;
 
 pub use gitea::types::Repository;
 
+#[derive(Clone)]
 pub struct Client {
     client: gitea::Client,
     github_access_token: String,

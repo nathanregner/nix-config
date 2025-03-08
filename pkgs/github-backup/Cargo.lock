@@ -1389,8 +1389,8 @@ dependencies = [
 
 [[package]]
 name = "progenitor"
-version = "0.8.0"
-source = "git+https://github.com/nathanregner/progenitor#b330e1688f12983d167802cca861bf3f313b83a8"
+version = "0.9.1"
+source = "git+https://github.com/nathanregner/progenitor#68767e3816e73ce6c431058473a54759dc78ad76"
 dependencies = [
  "progenitor-client",
  "progenitor-impl",
@@ -1399,8 +1399,8 @@ dependencies = [
 
 [[package]]
 name = "progenitor-client"
-version = "0.8.0"
-source = "git+https://github.com/nathanregner/progenitor#b330e1688f12983d167802cca861bf3f313b83a8"
+version = "0.9.1"
+source = "git+https://github.com/nathanregner/progenitor#68767e3816e73ce6c431058473a54759dc78ad76"
 dependencies = [
  "bytes",
  "futures-core",
@@ -1408,13 +1408,14 @@ dependencies = [
  "reqwest",
  "serde",
  "serde_json",
+ "serde_path_to_error",
  "serde_urlencoded",
 ]
 
 [[package]]
 name = "progenitor-impl"
-version = "0.8.0"
-source = "git+https://github.com/nathanregner/progenitor#b330e1688f12983d167802cca861bf3f313b83a8"
+version = "0.9.1"
+source = "git+https://github.com/nathanregner/progenitor#68767e3816e73ce6c431058473a54759dc78ad76"
 dependencies = [
  "heck",
  "http",
@@ -1427,15 +1428,15 @@ dependencies = [
  "serde",
  "serde_json",
  "syn",
- "thiserror 1.0.69",
+ "thiserror 2.0.12",
  "typify",
  "unicode-ident",
 ]
 
 [[package]]
 name = "progenitor-macro"
-version = "0.8.0"
-source = "git+https://github.com/nathanregner/progenitor#b330e1688f12983d167802cca861bf3f313b83a8"
+version = "0.9.1"
+source = "git+https://github.com/nathanregner/progenitor#68767e3816e73ce6c431058473a54759dc78ad76"
 dependencies = [
  "openapiv3",
  "proc-macro2",
@@ -1804,6 +1805,16 @@ dependencies = [
  "itoa",
  "memchr",
  "ryu",
+ "serde",
+]
+
+[[package]]
+name = "serde_path_to_error"
+version = "0.1.17"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "59fab13f937fa393d08645bf3a84bdfe86e296747b506ada67bb15f10f218b2a"
+dependencies = [
+ "itoa",
  "serde",
 ]
 
