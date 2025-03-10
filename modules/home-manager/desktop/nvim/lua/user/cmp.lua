@@ -1,4 +1,5 @@
 local cmp = require("cmp")
+local types = require("cmp.types")
 
 local luasnip = require("luasnip")
 
@@ -115,9 +116,16 @@ cmp.setup({
   },
   sources = {
     { name = "luasnip" },
-    { name = "nvim_lsp" },
-    buffer,
     { name = "path" },
+    {
+      name = "nvim_lsp",
+      entry_filter = function(entry, _ctx)
+        local kind = types.lsp.CompletionItemKind[entry:get_kind()]
+        if kind == "Text" then return false end
+        return true
+      end,
+    },
+    buffer,
   },
 })
 
