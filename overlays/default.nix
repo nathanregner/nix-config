@@ -63,7 +63,7 @@ let
           });
     };
 in
-{
+rec {
   additions =
     final: prev:
     builtins.mapAttrs
@@ -89,7 +89,6 @@ in
       system = stableFinal.system;
       config.allowUnfree = true;
       overlays = [
-        inputs.poetry2nix.overlays.default
         (
           final: prev:
           builtins.mapAttrs

@@ -480,8 +480,6 @@ require("lazy").setup({
             ["workspace/publishDiagnostics"] = downgrade_js_errors("workspace/publishDiagnostics"),
           },
           settings = {
-            javascript = { implicitProjectConfig = { checkJs = true } },
-            ["js/ts"] = { implicitProjectConfig = { checkJs = true } },
             -- https://github.com/microsoft/vscode/issues/13953
             typescript = { tsserver = { experimental = { enableProjectDiagnostics = true } } },
           },
@@ -1284,68 +1282,6 @@ require("lazy").setup({
       },
       lang = "java",
     },
-  },
-
-  {
-    "Davidyz/VectorCode",
-    version = "*", -- optional, depending on whether you're on nightly or release
-    dependencies = { "nvim-lua/plenary.nvim" },
-    cmd = "VectorCode", -- if you're lazy-loading VectorCode
-  },
-
-  {
-    "milanglacier/minuet-ai.nvim",
-    config = function()
-      -- This uses the async cache to accelerate the prompt construction.
-      -- There's also the require('vectorcode').query API, which provides
-      -- more up-to-date information, but at the cost of blocking the main UI.
-      local vectorcode_cacher = require("vectorcode.config").get_cacher_backend()
-      require("minuet").setup({
-        add_single_line_entry = true,
-        n_completions = 1,
-        -- I recommend you start with a small context window firstly, and gradually
-        -- increase it based on your local computing power.
-        context_window = 4096,
-        after_cursor_filter_length = 30,
-        notify = "debug",
-        provider = "openai_fim_compatible",
-        provider_options = {
-          openai_fim_compatible = {
-            api_key = "TERM",
-            name = "Ollama",
-            stream = true,
-            end_point = "http://127.0.0.1:11434/v1/completions",
-            model = "qwen2.5-coder:7b-base-q4_1",
-            template = {
-              prompt = function(pref, suff)
-                local prompt_message = ""
-                for _, file in ipairs(vectorcode_cacher.query_from_cache(0)) do
-                  prompt_message = prompt_message .. "<|file_sep|>" .. file.path .. "\n" .. file.document
-                end
-                return prompt_message .. "<|fim_prefix|>" .. pref .. "<|fim_suffix|>" .. suff .. "<|fim_middle|>"
-              end,
-              suffix = false,
-            },
-          },
-        },
-        virtualtext = {
-          auto_trigger_ft = { "*" },
-          keymap = {
-            -- accept whole completion
-            accept = "<A-L>",
-            -- accept one line
-            accept_line = "<A-l>",
-            -- accept n lines (prompts for number)
-            accept_n_lines = "<A-z>",
-            -- Cycle to prev completion item, or manually invoke completion
-            prev = "<A-[>",
-            -- Cycle to next completion item, or manually invoke completion
-            next = "<A-]>",
-            dismiss = "<A-e>",
-          },
-        },
-      })
-    end,
   },
 
   { import = "user.plugins" },
