@@ -78,6 +78,7 @@
       [
         ".direnv"
         "Session.vim"
+        ".neoconf.json"
       ]
       ++ lib.optionals pkgs.stdenv.isDarwin [
         ".DS_Store"
