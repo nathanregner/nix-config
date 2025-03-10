@@ -32,18 +32,33 @@
     enable = true;
     package = pkgs.unstable.hyprland;
   };
-  services.displayManager.defaultSession = "hyprland";
-  # https://wiki.hyprland.org/Configuring/Multi-GPU/
-  services.displayManager.environment = {
-    WLR_DRM_DEVICES = lib.concatStringsSep ":" [
-      "/dev/dri/by-path/pci-0000:2d:00.0-card" # RTX 2070 (primary)
-      "/dev/dri/by-path/pci-0000:24:00.0-card" # GTX 1060 (secondary)
-    ];
+
+  services.displayManager = {
+    autoLogin = {
+      enable = true;
+      user = "nregner";
+    };
+
+    defaultSession = "hyprland";
+
+    environment = {
+      # https://wiki.hyprland.org/Configuring/Multi-GPU/
+      WLR_DRM_DEVICES = lib.concatStringsSep ":" [
+        "/dev/dri/by-path/pci-0000:2d:00.0-card" # RTX 2070 (primary)
+        "/dev/dri/by-path/pci-0000:24:00.0-card" # GTX 1060 (secondary)
+      ];
+    };
+
+    # https://wiki.hyprland.org/0.20.1beta/Getting-Started/Installation/
+    sddm = {
+      enable = true;
+      wayland.enable = true;
+      package = pkgs.unstable.kdePackages.sddm;
+    };
   };
 
-  # https://wiki.hyprland.org/0.20.1beta/Getting-Started/Installation/
-  services.displayManager.sddm.enable = true;
-  services.displayManager.sddm.wayland.enable = true;
+  catppuccin.sddm.enable = true;
+
   security.pam.services.hyprlock = { };
 
   # services.xserver.displayManager.gdm.enable = true;
@@ -73,9 +88,6 @@
     simple-scan
     yelp
   ];
-
-  services.displayManager.autoLogin.enable = true;
-  services.displayManager.autoLogin.user = "nregner";
 
   # Workaround for GNOME autologin: https://github.com/NixOS/nixpkgs/issues/103746#issuecomment-945091229
   systemd.services."getty@tty1".enable = false;
