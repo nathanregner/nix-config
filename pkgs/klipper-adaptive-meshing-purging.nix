@@ -4,7 +4,7 @@
   stdenvNoCC,
 }:
 stdenvNoCC.mkDerivation rec {
-  pname = "kamp";
+  pname = "klipper-adaptive-meshing-purging";
   version = "1.1.2";
   src = fetchFromGitHub {
     owner = "kyleisah";

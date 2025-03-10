@@ -1079,13 +1079,7 @@ require("lazy").setup({
     cmd = "Trouble",
     init = function()
       local ts_repeat_move = require("nvim-treesitter.textobjects.repeatable_move")
-      local trouble = require("trouble")
-      local next, prev = ts_repeat_move.make_repeatable_move_pair(
-        ---@diagnostic disable-next-line: missing-parameter, missing-fields
-        function() trouble.next({ jump = true }) end,
-        ---@diagnostic disable-next-line: missing-parameter, missing-fields
-        function() trouble.prev({ jump = true }) end
-      )
+      local next, prev = ts_repeat_move.make_repeatable_move_pair(require("trouble").next, require("trouble").prev)
       vim.keymap.set("n", "]x", next, { desc = "Trouble next" })
       vim.keymap.set("n", "[x", prev, { desc = "Trouble prev" })
     end,

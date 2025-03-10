@@ -333,16 +333,6 @@
             ] outputs.devShells
           );
         };
-
-        githubActions = {
-          nixUpdate = rec {
-            pkgs = import ./pkgs/update-pkgs/find-pkgs.nix {
-              inherit lib;
-              pkgs = self.packages.x86_64-linux;
-            };
-            attrs = builtins.attrNames pkgs;
-          };
-        };
       };
     };
 }

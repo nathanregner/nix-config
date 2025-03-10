@@ -1,4 +1,4 @@
-name: Update Dependencies
+name: Update flake inputs
 
 on:
   workflow_dispatch: # allow manual trigger
@@ -21,34 +21,4 @@ jobs:
           git config user.name "github-actions[bot]"
           git add -A
           git commit -m "build: update flake.lock"
-          git push
-  nix-update-matrix:
-    runs-on: [self-hosted]
-    outputs:
-      attrs: ${{ steps.attrs.outputs.attrs }}
-    steps:
-      - uses: actions/checkout@cd7d8d697e10461458bc61a30d094dc601a8b017 # pin@main
-        with:
-          token: ${{ secrets.GH_TOKEN_FOR_UPDATES }}
-          ref: next
-      - id: attrs
-        run: |
-          echo "attrs=`nix eval .\#githubActions.nixUpdate.attrs --json`" >> "$GITHUB_OUTPUT"
-  nix-update:
-    runs-on: [self-hosted]
-    needs: nix-update-matrix
-    strategy:
-      matrix:
-        attr: ${{ fromJSON(needs.nix-update-matrix.outputs.attrs) }}
-    continue-on-error: true
-    steps:
-      - uses: actions/checkout@cd7d8d697e10461458bc61a30d094dc601a8b017 # pin@main
-        with:
-          token: ${{ secrets.GH_TOKEN_FOR_UPDATES }}
-          ref: next
-      - name: Run update script
-        run: |
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git config user.name "github-actions[bot]"
-          nix run .\#update-pkgs -- ${{ matrix.attr }}
           git push
