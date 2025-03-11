@@ -1,4 +1,9 @@
-{ config, pkgs, ... }:
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
 {
   programs.firefox = {
     enable = true;
@@ -17,12 +22,8 @@
   };
 
   home.packages = [
-    (pkgs.writeShellApplication {
-      name = "firefox";
-      runtimeInputs = [ config.programs.firefox.package ];
-      text = ''
-        firefox-devedition "$@"
-      '';
-    })
+    (pkgs.runCommand "firefox" { nativeBuildInputs = [ pkgs.makeWrapper ]; } ''
+      makeWrapper ${lib.getExe config.programs.firefox.package} $out/bin/firefox
+    '')
   ];
 }
