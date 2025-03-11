@@ -776,6 +776,13 @@ require("lazy").setup({
     },
   },
 
+  {
+    "kylechui/nvim-surround",
+    version = "*", -- Use for stability; omit to use `main` branch for the latest features
+    event = "VeryLazy",
+    opts = {},
+  },
+
   { -- Comment.nvim
     "numToStr/Comment.nvim",
     dependencies = {
@@ -797,8 +804,8 @@ require("lazy").setup({
       local ts_repeat_move = require("nvim-treesitter.textobjects.repeatable_move")
       local jump_next, jump_prev = ts_repeat_move.make_repeatable_move_pair(todo.jump_next, todo.jump_prev)
       return {
-        -- { "]T", jump_next, desc = "Next [T]odo comment" },
-        -- { "[T", jump_prev, desc = "Previous [T]odo comment" },
+        { "]t", jump_next, desc = "Next [T]odo comment" },
+        { "[t", jump_prev, desc = "Previous [T]odo comment" },
       }
     end,
     opts = {
