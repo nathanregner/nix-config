@@ -273,6 +273,7 @@ require("lazy").setup({
     "neovim/nvim-lspconfig",
     dependencies = {
       "artemave/workspace-diagnostics.nvim",
+      "dmmulroy/ts-error-translator.nvim",
       "folke/neoconf.nvim",
       "j-hui/fidget.nvim",
       "yioneko/nvim-vtsls",
@@ -339,6 +340,7 @@ require("lazy").setup({
       local downgrade_js_errors = function(method)
         local default_diagnostic_handler = vim.lsp.handlers[method]
         return function(err, result, context, config)
+          require("ts-error-translator").translate_diagnostics(err, result, context)
           -- local log = require("vim.lsp.log")
           if result.uri:match(".*.js$") then
             -- log.error(result.diagnostics)
@@ -487,8 +489,14 @@ require("lazy").setup({
             },
           },
           handlers = {
-            ["textDocument/publishDiagnostics"] = downgrade_js_errors("textDocument/publishDiagnostics"),
-            ["workspace/publishDiagnostics"] = downgrade_js_errors("workspace/publishDiagnostics"),
+            ["textDocument/publishDiagnostics"] = function(err, result, ctx)
+              require("ts-error-translator").translate_diagnostics(err, result, ctx)
+              vim.lsp.diagnostic.on_publish_diagnostics(err, result, ctx)
+            end,
+            ["workspace/publishDiagnostics"] = function(err, result, ctx)
+              require("ts-error-translator").translate_diagnostics(err, result, ctx)
+              vim.lsp.diagnostic.on_publish_diagnostics(err, result, ctx)
+            end,
           },
           settings = {
             -- https://github.com/microsoft/vscode/issues/13953
