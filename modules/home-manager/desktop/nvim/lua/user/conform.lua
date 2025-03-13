@@ -53,12 +53,13 @@ require("conform").setup({
     -- global disabled?
     if not settings.enabled then return end
 
-    -- filetype disabled?
-    local ft = vim.bo[bufnr].filetype
-    if settings.filetypes[ft] == false then return end
-
     -- buffer disabled?
     if vim.b[bufnr].format_on_save == false then return end
+
+    -- filetype disabled?
+    local ft = vim.bo[bufnr].filetype
+    local lsp_format = "fallback"
+    if settings.filetypes[ft] == false then lsp_format = "never" end
 
     -- formatter disabled?
     local formatters = {}
@@ -69,7 +70,7 @@ require("conform").setup({
     end
 
     ---@type conform.FormatOpts
-    return { timeout_ms = 500, lsp_format = "fallback", formatters = formatters }
+    return { timeout_ms = 500, lsp_format = lsp_format, formatters = formatters }
   end,
 })
 
