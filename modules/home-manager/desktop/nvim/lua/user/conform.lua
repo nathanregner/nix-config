@@ -60,7 +60,16 @@ require("conform").setup({
     -- buffer disabled?
     if vim.b[bufnr].format_on_save == false then return end
 
-    return { timeout_ms = 500, lsp_format = "fallback" }
+    -- formatter disabled?
+    local formatters = {}
+    local formatter_names = require("conform").list_formatters_for_buffer(bufnr)
+    for _, formatter in ipairs(formatter_names) do
+      local formatter_settings = settings.formatters[formatter]
+      if not (formatter_settings == false) then table.insert(formatters, formatter) end
+    end
+
+    ---@type conform.FormatOpts
+    return { timeout_ms = 500, lsp_format = "fallback", formatters = formatters }
   end,
 })
 

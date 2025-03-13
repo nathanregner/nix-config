@@ -1,11 +1,11 @@
 --- @class ConformSettings
+--- @field filetypes { [string]: boolean } ]]
+--- @field formatters { [string]: boolean } ]]
 local defaults = {
   enabled = true,
   filetypes = {},
+  formatters = {},
 }
-
---[[ - @field enabled boolean
-- @field filetypes { [string]: boolean } ]]
 
 local settings = nil
 
@@ -16,15 +16,19 @@ local M = {
       name = "conform",
       on_schema = function(schema)
         schema:import("conform", defaults)
-        local properties = {}
-        local filetypes = vim.fn.getcompletion("", "filetype")
-        for _, value in ipairs(filetypes) do
-          properties[value] = { type = "boolean" }
+
+        local filetypes = {}
+        for _, name in ipairs(vim.fn.getcompletion("", "filetype")) do
+          filetypes[name] = { type = "boolean" }
         end
-        schema:set("conform.filetypes", {
-          type = "object",
-          properties = properties,
-        })
+        schema:set("conform.filetypes", { type = "object", properties = filetypes })
+
+        local formatters = {}
+        for _, formatter in ipairs(require("conform").list_all_formatters()) do
+          formatters[formatter.name] = { type = "boolean" }
+        end
+
+        schema:set("conform.formatters", { type = "object", properties = formatters })
       end,
       on_update = function() settings = require("neoconf").get("conform", defaults) end,
     })
