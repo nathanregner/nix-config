@@ -39,7 +39,23 @@ return {
       },
       textobjects = {
         select = {
-          enable = false,
+          enable = true,
+          lookahead = true, -- Automatically jump forward to textobj, similar to targets.vim
+          keymaps = {
+            -- You can use the capture groups defined in textobjects.scm
+            ["aa"] = "@parameter.outer",
+            ["ia"] = "@parameter.inner",
+            ["af"] = "@function.outer",
+            ["if"] = "@function.inner",
+            ["aC"] = "@class.outer",
+            ["iC"] = "@class.inner",
+            ["ac"] = "@comment.outer",
+            ["ic"] = "@comment.inner",
+            ["al"] = "@loop.outer",
+            ["il"] = "@loop.inner",
+            ["at"] = "@tag.outer",
+            ["it"] = "@tag.inner",
+          },
         },
         move = {
           enable = true,
@@ -200,8 +216,11 @@ return {
   },
   {
     "nathanregner/nvim-ts-autotag", -- TODO
+    dev = true,
     -- "windwp/nvim-ts-autotag",
-    opts = {},
+    opts = {
+      enable_close_on_slash = true,
+    },
     -- dev = true,
     -- dir = "~/dev/github/nvim-ts-autotag",
   },
