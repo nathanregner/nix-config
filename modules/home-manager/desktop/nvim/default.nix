@@ -57,7 +57,7 @@ in
         emmet-language-server
         fennel-ls
         gopls
-        nodejs.pkgs.graphql-language-service-cli
+        graphql-language-service-cli
         harper
         helm-ls
         libclang

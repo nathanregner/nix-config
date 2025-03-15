@@ -11,7 +11,7 @@
 (defn eval-update-script
   [attr]
   (let [{:strs [name pname oldVersion updateScript]}
-        (->> (str ".#githubActions.nixUpdate.pkgs." attr)
+        (->> (str ".#update-pkgs.passthru.targets." attr)
              (shell {:out :string} "nix" "eval" "--json")
              :out
              (json/parse-string-strict))]
