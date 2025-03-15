@@ -67,26 +67,35 @@ rec {
     // sharedModifications final prev;
 
   unstable-packages = stableFinal: stablePrev: {
-    unstable = import inputs.nixpkgs-unstable {
-      system = stableFinal.system;
-      config.allowUnfree = true;
-      overlays = [
-        (
-          final: prev:
-          builtins.mapAttrs
+    unstable =
+      import
+        ((import inputs.nixpkgs-unstable { inherit (stableFinal) system; }).applyPatches {
+          name = "nixpkgs-unstable-patched";
+          src = inputs.nixpkgs-unstable;
+          patches = builtins.map (file: stableFinal.fetchpatch2 (import file)) (
+            lib.filesystem.listFilesRecursive ./patches
+          );
+        })
+        {
+          inherit (stableFinal) system;
+          config.allowUnfree = true;
+          overlays = [
             (
-              name: pkg:
-              if builtins.hasAttr name prev && lib.isDerivation pkg then warnIfOutdated prev.${name} pkg else pkg
+              final: prev:
+              builtins.mapAttrs
+                (
+                  name: pkg:
+                  if builtins.hasAttr name prev && lib.isDerivation pkg then warnIfOutdated prev.${name} pkg else pkg
+                )
+                (
+                  import ../pkgs {
+                    inherit lib;
+                    pkgs = stableFinal;
+                  }
+                )
             )
-            (
-              import ../pkgs {
-                inherit lib;
-                pkgs = stableFinal;
-              }
-            )
-        )
-        sharedModifications
-      ];
-    };
+            sharedModifications
+          ];
+        };
   };
 }
