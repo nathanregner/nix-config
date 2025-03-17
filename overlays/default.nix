@@ -2,6 +2,12 @@
 let
   inherit (inputs.nixpkgs) lib;
 
+  assertVersion =
+    version: pkg:
+    lib.throwIf (
+      version != pkg.version
+    ) "${pkg.pname or "???"} has been updated: ${version} -> ${pkg.version}" pkg;
+
   warnIfOutdated =
     prev: final:
     lib.warnIf ((lib.versionOlder final.version prev.version) || (final.version == prev.version))
@@ -14,6 +20,19 @@ let
       stable = inputs.nixpkgs.legacyPackages.${final.system};
     in
     rec {
+      # FIXME
+      # https://github.com/NixOS/nixpkgs/issues/305779
+      # https://github.com/betaflight/betaflight-configurator/issues/3947
+      betaflight-configurator = (assertVersion "10.10.0" prev.betaflight-configurator).override {
+        nwjs = prev.nwjs.overrideAttrs rec {
+          version = "0.84.0";
+          src = prev.fetchurl {
+            url = "https://dl.nwjs.io/v${version}/nwjs-v${version}-linux-x64.tar.gz";
+            hash = "sha256-VIygMzCPTKzLr47bG1DYy/zj0OxsjGcms0G1BkI/TEI=";
+          };
+        };
+      };
+
       hydra_unstable = prev.hydra_unstable.overrideAttrs (oldAttrs: {
         patches = (oldAttrs.patches or [ ]) ++ [
           ./hydra/feat-add-always_supported_system_types-option.patch
