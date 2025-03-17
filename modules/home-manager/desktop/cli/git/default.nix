@@ -13,6 +13,23 @@
     maintenance.enable = true;
     extraConfig = {
       alias = {
+        # https://morgan.cugerone.com/blog/workarounds-to-git-worktree-using-bare-repository-and-cannot-fetch-remote-branches/
+        clone-for-worktrees = ''!${
+          lib.getExe (
+            pkgs.writeShellApplication {
+              name = "clone-for-worktrees";
+              text = (builtins.readFile ./clone-for-worktrees.sh);
+            }
+          )
+        }'';
+        convert-to-worktrees = ''!${
+          lib.getExe (
+            pkgs.writeShellApplication {
+              name = "convert-to-worktrees";
+              text = (builtins.readFile ./convert-to-worktrees.sh);
+            }
+          )
+        }'';
         # https://github.com/orgs/community/discussions/9632#discussioncomment-4702442
         ddiff = "-c diff.external=difft diff";
         diff-refactor = ''

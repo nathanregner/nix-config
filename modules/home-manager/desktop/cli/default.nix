@@ -1,8 +1,7 @@
 { pkgs, ... }:
 {
   imports = [
-    ./direnv.nix
-    ./git.nix
+    ./git
     ./k9s.nix
     ./lazygit.nix
     ./nix.nix
@@ -29,6 +28,7 @@
     rsync
     tree
     which
+    trash-cli
 
     # archive formats
     gnutar
