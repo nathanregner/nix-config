@@ -1,13 +1,13 @@
 { pkgs, ... }:
 {
   imports = [
-    ./git.nix
-    ./zoxide.nix
+    ./git
     ./k9s.nix
     ./lazygit.nix
     ./nix.nix
     ./starship.nix
     ./tmux-sessionizer.nix
+    ./zoxide.nix
     ./zsh.nix
   ];
 
