@@ -9,17 +9,17 @@
 
 buildNpmPackage rec {
   pname = "pin-github-action";
-  version = "2.1.1";
+  version = "3.1.0";
 
   src = fetchFromGitHub {
     owner = "mheap";
     repo = "pin-github-action";
     rev = "v${version}";
-    hash = "sha256-eeOnPQiBKXOx42M/JenzhPeZCZ/krLxhRyaAETPe4CM=";
+    hash = "sha256-0YeBGMioUFkxi7moeVPv71Ww4EBYqHtwKbS/gtb1svU=";
     fetchSubmodules = true;
   };
 
-  npmDepsHash = "sha256-2Y7pouKyfjMyejbktmBHhKqycp28MuGG7ZW8/9O1LYY=";
+  npmDepsHash = "sha256-+lda/Xh3Hh1d0nU5m3zmS0roy7Y9qAL8pOij807j2LE=";
 
   dontNpmBuild = true;
 
