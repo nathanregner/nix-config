@@ -2,7 +2,6 @@
 {
   imports = [
     ./git
-    ./direnv.nix
     ./k9s.nix
     ./lazygit.nix
     ./nix.nix
