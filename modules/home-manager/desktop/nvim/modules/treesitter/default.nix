@@ -28,31 +28,24 @@ in
     }
   );
 
-  # programs.neovim.extraPackages = with pkgs.unstable; [
-  #   clang
-  #   gnumake
-  # ];
+  xdg.configFile."nvim/after/queries" = {
+    source = config.lib.file.mkFlakeSymlink ./queries;
+    force = true;
+  };
 
-  xdg.dataFile =
-    {
-      "nvim/after/queries" = {
-        source = config.lib.file.mkFlakeSymlink ./queries;
-        force = true;
-      };
-    }
-    // builtins.listToAttrs (
-      builtins.map (
-        grammar:
-        let
-          language = builtins.elemAt (builtins.match "vimplugin-treesitter-grammar-(.*)" grammar.name) 0;
-        in
-        {
-          name = "${parserPrefix}/parser/${language}.so";
-          value = {
-            source = "${grammar}/parser/${language}.so";
-            force = true;
-          };
-        }
-      ) package.passthru.dependencies
-    );
+  xdg.dataFile = builtins.listToAttrs (
+    builtins.map (
+      grammar:
+      let
+        language = builtins.elemAt (builtins.match "vimplugin-treesitter-grammar-(.*)" grammar.name) 0;
+      in
+      {
+        name = "${parserPrefix}/parser/${language}.so";
+        value = {
+          source = "${grammar}/parser/${language}.so";
+          force = true;
+        };
+      }
+    ) package.passthru.dependencies
+  );
 }
