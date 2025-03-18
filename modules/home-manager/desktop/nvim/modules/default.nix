@@ -2,7 +2,6 @@
   imports = [
     ./clojure
     ./java
-
-    ./treesitter.nix
+    ./treesitter
   ];
 }
