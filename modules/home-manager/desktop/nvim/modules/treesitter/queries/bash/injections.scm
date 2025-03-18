@@ -6,11 +6,27 @@
 ;            (#offset! @injection.content 0 1 0 -1)
 ;            (#set-template-literal-lang-from-comment! @tlc.language @injection.content))
 
+; ((command
+;    name: (command_name (word) @_name)
+;    argument: (string (string_content) @injection.content)
+;    (#eq? @_name "jq")
+;    (#set! injection.language "jq")))
+
+; jq --args 'filter'
 ((command
-   name: (command_name (word) @_name)
-   argument: (string (string_content) @injection.content)
-   (#eq? @_name "jq")
-   (#set! injection.language "jq")))
+  name: (command_name) @_command
+  argument: [
+    (string) @injection.content
+    (concatenation
+      (string) @injection.content)
+    (raw_string) @injection.content
+    (concatenation
+      (raw_string) @injection.content)
+  ])
+  (#eq? @_command "jq")
+  (#offset! @injection.content 0 1 0 -1)
+  (#set! injection.include-children)
+  (#set! injection.language "jq"))
 
   ; (redirected_statement ; [2, 0] - [4, 3]
   ;   body: (command ; [2, 0] - [2, 14]

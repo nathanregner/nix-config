@@ -35,8 +35,8 @@ in
 
   xdg.dataFile =
     {
-      "${parserPrefix}/queries" = {
-        source = config.lib.file.mkFlakeSymlink ../after/queries;
+      "nvim/after/queries" = {
+        source = config.lib.file.mkFlakeSymlink ./queries;
         force = true;
       };
     }
