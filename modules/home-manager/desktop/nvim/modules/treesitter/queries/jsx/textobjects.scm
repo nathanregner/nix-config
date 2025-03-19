@@ -6,4 +6,4 @@
 (jsx_element
   open_tag: (_) @_start
   close_tag: (_) @_end
-  (#make-range-exclusive! "tag.inner" @_start @_end))
+  (#make-range-exclusive! "tag.inner" @_start @_end)) @tag.inner
