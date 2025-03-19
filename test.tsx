@@ -5,7 +5,7 @@ type Props = {};
 const test = (props: Props) => {
   const f = () => {};
   const selfClose = <div />;
-  const empty = <div>asdf</div>;
+  const empty = <div></div>;
   const a = <div>text</div>;
   const b = (
     <div>
