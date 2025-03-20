@@ -26,8 +26,9 @@
         nixRebuild = if pkgs.stdenv.isDarwin then "darwin-rebuild" else "nixos-rebuild";
       in
       rec {
-        jqless = "jq -C | less -r";
         cdiff = "diff --new-line-format='+%L' --old-line-format='-%L' --unchanged-line-format=' %L'"; # diff with full context
+        jqless = "jq -C | less -r";
+        json2nix = "nix eval --arg-from-file stdin /dev/stdin --expr '{ stdin }: { stdin = builtins.fromJSON stdin; }' stdin";
 
         nr = "${nixRebuild} --flake .";
         nrb = "${nr} build";
