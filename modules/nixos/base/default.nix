@@ -73,6 +73,7 @@
     curl
     dig
     ethtool
+    iperf2
     iputils
     mtr
     nmap
