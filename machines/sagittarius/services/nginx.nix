@@ -120,7 +120,6 @@ in
       cookie = {
         domain = "nregner.net";
         secret = null;
-        refresh = "";
       };
       extraConfig = {
         # disable old approval_prompt parameter: https://developers.google.com/identity/openid-connect/openid-connect#prompt
