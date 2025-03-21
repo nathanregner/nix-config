@@ -1,4 +1,4 @@
-{ config, ... }:
+{ config, pkgs, ... }:
 {
   services.grafana = {
     enable = true;
@@ -16,7 +16,7 @@
       dashboards.settings.providers = [
         {
           name = "Host Monitoring";
-          options.path = "/etc/grafana/dashboards";
+          options.path = "/etc/grafana.d/dashboards";
         }
       ];
 
@@ -30,9 +30,8 @@
     };
   };
 
-  environment.etc."grafana.d/dashboards" = {
-    # https://grafana.com/grafana/dashboards/1860-node-exporter-full/
-    source = ./dashboards;
+  environment.etc."grafana.d/dashboards/node-exporter-full.json" = {
+    source = pkgs.node-exporter-full;
     group = "grafana";
     user = "grafana";
   };
