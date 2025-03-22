@@ -1,12 +1,11 @@
 # https://github.com/NixOS/nixpkgs/blob/master/doc/languages-frameworks/rust.section.md
 {
-  installShellFiles,
   lib,
-  mkShell,
+  installShellFiles,
+  mkRustShell,
   nvd,
-  rust-analyzer,
   rustPlatform,
-  rustfmt,
+  ...
 }:
 let
   pkg = rustPlatform.buildRustPackage {
@@ -36,15 +35,8 @@ let
       installShellCompletion target/completions/*
     '';
 
-    passthru.devShell = mkShell {
-      RUST_SRC_PATH = "${rustPlatform.rustcSrc}/library";
-      packages =
-        pkg.nativeBuildInputs
-        ++ pkg.buildInputs
-        ++ [
-          rust-analyzer
-          rustfmt
-        ];
+    passthru.devShell = mkRustShell {
+      inherit pkg rustPlatform;
     };
   };
 in

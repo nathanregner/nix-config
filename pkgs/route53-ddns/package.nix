@@ -1,6 +1,5 @@
 {
   lib,
-  cmake,
   mkRustShell,
   rustPlatform,
   ...
