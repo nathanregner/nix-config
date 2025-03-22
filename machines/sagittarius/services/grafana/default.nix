@@ -6,6 +6,7 @@
       server = {
         http_addr = "127.0.0.1";
         http_port = 3004;
+        domain = "grafana.nregner.net";
       };
     };
 
@@ -35,6 +36,10 @@
     user = "grafana";
   };
 
-  nginx.subdomain.grafana."/".extraConfig = # nginx
-    "return 302 http://sagittarius:${toString config.services.grafana.settings.server.http_port}$request_uri;";
+  nginx.subdomain.grafana = {
+    "/" = {
+      proxyPass = "http://127.0.0.1:${toString config.services.grafana.settings.server.http_port}/";
+      proxyWebsockets = true;
+    };
+  };
 }
