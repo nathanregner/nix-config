@@ -35,7 +35,6 @@ let
 
       hydra_unstable = prev.hydra_unstable.overrideAttrs (oldAttrs: {
         patches = (oldAttrs.patches or [ ]) ++ [
-          ./hydra/fix-restrict-eval-does-not-allow-access-to-git-flake.patch
           ./hydra/feat-add-always_supported_system_types-option.patch
         ];
         checkPhase = "";

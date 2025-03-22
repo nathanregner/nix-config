@@ -27,9 +27,10 @@ pub fn get_latest_build(
 
     let url = format!("{instance}/job/{project}/{jobset}/{job}/latest");
     let response: Build = ureq::get(&url)
-        .set("Accept", "application/json")
+        .header("Accept", "application/json")
         .call()?
-        .into_json()?;
+        .into_body()
+        .read_json()?;
     Ok(response)
 }
 
