@@ -14,9 +14,8 @@
     };
   };
 
-  nginx.subdomain.qb = {
-    "/".proxyPass = "http://127.0.0.1:${toString config.services.qbittorrent.port}/";
-  };
+  nginx.subdomain.qb."/".extraConfig = # nginx
+    "return 302 http://sagittarius:${toString config.services.qbittorrent.port}$request_uri;";
 
   users.users.nregner.extraGroups = [ config.services.qbittorrent.group ];
 }
