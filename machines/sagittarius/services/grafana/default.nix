@@ -15,7 +15,7 @@
       dashboards.settings.providers = [
         {
           name = "Host Monitoring";
-          options.path = "/etc/grafana/dashboards";
+          options.path = "/etc/grafana.d/dashboards";
         }
       ];
 
