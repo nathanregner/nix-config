@@ -9,7 +9,7 @@ clap = { version = "4.5.4", features = ["derive"] }
 clap_complete = "4.5.38"
 serde = { version = "1.0.214", features = ["derive"] }
 tempdir = "0.3.7"
-ureq = { version = "2.10.1", features = ["json"] }
+ureq = { version = "3.0.10", features = ["json"] }
 whoami = { version = "1.5.2", default-features = false }
 
 [build-dependencies]

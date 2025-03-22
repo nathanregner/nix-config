@@ -11,8 +11,8 @@ fn main() -> Result<(), Error> {
     std::fs::create_dir_all(outdir)?;
 
     let mut cmd = <crate::Args as CommandFactory>::command();
-    generate_to(Bash, &mut cmd, "completions", &outdir)?;
-    generate_to(Zsh, &mut cmd, "completions.zsh", &outdir)?;
+    generate_to(Bash, &mut cmd, "completions", outdir)?;
+    generate_to(Zsh, &mut cmd, "completions.zsh", outdir)?;
 
     println!("cargo:warning=completion file is generated: {outdir:?}");
 

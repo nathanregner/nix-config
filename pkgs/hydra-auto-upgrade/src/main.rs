@@ -41,7 +41,7 @@ fn main() -> Result<()> {
 
 fn copy(build: &Build) -> io::Result<()> {
     let mut command = Command::new("nix");
-    command.arg("build").arg("--no-link").arg(&build.out_path());
+    command.arg("build").arg("--no-link").arg(build.out_path());
     exec(&mut command)
 }
 
