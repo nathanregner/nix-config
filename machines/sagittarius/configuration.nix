@@ -4,7 +4,7 @@
     ../../modules/nixos/server
     ./hardware-configuration.nix
     ./services
-    ./users.nix
+    ./users
   ];
 
   networking.hostName = "sagittarius";
@@ -21,6 +21,10 @@
     ttl = 900;
     environmentFile = config.sops.secrets.ddns.path;
   };
+
+  networking.firewall.allowedTCPPorts = [
+    5001 # iperf
+  ];
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions

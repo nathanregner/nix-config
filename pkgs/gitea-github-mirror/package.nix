@@ -1,23 +1,17 @@
 # TODO: nix-update
 {
   lib,
-  cargo,
-  clippy,
   fetchurl,
   git,
   gitea,
   jq,
-  makeRustPlatform,
   mkRustShell,
   openapi-tools,
   openssl,
   pkg-config,
   remarshal,
   runCommand,
-  rust-analyzer,
   rustPlatform,
-  rustfmt,
-  stdenv,
   swagger-codegen3,
   ...
 }:

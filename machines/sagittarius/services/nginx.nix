@@ -45,24 +45,6 @@ in
           };
         in
         {
-          "craigslist.nregner.net" = virtualHost { "/".proxyPass = "http://127.0.0.1:8888/"; };
-          "craigslist-api.nregner.net" = virtualHost {
-            "/" = {
-              proxyPass = "http://127.0.0.1:6000/";
-              extraConfig = ''
-                proxy_hide_header Access-Control-Allow-Origin;
-                proxy_hide_header Access-Control-Allow-Credentials;
-                proxy_hide_header Access-Control-Allow-Headers;
-                proxy_hide_header Access-Control-Allow-Methods;
-
-                add_header Access-Control-Allow-Origin https://craigslist.nregner.net always;
-                add_header Access-Control-Allow-Credentials true always;
-                add_header Access-Control-Allow-Headers * always;
-                add_header Access-Control-Allow-Methods * always;
-              '';
-            };
-          };
-
           "nregner.net" = virtualHost {
             "/" = {
               extraConfig = ''
@@ -120,7 +102,6 @@ in
       cookie = {
         domain = "nregner.net";
         secret = null;
-        refresh = "";
       };
       extraConfig = {
         # disable old approval_prompt parameter: https://developers.google.com/identity/openid-connect/openid-connect#prompt
