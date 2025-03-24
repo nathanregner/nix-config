@@ -7,13 +7,18 @@
 let
   inherit (lib) mkOption types mkIf;
   cfg = config.programs.neovim.modules.java;
-  formatterCfg = "nvim/lsp/jdtls/formatter.xml";
+  formatterConfigPath = "nvim/lsp/jdtls/formatter.xml";
 in
 {
-  options = {
-    programs.neovim.modules.java.enable = mkOption {
+  options.programs.neovim.modules.java = {
+    enable = mkOption {
       type = types.bool;
-      default = true;
+      default = false;
+    };
+
+    formatterConfig = mkOption {
+      type = types.path;
+      default = config.lib.file.mkFlakeSymlink ./cb_eclipse-java-google-style.xml;
     };
   };
 
@@ -31,7 +36,7 @@ in
         };
         settings = {
           java = {
-            format.settings.url = "file://${config.xdg.configHome}/${formatterCfg}";
+            format.settings.url = "file://${config.xdg.configHome}/${formatterConfigPath}";
           };
         };
       };
@@ -42,8 +47,8 @@ in
         source = config.lib.file.mkFlakeSymlink ./java.lua;
         force = true;
       };
-      ${formatterCfg} = {
-        source = config.lib.file.mkFlakeSymlink ./formatter.xml;
+      ${formatterConfigPath} = {
+        source = cfg.formatterConfig;
         force = true;
       };
     };
