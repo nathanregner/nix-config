@@ -44,12 +44,22 @@ let
       # https://github.com/NixOS/nixpkgs/issues/154163#issuecomment-1350599022
       makeModulesClosure = x: prev.makeModulesClosure (x // { allowMissing = true; });
 
-      vimPlugins = prev.vimPlugins // {
-        lazy-nvim = prev.vimPlugins.lazy-nvim.overrideAttrs (old: {
-          patches = old.patches or [ ] ++ [
-            ./lazy-nvim/0001-feat-restore-only-fetch-if-commit-is-missing.patch
-          ];
-        });
+      # FIXME: darwin build
+      nodejs_latest = warnIfOutdated prev.nodejs_latest prev.nodejs_22;
+
+      # TODO: remove once https://github.com/NixOS/nixpkgs/issues/380828
+      python3 = prev.python3.override {
+        packageOverrides = pyfinal: pyprev: {
+          plux = pyprev.plux.overridePythonAttrs (_: rec {
+            version = "1.12.0";
+            src = final.fetchFromGitHub {
+              owner = "localstack";
+              repo = "plux";
+              tag = "v${version}";
+              hash = "sha256-2Sxn/LuiwTzByAAz7VlNLsxEiPIyJWXr86/76Anx+EU=";
+            };
+          });
+        };
       };
 
       wrapNeovimUnstable =
