@@ -270,6 +270,7 @@ require("lazy").setup({
     "neovim/nvim-lspconfig",
     dependencies = {
       "artemave/workspace-diagnostics.nvim",
+      "folke/neoconf.nvim",
       "j-hui/fidget.nvim",
       "yioneko/nvim-vtsls",
     },
