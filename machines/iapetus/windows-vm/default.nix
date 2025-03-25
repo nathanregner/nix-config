@@ -5,9 +5,9 @@
     ./usb-libvirt-hotplug.nix
   ];
   virtualisation.libvirtd.enable = true;
-  vfio.enable = lib.mkDefault true;
-  specialisation."novfio".configuration = {
-    system.nixos.tags = [ "no-vfio" ];
-    vfio.enable = false;
+  vfio.enable = lib.mkDefault false;
+  specialisation."vfio".configuration = {
+    system.nixos.tags = [ "vfio" ];
+    vfio.enable = true;
   };
 }
