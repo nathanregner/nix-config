@@ -1049,8 +1049,18 @@ require("lazy").setup({
       "MunifTanjim/nui.nvim",
     },
     lazy = leet_arg ~= vim.fn.argv(0, -1),
-    opts = { arg = leet_arg, lang = "java" },
+    opts = {
+      arg = leet_arg,
+      injector = {
+        ["cpp"] = { before = true },
+        ["java"] = { before = true },
+        ["python3"] = { before = true },
+      },
+      lang = "java",
+    },
   },
+
+  { import = "user.plugins" },
 }, {
   dev = {
     path = "~/dev/github",
