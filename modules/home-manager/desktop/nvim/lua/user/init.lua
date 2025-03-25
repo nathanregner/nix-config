@@ -423,6 +423,7 @@ require("lazy").setup({
           },
         },
         nil_ls = {},
+        nixd = {},
         nushell = {},
         pyright = {},
         rust_analyzer = {

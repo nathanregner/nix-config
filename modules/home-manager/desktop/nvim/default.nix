@@ -55,6 +55,7 @@ in
           libclang
           lua-language-server
           nil
+          nixd
           terraform-ls
           tflint
           vscode-langservers-extracted
