@@ -47,12 +47,14 @@ return {
             ["ia"] = "@parameter.inner",
             ["af"] = "@function.outer",
             ["if"] = "@function.inner",
-            ["at"] = "@class.outer",
-            ["it"] = "@class.inner",
+            ["aC"] = "@class.outer",
+            ["iC"] = "@class.inner",
             ["ac"] = "@comment.outer",
             ["ic"] = "@comment.inner",
             ["al"] = "@loop.outer",
             ["il"] = "@loop.inner",
+            ["at"] = "@tag.outer",
+            ["it"] = "@tag.inner",
           },
         },
         move = {
@@ -134,11 +136,25 @@ return {
     end,
     opts = {
       sortables = {
+        graphql = {
+          argument = { node = "argument", ordinal = "name" },
+          field = { node = "field_definition", ordinal = "name" },
+          fragments = { node = "definition", ordinal = "fragment_definition" },
+          selection = { node = "selection", ordinal = "name" },
+          variable = { node = "variable_definition", ordinal = "name" },
+        },
+        java = {
+          annotation_array = { node = "class_literal" },
+          annotation_element = { node = "element_value_pair" },
+        },
         javascript = {
+          -- TODO: merge
           keys = { node = "pair" },
+          shorthand = { node = "shorthand_property_identifier" },
         },
         javascriptreact = {
           keys = { node = "pair" },
+          shorthand = { node = "shorthand_property_identifier" },
         },
         nix = {
           -- TODO: inherit(a) b c d;
