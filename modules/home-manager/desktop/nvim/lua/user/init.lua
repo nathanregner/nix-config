@@ -37,6 +37,17 @@ require("lazy").setup({
   "tpope/vim-fugitive",
   "tpope/vim-rhubarb",
 
+  -- Better "s" command
+  {
+    "tpope/vim-abolish",
+    dependencies = {
+      {
+        "markonm/traces.vim",
+        init = function() vim.g.traces_abolish_integration = 1 end,
+      },
+    },
+  },
+
   -- replacement for ":w !sudo tee % > /dev/null" trick
   "lambdalisue/vim-suda",
 
