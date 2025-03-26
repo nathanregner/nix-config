@@ -4,7 +4,7 @@
   treefmt,
 }:
 {
-  default = pkgs.mkShell {
+  default = pkgs.mkShellNoCC {
     packages = with pkgs.unstable; [
       age
       inputs'.deploy-rs.packages.default
@@ -17,7 +17,7 @@
     ];
   };
 
-  bootstrap = pkgs.mkShell {
+  bootstrap = pkgs.mkShellNoCC {
     NIX_CONFIG = "experimental-features = nix-command flakes";
     nativeBuildInputs = with pkgs.unstable; [
       nixVersions.latest

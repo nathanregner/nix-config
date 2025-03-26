@@ -1,13 +1,13 @@
 {
   cargo,
   clippy,
-  mkShell,
+  mkShellNoCC,
   rust-analyzer,
   rustfmt,
   ...
 }:
 { pkg, rustPlatform, ... }@args:
-mkShell (
+mkShellNoCC (
   {
     RUST_SRC_PATH = "${rustPlatform.rustLibSrc}";
     packages =
