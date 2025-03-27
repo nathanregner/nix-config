@@ -2,14 +2,12 @@
   lib,
   fetchFromGitHub,
   fetchYarnDeps,
-  gitUpdater,
-  graphql-language-service-cli,
   makeWrapper,
   nodejs,
   stdenv,
-  testers,
   yarnBuildHook,
   yarnConfigHook,
+  versionCheckHook,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -19,13 +17,17 @@ stdenv.mkDerivation (finalAttrs: {
   src = fetchFromGitHub {
     owner = "graphql";
     repo = "graphiql";
-    tag = "graphql-language-service-cli@${finalAttrs.version}";
-    hash = "sha256-NJTggaMNMjOP5oN+gHxFTwEdNipPNzTFfA6f975HDgM=";
+    rev = "592e6832d3257774a18d0566a9435e033f7b4274";
+    hash = "sha256-SK9B/M2/nDBKUpkVRYn1TrlZQBFUxU1zhTwjvu8CXPA=";
   };
+
+  patches = [
+    ./patches/0001-repurpose-vscode-graphql-build-script.patch
+  ];
 
   yarnOfflineCache = fetchYarnDeps {
     yarnLock = "${finalAttrs.src}/yarn.lock";
-    hash = "sha256-ae6KP2sFgw8/8YaTJSPscBlVQ5/bzbvHRZygcMgFAlU=";
+    hash = "sha256-pvGIv1zQdYk+AbmTYcul84Pu4/hYd6hPFMyau0t6xCM=";
   };
 
   nativeBuildInputs = [
@@ -42,15 +44,12 @@ stdenv.mkDerivation (finalAttrs: {
 
     pushd packages/graphql-language-service-cli
 
-    # even with dev dependencies stripped, node_modules is over 1GB
-    # just bundle what we need
-    cp ${./esbuild.js} esbuild.js
-    node esbuild.js
+    node esbuild.js --minify
 
     # copy package.json for --version command
     mv {out/graphql.js,package.json} $out/lib
 
-    makeWrapper ${nodejs}/bin/node $out/bin/graphql-lsp \
+    makeWrapper ${lib.getExe nodejs} $out/bin/graphql-lsp \
       --add-flags $out/lib/graphql.js \
 
     popd
@@ -58,14 +57,12 @@ stdenv.mkDerivation (finalAttrs: {
     runHook postInstall
   '';
 
-  passthru = {
-    updateScript = gitUpdater {
-      rev-prefix = "graphql-language-service-cli@";
-    };
+  nativeInstallCheckInputs = [ versionCheckHook ];
+  doInstallCheck = true;
+  versionCheckProgram = "${placeholder "out"}/bin/${finalAttrs.meta.mainProgram}";
 
-    tests.version = testers.testVersion {
-      package = graphql-language-service-cli;
-    };
+  passthru = {
+    updateScript = ./updater.sh;
   };
 
   meta = {
