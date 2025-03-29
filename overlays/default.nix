@@ -33,7 +33,7 @@ let
         };
       };
 
-      hydra_unstable = prev.hydra_unstable.overrideAttrs (oldAttrs: {
+      hydra = prev.hydra.overrideAttrs (oldAttrs: {
         patches = (oldAttrs.patches or [ ]) ++ [
           ./hydra/feat-add-always_supported_system_types-option.patch
         ];
