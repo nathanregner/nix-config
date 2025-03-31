@@ -11,6 +11,7 @@
     ./docker.nix
     ./networking.nix
     ./nix.nix
+    ./rustic.nix
     ./services
     ./sops.nix
     ./tailscale.nix
