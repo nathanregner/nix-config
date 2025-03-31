@@ -8,7 +8,10 @@
   imports = [
     ../../modules/nixos/server
     ./klipper
+    ./minimal.nix
   ];
+
+  system.hydra-auto-upgrade.enable = false;
 
   boot = {
     supportedFilesystems = lib.mkForce [
