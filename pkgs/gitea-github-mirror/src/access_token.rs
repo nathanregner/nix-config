@@ -8,7 +8,7 @@ use std::{
 use color_eyre::eyre::Result;
 use gix_config::Source;
 use tempdir::TempDir;
-use url::{Host, Url};
+use url::Url;
 
 pub fn update_access_token(repositories: PathBuf, access_token: &str) -> Result<u32> {
     let mut count = 0;
