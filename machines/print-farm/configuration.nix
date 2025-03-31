@@ -6,19 +6,15 @@
 }:
 {
   imports = [
-    ../../modules/nixos/server
+    # ../../modules/nixos/server
     ./klipper
     ./minimal.nix
   ];
-
-  system.hydra-auto-upgrade.enable = false;
 
   boot = {
     supportedFilesystems = lib.mkForce [
       "vfat"
       "ext4"
-      "ntfs"
-      "cifs"
     ];
     consoleLogLevel = lib.mkDefault 7;
     initrd = {
@@ -31,36 +27,6 @@
 
   users.users.root.password = "root";
   services.openssh.settings.PasswordAuthentication = false;
-
-  sops.defaultSopsFile = ./secrets.yaml;
-
-  # keep record of flake source
-  environment.etc."nix/flake-channels/system".source = self;
-
-  # Networking
-  sops.secrets.wireless.sopsFile = ./secrets.yaml;
-  networking.wireless = {
-    enable = true;
-    userControlled.enable = true;
-    secretsFile = config.sops.secrets.wireless.path;
-    networks."4Cosands" = {
-      priority = 1;
-      psk = "ext:Cosands";
-    };
-    networks."REGNERD" = {
-      priority = 2;
-      psk = "ext:REGNERD";
-    };
-  };
-
-  sops.secrets.ddns.key = "route53/ddns";
-  services.route53-ddns = {
-    enable = true;
-    domain = "${config.networking.hostName}.print.nregner.net";
-    ipType = "lan";
-    ttl = 60;
-    environmentFile = config.sops.secrets.ddns.path;
-  };
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions

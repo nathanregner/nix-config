@@ -30,13 +30,6 @@ in
     (
       { pkgs, ... }:
       {
-        print-farm.klipper = {
-          enable = true;
-          configFile = ./klipper/sunlu-s8.cfg;
-          productId = "614e";
-          vendorId = "1d50";
-        };
-        environment.systemPackages = [ (pkgs.callPackage ./klipper/firmware { }).flash-sunlu-s8 ];
       }
     )
   ];
