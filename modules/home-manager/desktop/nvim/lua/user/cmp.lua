@@ -1,4 +1,5 @@
 local cmp = require("cmp")
+local types = require("cmp.types")
 
 local luasnip = require("luasnip")
 
@@ -104,9 +105,9 @@ cmp.setup({
 
       -- compare.score_offset, -- not good at all
       compare.exact,
-      compare.score, -- based on :  score = score + ((#sources - (source_index - 1)) * sorting.priority_weight)
       compare.locality,
       compare.recently_used,
+      compare.score, -- based on :  score = score + ((#sources - (source_index - 1)) * sorting.priority_weight)
       compare.offset,
       -- compare.scopes, -- what?
       compare.sort_text,
@@ -115,9 +116,16 @@ cmp.setup({
   },
   sources = {
     { name = "luasnip" },
-    { name = "nvim_lsp" },
-    buffer,
     { name = "path" },
+    {
+      name = "nvim_lsp",
+      entry_filter = function(entry, _ctx)
+        local kind = types.lsp.CompletionItemKind[entry:get_kind()]
+        if kind == "Text" then return false end
+        return true
+      end,
+    },
+    buffer,
   },
 })
 

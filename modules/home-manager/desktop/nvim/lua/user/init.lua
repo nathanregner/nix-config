@@ -451,7 +451,18 @@ require("lazy").setup({
           },
         },
         nil_ls = {},
+        nixd = {},
         nushell = {},
+        omnisharp = {
+          cmd = { "OmniSharp" },
+          settings = {
+            RoslynExtensionsOptions = {
+              EnableDecompilationSupport = true,
+              EnableImportCompletion = true,
+              AnalyzeOpenDocumentsOnly = false,
+            },
+          },
+        },
         pyright = {},
         rust_analyzer = {
           -- https://rust-analyzer.github.io/manual.html#configuration
@@ -524,10 +535,15 @@ require("lazy").setup({
       capabilities = vim.tbl_deep_extend("force", capabilities, require("cmp_nvim_lsp").default_capabilities())
 
       for server_name, server_config in pairs(servers) do
-        require("lspconfig")[server_name].setup(vim.tbl_deep_extend("error", {
+        require("lspconfig")[server_name].setup({
+          cmd = server_config.cmd,
           capabilities = capabilities,
           on_attach = on_attach,
-        }, server_config))
+          settings = server_config.settings,
+          filetypes = server_config.filetypes,
+          init_options = server_config.init_options,
+          root_dir = server_config.root_dir,
+        })
       end
     end,
   },
@@ -691,7 +707,7 @@ require("lazy").setup({
         lualine_b = { "diagnostics" },
         lualine_c = { { "filename", path = 1 } },
         lualine_x = { "encoding", "fileformat", "filetype" },
-        lualine_y = { "progress" },
+        lualine_y = { "progress", "searchcount" },
         lualine_z = { "location", "selectioncount" },
       },
     },
@@ -814,25 +830,6 @@ require("lazy").setup({
       },
     },
   },
-
-  -- { -- Colorizer
-  --   "norcalli/nvim-colorizer.lua",
-  --   event = "VeryLazy",
-  --   cmd = "ColorizerToggle",
-  --   opts = {
-  --     "*", -- Highlight all files
-  --     "!TelescopePrompt", -- Except telescope previews. Seems to result in freezes: https://github.com/nvim-telescope/telescope.nvim/issues/1379
-  --     RGB = true, -- #RGB hex codes
-  --     RRGGBB = true, -- #RRGGBB hex codes
-  --     names = false, -- "Name" codes like Blue
-  --     RRGGBBAA = true, -- #RRGGBBAA hex codes
-  --     rgb_fn = true, -- CSS rgb() and rgba() functions
-  --     hsl_fn = true, -- CSS hsl() and hsla() functions
-  --     css = true, -- Enable all CSS features: rgb_fn, hsl_fn, names, RGB, RRGGBB
-  --     css_fn = true, -- Enable all CSS *functions*: rgb_fn, hsl_fn
-  --   },
-  --   config = function(_, opts) require("colorizer").setup({ "*" }, opts) end,
-  -- },
 
   { -- Neotest
     "nvim-neotest/neotest",
