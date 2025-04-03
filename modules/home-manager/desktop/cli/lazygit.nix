@@ -23,7 +23,7 @@
       in
       ''
         makeWrapper ${lib.getExe pkgs.unstable.lazygit} $out/bin/lazygit \
-          --prefix LG_CONFIG_FILE : "${themePkg}/${cfg.flavor}/${cfg.accent}.yml,${configFile}";
+          --prefix LG_CONFIG_FILE , "${themePkg}/${cfg.flavor}/${cfg.accent}.yml,${configFile}";
       ''
     );
     # https://github.com/jesseduffield/lazygit/blob/master/docs/Config.md
