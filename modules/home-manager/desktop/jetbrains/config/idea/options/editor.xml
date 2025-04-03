@@ -4,6 +4,7 @@
     <option name="COMPLETION_CASE_SENSITIVE" value="2" />
     <option name="USE_ACCESSORS_IN_EQUALS_HASHCODE" value="true" />
     <option name="ADD_UNAMBIGIOUS_IMPORTS_ON_THE_FLY" value="true" />
+    <EXCLUDED_PACKAGE NAME="org.hibernate.jpa.QueryHints" />
   </component>
   <component name="CodeVisionSettings">
     <option name="codeVisionGroupToPosition">
