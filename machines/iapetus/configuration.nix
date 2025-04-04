@@ -8,6 +8,7 @@
   imports = [
     ../../modules/nixos/desktop
     ./hardware-configuration.nix
+    ./squid
     ./windows-vm
     ./zsa.nix
   ];
