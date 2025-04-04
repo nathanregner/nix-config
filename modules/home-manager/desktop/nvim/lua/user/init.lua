@@ -682,12 +682,6 @@ require("lazy").setup({
     init = function() vim.cmd.colorscheme("catppuccin") end,
   },
 
-  -- https://github.com/stevearc/dressing.nvim
-  {
-    "stevearc/dressing.nvim",
-    opts = {},
-  },
-
   {
     "nvim-lualine/lualine.nvim",
     opts = {
