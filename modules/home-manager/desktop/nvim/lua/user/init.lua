@@ -215,6 +215,7 @@ require("lazy").setup({
 
   { -- Notifications + LSP Progress Messages
     "j-hui/fidget.nvim",
+    lazy = false,
     ---@type fidget.config
     opts = {
       notification = {
