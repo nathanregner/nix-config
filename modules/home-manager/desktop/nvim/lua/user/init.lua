@@ -669,15 +669,6 @@ require("lazy").setup({
       styles = {
         conditionals = {}, -- disable italics
       },
-      integrations = {
-        snacks = true,
-      },
-      -- https://github.com/catppuccin/nvim/issues/823
-      custom_highlights = function(colors)
-        return {
-          NormalFloat = { bg = colors.base, fg = colors.text },
-        }
-      end,
     },
     init = function() vim.cmd.colorscheme("catppuccin") end,
   },
