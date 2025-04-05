@@ -75,6 +75,7 @@
 
           exec-once = ${lib.getExe import-env} tmux
           exec-once = ${lib.getExe import-env} system
+          exec-once = nm-applet --indicator
           exec-once = blueman-applet
           exec-once = "systemctl --user start waybar.service"
           source = ${config.xdg.configHome}/hypr/hyprland.user.conf

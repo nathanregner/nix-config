@@ -137,6 +137,7 @@
     ++ (with pkgs.unstable; [
       android-file-transfer # aft-mtp-mount ~/mnt
       nautilus-python
+      networkmanagerapplet
       libmtp
       virt-manager
     ]);
