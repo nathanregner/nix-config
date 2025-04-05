@@ -95,7 +95,6 @@ in
       '';
       clientID = "397693947419-n7dljfbjdrs7da82o1mpa9fhoafo7467.apps.googleusercontent.com";
       clientSecret = null;
-      scope = "offline_access";
       google = {
         serviceAccountJSON = config.sops.secrets.oauth2-proxy-google-service-account.path;
       };
