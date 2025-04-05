@@ -6,7 +6,7 @@ edition = "2021"
 [dependencies]
 clients = { path = "./clients" }
 color-eyre = "0.6.3"
-gix-config = "0.43.0"
+gix-config = "0.44.0"
 http = "1"
 tempdir = "0.3.7"
 tracing = "0.1.40"
