@@ -9,6 +9,7 @@
     inputs.catppuccin-nix.nixosModules.catppuccin
     inputs.nixos-generators.nixosModules.all-formats
     ./docker.nix
+    ./keyd.nix
     ./networking.nix
     ./nix.nix
     ./services
