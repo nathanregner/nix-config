@@ -80,7 +80,7 @@ let
       lockFile = ./Cargo.lock;
       outputHashes = {
         "progenitor-0.9.1" = "sha256-s8ebaxdCYft2FHwB41hnBrKr1t5OU8g4duc+y/3YkeI=";
-        "typify-0.3.0" = "sha256-R5pVKvIy0uWkq/Q1MrpV9fAtSzgIHhwm9EQcss4MGIo=";
+        "typify-0.3.0" = "sha256-6seAL8DfQmCgQyFR9IAbzuL8ZJXWd56Kkxcr/Y2yE3A=";
       };
     };
 
