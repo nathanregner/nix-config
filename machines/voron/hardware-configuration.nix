@@ -1,5 +1,6 @@
 {
   inputs,
+  config,
   pkgs,
   lib,
   ...
@@ -8,7 +9,7 @@
   imports = [ inputs.nixos-hardware.nixosModules.common-pc-ssd ];
 
   boot = {
-    kernelPackages = pkgs.linuxPackagesFor pkgs.local.linux-orangepi-6_1-rk35xx;
+    kernelPackages = pkgs.linuxKernel.packages.linux_6_16;
 
     supportedFilesystems = lib.mkForce [
       "vfat"
@@ -24,6 +25,15 @@
 
     initrd.includeDefaultModules = false;
   };
+
+  assertions = [
+    {
+      assertion = lib.strings.versionAtLeast config.boot.kernelPackages.kernel.version pkgs.linuxPackages.kernel.version;
+      message = ''
+        Kernel is out of date: ${config.boot.kernelPackages.kernel.version} < ${pkgs.linuxPkgs.kernel.version}
+      '';
+    }
+  ];
 
   powerManagement.cpuFreqGovernor = "ondemand";
 
