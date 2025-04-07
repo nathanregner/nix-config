@@ -8,6 +8,7 @@
   imports = [
     ../../modules/nixos/desktop
     ./hardware-configuration.nix
+    ./squid
     ./windows-vm
     ./zsa.nix
   ];
@@ -18,6 +19,7 @@
   networking.hostName = "iapetus";
   networking.networkmanager.enable = true;
   systemd.services.NetworkManager-wait-online.enable = false;
+  services.blueman.enable = true;
 
   # Desktop environment
   services.xserver = {
@@ -136,6 +138,7 @@
     ++ (with pkgs.unstable; [
       android-file-transfer # aft-mtp-mount ~/mnt
       nautilus-python
+      networkmanagerapplet
       libmtp
       virt-manager
     ]);

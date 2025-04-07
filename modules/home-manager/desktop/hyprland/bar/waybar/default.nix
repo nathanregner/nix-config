@@ -37,7 +37,6 @@
           "custom/storage"
           "backlight"
           "pulseaudio"
-          "network"
           "idle_inhibitor"
           "battery"
           "clock"
@@ -85,22 +84,6 @@
             activated = "󰅶";
             deactivated = "󰾪";
           };
-        };
-
-        network = {
-          format = iconFormat;
-          format-alt = "{ipaddr}/{cidr} ${iconFormat}";
-          format-alt-click = "click-right";
-          format-icons = {
-            disconnected = [ "" ];
-            ethernet = [ "󰈀" ];
-            wifi = [
-              ""
-              ""
-              ""
-            ];
-          };
-          # on-click = "nmtui";
         };
 
         pulseaudio = {

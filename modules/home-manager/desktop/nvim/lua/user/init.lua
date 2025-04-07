@@ -215,6 +215,7 @@ require("lazy").setup({
 
   { -- Notifications + LSP Progress Messages
     "j-hui/fidget.nvim",
+    lazy = false,
     ---@type fidget.config
     opts = {
       notification = {
@@ -242,8 +243,6 @@ require("lazy").setup({
 
   { -- Autocompletion
     "hrsh7th/nvim-cmp",
-    -- FIXME: doesn't autocomplete cmdline until a buffer is opened
-    -- event = "InsertEnter",
     lazy = false,
     dependencies = {
       -- Snippet Engine & its associated nvim-cmp source
@@ -836,7 +835,6 @@ require("lazy").setup({
     dependencies = {
       "nvim-neotest/nvim-nio",
       "nvim-lua/plenary.nvim",
-      "antoinemadec/FixCursorHold.nvim",
       "nvim-treesitter/nvim-treesitter",
       -- Adapters
       "marilari88/neotest-vitest",

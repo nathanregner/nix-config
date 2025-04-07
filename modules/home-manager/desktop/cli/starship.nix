@@ -12,6 +12,7 @@
       };
       docker_context.only_with_files = false;
       package.disabled = true;
+      git_status.disabled = true;
 
       # FIXME: IFD
       # catppuccin.starship.enable = false;

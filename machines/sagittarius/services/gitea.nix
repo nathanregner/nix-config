@@ -13,9 +13,8 @@
     };
   };
 
-  nginx.subdomain.git = {
-    "/".proxyPass = "http://127.0.0.1:${toString config.services.gitea.settings.server.HTTP_PORT}/";
-  };
+  nginx.subdomain.git."/".extraConfig = # nginx
+    "return 302 http://sagittarius:${toString config.services.gitea.settings.server.HTTP_PORT}$request_uri;";
 
   sops.secrets.gitea-github-mirror = { };
 
