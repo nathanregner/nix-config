@@ -243,8 +243,6 @@ require("lazy").setup({
 
   { -- Autocompletion
     "hrsh7th/nvim-cmp",
-    -- FIXME: doesn't autocomplete cmdline until a buffer is opened
-    -- event = "InsertEnter",
     lazy = false,
     dependencies = {
       -- Snippet Engine & its associated nvim-cmp source

@@ -9,8 +9,10 @@
     inputs.catppuccin-nix.nixosModules.catppuccin
     inputs.nixos-generators.nixosModules.all-formats
     ./docker.nix
+    ./keyd.nix
     ./networking.nix
     ./nix.nix
+    ./rustic.nix
     ./services
     ./sops.nix
     ./tailscale.nix
