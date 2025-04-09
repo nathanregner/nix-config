@@ -208,18 +208,7 @@ require("lazy").setup({
   {
     "AndrewRadev/bufferize.vim",
     keys = {
-      { "<leader>n", function() vim.cmd("Bufferize Fidget history") end, desc = "Notification History" },
-    },
-  },
-
-  { -- Notifications + LSP Progress Messages
-    "j-hui/fidget.nvim",
-    lazy = false,
-    ---@type fidget.config
-    opts = {
-      notification = {
-        override_vim_notify = true,
-      },
+      -- { "<leader>n", function() vim.cmd("Bufferize Fidget history") end, desc = "Notification History" },
     },
   },
 
@@ -272,7 +261,6 @@ require("lazy").setup({
     dependencies = {
       "artemave/workspace-diagnostics.nvim",
       "folke/neoconf.nvim",
-      "j-hui/fidget.nvim",
       "yioneko/nvim-vtsls",
     },
     config = function()
@@ -510,6 +498,19 @@ require("lazy").setup({
         })
       end
     end,
+  },
+
+  {
+    "folke/noice.nvim",
+    dependencies = {
+      "MunifTanjim/nui.nvim",
+    },
+    event = "VeryLazy",
+    -- lazy = false,
+    opts = {
+      cmdline = { enabled = false },
+      messages = { enabled = false },
+    },
   },
 
   {
