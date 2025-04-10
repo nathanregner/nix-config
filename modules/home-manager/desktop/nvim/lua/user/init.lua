@@ -537,19 +537,6 @@ require("lazy").setup({
   },
 
   {
-    "folke/noice.nvim",
-    dependencies = {
-      "MunifTanjim/nui.nvim",
-    },
-    event = "VeryLazy",
-    -- lazy = false,
-    opts = {
-      cmdline = { enabled = false },
-      messages = { enabled = false },
-    },
-  },
-
-  {
     "folke/lazydev.nvim",
     ft = "lua",
     dependencies = { "Bilal2453/luvit-meta", lazy = true }, -- optional `vim.uv` typings
@@ -570,18 +557,31 @@ require("lazy").setup({
   },
 
   {
+    "folke/noice.nvim",
+    dependencies = {
+      "MunifTanjim/nui.nvim",
+    },
+    event = "VeryLazy",
+    -- lazy = false,
+    opts = {
+      cmdline = { enabled = false },
+      messages = { enabled = false },
+    },
+  },
+
+  {
     "folke/which-key.nvim",
+    event = "VeryLazy",
     config = function()
       ---@diagnostic disable-next-line: missing-fields
       require("which-key").setup({})
-      require("which-key").register({
-        ["<leader>c"] = { name = "[C]ode", _ = "which_key_ignore" },
-        ["<leader>d"] = { name = "[D]ocument", _ = "which_key_ignore" },
-        ["<leader>g"] = { name = "[G]it", _ = "which_key_ignore" },
-        ["<leader>h"] = { name = "More git", _ = "which_key_ignore" },
-        ["<leader>r"] = { name = "[R]ename", _ = "which_key_ignore" },
-        ["<leader>f"] = { name = "[F]ind", _ = "which_key_ignore" },
-        ["<leader>w"] = { name = "[W]orkspace", _ = "which_key_ignore" },
+      require("which-key").add({
+        { "<leader>c", group = "Code" },
+        { "<leader>f", group = "Find" },
+        { "<leader>g", group = "Git" },
+        { "<leader>h", group = "Hunk" },
+        { "<leader>r", group = "Rename" },
+        { "<leader>w", group = "Workspace" },
       })
     end,
   },
