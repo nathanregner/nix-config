@@ -68,6 +68,7 @@ in
       extraPackages = builtins.attrValues {
         # language servers
         inherit (pkgs.unstable)
+          bash-language-server
           emmet-language-server
           gopls
           graphql-language-service-cli
