@@ -215,12 +215,6 @@ return {
   },
   {
     "nathanregner/nvim-ts-autotag", -- TODO
-    dev = true,
-    -- "windwp/nvim-ts-autotag",
-    opts = {
-      enable_close_on_slash = true,
-    },
-    -- dev = true,
-    -- dir = "~/dev/github/nvim-ts-autotag",
+    opts = {},
   },
 }
