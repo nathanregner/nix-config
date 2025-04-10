@@ -9,6 +9,7 @@
     ./jetbrains
     ./nvim
     ./sops.nix
+    ./terraform
     ./theme.nix
   ];
 
