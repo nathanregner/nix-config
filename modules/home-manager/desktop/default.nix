@@ -3,6 +3,7 @@
   imports = [
     ../base
     ./alacritty.nix
+    ./ast-grep
     ./cli
     ./firefox
     ./insync.nix

@@ -333,6 +333,7 @@ require("lazy").setup({
       ---
       --- @type { [string]: LspConfig }
       local servers = {
+        ast_grep = {},
         bashls = {},
         clangd = {
           cmd = { -- https://www.reddit.com/r/neovim/comments/12qbcua/multiple_different_client_offset_encodings/
