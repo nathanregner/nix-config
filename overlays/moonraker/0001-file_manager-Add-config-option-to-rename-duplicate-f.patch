@@ -1,0 +1,63 @@
+From 3665e366735e6912ba61b28c57c4946873355d1e Mon Sep 17 00:00:00 2001
+From: Nathan Regner <nathanregner@gmail.com>
+Date: Fri, 11 Apr 2025 16:36:45 -0600
+Subject: [PATCH] file_manager: Add config option to rename duplicate files
+ instead of overwriting
+
+Signed-off-by: Nathan Regner <nathanregner@gmail.com>
+---
+ docs/configuration.md                             |  4 ++++
+ moonraker/components/file_manager/file_manager.py | 15 +++++++++++++++
+ 2 files changed, 19 insertions(+)
+
+diff --git a/docs/configuration.md b/docs/configuration.md
+index 299ea5d..a2b3179 100644
+--- a/docs/configuration.md
++++ b/docs/configuration.md
+@@ -158,6 +158,10 @@ enable_config_write_access: True
+ #   When enabled the configuration folder is writable over the API.  Some
+ #   installations, such as those in public areas, may wish to lock out
+ #   configuration changes.  The default is True.
++enable_upload_overwrite: True
++#   When enabled, Moonraker will overwrite existing files on upload. Otherwise,
++#   a unique suffix will be appened to the filename. Example:
++#     duplicate.gcode -> duplicate(1).gcode
+ ```
+ 
+ /// Note
+diff --git a/moonraker/components/file_manager/file_manager.py b/moonraker/components/file_manager/file_manager.py
+index 758c994..8a07301 100644
+--- a/moonraker/components/file_manager/file_manager.py
++++ b/moonraker/components/file_manager/file_manager.py
+@@ -82,6 +82,7 @@ class FileManager:
+         self.add_reserved_path("backup", self.datapath.joinpath("backup"), False)
+         self.gcode_metadata = MetadataStorage(config, db)
+         self.sync_lock = NotifySyncLock(config)
++        self.enable_upload_overwrite = config.getboolean('enable_upload_overwrite', True)
+         avail_observers: Dict[str, Type[BaseFileSystemObserver]] = {
+             "none": BaseFileSystemObserver,
+             "inotify": InotifyObserver
+@@ -880,6 +881,20 @@ class FileManager:
+             logging.info(
+                 f"Destination file exists and appears to be read-only: {dest_path}"
+             )
++
++        # Imperfect implementation that suffers from a TOCTOU race, however:
++        # 1. It's unlikely to occur (at this point we've acquired `sync_lock`,
++        #    so it'd have to be done by an external program)
++        # 2. Atomic renames don't work across filesystems, so we're likely to
++        #    encounter this anyway trying to copy from tmpfs -> disk
++        if not self.enable_upload_overwrite:
++            name, ext = os.path.splitext(dest_path)
++            i = 1
++            while os.path.exists(dest_path):
++                dest_path = f"{name}({i}){ext}"
++                i += 1
++            filename = os.path.basename(dest_path)
++
+         return {
+             'root': root,
+             'filename': filename,
+-- 
+2.48.1
+
