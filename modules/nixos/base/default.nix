@@ -35,7 +35,8 @@
 
   system.configurationRevision = self.rev or self.dirtyRev or null;
 
-  boot.tmp.cleanOnBoot = true;
+  boot.tmp.useTmpfs = true;
+  nix.settings.build-dir = "/var/tmp";
 
   # basic system utilities
   environment.systemPackages = with pkgs.unstable; [
