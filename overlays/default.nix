@@ -108,7 +108,7 @@ rec {
 
   unstable-packages = stableFinal: stablePrev: {
     unstable = import inputs.nixpkgs-unstable {
-      system = stableFinal.system;
+      system = stableFinal.stdenv.system;
       config.allowUnfree = true;
       overlays = [
         (

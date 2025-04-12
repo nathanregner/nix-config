@@ -1,5 +1,9 @@
 # derived from <nixpkgs>/maintainers/scripts/update.nix
-{ lib, pkgs }:
+{
+  pkgs,
+  lib,
+  writeText,
+}:
 let
   get-script = pkg: pkg.updateScript or null;
 
@@ -97,4 +101,4 @@ let
       };
     };
 in
-builtins.listToAttrs (map packageData packages)
+writeText "packages.json" (builtins.toJSON (builtins.listToAttrs (map packageData packages)))

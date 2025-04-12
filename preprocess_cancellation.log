@@ -1,0 +1,90 @@
++ url=
++ branch=
++ hardcode_zero_version=
++ tag_format=
++ tag_prefix=
++ tag_converter=
++ shallow_clone=
++ : ''
++ ((  3 > 0  ))
++ flag=--url=
++ shift 1
++ case "$flag" in
++ url=
++ ((  2 > 0  ))
++ flag='--tag-format=*'
++ shift 1
++ case "$flag" in
++ tag_format='*'
++ ((  1 > 0  ))
++ flag=--shallow-clone
++ shift 1
++ case "$flag" in
++ shallow_clone=1
++ ((  0 > 0  ))
++ [[ -z '' ]]
+++ nix-instantiate --eval -E 'with import ./. {}; preprocess_cancellation.src.gitRepoUrl'
+++ tr -d '"'
+warning: Git tree '/home/nregner/nix-config/voron' is dirty
++ url=https://github.com/nathanregner/preprocess_cancellation.git
+++ mktemp -d
++ tmpdir=/tmp/nix-shell-86926-0/tmp.s2Yzg165xG
++ cloneArgs=()
++ [[ 1 == \1 ]]
++ cloneArgs+=(--depth=1)
++ [[ -n '' ]]
++ git clone --depth=1 https://github.com/nathanregner/preprocess_cancellation.git /tmp/nix-shell-86926-0/tmp.s2Yzg165xG
+Cloning into '/tmp/nix-shell-86926-0/tmp.s2Yzg165xG'...
++ pushd /tmp/nix-shell-86926-0/tmp.s2Yzg165xG
+++ git show -s --pretty=format:%cs
++ commit_date=2025-04-11
+++ git show -s --pretty=format:%H
++ commit_sha=7d16ded500424d8a25d504875a9ddf330d4459ff
++ last_tag=
++ [[ -z '' ]]
++ [[ 1 == \1 ]]
++ depth=100
++ ((  depth < 10000  ))
+++ getLatestVersion
+++ git describe --tags --abbrev=0 --match '*'
+++ true
++ last_tag=
++ [[ -n '' ]]
++ git fetch --depth=100 --tags
+From https://github.com/nathanregner/preprocess_cancellation
+ * [new tag]         0.1.0      -> 0.1.0
+ * [new tag]         0.1.6      -> 0.1.6
+ * [new tag]         0.1.7      -> 0.1.7
+ * [new tag]         0.2.0      -> 0.2.0
+ * [new tag]         0.3.a1     -> 0.3.a1
+ * [new tag]         0.3.a2     -> 0.3.a2
++ depth=200
++ ((  depth < 10000  ))
+++ getLatestVersion
+++ git describe --tags --abbrev=0 --match '*'
+++ true
++ last_tag=
++ [[ -n '' ]]
++ git fetch --depth=200 --tags
++ depth=400
++ ((  depth < 10000  ))
+++ getLatestVersion
+++ git describe --tags --abbrev=0 --match '*'
++ last_tag=0.2.0
++ [[ -n 0.2.0 ]]
++ break
++ [[ -z 0.2.0 ]]
++ [[ -z 0.2.0 ]]
++ [[ -n '' ]]
++ [[ -n '' ]]
++ [[ ! 0.2.0 =~ ^[[:digit:]] ]]
++ new_version=0.2.0-unstable-2025-04-11
++ popd
++ update-source-version preprocess_cancellation 0.2.0-unstable-2025-04-11 --rev=7d16ded500424d8a25d504875a9ddf330d4459ff
+warning: Git tree '/home/nregner/nix-config/voron' is dirty
+warning: Git tree '/home/nregner/nix-config/voron' is dirty
+warning: Git tree '/home/nregner/nix-config/voron' is dirty
+warning: Git tree '/home/nregner/nix-config/voron' is dirty
+warning: Git tree '/home/nregner/nix-config/voron' is dirty
+warning: Git tree '/home/nregner/nix-config/voron' is dirty
+sed: couldn't open temporary file /nix/store/9wv5v7cj88qr7aak526hsna1qqp0hzhr-source/pkgs/preprocess_cancellation/sedJeiL2T: Read-only file system

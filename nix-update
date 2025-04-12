@@ -1,0 +1,32 @@
+PATH=${PATH:+':'$PATH':'}
+PATH=${PATH/':''/nix/store/phmkwcmwz04sb2g3iicflbr2034ywxi0-nix-update-1.10.0/bin'':'/':'}
+PATH='/nix/store/phmkwcmwz04sb2g3iicflbr2034ywxi0-nix-update-1.10.0/bin'$PATH
+PATH=${PATH#':'}
+PATH=${PATH%':'}
+export PATH
+PATH=${PATH:+':'$PATH':'}
+PATH=${PATH/':''/nix/store/f2krmq3iv5nibcvn4rw7nrnrciqprdkh-python3-3.12.9/bin'':'/':'}
+PATH='/nix/store/f2krmq3iv5nibcvn4rw7nrnrciqprdkh-python3-3.12.9/bin'$PATH
+PATH=${PATH#':'}
+PATH=${PATH%':'}
+export PATH
+export PYTHONNOUSERSITE='true'
+PATH=${PATH:+':'$PATH':'}
+PATH=${PATH/':''/nix/store/f4srzvsy2vak1bwsa306jwcrjf1897j5-nixpkgs-review-3.2.0/bin'':'/':'}
+PATH='/nix/store/f4srzvsy2vak1bwsa306jwcrjf1897j5-nixpkgs-review-3.2.0/bin'$PATH
+PATH=${PATH#':'}
+PATH=${PATH%':'}
+export PATH
+PATH=${PATH:+':'$PATH':'}
+PATH=${PATH/':''/nix/store/gg1b5asslgwzmh0cznwxvpclwpg2706f-nix-prefetch-git/bin'':'/':'}
+PATH='/nix/store/gg1b5asslgwzmh0cznwxvpclwpg2706f-nix-prefetch-git/bin'$PATH
+PATH=${PATH#':'}
+PATH=${PATH%':'}
+export PATH
+PATH=${PATH:+':'$PATH':'}
+PATH=${PATH/':''/nix/store/ya0hx71mq5jv3rwv4in7jk1d8zmbnzic-nix-2.24.13/bin'':'/':'}
+PATH='/nix/store/ya0hx71mq5jv3rwv4in7jk1d8zmbnzic-nix-2.24.13/bin'$PATH
+PATH=${PATH#':'}
+PATH=${PATH%':'}
+export PATH
+exec -a "$0" "/nix/store/phmkwcmwz04sb2g3iicflbr2034ywxi0-nix-update-1.10.0/bin/.nix-update-wrapped"  "$@"
