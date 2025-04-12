@@ -35,8 +35,15 @@
 
   system.configurationRevision = self.rev or self.dirtyRev or null;
 
-  boot.tmp.useTmpfs = true;
-  nix.settings.build-dir = "/var/tmp";
+  boot.tmp.cleanOnBoot = true;
+
+  # https://github.com/NixOS/nix/issues/7154
+  # boot.tmp.useTmpfs = true;
+  # nix.settings.store = "daemon";
+  # systemd.services."nix-daemon".environment.TMPDIR = "/nix/tmp";
+  # systemd.tmpfiles.rules = [
+  #   "d /nix/tmp 770 root nixbld"
+  # ];
 
   # basic system utilities
   environment.systemPackages = with pkgs.unstable; [
