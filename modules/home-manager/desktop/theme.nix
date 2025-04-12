@@ -1,7 +1,7 @@
 { inputs, pkgs, ... }:
 {
   imports = [
-    inputs.catppuccin-nix.homeManagerModules.catppuccin
+    inputs.catppuccin-nix.homeModules.catppuccin
     ./theme.linux.nix
   ];
 
