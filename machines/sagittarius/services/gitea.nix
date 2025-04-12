@@ -13,8 +13,11 @@
     };
   };
 
-  nginx.subdomain.git = {
-    "/".proxyPass = "http://127.0.0.1:${toString config.services.gitea.settings.server.HTTP_PORT}/";
+  nginx.subdomain.git."/" = {
+    proxyPass = "http://127.0.0.1:${toString config.services.gitea.settings.server.HTTP_PORT}/";
+    extraConfig = ''
+      client_max_body_size 0;
+    '';
   };
 
   sops.secrets.gitea-github-mirror = { };
