@@ -7,9 +7,17 @@
       enable = true;
     };
     settings = {
-      service.DISABLE_REGISTRATION = true;
-      server.DOMAIN = "git.nregner.net";
-      server.SSH_PORT = 30022;
+      server = {
+        DOMAIN = "git.nregner.net";
+        LFS_ALLOW_PURE_SSH = true;
+        ROOT_URL = "https://git.nregner.net/";
+        SSH_DOMAIN = "sagittarius";
+        SSH_PORT = 30022;
+        START_SSH_SERVER = true;
+      };
+      service = {
+        DISABLE_REGISTRATION = true;
+      };
     };
   };
 
