@@ -72,6 +72,10 @@ in
           stylua
           taplo
           ;
+
+        inherit (pkgs.unstable)
+          inotify-tools
+          ;
       };
     };
 
