@@ -44,6 +44,13 @@ let
       # https://github.com/NixOS/nixpkgs/issues/154163#issuecomment-1350599022
       makeModulesClosure = x: prev.makeModulesClosure (x // { allowMissing = true; });
 
+      # TODO: upstream https://github.com/Arksine/moonraker/issues/401
+      moonraker = prev.moonraker.overrideAttrs (oldAttrs: {
+        patches = oldAttrs.patches or [ ] ++ [
+          ./moonraker/0001-file_manager-Add-config-option-to-rename-duplicate-f.patch
+        ];
+      });
+
       # FIXME: darwin build
       nodejs_latest = warnIfOutdated prev.nodejs_latest prev.nodejs_22;
 

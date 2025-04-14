@@ -1,35 +1,32 @@
-import React from 'react'
+import React from "react";
 
-type Props = {}
+type Props = {};
 
-const test = (props: Props) => {
-  const f = () => { };
+const Test = (props: Props) => {
+  const f = () => {};
   const selfClose = <div />;
   const empty = <div></div>;
-  const a = <div>
-    text
-  </div>;
-  const b = <div>
-    text
+  const a = <div>text</div>;
+  const b = (
     <div>
-      test
+      text
+      <div>test</div>
+      text
     </div>
-    text
-  </div>;
+  );
   return (
     <test>
       123test
-      <button onClick={() => {
-        return;
-      }}>
+      <button
+        onClick={() => {
+          return;
+        }}
+      >
         bogus
         <div></div>
       </button>
-      <button onClick={() => {
-        return;
-      }} />
+      <button onClick={() => {}} />
       <br />
     </test>
-  )
-
-}
+  );
+};

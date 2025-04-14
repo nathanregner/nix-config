@@ -9,7 +9,7 @@
   nixpkgs = import ../../../nixpkgs.nix { inherit outputs; };
 
   nix = {
-    package = pkgs.unstable.nixVersions.nix_2_27;
+    package = pkgs.unstable.nixVersions.latest;
     distributedBuilds = true;
     optimise.automatic = true;
 

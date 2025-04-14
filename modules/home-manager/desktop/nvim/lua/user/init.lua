@@ -537,6 +537,19 @@ require("lazy").setup({
   },
 
   {
+    "folke/noice.nvim",
+    dependencies = {
+      "MunifTanjim/nui.nvim",
+    },
+    event = "VeryLazy",
+    -- lazy = false,
+    opts = {
+      cmdline = { enabled = false },
+      messages = { enabled = false },
+    },
+  },
+
+  {
     "folke/lazydev.nvim",
     ft = "lua",
     dependencies = { "Bilal2453/luvit-meta", lazy = true }, -- optional `vim.uv` typings
