@@ -10,6 +10,11 @@
           nix flake new -t github:NixOS/templates#''${1:-"utils-generic"} .
         }
 
+        nixify() {
+          cp ${./templates}/* .
+          chmod +w {shell.nix,.envrc}
+        }
+
         # https://github.com/NixOS/nixpkgs/issues/275770
         complete -C aws_completer aws
       ''
