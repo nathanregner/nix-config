@@ -4,6 +4,8 @@ vim.g.loaded_netrwPlugin = 1
 
 vim.opt.diffopt = "internal,filler,closeoff,indent-heuristic,linematch:60,algorithm:histogram"
 
+vim.opt.wrap = false
+
 vim.diagnostic.config({
   virtual_text = { current_line = true },
 })
