@@ -1259,18 +1259,20 @@ end
 -- Indentation
 vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
   pattern = {
+    "*.css",
+    "*.gql",
+    "*.graphql",
+    "*.html",
     "*.js",
+    "*.json",
     "*.jsx",
+    "*.less",
+    "*.sass",
+    "*.scss",
     "*.ts",
     "*.tsx",
-    "*.json",
-    "*.graphql",
-    "*.gql",
-    "*.html",
-    "*.css",
-    "*.scss",
-    "*.sass",
-    "*.less",
+    "*.yaml",
+    "*.yml",
   },
   callback = function()
     vim.bo.tabstop = 2
