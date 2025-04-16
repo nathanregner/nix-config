@@ -4,9 +4,30 @@ return {
   pin = true,
   event = "VeryLazy",
   opts = {
-    provider = "ollama",
-    ollama = {
-      model = "qwq:32b",
+    -- provider = "ollama",
+    -- ollama = {
+    --   model = "qwq:32b",
+    -- },
+    provider = "gemini-pro",
+    cursor_applying_provider = "gemini-pro",
+    behaviour = {
+      minimize_diff = true,
+      enable_cursor_planning_mode = true,
+    },
+    gemini = {
+      model = "gemini-2.0-flash",
+    },
+    vendors = {
+      ["gemini-pro"] = {
+        __inherited_from = "gemini",
+        model = "gemini-2.5-pro-exp-03-25",
+        timeout = 120000,
+      },
+      ["gemini-flash"] = {
+        __inherited_from = "gemini",
+        model = "gemini-2.0-flash-lite",
+        timeout = 120000,
+      },
     },
   },
   dependencies = {

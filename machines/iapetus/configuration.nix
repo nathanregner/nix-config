@@ -139,7 +139,7 @@
       nautilus-python
       networkmanagerapplet
       libmtp
-      nvtopPackages.nvidia
+      # nvtopPackages.nvidia
       virt-manager
     ]);
 

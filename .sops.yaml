@@ -25,6 +25,12 @@ creation_rules:
           - *host_server
           - *host_voron
           - *user_nregner
+  - path_regex: modules/home/.*/secrets.yaml
+    key_groups:
+      - age:
+          - *host_enceladus
+          - *host_iapetus
+          - *user_nregner
   - path_regex: machines/voron/secrets.yaml
     key_groups:
       - age:
