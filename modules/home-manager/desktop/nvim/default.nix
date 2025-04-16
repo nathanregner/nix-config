@@ -41,6 +41,7 @@ in
       plugins = with pkgs.unstable.vimPlugins; [ lazy-nvim ];
 
       lua.globals = {
+        copilot.node = lib.getExe pkgs.unstable.nodejs;
         luasnip.dir = "${pkgs.unstable.vimPlugins.luasnip}";
       };
 

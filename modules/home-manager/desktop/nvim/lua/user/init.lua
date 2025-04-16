@@ -553,6 +553,34 @@ require("lazy").setup({
   },
 
   {
+    "zbirenbaum/copilot.lua",
+    cmd = "Copilot",
+    event = "InsertEnter",
+    opts = {
+      copilot_node_command = vim.g.nix.copilot.node,
+      panel = {
+        enabled = true,
+        auto_refresh = true,
+      },
+      suggestion = {
+        enabled = true,
+        auto_trigger = true,
+      },
+      filetypes = {
+        gitcommit = true,
+        gitrebase = true,
+        markdown = true,
+        yaml = true,
+      },
+      sh = function()
+        if string.match(vim.fs.basename(vim.api.nvim_buf_get_name(0)), "^%.env.*") then return false end
+        if string.match(vim.fs.basename(vim.api.nvim_buf_get_name(0)), ".*secrets\\..*") then return false end
+        return true
+      end,
+    },
+  },
+
+  {
     "folke/which-key.nvim",
     event = "VeryLazy",
     config = function()
