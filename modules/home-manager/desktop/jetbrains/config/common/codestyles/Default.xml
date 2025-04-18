@@ -1,0 +1,11 @@
+<code_scheme name="Default" version="173">
+  <SqlCodeStyleSettings version="7">
+    <option name="KEYWORD_CASE" value="2" />
+    <option name="TYPE_CASE" value="3" />
+    <option name="CUSTOM_TYPE_CASE" value="3" />
+    <option name="ORIGINAL_CASE" value="true" />
+  </SqlCodeStyleSettings>
+  <codeStyleSettings language="JAVA">
+    <option name="ALIGN_MULTILINE_BINARY_OPERATION" value="true" />
+  </codeStyleSettings>
+</code_scheme>
