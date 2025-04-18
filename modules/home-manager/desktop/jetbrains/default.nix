@@ -1,4 +1,9 @@
-{ config, lib, ... }:
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
 let
   listFilesRecursive =
     root:
@@ -32,5 +37,10 @@ in
         "datagrip"
       ]
     );
+
+    programs.zsh.shellAliases = lib.optionalAttrs pkgs.stdenv.isDarwin {
+      idea = "open -a /Users/nathan.regner/Applications/IntelliJ\\ IDEA\\ Ultimate\\ *.app";
+      datagrip = "open -a /Users/nathan.regner/Applications/Datagrip\\ *.app";
+    };
   };
 }
