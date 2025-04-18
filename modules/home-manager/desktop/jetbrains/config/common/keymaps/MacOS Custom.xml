@@ -1,7 +1,4 @@
-<keymap version="1" name="macOS copy" parent="Mac OS X 10.5+">
-  <action id="$LRU">
-    <keyboard-shortcut first-keystroke="shift ctrl meta comma" />
-  </action>
+<keymap version="1" name="MacOS Custom" parent="Mac OS X 10.5+">
   <action id="ActivateBigDataToolWindowToolWindow">
     <keyboard-shortcut first-keystroke="shift ctrl meta b" />
   </action>
@@ -23,6 +20,9 @@
   <action id="CloseProject">
     <keyboard-shortcut first-keystroke="alt f" second-keystroke="j" />
   </action>
+  <action id="Console.Jdbc.ExplainPlan">
+    <keyboard-shortcut first-keystroke="shift meta p" />
+  </action>
   <action id="ConsoleView.ClearAll">
     <keyboard-shortcut first-keystroke="meta l" />
   </action>
@@ -33,18 +33,13 @@
     <keyboard-shortcut first-keystroke="ctrl d" />
     <keyboard-shortcut first-keystroke="shift f9" />
   </action>
-  <action id="Debugger.PopFrame">
-    <keyboard-shortcut first-keystroke="shift ctrl meta f12" />
-  </action>
   <action id="Diff.ApplyLeftSide">
     <keyboard-shortcut first-keystroke="ctrl meta right" />
     <keyboard-shortcut first-keystroke="shift alt l" />
-    <keyboard-shortcut first-keystroke="c" second-keystroke="o" />
   </action>
   <action id="Diff.ApplyRightSide">
     <keyboard-shortcut first-keystroke="ctrl meta left" />
     <keyboard-shortcut first-keystroke="shift alt h" />
-    <keyboard-shortcut first-keystroke="c" second-keystroke="t" />
   </action>
   <action id="Diff.NextChange">
     <keyboard-shortcut first-keystroke="shift ctrl right" />
@@ -84,9 +79,6 @@
     <keyboard-shortcut first-keystroke="ctrl j" />
     <mouse-shortcut keystroke="control button2" />
   </action>
-  <action id="LocalHistory">
-    <keyboard-shortcut first-keystroke="shift meta l" second-keystroke="shift meta h" />
-  </action>
   <action id="NextDiff">
     <keyboard-shortcut first-keystroke="f7" />
     <keyboard-shortcut first-keystroke="shift alt j" />
@@ -117,6 +109,9 @@
     <mouse-shortcut keystroke="control button2" />
     <keyboard-shortcut first-keystroke="ctrl q" />
     <keyboard-shortcut first-keystroke="alt q" />
+  </action>
+  <action id="RecentProjectListGroup">
+    <keyboard-shortcut first-keystroke="shift ctrl meta comma" />
   </action>
   <action id="RerunFailedTests">
     <keyboard-shortcut first-keystroke="shift ctrl meta r" />
@@ -149,9 +144,6 @@
     <keyboard-shortcut first-keystroke="ctrl p" />
     <keyboard-shortcut first-keystroke="shift alt n" />
   </action>
-  <action id="UpdateRunningApplication">
-    <keyboard-shortcut first-keystroke="ctrl meta f9" />
-  </action>
   <action id="UsageFiltering.WriteAccess" />
   <action id="Vcs.Log.FocusTextFilter" />
   <action id="Vcs.Log.GetVersion">
@@ -171,10 +163,6 @@
   <action id="VcsShowPrevChangeMarker">
     <keyboard-shortcut first-keystroke="shift ctrl alt up" />
     <keyboard-shortcut first-keystroke="shift ctrl meta k" />
-  </action>
-  <action id="copilot.applyInlays">
-    <keyboard-shortcut first-keystroke="tab" />
-    <keyboard-shortcut first-keystroke="alt l" />
   </action>
   <action id="copilot.disposeInlays" />
   <action id="tasks.goto" />

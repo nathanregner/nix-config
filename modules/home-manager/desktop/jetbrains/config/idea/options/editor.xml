@@ -4,7 +4,17 @@
     <option name="COMPLETION_CASE_SENSITIVE" value="2" />
     <option name="USE_ACCESSORS_IN_EQUALS_HASHCODE" value="true" />
     <option name="ADD_UNAMBIGIOUS_IMPORTS_ON_THE_FLY" value="true" />
+    <EXCLUDED_PACKAGE NAME="org.assertj.core.api.AssertionsForClassTypes" />
+    <EXCLUDED_PACKAGE NAME="org.assertj.core.api.AssertionsForInterfaceTypes" />
+    <EXCLUDED_PACKAGE NAME="org.assertj.core.api.ClassBasedNavigableIterableAssert" />
+    <EXCLUDED_PACKAGE NAME="org.assertj.core.api.ClassBasedNavigableListAssert" />
+    <EXCLUDED_PACKAGE NAME="org.assertj.core.api.FactoryBasedNavigableIterableAssert" />
+    <EXCLUDED_PACKAGE NAME="org.assertj.core.api.FactoryBasedNavigableListAssert" />
+    <EXCLUDED_PACKAGE NAME="org.assertj.core.api.Java6Assertions" />
+    <EXCLUDED_PACKAGE NAME="org.hamcrest.MatcherAssert.assertThat" />
     <EXCLUDED_PACKAGE NAME="org.hibernate.jpa.QueryHints" />
+    <EXCLUDED_PACKAGE NAME="org.junit.Assert" />
+    <EXCLUDED_PACKAGE NAME="org.testcontainers.shaded" />
   </component>
   <component name="CodeVisionSettings">
     <option name="codeVisionGroupToPosition">
@@ -60,7 +70,7 @@
         <entry key="yaml" value="true" />
       </map>
     </option>
-    <option name="USE_SOFT_WRAPS" value="" />
+    <option name="USE_SOFT_WRAPS" value="CONSOLE" />
     <option name="IS_ENSURE_NEWLINE_AT_EOF" value="true" />
     <option name="IS_WHEEL_FONTCHANGE_ENABLED" value="true" />
     <option name="IS_WHEEL_FONTCHANGE_PERSISTENT" value="true" />

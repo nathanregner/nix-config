@@ -23,6 +23,7 @@ let
       {
         "JetBrains/${appName}/config/${name}" = {
           source = config.lib.file.mkFlakeSymlink path;
+          force = true;
         };
       }
     ) (commonConfig ++ appConfig);
