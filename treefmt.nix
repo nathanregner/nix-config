@@ -8,6 +8,7 @@
     };
     prettier = {
       enable = true;
+      package = pkgs.unstable.nodejs.pkgs.prettier;
       excludes = [
         "**/*-lock.json"
         "**/secrets.yaml"

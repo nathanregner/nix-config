@@ -1,7 +1,8 @@
 {
-  fetchFromGitHub,
-  lib,
   pkgs,
+  lib,
+  fetchFromGitHub,
+  linuxManualConfig,
   pkgsCross,
   ubootTools,
   writeShellScriptBin,
@@ -9,9 +10,10 @@
 }@args:
 let
   extraArgs = builtins.removeAttrs args [
-    "fetchFromGitHub"
-    "lib"
     "pkgs"
+    "lib"
+    "fetchFromGitHub"
+    "linuxManualConfig"
     "pkgsCross"
     "ubootTools"
     "writeShellScriptBin"
@@ -25,8 +27,13 @@ let
      done < "${./config}"
      echo "}"
   '';
+  mkKernel =
+    if (pkgs.stdenv.system == "x86_64-linux") then
+      pkgsCross.aarch64-multiplatform.linuxManualConfig
+    else
+      linuxManualConfig;
 in
-(pkgsCross.aarch64-multiplatform.linuxManualConfig (
+(mkKernel (
   {
     version = "6.1-rk3588";
     modDirVersion = "6.1.43";
