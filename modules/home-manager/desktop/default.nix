@@ -8,6 +8,7 @@
     ./firefox
     ./insync.nix
     ./jetbrains
+    ./jetbrains
     ./nvim
     ./sops.nix
     ./terraform
