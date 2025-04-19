@@ -82,8 +82,8 @@ in
       "parser-directories" = [
         (pkgs.linkFarm "tree-sitter-parser-directory" (
           lib.mapAttrsToList (name: lang: {
-            inherit name;
-            path = lang.library;
+            name = "tree-sitter-${name}/parser.so";
+            path = "${lang.library}/parser";
           }) cfg.customLanguages
         ))
       ];
