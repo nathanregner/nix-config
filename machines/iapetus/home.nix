@@ -56,7 +56,6 @@
 
   programs.zsh.initExtra = ''
     export PATH="$PATH:$HOME/.cargo/bin"
-    export PATH="$PATH:$HOME/.local/share/JetBrains/Toolbox/scripts"
   '';
 
   programs.insync = {
@@ -68,7 +67,6 @@
     # apps
     discord
     evince
-    jetbrains-toolbox
     openrgb
 
     awscli2
@@ -134,11 +132,6 @@
   };
 
   services.easyeffects.enable = true;
-
-  services.ollama = {
-    enable = true;
-    acceleration = "cuda";
-  };
 
   # Nicely reload system units when changing configs
   systemd.user.startServices = "sd-switch";

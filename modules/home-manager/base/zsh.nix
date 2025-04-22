@@ -11,7 +11,7 @@
         }
 
         nixify() {
-          cp ${./templates}/* .
+          cp ${./templates}/{shell.nix,.envrc} .
           chmod +w {shell.nix,.envrc}
         }
 

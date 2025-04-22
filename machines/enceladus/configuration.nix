@@ -1,7 +1,6 @@
 {
   self,
   pkgs,
-  lib,
   ...
 }:
 {
@@ -15,8 +14,7 @@
   networking.hostName = "enceladus";
 
   users.users.nregner = {
-    # TODO: separate build user
-    openssh.authorizedKeys.keys = lib.attrValues self.globals.ssh.allKeys;
+    openssh.authorizedKeys.keys = builtins.attrValues self.globals.ssh.userKeys.nregner;
   };
 
   security.pam.enableSudoTouchIdAuth = true;

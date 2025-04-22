@@ -2,7 +2,7 @@
   pkgs ? import <nixpkgs> { },
 }:
 pkgs.mkShellNoCC {
-  packages = [
+  packages = with pkgs; [
     # TODO
   ];
 }

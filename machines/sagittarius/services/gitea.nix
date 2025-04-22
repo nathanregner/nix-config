@@ -7,14 +7,26 @@
       enable = true;
     };
     settings = {
-      service.DISABLE_REGISTRATION = true;
-      server.DOMAIN = "git.nregner.net";
-      server.SSH_PORT = 30022;
+      server = {
+        DOMAIN = "git.nregner.net";
+        LFS_ALLOW_PURE_SSH = true;
+        ROOT_URL = "https://git.nregner.net/";
+        SSH_DOMAIN = "sagittarius";
+        SSH_PORT = 30022;
+        START_SSH_SERVER = true;
+      };
+      service = {
+        DISABLE_REGISTRATION = true;
+      };
     };
   };
 
-  nginx.subdomain.git."/".extraConfig = # nginx
-    "return 302 http://sagittarius:${toString config.services.gitea.settings.server.HTTP_PORT}$request_uri;";
+  nginx.subdomain.git."/" = {
+    proxyPass = "http://127.0.0.1:${toString config.services.gitea.settings.server.HTTP_PORT}/";
+    extraConfig = ''
+      client_max_body_size 0;
+    '';
+  };
 
   sops.secrets.gitea-github-mirror = { };
 
