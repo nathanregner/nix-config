@@ -3,6 +3,7 @@ local types = require("cmp.types")
 
 local luasnip = require("luasnip")
 
+---@type cmp.SourceConfig
 local buffer = {
   name = "buffer",
   option = {
@@ -15,6 +16,12 @@ local buffer = {
       return vim.api.nvim_list_bufs()
     end,
   },
+  ---@param entry cmp.Entry
+  ---@param ctx cmp.Context
+  entry_filter = function(entry, ctx)
+    if #entry.word > 100 then return false end
+    return true
+  end,
 }
 
 local lspkind = require("lspkind")
@@ -26,7 +33,7 @@ cmp.setup({
 
   formatting = {
     format = lspkind.cmp_format({
-      mode = "symbol",
+      -- mode = "symbol",
       maxwidth = {
         menu = 50, -- leading text (labelDetails)
         abbr = 50, -- actual suggestion item
@@ -42,10 +49,11 @@ cmp.setup({
         cmp.select_next_item()
       else
         cmp.complete({
+          reason = "manual",
+          ---@type cmp.ConfigSchema
           config = {
             sources = {
-              { name = "nvim_lsp" },
-              buffer,
+              { name = "luasnip" },
             },
           },
         })
@@ -105,9 +113,9 @@ cmp.setup({
 
       -- compare.score_offset, -- not good at all
       compare.exact,
+      compare.score, -- based on :  score = score + ((#sources - (source_index - 1)) * sorting.priority_weight)
       compare.locality,
       compare.recently_used,
-      compare.score, -- based on :  score = score + ((#sources - (source_index - 1)) * sorting.priority_weight)
       compare.offset,
       -- compare.scopes, -- what?
       compare.sort_text,
