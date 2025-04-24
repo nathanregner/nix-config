@@ -1,4 +1,5 @@
-# https://github.com/CamJN/launchctl-completion/blob/master/launchctl-completion.sh
+#!/usr/bin/env bash
+# https://gist.githubusercontent.com/varenc/8ca07828a3a3a8cd170c81560a371322/raw/4040b48300b99312018aee4d5ac9ff5e630f1440/_launchctl
 # Bash completion support for launchctl
 __launchctl_list_sigs() {
   echo {,SIG}{HUP,INT,QUIT,ILL,TRAP,ABRT,EMT,FPE,KILL,BUS,SEGV,SYS,PIPE,ALRM,TERM,URG,STOP,TSTP,CONT,CHLD,TTIN,TTOU,IO,XCPU,XFSZ,VTALRM,PROF,WINCH,INFO,USR1,USR2} $(seq 1 31 | tr '\n' ' ')
@@ -45,14 +46,14 @@ __launchctl_list_stopped() {
   launchctl list | awk 'NR>1 && $3 !~ /0x[0-9a-fA-F]+\.(anonymous|mach_init)/ && $1 ~ /-/ {print $3}'
 }
 _launchctl() {
-  complete +o default
+  compopt +o default 2>/dev/null ## HACK. hide error. Seems to work despite it :-(
   COMPREPLY=()
   local cur="${COMP_WORDS[COMP_CWORD]}"
   local prev="${COMP_WORDS[COMP_CWORD - 1]}"
   local two_prev="${COMP_WORDS[COMP_CWORD - 2]}"
 
   # Subcommand list
-  local subcommands="bootstrap bootout enable disable uncache kickstart attach debug kill blame print print-cache print-disabledplist procinfo hostinfo resolveport limit runstats examine config dumpstate reboot bootshell load unload remove list start stop setenv unsetenv getenv bsexec asuser submit managerpid manageruid managername error variant version help"
+  local subcommands="bootstrap bootout enable disable uncache kickstart attach debug kill blame print print-cache print-disabled plist procinfo hostinfo resolveport limit runstats examine config dumpstate reboot bootshell load unload remove list start stop setenv unsetenv getenv bsexec asuser submit managerpid manageruid managername error variant version help"
   [[ ${COMP_CWORD} -eq 1 ]] && {
     COMPREPLY=($(compgen -W "${subcommands}" -- ${cur}))
     return
@@ -60,7 +61,7 @@ _launchctl() {
   if [[ ${COMP_CWORD} -eq 2 ]]; then
     case "$prev" in
     print | enable | disable | blame | runstats | bootstrap | bootout | debug)
-      complete -o nospace
+      compopt -o nospace 2>/dev/null ## HACK. hide error. Seems to work despite it :-(
       if [[ ${cur} == */*/* ]]; then
         COMPREPLY=($(compgen -W "$(__launchctl_list_service_targets)" -- ${cur}))
       elif [[ ${cur} == */* ]]; then
@@ -131,8 +132,8 @@ _launchctl() {
       return
       ;;
     load | unload)
-      complete -o filenames
-      complete -o nospace
+      compopt -o filenames 2>/dev/null ## HACK. hide error. Seems to work despite it :-( 2> /dev/null ## HACK. hide error. Seems to work despite it :-(
+      compopt -o nospace 2>/dev/null   ## HACK. hide error. Seems to work despite it :-( 2> /dev/null ## HACK. hide error. Seems to work despite it :-(
       COMPREPLY=($(compgen -f -- ${cur}))
       return
       ;;
@@ -149,7 +150,7 @@ _launchctl() {
       return
       ;;
     kill | attach | kickstart)
-      complete -o nospace
+      compopt -o nospace 2>/dev/null ## HACK. hide error. Seems to work despite it :-(
       if [[ ${cur} == */*/* ]]; then
         COMPREPLY=($(compgen -W "$(__launchctl_list_service_targets)" -- ${cur}))
       elif [[ ${cur} == */* ]]; then
@@ -160,8 +161,8 @@ _launchctl() {
       return
       ;;
     bootstrap | bootout)
-      complete -o filenames
-      complete -o nospace
+      compopt -o filenames 2>/dev/null ## HACK. hide error. Seems to work despite it :-(
+      compopt -o nospace 2>/dev/null   ## HACK. hide error. Seems to work despite it :-(
       COMPREPLY=($(compgen -f -- ${cur}))
       return
       ;;
@@ -174,5 +175,3 @@ _launchctl() {
 }
 
 complete -F _launchctl launchctl
-
-# vim: ft=bash
