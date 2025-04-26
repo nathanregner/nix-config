@@ -28,7 +28,7 @@ in
       type = lib.types.attrsOf tomlFormat.type;
       default = {
         "${config.home.homeDirectory}/dev" = {
-          depth = 2;
+          depth = 3;
         };
         "${config.home.homeDirectory}/nix-config" = {
           depth = 2;
