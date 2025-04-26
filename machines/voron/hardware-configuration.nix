@@ -8,7 +8,7 @@
   imports = [ inputs.nixos-hardware.nixosModules.common-pc-ssd ];
 
   boot = {
-    kernelPackages = pkgs.linuxPackagesFor pkgs.linux-orange-pi-6_6-rk35xx;
+    kernelPackages = pkgs.linuxPackagesFor pkgs.linux-orangepi-6_1-rk35xx;
 
     supportedFilesystems = lib.mkForce [
       "vfat"

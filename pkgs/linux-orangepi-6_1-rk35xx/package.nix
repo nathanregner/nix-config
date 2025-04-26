@@ -4,7 +4,6 @@
   pkgs,
   pkgsCross,
   ubootTools,
-  unstableGitUpdater,
   writeShellScriptBin,
   ...
 }@args:
@@ -15,7 +14,6 @@ let
     "pkgs"
     "pkgsCross"
     "ubootTools"
-    "unstableGitUpdater"
     "writeShellScriptBin"
   ];
   readConfig = writeShellScriptBin "read-config" ''
@@ -44,7 +42,7 @@ in
     # https://github.com/orangepi-xunlong/orangepi-build/tree/next/external/config/kernel
     configfile = ./config;
 
-    # nix eval --expr "$(nix run .\#linux-orange-pi-6_6-rk35xx.passthru.readConfig)" | nixfmt > pkgs/linux-orange-pi-6_6-rk35xx/config.nix
+    # nix eval --expr "$(nix run .\#linux-orangepi-6_1-rk35xx.passthru.readConfig)" | nixfmt > pkgs/linux-orangepi-6_6-rk35xx/config.nix
     config = import ./config.nix;
   }
   // extraArgs
@@ -55,9 +53,7 @@ in
 
     passthru = old.passthru // {
       inherit readConfig;
-      updateScript = unstableGitUpdater {
-        branch = "orange-pi-6.1-rk35xx";
-      };
+      updateScript = ./update.sh;
 
       devShell = (
         # make O=build nconfig
