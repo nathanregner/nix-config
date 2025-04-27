@@ -24,6 +24,16 @@ local buffer = {
   end,
 }
 
+---@type cmp.SourceConfig
+local lsp = {
+  name = "nvim_lsp",
+  entry_filter = function(entry, _ctx)
+    local kind = types.lsp.CompletionItemKind[entry:get_kind()]
+    if kind == "Text" then return false end
+    return true
+  end,
+}
+
 local lspkind = require("lspkind")
 
 local compare = cmp.config.compare
@@ -53,7 +63,7 @@ cmp.setup({
           ---@type cmp.ConfigSchema
           config = {
             sources = {
-              { name = "luasnip" },
+              lsp,
             },
           },
         })
@@ -125,14 +135,7 @@ cmp.setup({
   sources = {
     { name = "luasnip" },
     { name = "path" },
-    {
-      name = "nvim_lsp",
-      entry_filter = function(entry, _ctx)
-        local kind = types.lsp.CompletionItemKind[entry:get_kind()]
-        if kind == "Text" then return false end
-        return true
-      end,
-    },
+    lsp,
     buffer,
   },
 })
