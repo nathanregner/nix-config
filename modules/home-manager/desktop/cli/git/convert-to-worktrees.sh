@@ -1,4 +1,4 @@
-name=$1
+name="${1:-$(pwd)}"
 target="$(mktemp -d)"
 
 cp -lr "$name/.git" "$target/.bare"
@@ -20,4 +20,4 @@ default_branch="$(basename "$(git symbolic-ref --short refs/remotes/origin/HEAD)
 git worktree prune
 git worktree add "../$default_branch"
 
-popd "$name"
+popd

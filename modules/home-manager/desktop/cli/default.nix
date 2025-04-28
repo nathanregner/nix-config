@@ -6,8 +6,10 @@
     ./k9s.nix
     ./lazygit.nix
     ./nix.nix
+    ./nushell
     ./starship.nix
     ./tmux-sessionizer.nix
+    ./topiary.nix
     ./zoxide.nix
     ./zsh.nix
   ];

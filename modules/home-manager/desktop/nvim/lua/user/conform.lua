@@ -1,3 +1,25 @@
+local slow = {
+  nu = true,
+}
+
+local enabled = function(bufnr, before)
+  local settings = require("user.neoconf.conform").settings()
+
+  -- global disabled?
+  if not settings.enabled then return false end
+
+  -- filetype disabled?
+  local ft = vim.bo[bufnr].filetype
+  if settings.filetypes[ft] == false then return false end
+
+  -- buffer disabled?
+  if vim.b[bufnr].format_on_save == false then return false end
+
+  if before and slow[ft] then return false end
+
+  return true
+end
+
 require("conform").setup({
   formatters_by_ft = {
     bash = { "shfmt" },
@@ -16,9 +38,12 @@ require("conform").setup({
     lua = { "stylua" },
     markdown = { "prettierd", "injected" },
     nginx = { "nginxfmt" },
+    nu = { "nufmt" },
     nix = {
       "nixfmt", --[[ "injected" ]]
     }, -- FIXME: injected bash formatter broken
+    nu = { "topiary_nu" },
+    query = { "topiary_tree_sitter_query" },
     rust = { "rustfmt" },
     sh = { "shfmt" },
     terraform = { "terraform_fmt" },
@@ -46,31 +71,22 @@ require("conform").setup({
       args = { "$FILENAME" },
       stdin = true,
     },
+    topiary_nu = {
+      command = "topiary",
+      args = { "format", "--language", "nu" },
+    },
+    topiary_tree_sitter_query = {
+      command = "topiary",
+      args = { "format", "--language", "tree_sitter_query" },
+    },
   },
   format_on_save = function(bufnr)
-    local settings = require("user.neoconf.conform").settings()
-
-    -- global disabled?
-    if not settings.enabled then return end
-
-    -- buffer disabled?
-    if vim.b[bufnr].format_on_save == false then return end
-
-    -- filetype disabled?
-    local ft = vim.bo[bufnr].filetype
-    local lsp_format = "fallback"
-    if settings.filetypes[ft] == false then lsp_format = "never" end
-
-    -- formatter disabled?
-    local formatters = {}
-    local formatter_names = require("conform").list_formatters_for_buffer(bufnr)
-    for _, formatter in ipairs(formatter_names) do
-      local formatter_settings = settings.formatters[formatter]
-      if not (formatter_settings == false) then table.insert(formatters, formatter) end
-    end
-
-    ---@type conform.FormatOpts
-    return { timeout_ms = 500, lsp_format = lsp_format, formatters = formatters }
+    if not enabled(bufnr, true) then return end
+    return { timeout_ms = 500, lsp_format = "fallback" }
+  end,
+  format_after_save = function(bufnr)
+    if not enabled(bufnr, false) then return end
+    return { async = true, lsp_format = "fallback" }
   end,
 })
 
