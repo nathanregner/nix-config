@@ -54,7 +54,7 @@
     "L+ /home/nregner/.config/hypr/cards/rtx-2070 - - - - /dev/dri/by-path/pci-0000:2d:00.0-card"
   ];
 
-  programs.zsh.initExtra = ''
+  programs.zsh.initContent = ''
     export PATH="$PATH:$HOME/.cargo/bin"
   '';
 
