@@ -10,6 +10,8 @@ vim.diagnostic.config({
   virtual_text = { current_line = true },
 })
 
+vim.opt.listchars = "eol:$,space:-,tab:>#,trail:~"
+
 local function find_git_root()
   -- Use the current buffer's path as the starting point for the git search
   local current_file = vim.api.nvim_buf_get_name(0)
