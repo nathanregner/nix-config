@@ -42,6 +42,14 @@ in
       };
     };
 
+    programs.git.ignores = [
+      ".classpath"
+      ".eclipse"
+      ".factorypath"
+      ".project"
+      ".settings"
+    ];
+
     xdg.configFile = {
       "nvim/after/ftplugin/java.lua" = {
         source = config.lib.file.mkFlakeSymlink ./java.lua;
@@ -52,5 +60,8 @@ in
         force = true;
       };
     };
+
+    home.file.".gradle/init.d/add-versions-plugin.init.gradle.kts".source =
+      ./add-versions-plugin.init.gradle.kts;
   };
 }

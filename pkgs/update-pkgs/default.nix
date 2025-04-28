@@ -2,13 +2,18 @@
   lib,
   packages,
   writeBabashkaApplication,
+  writeText,
   ...
 }:
 let
-  targets = import ./find-pkgs.nix {
-    inherit lib;
-    pkgs = packages;
-  };
+  targets = writeText "packages.json" (
+    builtins.toJSON (
+      import ./find-pkgs.nix {
+        inherit lib;
+        pkgs = packages;
+      }
+    )
+  );
 in
 writeBabashkaApplication {
   name = "update-pkgs";

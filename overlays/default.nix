@@ -44,6 +44,9 @@ let
       # https://github.com/NixOS/nixpkgs/issues/154163#issuecomment-1350599022
       makeModulesClosure = x: prev.makeModulesClosure (x // { allowMissing = true; });
 
+      # TODO: remove once https://github.com/mealie-recipes/mealie/pull/5290/files issue is fixed
+      mealie = final.callPackage ./mealie/package.nix { };
+
       # TODO: upstream https://github.com/Arksine/moonraker/issues/401
       moonraker = prev.moonraker.overrideAttrs (oldAttrs: {
         patches = oldAttrs.patches or [ ] ++ [

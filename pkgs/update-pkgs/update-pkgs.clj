@@ -1,5 +1,4 @@
 (require '[babashka.process :refer [shell]])
-(require '[babashka.fs :as fs])
 (require '[clojure.string :as str])
 (require '[cheshire.core :as json])
 
@@ -10,45 +9,36 @@
 
 (defn eval-update-script
   [attr]
-  (let [{:strs [name pname oldVersion updateScript]}
-        (->> (str ".#update-pkgs.passthru.targets." attr)
-             (shell {:out :string} "nix" "eval" "--json")
-             :out
-             (json/parse-string-strict))]
+  (let [targets (-> (shell {:out :string}
+                           "nix" "build"
+                           ".#update-pkgs.passthru.targets"
+                           "--no-link"
+                           "--print-out-paths")
+                    :out (str/trim)
+                    (slurp)
+                    (json/parse-string-strict))
+        {:strs [name pname oldVersion updateScript]} (or (get targets attr) (throw (ex-info "Attr not found" targets)))]
     {:script updateScript
      :env {:UPDATE_NIX_NAME name
            :UPDATE_NIX_PNAME pname
            :UPDATE_NIX_OLD_VERSION oldVersion
            :UPDATE_NIX_ATTR_PATH attr}}))
 
-(defn nix-build
-  [{[executable] :script}]
-  (shell "nix" "build" "--no-link" executable))
-
-(defn with-args
-  [script]
-  (if (= (fs/file-name (first script)) "nix-update")
-    (conj script "--flake" "--commit")
-    script))
-
 (defn run-script
   [{:keys [script env]}]
   (:out (apply shell {:extra-env env
                       :dir (git-root)}
-               (with-args script))))
+               script)))
 
 (defn -main
   [[attr]]
   (let [update-script (eval-update-script attr)]
-    (nix-build update-script)
     (run-script update-script)))
 
 (when (= *file* (System/getProperty "babashka.file"))
   (-main *command-line-args*))
 
 (comment
-  (-main "blink-cmp")
-  (def update-script (eval-update-script "blink-cmp"))
-  (with-args (:script update-script))
-  (run-script update-script)
-  (nix-build update-script))
+  (-main "linux-orangepi-6_6-rk35xx")
+  @(def update-script (eval-update-script "linux-orangepi-6_1-rk35xx"))
+  (run-script update-script))

@@ -8,9 +8,8 @@ let
     directory = ./.;
   };
 in
-lib.recurseIntoAttrs (
-  packages
-  // {
-    klipper-pkgs = lib.recurseIntoAttrs packages.klipper-pkgs;
-  }
-)
+packages
+// {
+  linux-orangepi-6_1-rk35xx = pkgs.callPackage ./linux-orangepi-6_1-rk35xx/package.nix { };
+  update-pkgs = pkgs.unstable.callPackage ./update-pkgs { inherit packages; };
+}

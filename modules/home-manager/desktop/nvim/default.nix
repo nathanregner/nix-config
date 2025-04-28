@@ -1,5 +1,4 @@
 {
-  inputs,
   config,
   pkgs,
   lib,
@@ -65,35 +64,42 @@ in
         luasnip.dir = "${pkgs.unstable.vimPlugins.luasnip}";
       };
 
-      extraPackages = builtins.attrValues {
-        # language servers
-        inherit (pkgs.unstable)
-          bash-language-server
-          emmet-language-server
-          gopls
-          graphql-language-service-cli
-          harper
-          helm-ls
-          libclang
-          lua-language-server
-          nil
-          nixd
-          terraform-ls
-          tflint
-          vscode-langservers-extracted
-          vtsls
-          yaml-language-server
-          ;
+      extraPackages = builtins.attrValues (
+        {
+          # language servers
+          inherit (pkgs.unstable)
+            bash-language-server
+            emmet-language-server
+            gopls
+            graphql-language-service-cli
+            harper
+            helm-ls
+            libclang
+            lua-language-server
+            nil
+            nixd
+            terraform-ls
+            tflint
+            vscode-langservers-extracted
+            vtsls
+            yaml-language-server
+            ;
 
-        # formatters/linters
-        inherit (pkgs.unstable)
-          nixfmt-rfc-style
-          prettierd
-          shfmt
-          stylua
-          taplo
-          ;
-      };
+          # formatters/linters
+          inherit (pkgs.unstable)
+            nixfmt-rfc-style
+            prettierd
+            shfmt
+            stylua
+            taplo
+            ;
+        }
+        // lib.optionalAttrs pkgs.stdenv.isLinux {
+          inherit (pkgs.unstable)
+            inotify-tools
+            ;
+        }
+      );
     };
 
     home.packages = with pkgs.unstable; [

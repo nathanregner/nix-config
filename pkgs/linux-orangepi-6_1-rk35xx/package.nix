@@ -1,21 +1,21 @@
 {
-  fetchFromGitHub,
-  lib,
   pkgs,
+  lib,
+  fetchFromGitHub,
+  linuxManualConfig,
   pkgsCross,
   ubootTools,
-  unstableGitUpdater,
   writeShellScriptBin,
   ...
 }@args:
 let
   extraArgs = builtins.removeAttrs args [
-    "fetchFromGitHub"
-    "lib"
     "pkgs"
+    "lib"
+    "fetchFromGitHub"
+    "linuxManualConfig"
     "pkgsCross"
     "ubootTools"
-    "unstableGitUpdater"
     "writeShellScriptBin"
   ];
   readConfig = writeShellScriptBin "read-config" ''
@@ -27,8 +27,13 @@ let
      done < "${./config}"
      echo "}"
   '';
+  mkKernel =
+    if (pkgs.stdenv.system == "x86_64-linux") then
+      pkgsCross.aarch64-multiplatform.linuxManualConfig
+    else
+      linuxManualConfig;
 in
-(pkgsCross.aarch64-multiplatform.linuxManualConfig (
+(mkKernel (
   {
     version = "6.1-rk3588";
     modDirVersion = "6.1.43";
@@ -44,7 +49,7 @@ in
     # https://github.com/orangepi-xunlong/orangepi-build/tree/next/external/config/kernel
     configfile = ./config;
 
-    # nix eval --expr "$(nix run .\#linux-orange-pi-6_6-rk35xx.passthru.readConfig)" | nixfmt > pkgs/linux-orange-pi-6_6-rk35xx/config.nix
+    # nix eval --expr "$(nix run .\#linux-orangepi-6_1-rk35xx.passthru.readConfig)" | nixfmt > pkgs/linux-orangepi-6_6-rk35xx/config.nix
     config = import ./config.nix;
   }
   // extraArgs
@@ -55,9 +60,7 @@ in
 
     passthru = old.passthru // {
       inherit readConfig;
-      updateScript = unstableGitUpdater {
-        branch = "orange-pi-6.1-rk35xx";
-      };
+      updateScript = ./update.sh;
 
       devShell = (
         # make O=build nconfig

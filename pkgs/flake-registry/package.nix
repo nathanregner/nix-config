@@ -5,13 +5,13 @@
 }:
 stdenvNoCC.mkDerivation {
   pname = "flake-registry";
-  version = "0-unstable-2024-12-17";
+  version = "0-unstable-2025-04-14";
   src = fetchFromGitHub {
     owner = "NixOS";
     repo = "flake-registry";
-    rev = "02fe640c9e117dd9d6a34efc7bcb8bd09c08111d";
+    rev = "1322f33d5836ae757d2e6190239252cf8402acf6";
     fetchSubmodules = false;
-    sha256 = "sha256-/3gigrEBFORQs6a8LL5twoHs7biu08y/8Xc5aQmk3b0=";
+    sha256 = "sha256-nlQTQrHqM+ywXN0evDXnYEV6z6WWZB5BFQ2TkXsduKw=";
   };
   installPhase = ''
     mv flake-registry.json $out

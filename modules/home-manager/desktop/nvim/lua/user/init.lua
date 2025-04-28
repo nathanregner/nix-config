@@ -6,6 +6,10 @@ vim.opt.diffopt = "internal,filler,closeoff,indent-heuristic,linematch:60,algori
 
 vim.opt.wrap = false
 
+vim.diagnostic.config({
+  virtual_text = { current_line = true },
+})
+
 local function find_git_root()
   -- Use the current buffer's path as the starting point for the git search
   local current_file = vim.api.nvim_buf_get_name(0)
@@ -349,6 +353,7 @@ require("lazy").setup({
       ---
       --- @type { [string]: LspConfig }
       local servers = {
+        ast_grep = {},
         bashls = {},
         clangd = {
           cmd = { -- https://www.reddit.com/r/neovim/comments/12qbcua/multiple_different_client_offset_encodings/
