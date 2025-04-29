@@ -41,6 +41,10 @@
     # system monitoring
     htop-vim
 
+    # nix
+    nix-init
+    nurl
+
     # misc
     sops
   ];
