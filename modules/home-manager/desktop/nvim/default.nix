@@ -109,26 +109,6 @@ in
 
     programs.zsh.shellAliases.vimdiff = "nvim -d";
 
-    programs.zsh.initExtra =
-      # bash
-      ''
-        if typeset -f nvim >/dev/null; then
-          unset -f nvim
-        fi
-        _nvim=$(which nvim)
-        nvim() {
-          if [[ -z "$@" ]]; then
-            if [[ -f "./Session.vim" ]]; then
-              $_nvim -c ':silent source Session.vim' -c 'lua vim.g.savesession = true'
-            else
-              $_nvim
-            fi
-          else
-            $_nvim "$@"
-          fi
-        }
-      '';
-
     # https://github.com/jesseduffield/lazygit/wiki/Custom-Commands-Compendium
     programs.lazygit.settings.customCommands = [
       {
