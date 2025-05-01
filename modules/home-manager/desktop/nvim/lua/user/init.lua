@@ -766,14 +766,19 @@ require("lazy").setup({
     dependencies = { { "nvim-tree/nvim-web-devicons", opts = {} } },
     lazy = false, -- https://github.com/stevearc/oil.nvim/issues/409
     keys = {
-      {
-        "-",
-        function() require("oil").open() end,
-      },
+      { "-", function() require("oil").open() end },
     },
     opts = {
       keymaps = {
-        ["1"] = function() require("oil").open(find_git_root()) end,
+        ["gr"] = function() require("oil").open(find_git_root()) end,
+        ["gd"] = function()
+          local oil = require("oil")
+          if #require("oil.config").columns == 1 then
+            oil.set_columns({ "icon", "permissions", "size", "mtime" })
+          else
+            oil.set_columns({ "icon" })
+          end
+        end,
         ["<Esc>"] = function()
           local oil = require("oil")
           local was_modified = vim.bo.modified
