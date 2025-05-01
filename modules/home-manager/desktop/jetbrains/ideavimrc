@@ -75,7 +75,7 @@ nnoremap gr :action GotoDeclaration<CR>
 nnoremap gD :action GotoSuperMethod<CR>
 nnoremap gI :action GotoImplementation<CR>
 nnoremap <leader>ca :action ShowIntentionActions<CR>
-noremap gcc :action CommentByLineComment<CR>
+nnoremap gx gd
 " nnoremap <C-q> :action FindUsages<CR>
 
 " Editing
@@ -95,4 +95,3 @@ nnoremap <leader>hr :action Vcs.RollbackChangedLines<CR>
 
 " Debugging
 nnoremap <leader>b :action ToggleLineBreakpoint<CR>
-
