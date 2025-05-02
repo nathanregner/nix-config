@@ -1,12 +1,15 @@
-{ inputs, ... }:
+{ inputs, outputs }:
 let
   inherit (inputs.nixpkgs) lib;
+  filterPackagesRecursive = import ../lib/filterPackagesRecursive.nix lib;
 
   assertVersion =
     version: pkg:
     lib.throwIf (
       version != pkg.version
     ) "${pkg.pname or "???"} has been updated: ${version} -> ${pkg.version}" pkg;
+
+  overrideAttrsWarnIfOutdated = drv: args: warnIfOutdated (drv.overrideAttrs args) drv;
 
   warnIfOutdated =
     prev: final:
@@ -83,17 +86,12 @@ in
 rec {
   additions =
     final: prev:
-    builtins.mapAttrs
-      (
-        name: pkg:
-        if builtins.hasAttr name prev && lib.isDerivation pkg then warnIfOutdated prev.${name} pkg else pkg
-      )
-      (
-        import ../pkgs {
-          inherit lib;
-          pkgs = final;
-        }
-      );
+    let
+      inherit (prev.stdenv.hostPlatform) system;
+    in
+    {
+      local = filterPackagesRecursive system outputs.legacyPackages.${system};
+    };
 
   modifications =
     final: prev:
@@ -106,20 +104,7 @@ rec {
       system = stableFinal.system;
       config.allowUnfree = true;
       overlays = [
-        (
-          final: prev:
-          builtins.mapAttrs
-            (
-              name: pkg:
-              if builtins.hasAttr name prev && lib.isDerivation pkg then warnIfOutdated prev.${name} pkg else pkg
-            )
-            (
-              import ../pkgs {
-                inherit lib;
-                pkgs = stableFinal;
-              }
-            )
-        )
+        (final: prev: { inherit (stableFinal) local; })
         sharedModifications
       ];
     };

@@ -21,7 +21,7 @@
         "flakes"
       ];
       # https://github.com/NixOS/nix/issues/9087
-      flake-registry = pkgs.flake-registry;
+      flake-registry = pkgs.local.flake-registry;
       trusted-users = [
         "@wheel"
         "nregner"

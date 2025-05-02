@@ -55,7 +55,10 @@ in
   // extraArgs
 )).overrideAttrs
   (old: {
+    meta.platforms = lib.platforms.linux;
+
     name = "k"; # dodge uboot length limits
+
     nativeBuildInputs = old.nativeBuildInputs ++ [ ubootTools ];
 
     passthru = old.passthru // {

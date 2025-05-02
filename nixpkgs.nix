@@ -10,5 +10,6 @@
     outputs.overlays.additions
     outputs.overlays.modifications
     outputs.overlays.unstable-packages
+    (_: _: { inherit outputs; })
   ];
 }

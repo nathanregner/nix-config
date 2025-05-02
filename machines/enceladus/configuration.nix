@@ -27,7 +27,7 @@
   };
 
   environment.systemPackages = [
-    pkgs.hydra-auto-upgrade
+    pkgs.local.hydra-auto-upgrade
   ];
 
   nix.distributedBuilds = true;

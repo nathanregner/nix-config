@@ -31,7 +31,7 @@
   };
 
   environment.etc."grafana.d/dashboards/node-exporter-full.json" = {
-    source = pkgs.node-exporter-full;
+    source = pkgs.local.node-exporter-full;
     group = "grafana";
     user = "grafana";
   };

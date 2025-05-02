@@ -31,7 +31,7 @@ in
       }
     ];
 
-    environment.systemPackages = [ pkgs.hydra-auto-upgrade ];
+    environment.systemPackages = [ pkgs.local.hydra-auto-upgrade ];
 
     systemd.services.nixos-upgrade = lib.mkIf (cfg.dates != null) {
       description = "NixOS Upgrade";
@@ -39,7 +39,7 @@ in
       unitConfig.X-StopOnRemoval = false;
       serviceConfig.Type = "oneshot";
       path = [
-        pkgs.hydra-auto-upgrade
+        pkgs.local.hydra-auto-upgrade
         config.nix.package
       ];
       script = ''

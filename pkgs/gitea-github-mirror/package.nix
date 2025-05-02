@@ -97,6 +97,8 @@ let
         inherit pkg rustPlatform;
       };
     };
+
+    meta.platforms = [ "x86_64-linux" ];
   };
 in
 pkg

@@ -112,7 +112,7 @@
 
         "custom/storage" = {
           exec = lib.getExe (
-            pkgs.writeBabashkaApplication {
+            pkgs.local.writeBabashkaApplication {
               name = "waybar-storage";
               text = builtins.readFile ./modules/storage.clj;
               runtimeInputs = [ pkgs.coreutils ];

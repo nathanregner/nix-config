@@ -23,5 +23,6 @@ stdenvNoCC.mkDerivation rec {
   meta = {
     description = "A unique leveling solution for Klipper-enabled 3D printers!";
     homepage = "https://github.com/kyleisah/Klipper-Adaptive-Meshing-Purging";
+    platforms = [ "aarch64-linux" ];
   };
 }

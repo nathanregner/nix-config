@@ -50,7 +50,7 @@
     };
 
     script = ''
-      ${pkgs.gitea-github-mirror}/bin/gitea-github-mirror
+      ${pkgs.local.gitea-github-mirror}/bin/gitea-github-mirror
     '';
   };
 

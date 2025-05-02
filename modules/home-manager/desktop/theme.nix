@@ -13,7 +13,7 @@
   # fc-cache -rf to clear
   fonts.fontconfig.enable = true;
   home.packages = [
+    pkgs.local.sf-mono-nerd-font
     pkgs.unstable.nerd-fonts.jetbrains-mono
-    pkgs.sf-mono-nerd-font
   ];
 }

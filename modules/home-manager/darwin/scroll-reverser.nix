@@ -11,5 +11,5 @@
     ShowDiscreteScrollOptions = 1;
   };
 
-  home.packages = [ pkgs.scroll-reverser ];
+  home.packages = [ pkgs.local.scroll-reverser ];
 }

@@ -43,7 +43,7 @@ in
     };
 
     environment.etc = {
-      "klipper/KAMP".source = pkgs.klipper-adaptive-meshing-purging;
+      "klipper/KAMP".source = pkgs.local.klipper-adaptive-meshing-purging;
       "klipper/adxl.cfg".source = ./adxl.cfg;
       "klipper/printer.cfg".source = pkgs.writeText "printer.immutable.cfg" ''
         [include ${cfg.configFile}]

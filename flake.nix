@@ -28,6 +28,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     flake-parts.url = "github:hercules-ci/flake-parts";
+    pkgs-by-name-for-flake-parts.url = "github:drupol/pkgs-by-name-for-flake-parts";
     hydra-sentinel = {
       url = "github:nathanregner/hydra-sentinel";
       inputs = {
@@ -111,7 +112,10 @@
         "x86_64-linux"
         "aarch64-darwin"
       ];
-      imports = [ inputs.treefmt-nix.flakeModule ];
+      imports = [
+        inputs.pkgs-by-name-for-flake-parts.flakeModule
+        inputs.treefmt-nix.flakeModule
+      ];
 
       perSystem =
         {
@@ -123,28 +127,17 @@
         }:
         {
           # apply overlays to flake-parts: https://flake.parts/overlays#consuming-an-overlay
-          _module.args.pkgs = import inputs.nixpkgs (
+          _module.args.pkgs = import inputs.nixpkgs-unstable (
             { inherit system; } // (import ./nixpkgs.nix { inherit outputs; })
           );
 
-          # custom packages
-          packages = import ./pkgs { inherit pkgs lib; };
+          devShells = import ./shells.nix {
+            inherit inputs' pkgs;
+            treefmt = config.treefmt.build.wrapper;
+          };
 
-          # devshells for flake development
-          devShells =
-            let
-              shells = import ./shells.nix {
-                inherit inputs' pkgs;
-                treefmt = config.treefmt.build.wrapper;
-              };
-            in
-            shells
-            // {
-              _aggregate = pkgs.releaseTools.aggregate {
-                constituents = lib.attrValues shells;
-                name = "devshell-${system}";
-              };
-            };
+          # https://github.com/drupol/pkgs-by-name-for-flake-parts
+          pkgsDirectory = ./pkgs;
 
           treefmt = import ./treefmt.nix { inherit pkgs; };
         };
@@ -153,7 +146,7 @@
         globals = import ./globals.nix { inherit lib; };
 
         # custom packages and modifications, exported as overlays
-        overlays = import ./overlays { inherit inputs; };
+        overlays = import ./overlays { inherit inputs outputs; };
 
         nixosConfigurations =
           {
@@ -316,18 +309,26 @@
           in
           systemProfiles "nixos" nixosConfigurations // systemProfiles "darwin" darwinConfigurations;
 
-        hydraJobs = {
-          deploy = lib.mapAttrs (
-            name: { profiles, ... }: builtins.mapAttrs (_: { path, ... }: path) profiles
-          ) deploy.nodes;
+        hydraJobs =
+          let
+            mkAggregates = import ./lib/mkAggregates.nix nixpkgs;
+          in
+          {
+            deploy = lib.mapAttrs (
+              name: { profiles, ... }: builtins.mapAttrs (_: { path, ... }: path) profiles
+            ) deploy.nodes;
 
-          devShells = lib.mapAttrs (system: { _aggregate, ... }: _aggregate) (
-            lib.getAttrs [
-              "x86_64-linux"
+            devShells = mkAggregates "devShells" [
               "aarch64-darwin"
-            ] outputs.devShells
-          );
-        };
+              "x86_64-linux"
+            ] outputs.devShells;
+
+            packages = mkAggregates "packages" [
+              "aarch64-darwin"
+              "aarch64-linux"
+              "x86_64-linux"
+            ] outputs.legacyPackages;
+          };
       };
     };
 }

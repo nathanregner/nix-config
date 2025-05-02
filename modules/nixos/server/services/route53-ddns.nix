@@ -74,7 +74,7 @@ in
       serviceConfig.EnvironmentFile = cfg.environmentFile;
 
       script = ''
-        ${pkgs.route53-ddns}/bin/route53-ddns \
+        ${pkgs.local.route53-ddns}/bin/route53-ddns \
           --hosted-zone-id $HOSTED_ZONE_ID \
           --domain ${cfg.domain} \
           --ip ${cfg.ipType} \
