@@ -22,7 +22,7 @@ in
   };
 
   config = lib.mkIf cfg.enable {
-    programs.zsh.initExtra = ''
+    programs.zsh.initContent = ''
       source ${pkgs.unstable.spaceship-prompt}/lib/spaceship-prompt/spaceship.zsh
     '';
 
