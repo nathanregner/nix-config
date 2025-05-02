@@ -26,6 +26,7 @@
           outputs
           ;
       };
+
       users.nregner = {
         imports = [ ../../../home-manager/server ];
 
