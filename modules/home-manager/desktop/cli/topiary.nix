@@ -92,7 +92,8 @@ in
     xdg.configFile."topiary/languages".source = pkgs.srcOnly {
       name = "topiary-languages";
       version = "latest";
-      srcs = [ cfg.languages ];
+      srcs = cfg.languages;
+      stdenv = pkgs.stdenvNoCC;
     };
 
     xdg.configFile."topiary/languages.ncl".text = ''
