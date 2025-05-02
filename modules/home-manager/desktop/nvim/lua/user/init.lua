@@ -573,6 +573,15 @@ require("lazy").setup({
 
   "b0o/schemastore.nvim",
 
+  {
+    "someone-stole-my-name/yaml-companion.nvim",
+    requires = {
+      { "neovim/nvim-lspconfig" },
+      { "nvim-lua/plenary.nvim" },
+      { "nvim-telescope/telescope.nvim" },
+    },
+  },
+
   { -- Autoformat
     "stevearc/conform.nvim",
     dependencies = { "folke/neoconf.nvim" },
