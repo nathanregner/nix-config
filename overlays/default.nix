@@ -90,19 +90,7 @@ let
     };
 in
 rec {
-  additions =
-    final: prev:
-    builtins.mapAttrs
-      (
-        name: pkg:
-        if builtins.hasAttr name prev && lib.isDerivation pkg then warnIfOutdated prev.${name} pkg else pkg
-      )
-      (
-        import ../pkgs {
-          inherit lib;
-          pkgs = final;
-        }
-      );
+  additions = final: prev: { };
 
   modifications =
     final: prev:
@@ -115,20 +103,6 @@ rec {
       system = stableFinal.system;
       config.allowUnfree = true;
       overlays = [
-        (
-          final: prev:
-          builtins.mapAttrs
-            (
-              name: pkg:
-              if builtins.hasAttr name prev && lib.isDerivation pkg then warnIfOutdated prev.${name} pkg else pkg
-            )
-            (
-              import ../pkgs {
-                inherit lib;
-                pkgs = stableFinal;
-              }
-            )
-        )
         sharedModifications
       ];
     };
