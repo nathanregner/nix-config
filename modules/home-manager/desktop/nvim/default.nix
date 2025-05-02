@@ -109,7 +109,7 @@ in
 
     programs.zsh.shellAliases.vimdiff = "nvim -d";
 
-    programs.zsh.initExtra =
+    programs.zsh.initContent =
       # bash
       ''
         if typeset -f nvim >/dev/null; then
