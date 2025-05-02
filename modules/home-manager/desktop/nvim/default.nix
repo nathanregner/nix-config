@@ -51,7 +51,6 @@ in
             emmet-language-server
             gopls
             graphql-language-service-cli
-            harper
             helm-ls
             libclang
             lua-language-server
@@ -59,6 +58,7 @@ in
             nixd
             terraform-ls
             tflint
+            typos-lsp
             vscode-langservers-extracted
             vtsls
             yaml-language-server

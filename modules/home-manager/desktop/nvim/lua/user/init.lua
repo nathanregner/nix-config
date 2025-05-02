@@ -367,15 +367,11 @@ require("lazy").setup({
         graphql = {
           filetypes = { "graphql", "javascript", "javascriptreact", "typescript", "typescriptreact" },
         },
-        harper_ls = {
-          settings = {
-            ["harper-ls"] = { -- https://writewithharper.com/docs/integrations/neovim
-              linters = {
-                LongSentences = false,
-                SentenceCapitalization = false,
-                Spaces = false,
-              },
-            },
+        typos_lsp = {
+          cmd_env = { RUST_LOG = "error" },
+          init_options = {
+            -- config = "~/code/typos-lsp/crates/typos-lsp/tests/typos.toml",
+            diagnosticSeverity = "Hint",
           },
         },
         helm_ls = {
