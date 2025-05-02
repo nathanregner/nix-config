@@ -1,4 +1,4 @@
-{ inputs, ... }:
+{ inputs, withSystem }:
 let
   inherit (inputs.nixpkgs) lib;
 
@@ -71,17 +71,9 @@ in
 rec {
   additions =
     final: prev:
-    builtins.mapAttrs
-      (
-        name: pkg:
-        if builtins.hasAttr name prev && lib.isDerivation pkg then warnIfOutdated prev.${name} pkg else pkg
-      )
-      (
-        import ../pkgs {
-          inherit lib;
-          pkgs = final;
-        }
-      );
+    withSystem prev.stdenv.hostPlatform.system (
+      { config, ... }: { _local = config.packages; } // config.packages
+    );
 
   modifications =
     final: prev:
@@ -94,20 +86,7 @@ rec {
       system = stableFinal.system;
       config.allowUnfree = true;
       overlays = [
-        (
-          final: prev:
-          builtins.mapAttrs
-            (
-              name: pkg:
-              if builtins.hasAttr name prev && lib.isDerivation pkg then warnIfOutdated prev.${name} pkg else pkg
-            )
-            (
-              import ../pkgs {
-                inherit lib;
-                pkgs = stableFinal;
-              }
-            )
-        )
+        (final: prev: stableFinal._local)
         sharedModifications
       ];
     };
