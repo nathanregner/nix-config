@@ -770,7 +770,7 @@ require("lazy").setup({
     },
     opts = {
       keymaps = {
-        ["gr"] = function() require("oil").open(find_git_root()) end,
+        ["Gr"] = function() require("oil").open(find_git_root()) end,
         ["gd"] = function()
           local oil = require("oil")
           if #require("oil.config").columns == 1 then
