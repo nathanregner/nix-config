@@ -351,8 +351,6 @@ require("lazy").setup({
       local util = require("lspconfig.util")
 
       --- @class (partial) LspConfig : vim.lsp.ClientConfig
-      --- @field root_dir? string | function
-      ---
       --- @type { [string]: LspConfig }
       local servers = {
         ast_grep = {},
@@ -395,11 +393,14 @@ require("lazy").setup({
         },
         harper_ls = {
           settings = {
-            ["harper-ls"] = { -- https://writewithharper.com/docs/integrations/neovim
+            -- https://writewithharper.com/docs/integrations/neovim
+            -- https://github.com/Automattic/harper/blob/1dc6a185a985fcb2ca462b1b7cdd08cf9a199b3e/harper-core/src/linting/phrase_corrections.rs#L586
+            ["harper-ls"] = {
               linters = {
                 LongSentences = false,
                 SentenceCapitalization = false,
                 Spaces = false,
+                ToDoHyphen = false,
               },
             },
           },
