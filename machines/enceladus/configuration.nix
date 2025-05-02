@@ -17,7 +17,12 @@
     openssh.authorizedKeys.keys = builtins.attrValues self.globals.ssh.userKeys.nregner;
   };
 
-  security.pam.enableSudoTouchIdAuth = true;
+  security.pam.services.sudo_local = {
+    touchIdAuth = true;
+    reattach = true;
+  };
+
+  system.primaryUser = "nregner";
 
   services.nregner.hydra-builder.enable = true;
 
