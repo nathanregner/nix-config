@@ -72,7 +72,10 @@ rec {
   additions =
     final: prev:
     withSystem prev.stdenv.hostPlatform.system (
-      { config, ... }: { _local = config.packages; } // config.packages
+      { config, ... }:
+      {
+        local = (lib.traceVal (config.packages));
+      }
     );
 
   modifications =
@@ -86,7 +89,7 @@ rec {
       system = stableFinal.system;
       config.allowUnfree = true;
       overlays = [
-        (final: prev: stableFinal._local)
+        # (final: prev: stableFinal._local)
         sharedModifications
       ];
     };
