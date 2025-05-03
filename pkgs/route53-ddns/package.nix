@@ -1,5 +1,6 @@
 {
   lib,
+  cargo-update-script,
   mkRustShell,
   rustPlatform,
   ...
@@ -20,8 +21,11 @@ let
 
     cargoLock.lockFile = ./Cargo.lock;
 
-    passthru.devShell = mkRustShell {
-      inherit pkg rustPlatform;
+    passthru = {
+      updateScript = cargo-update-script pkg { breaking = false; };
+      devShell = mkRustShell {
+        inherit pkg rustPlatform;
+      };
     };
   };
 in

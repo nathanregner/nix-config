@@ -1,6 +1,7 @@
 # https://github.com/NixOS/nixpkgs/blob/master/doc/languages-frameworks/rust.section.md
 {
   lib,
+  cargo-update-script,
   installShellFiles,
   mkRustShell,
   nvd,
@@ -35,8 +36,11 @@ let
       installShellCompletion target/completions/*
     '';
 
-    passthru.devShell = mkRustShell {
-      inherit pkg rustPlatform;
+    passthru = {
+      updateScript = cargo-update-script pkg { };
+      devShell = mkRustShell {
+        inherit pkg rustPlatform;
+      };
     };
   };
 in

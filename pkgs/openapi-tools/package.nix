@@ -1,6 +1,7 @@
 # https://github.com/NixOS/nixpkgs/blob/master/doc/languages-frameworks/rust.section.md
 {
   lib,
+  cargo-update-script,
   fetchurl,
   installShellFiles,
   mkRustShell,
@@ -36,17 +37,20 @@ let
       installShellCompletion target/completions/*
     '';
 
-    passthru.devShell = mkRustShell {
-      inherit env pkg rustPlatform;
+    passthru = {
+      devShell = mkRustShell {
+        inherit env pkg rustPlatform;
 
-      SWAGGER_PETSTORE = runCommand "swagger-petstore.json" { nativeBuildInputs = [ remarshal ]; } ''
-        remarshal ${
-          fetchurl {
-            url = "https://raw.githubusercontent.com/swagger-api/swagger-petstore/a0f12dd24efcf2fd68faa59c371ea5e35a90bbd1/src/main/resources/openapi.yaml";
-            sha256 = "sha256-n9dTzphU0HbFhKSRKvngqEntjxXVcslNVFydTaqIvJI=";
-          }
-        } -of json -o $out --json-indent 2
-      '';
+        SWAGGER_PETSTORE = runCommand "swagger-petstore.json" { nativeBuildInputs = [ remarshal ]; } ''
+          remarshal ${
+            fetchurl {
+              url = "https://raw.githubusercontent.com/swagger-api/swagger-petstore/a0f12dd24efcf2fd68faa59c371ea5e35a90bbd1/src/main/resources/openapi.yaml";
+              sha256 = "sha256-n9dTzphU0HbFhKSRKvngqEntjxXVcslNVFydTaqIvJI=";
+            }
+          } -of json -o $out --json-indent 2
+        '';
+      };
+      updateScript = cargo-update-script pkg { };
     };
   };
 in
