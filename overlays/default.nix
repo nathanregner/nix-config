@@ -44,12 +44,24 @@ let
       # https://github.com/NixOS/nixpkgs/issues/154163#issuecomment-1350599022
       makeModulesClosure = x: prev.makeModulesClosure (x // { allowMissing = true; });
 
+      # TODO: remove once https://github.com/NixOS/nixpkgs/issues/402498
+      mealie = final.callPackage ./mealie/package.nix { };
+
       # TODO: upstream https://github.com/Arksine/moonraker/issues/401
       moonraker = prev.moonraker.overrideAttrs (oldAttrs: {
         patches = oldAttrs.patches or [ ] ++ [
           ./moonraker/0001-file_manager-Add-config-option-to-rename-duplicate-f.patch
         ];
       });
+
+      nix-update-script = (
+        args:
+        [
+          (lib.getExe final.nix-update)
+          "--flake"
+        ]
+        ++ (lib.lists.tail (prev.nix-update-script args))
+      );
 
       wrapNeovimUnstable =
         args: neovim-unwrapped:

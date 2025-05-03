@@ -17,7 +17,7 @@ let
 in
 writeBabashkaApplication {
   name = "update-pkgs";
-  text = builtins.readFile ./update-pkgs.clj;
+  text = builtins.readFile ./update_pkgs.clj;
 
   passthru = {
     inherit targets;

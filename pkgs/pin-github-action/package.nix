@@ -1,29 +1,30 @@
 {
-  stdenv,
-  lib,
   fetchFromGitHub,
-  nodejs,
   buildNpmPackage,
   nix-update-script,
+  writeShellScript,
 }:
 
 buildNpmPackage rec {
   pname = "pin-github-action";
-  version = "3.1.2";
+  version = "3.3.1";
 
   src = fetchFromGitHub {
     owner = "mheap";
     repo = "pin-github-action";
     rev = "v${version}";
-    hash = "sha256-IjMMckPx76/Dyj9WDYcRBuXJOz4ZP8SR1SdPn2WV80c=";
+    hash = "sha256-SPjQvHiAiknv0oILFrwGhyots5f1tyUpuyDgeQup9vQ=";
     fetchSubmodules = true;
   };
 
-  npmDepsHash = "sha256-nDOWeolGbaZK98yQnz+Aoe6kzgHd1PqzTCcKFjyJhu4=";
+  npmDepsHash = "sha256-Y/fQK9jSyu+ZbVMALfz7K7MErTBSdw8RZTn6XRFolJo=";
 
   dontNpmBuild = true;
 
   passthru = {
     updateScript = nix-update-script { };
+    # updateScript = [(writeShellScript "update" ''
+    #   exec -a "$0" bash -c 'echo $0'
+    # '')];
   };
 }
