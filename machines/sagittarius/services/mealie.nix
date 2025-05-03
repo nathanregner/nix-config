@@ -23,7 +23,7 @@ in
   };
 
   services.nregner.backup.paths.mealie = {
-    paths = [ dataDir ];
+    dynamicFilesFrom = "realpath ${dataDir}";
     restic = {
       s3 = { };
     };
