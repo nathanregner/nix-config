@@ -85,8 +85,9 @@ in
             initialize = true;
             passwordFile = args.config.sops.secrets.restic-password.path;
             environmentFile = args.config.sops.secrets.restic-s3-env.path;
+            # https://restic.readthedocs.io/en/stable/060_forget.html#removing-snapshots-according-to-a-policy
             pruneOpts = [
-              "--keep-within 1w"
+              "--keep-within 7d"
               "--keep-within-daily 1m"
               "--keep-within-weekly 6m"
               "--keep-within-monthly 1y"
