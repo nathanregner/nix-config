@@ -25,6 +25,13 @@
           diff --ignore-blank-lines --color-moved=dimmed-zebra --color-moved-ws=ignore-all-space --minimal'';
         dlog = "-c diff.external=difft log --ext-diff";
         dshow = "-c diff.external=difft show --ext-diff";
+        gc-expire-all = ''
+          -c gc.pruneExpire=now
+          -c gc.reflogExpire=0
+          -c gc.reflogExpireUnreachable=0
+          -c gc.rerereresolved=0
+          -c gc.rerereunresolved=0
+          gc'';
       };
       branch = {
         sort = "-committerdate";
