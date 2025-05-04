@@ -14,6 +14,7 @@
 
   catppuccin.nushell.enable = true;
 
+  # TODO: move to direnv file, = config.programs.nushell.enable
   programs.direnv.enableNushellIntegration = true;
 
   programs.topiary.languages.nu = {
