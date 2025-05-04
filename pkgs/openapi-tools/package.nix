@@ -34,7 +34,9 @@ let
     ];
 
     postInstall = ''
-      installShellCompletion target/completions/*
+      installShellCompletion --cmd hydra-auto-upgrade \
+        --bash contrib/completions/hydra-auto-upgrade.bash \
+        --zsh contrib/completions/_hydra-auto-upgrade
     '';
 
     passthru = {
