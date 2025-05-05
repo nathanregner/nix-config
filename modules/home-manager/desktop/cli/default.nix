@@ -44,6 +44,7 @@
     htop-vim
 
     # nix
+    nix-diff
     nix-init
     nurl
 

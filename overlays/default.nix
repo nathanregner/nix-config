@@ -44,33 +44,12 @@ let
       # https://github.com/NixOS/nixpkgs/issues/154163#issuecomment-1350599022
       makeModulesClosure = x: prev.makeModulesClosure (x // { allowMissing = true; });
 
-      # TODO: remove once https://github.com/mealie-recipes/mealie/pull/5290/files issue is fixed
-      mealie = final.callPackage ./mealie/package.nix { };
-
       # TODO: upstream https://github.com/Arksine/moonraker/issues/401
       moonraker = prev.moonraker.overrideAttrs (oldAttrs: {
         patches = oldAttrs.patches or [ ] ++ [
           ./moonraker/0001-file_manager-Add-config-option-to-rename-duplicate-f.patch
         ];
       });
-
-      # FIXME: darwin build
-      nodejs_latest = warnIfOutdated prev.nodejs_latest prev.nodejs_22;
-
-      # TODO: remove once https://github.com/NixOS/nixpkgs/issues/380828
-      python3 = prev.python3.override {
-        packageOverrides = pyfinal: pyprev: {
-          plux = pyprev.plux.overridePythonAttrs (_: rec {
-            version = "1.12.0";
-            src = final.fetchFromGitHub {
-              owner = "localstack";
-              repo = "plux";
-              tag = "v${version}";
-              hash = "sha256-2Sxn/LuiwTzByAAz7VlNLsxEiPIyJWXr86/76Anx+EU=";
-            };
-          });
-        };
-      };
 
       wrapNeovimUnstable =
         args: neovim-unwrapped:
@@ -90,7 +69,19 @@ let
     };
 in
 rec {
-  additions = final: prev: { };
+  additions =
+    final: prev:
+    builtins.mapAttrs
+      (
+        name: pkg:
+        if builtins.hasAttr name prev && lib.isDerivation pkg then warnIfOutdated prev.${name} pkg else pkg
+      )
+      (
+        import ../pkgs {
+          inherit lib;
+          pkgs = final;
+        }
+      );
 
   modifications =
     final: prev:
@@ -103,6 +94,20 @@ rec {
       system = stableFinal.system;
       config.allowUnfree = true;
       overlays = [
+        (
+          final: prev:
+          builtins.mapAttrs
+            (
+              name: pkg:
+              if builtins.hasAttr name prev && lib.isDerivation pkg then warnIfOutdated prev.${name} pkg else pkg
+            )
+            (
+              import ../pkgs {
+                inherit lib;
+                pkgs = stableFinal;
+              }
+            )
+        )
         sharedModifications
       ];
     };

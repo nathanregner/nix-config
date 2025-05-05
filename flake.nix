@@ -21,14 +21,13 @@
     # Tools
     deploy-rs = {
       url = "github:serokell/deploy-rs";
-      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
     disko = {
       url = "github:nix-community/disko";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     flake-parts.url = "github:hercules-ci/flake-parts";
-    pkgs-by-name-for-flake-parts.url = "github:drupol/pkgs-by-name-for-flake-parts";
     hydra-sentinel = {
       url = "github:nathanregner/hydra-sentinel";
       inputs = {
@@ -117,10 +116,7 @@
         "x86_64-linux"
         "aarch64-darwin"
       ];
-      imports = [
-        inputs.pkgs-by-name-for-flake-parts.flakeModule
-        inputs.treefmt-nix.flakeModule
-      ];
+      imports = [ inputs.treefmt-nix.flakeModule ];
 
       perSystem =
         {
@@ -132,20 +128,12 @@
         }:
         {
           # apply overlays to flake-parts: https://flake.parts/overlays#consuming-an-overlay
-          _module.args.pkgs = import inputs.nixpkgs-unstable (
-            {
-              inherit system;
-            }
-            // (import ./nixpkgs.nix {
-              inherit outputs;
-              overlays = [
-                (final: prev: { local = config.packages; })
-              ];
-            })
+          _module.args.pkgs = import inputs.nixpkgs (
+            { inherit system; } // (import ./nixpkgs.nix { inherit outputs; })
           );
 
           # custom packages
-          pkgsDirectory = ./pkgs;
+          packages = import ./pkgs { inherit pkgs lib; };
 
           # devshells for flake development
           devShells =

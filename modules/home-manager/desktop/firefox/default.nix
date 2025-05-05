@@ -44,8 +44,7 @@
       ];
     };
     profiles.dev-edition-default = {
-      # FIXME: doesn't auto-install
-      extensions.packages = [ pkgs.aws-cli-sso ];
+      extensions.packages = [ pkgs.firefox-aws-cli-sso ];
       settings = {
         "browser.aboutConfig.showWarning" = false;
 
