@@ -1,4 +1,8 @@
-{ outputs }:
+{
+  outputs,
+  overlays ? [ ],
+  system ? null,
+}:
 {
   config = {
     allowUnfree = true;
@@ -10,5 +14,6 @@
     outputs.overlays.additions
     outputs.overlays.modifications
     outputs.overlays.unstable-packages
-  ];
+  ] ++ overlays;
 }
+// (if system != null then { inherit system; } else { })
