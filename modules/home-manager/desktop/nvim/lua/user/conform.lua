@@ -30,7 +30,7 @@ require("conform").setup({
     go = { "gofmt" },
     graphql = { "prettierd" },
     html = { "prettierd" },
-    java = { "spring_javaformat" },
+    -- java = { "spring_javaformat" },
     javascript = { "prettierd" },
     javascriptreact = { "prettierd" },
     json = { "prettierd" },
