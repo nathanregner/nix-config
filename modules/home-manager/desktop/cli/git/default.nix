@@ -30,8 +30,8 @@
             }
           )
         }'';
-        # https://github.com/orgs/community/discussions/9632#discussioncomment-4702442
         ddiff = "-c diff.external=difft diff";
+        # https://github.com/orgs/community/discussions/9632#discussioncomment-4702442
         diff-refactor = ''
           -c color.diff.oldMoved='white dim'
           -c color.diff.oldMovedAlternative='white dim'
@@ -42,6 +42,7 @@
           diff --ignore-blank-lines --color-moved=dimmed-zebra --color-moved-ws=ignore-all-space --minimal'';
         dlog = "-c diff.external=difft log --ext-diff";
         dshow = "-c diff.external=difft show --ext-diff";
+        for-each-repo = ''!~/configs/nix-config/modules/home-manager/desktop/cli/git/for-each-repo.nu'';
       };
       branch = {
         sort = "-committerdate";
