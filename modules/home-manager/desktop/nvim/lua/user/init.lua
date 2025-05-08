@@ -45,17 +45,6 @@ require("lazy").setup({
   "tpope/vim-fugitive",
   "tpope/vim-rhubarb",
 
-  -- Better "s" command
-  {
-    "tpope/vim-abolish",
-    dependencies = {
-      {
-        "markonm/traces.vim",
-        init = function() vim.g.traces_abolish_integration = 1 end,
-      },
-    },
-  },
-
   -- replacement for ":w !sudo tee % > /dev/null" trick
   "lambdalisue/vim-suda",
 
@@ -1043,29 +1032,12 @@ require("lazy").setup({
     config = true,
   },
 
-  { -- coerce.nvim
-    "gregorias/coerce.nvim",
-    -- version = "3.0",
-    config = function()
-      require("coerce").setup()
-      require("coerce").register_case({
-        keymap = "K",
-        description = "Kebab-Case",
-        case = function(str)
-          local cc = require("coerce.case")
-          local cs = require("coerce.string")
-          local parts = cc.split - keyword(str)
-
-          for i = 1, #parts, 1 do
-            local part_graphemes = cs.str2graphemelist(parts[i])
-            part_graphemes[1] = vim.fn.toupper(part_graphemes[1])
-            parts[i] = table.concat(part_graphemes, "")
-          end
-
-          return table.concat(parts, "-")
-        end,
-      })
-    end,
+  {
+    "johmsalas/text-case.nvim",
+    lazy = false,
+    opts = {
+      substitude_command_name = "S",
+    },
   },
 
   { "Olical/nfnl" },
