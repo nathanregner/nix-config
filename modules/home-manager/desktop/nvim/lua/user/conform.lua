@@ -31,6 +31,7 @@ require("conform").setup({
     graphql = { "prettierd" },
     html = { "prettierd" },
     -- java = { "spring_javaformat" },
+    java = { "google-java-format" },
     javascript = { "prettierd" },
     javascriptreact = { "prettierd" },
     json = { "prettierd" },
@@ -38,7 +39,6 @@ require("conform").setup({
     lua = { "stylua" },
     markdown = { "prettierd", "injected" },
     nginx = { "nginxfmt" },
-    nu = { "nufmt" },
     nix = {
       "nixfmt", --[[ "injected" ]]
     }, -- FIXME: injected bash formatter broken

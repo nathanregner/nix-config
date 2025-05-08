@@ -1,6 +1,5 @@
 {
   # buildGraalvmNativeImage,
-  # graalvmPackages,
   jre,
   maven,
   writeShellApplication,
@@ -33,8 +32,6 @@ writeShellApplication {
 #   inherit pname version;
 #
 #   src = jar;
-#
-#   graalvmDrv = graalvmPackages.graalvm-ce;
 #
 #   executable = "spring-javaformat";
 #
