@@ -192,6 +192,10 @@ return {
           },
           list = { node = { "element" } },
         },
+        terraform = {
+          attribute = { node = "attribute", ordinal = "identifier" },
+          list = { node = "expression", ordinal = "literal_value" },
+        },
         toml = {
           table = { node = { "table" } },
         },
