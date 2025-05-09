@@ -190,7 +190,12 @@ require("lazy").setup({
           },
         },
         fold_virt_text_handler = handler,
-        provider_selector = function() return { "treesitter", "indent" } end,
+        ---@diagnostic disable-next-line: unused-local
+        provider_selector = function(bufnr, filetype, buftype)
+          -- vim.print({ _bufnr, _filetype, buftype })
+          if buftype == "" or buftype == nil then return { "treesitter", "indent" } end
+          return ""
+        end,
       })
       vim.keymap.set("n", "zR", require("ufo").openAllFolds)
       vim.keymap.set("n", "zM", require("ufo").closeAllFolds)
