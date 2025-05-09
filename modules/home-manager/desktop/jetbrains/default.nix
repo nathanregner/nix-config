@@ -53,8 +53,8 @@ in
         }
       else
         {
-          idea = "open -a /Users/nathan.regner/Applications/IntelliJ\\ IDEA\\ Ultimate\\ *.app";
-          datagrip = "open -a /Users/nathan.regner/Applications/Datagrip\\ *.app";
+          idea = "open -na ~/Applications/IntelliJ\\ IDEA\\ Ultimate*.app/Contents/MacOS/datagrip --args";
+          datagrip = "open -na ~/Applications/DataGrip\\*.app/Contents/MacOS/datagrip --args";
         };
 
     xdg.configFile = lib.mkMerge (
