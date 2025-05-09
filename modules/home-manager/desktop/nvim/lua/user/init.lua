@@ -1148,7 +1148,11 @@ require("lazy").setup({
         end,
       })
       vim.api.nvim_create_autocmd("VimLeavePre", {
-        callback = function() resession.save(get_session_name(), { dir = "dirsession", notify = false }) end,
+        callback = function()
+          if resession.get_current() ~= nil then
+            resession.save(get_session_name(), { dir = "dirsession", notify = false })
+          end
+        end,
       })
       vim.api.nvim_create_user_command(
         "Mksession",
