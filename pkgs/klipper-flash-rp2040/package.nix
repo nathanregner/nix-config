@@ -1,17 +1,17 @@
 {
-  pkgsCross,
-  stdenv,
-  klipper,
-  python3,
-  gnumake,
-  pkg-config,
-  libusb,
-  writeShellApplication,
-  mkShell,
-  wrapCCWith,
-  gcc-arm-embedded,
+  lib,
   bintools,
-  newlib-nano,
+  gcc-arm-embedded,
+  gnumake,
+  klipper,
+  libusb1,
+  pkg-config,
+  pkgsCross,
+  python3,
+  stdenv,
+  wrapCCWith,
+  writeShellApplication,
+  ...
 }:
 let
   firmware = stdenv.mkDerivation {
@@ -19,10 +19,10 @@ let
     inherit (klipper) src version;
 
     nativeBuildInputs = [
-      python3
       gnumake
+      libusb1
       pkg-config
-      libusb
+      python3
       (
         let
           libc = pkgsCross.arm-embedded.newlib-nano;
@@ -58,9 +58,10 @@ in
 writeShellApplication {
   name = "klipper-flash-rp2040";
   text = ''${firmware}/rp2040_flash ${firmware}/klipper.uf2 "$@"'';
-}
-// {
   passthru = {
     inherit firmware;
+  };
+  meta = {
+    platforms = lib.platforms.linux;
   };
 }
