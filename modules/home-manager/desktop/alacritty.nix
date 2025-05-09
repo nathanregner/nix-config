@@ -1,4 +1,9 @@
-{ pkgs, ... }:
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
 {
   catppuccin.alacritty.enable = true;
   programs.alacritty = {
@@ -16,7 +21,6 @@
         };
         size = 11;
       };
-      # http://www.leonerd.org.uk/hacks/fixterms/
       keyboard.bindings = [
         {
           mods = "Control";
@@ -34,8 +38,12 @@
           chars = "\\u001B[13;7u";
         }
       ];
+      # http://www.leonerd.org.uk/hacks/fixterms/
       selection = {
         save_to_clipboard = true;
+      };
+      terminal = lib.optionalAttrs pkgs.stdenv.hostPlatform.isDarwin {
+        shell = "${config.home.homeDirectory}/.nix-profile/bin/zsh";
       };
       window = {
         dynamic_padding = true;
