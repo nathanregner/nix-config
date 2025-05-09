@@ -1163,6 +1163,11 @@ require("lazy").setup({
     end,
   },
 
+  {
+    "MagicDuck/grug-far.nvim",
+    opts = {},
+  },
+
   { import = "user.plugins" },
 }, {
   dev = {
