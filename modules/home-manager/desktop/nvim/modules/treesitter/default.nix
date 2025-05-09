@@ -56,4 +56,24 @@ in
       symbol = "tree_sitter_query";
     };
   };
+
+  programs.ast-grep.customLanguages =
+    let
+      parsers = pkgs.unstable.vimPlugins.nvim-treesitter-parsers;
+    in
+    {
+      hcl = {
+        extensions = [
+          "hcl"
+          "tf"
+        ];
+        library = parsers.hcl;
+      };
+      dtd = {
+        extensions = [
+          "xml"
+        ];
+        library = parsers.dtd;
+      };
+    };
 }

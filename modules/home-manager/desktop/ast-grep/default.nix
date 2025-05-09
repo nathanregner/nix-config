@@ -41,15 +41,7 @@ in
           };
         }
       );
-
       default = {
-        hcl = {
-          extensions = [
-            "hcl"
-            "tf"
-          ];
-          library = pkgs.unstable.tree-sitter-grammars.tree-sitter-hcl;
-        };
       };
     };
   };
@@ -62,10 +54,10 @@ in
     home.file."sgconfig.yml" = {
       source = yaml.generate "sgconfig.yml" {
         customLanguages = builtins.mapAttrs (
-          _: lang:
+          name: lang:
           {
             inherit (lang) extensions;
-            libraryPath = "${lang.library}/parser";
+            libraryPath = "${lang.library}/parser/${name}.so";
           }
           // (lib.optionalAttrs (lang.expandoChar != null) {
             inherit (lang) expandoChar;
