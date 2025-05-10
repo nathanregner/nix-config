@@ -60,7 +60,8 @@ in
 
     passthru = old.passthru // {
       inherit readConfig;
-      updateScript = ./update.sh;
+      # FIXME
+      # updateScript = ./update.sh;
 
       devShell = (
         # make O=build nconfig

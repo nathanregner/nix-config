@@ -99,7 +99,7 @@ async fn update(
 
 async fn get_public_ip() -> Result<IpAddr, Box<dyn Error>> {
     let https = hyper_rustls::HttpsConnectorBuilder::new()
-        .with_native_roots()?
+        .with_native_roots()
         .https_only()
         .enable_all_versions()
         .build();

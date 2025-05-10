@@ -46,16 +46,21 @@
 
 (defn -main
   [[attr]]
-  (let [targets (list-targets)]
-    (->> (or (some-> attr (vector))
-             (keys targets))
-         (map (partial get-update-script targets))
-         (mapv run-script))))
+  (let [targets (list-targets)
+        errors (->> (or (some-> attr (vector))
+                        (keys targets))
+                    (mapv #(try (run-script (get-update-script targets %))
+                                (catch Exception e
+                                  (timbre/error attr e)
+                                  e))))]
+    (when (some #(instance? Exception %) errors)
+      (System/exit 1))))
 
 (when (= *file* (System/getProperty "babashka.file"))
   (-main *command-line-args*))
 
 (comment
+  (timbre/error "asdfasdfasd" (ex-info "asdf" {}))
   (-main [])
   @(def targets (dissoc (list-targets)
                         "linux-orangepi-6_1-rk35xx"))
