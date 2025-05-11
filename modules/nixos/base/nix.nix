@@ -1,15 +1,19 @@
 {
-  outputs,
+  inputs,
   config,
-  lib,
   pkgs,
+  lib,
+  outputs,
   ...
 }:
 {
+  imports = [
+    inputs.determinate.nixosModules.default
+  ];
+
   nixpkgs = import ../../../nixpkgs.nix { inherit outputs; };
 
   nix = {
-    package = pkgs.unstable.nixVersions.latest;
     distributedBuilds = true;
     optimise.automatic = true;
 

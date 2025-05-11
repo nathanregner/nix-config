@@ -1,9 +1,16 @@
-{ config, lib, ... }:
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
 {
   imports = [
     ../nixos/base/nix.nix
     ../nixos/desktop/nix.nix
   ];
+
+  nix.package = pkgs.unstable.nixVersions.latest;
 
   nix.gc = {
     automatic = true;

@@ -17,6 +17,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     flake-compat.url = "github:edolstra/flake-compat";
+    determinate.url = "https://flakehub.com/f/DeterminateSystems/determinate/*";
 
     # Tools
     deploy-rs = {
