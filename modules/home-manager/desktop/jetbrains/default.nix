@@ -53,7 +53,7 @@ in
         }
       else
         {
-          idea = "open -na ~/Applications/IntelliJ\\ IDEA\\ Ultimate*.app/Contents/MacOS/datagrip --args";
+          idea = "open -na ~/Applications/IntelliJ\\ IDEA\\ Ultimate*.app/Contents/MacOS/idea --args";
           datagrip = "open -na ~/Applications/DataGrip\\*.app/Contents/MacOS/datagrip --args";
         };
 
