@@ -6,8 +6,10 @@
 }:
 let
   inherit (lib) types mkOption;
-  json = pkgs.formats.json { };
   cfg = config.programs.topiary;
+  package = pkgs.topiary;
+  json = pkgs.formats.json { };
+
 in
 {
   options.programs.topiary = {
@@ -22,25 +24,12 @@ in
       type = types.nullOr types.package;
       readOnly = true;
       default = pkgs.runCommand "topiary" { nativeBuildInputs = [ pkgs.makeWrapper ]; } ''
-        makeWrapper ${lib.getExe cfg.package} $out/bin/topiary \
-          --set TOPIARY_CONFIG_FILE "${config.xdg.configHome}/topiary/languages.ncl" \
+        makeWrapper ${lib.getExe package} $out/bin/topiary \
           --set TOPIARY_LANGUAGE_DIR "${config.xdg.configHome}/topiary/languages"
       '';
     };
 
     languages = mkOption {
-      type = types.listOf (
-        types.oneOf [
-          types.package
-          types.path
-        ]
-      );
-      default = [
-        "${cfg.package}/share/queries"
-      ];
-    };
-
-    settings.languages = mkOption {
       description = "https://topiary.tweag.io/book/cli/configuration.html";
       type = types.attrsOf (
         types.submodule {
@@ -48,19 +37,11 @@ in
             extensions = mkOption {
               type = types.listOf types.str;
             };
-            indent = mkOption {
-              type = types.nullOr types.str;
-              default = null;
-            };
             grammar = mkOption {
               type = types.submodule {
                 options = {
-                  source.path = mkOption {
-                    type = types.oneOf [
-                      types.package
-                      types.path
-                      types.str
-                    ];
+                  package = mkOption {
+                    type = types.package;
                   };
                   symbol = mkOption {
                     type = types.nullOr types.str;
@@ -76,43 +57,55 @@ in
               };
               default = 1;
             };
-            workspaces = mkOption {
-              type = types.listOf types.int;
-              default = [ ];
+            indent = mkOption {
+              type = types.nullOr types.str;
+              default = null;
+            };
+            queries = mkOption {
+              type = types.nullOr types.path;
+              default = null;
             };
           };
         }
       );
-      default = {
-      };
     };
   };
 
-  config = lib.mkIf cfg.enable {
-    xdg.configFile."topiary/languages".source = pkgs.srcOnly {
-      name = "topiary-languages";
-      version = "latest";
-      srcs = cfg.languages;
-      stdenv = pkgs.stdenvNoCC;
-    };
+  config = lib.mkIf (cfg.enable && cfg.languages or null != null) {
+    xdg.configFile."topiary/languages".source = "${pkgs.runCommandLocal "topiary-queries" { } ''
+      mkdir $out
+      cp ${package}/share/queries/* $out/
+      ${builtins.concatStringsSep "\n" (
+        lib.mapAttrsToList (
+          name: language: if language.queries != null then "cp ${language.queries} $out/${name}.scm" else ""
+        ) cfg.languages
+      )}
+    ''}";
 
-    xdg.configFile."topiary/languages.ncl".text = ''
-      import "${json.generate "topiary-languages.json" cfg.settings}"
-    '';
-
-    programs.topiary.settings.languages = {
-      toml = {
-        extensions = [ "toml" ];
-        grammar.source.path = "${pkgs.tree-sitter-grammars.tree-sitter-toml}/parser";
-      };
-      tree_sitter_query = {
-        extensions = [ "scm" ];
-        grammar = {
-          source.path = "${pkgs.tree-sitter-grammars.tree-sitter-query}/parser";
-          symbol = "tree_sitter_query";
+    xdg.configFile."topiary/languages.ncl".text =
+      let
+        parserPath =
+          package:
+          assert lib.assertMsg (
+            ((builtins.readDir package).parser or null) == "regular"
+          ) "Package does not appear to be a valid tree-sitter grammar: ${package.pname}";
+          "${package}/parser";
+        languages = {
+          languages = builtins.mapAttrs (
+            _: language:
+            language
+            // {
+              grammar = {
+                inherit (language.grammar) symbol;
+                source.path = parserPath language.grammar.package;
+              };
+            }
+          ) cfg.languages;
         };
-      };
-    };
+      in
+      ''
+        import "${json.generate "topiary-languages.json" languages}"
+      '';
 
     home.packages = [
       cfg.finalPackage

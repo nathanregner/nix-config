@@ -1,22 +1,25 @@
 { pkgs, ... }:
 {
-  catppuccin.nushell.enable = true;
-
   programs.nushell = {
     enable = true;
+    settings = {
+      completions.external = {
+        enable = true;
+        max_results = 200;
+      };
+      edit_mode = "vi";
+      show_banner = false;
+    };
   };
 
-  programs.topiary = {
-    # languages = [ pkgs.topiary-nushell ];
-    languages = [
-      (pkgs.runCommand "nu-language" { } ''
-        mkdir $out
-        cp ${./nu.scm} $out/nu.scm
-      '')
-    ];
-    settings.languages.nu = {
-      extensions = [ "nu" ];
-      grammar.source.path = "${pkgs.tree-sitter-grammars.tree-sitter-nu}/parser";
-    };
+  catppuccin.nushell.enable = true;
+
+  # TODO: move to direnv file, = config.programs.nushell.enable
+  programs.direnv.enableNushellIntegration = true;
+
+  programs.topiary.languages.nu = {
+    extensions = [ "nu" ];
+    grammar.package = pkgs.tree-sitter-grammars.tree-sitter-nu;
+    queries = ./nu.scm;
   };
 }
