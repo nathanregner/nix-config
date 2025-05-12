@@ -56,6 +56,14 @@ in
       };
     };
 
+  programs.topiary.languages.tree_sitter_query = {
+    extensions = [ "scm" ];
+    grammar = {
+      package = pkgs.tree-sitter-grammars.tree-sitter-query;
+      symbol = "tree_sitter_query";
+    };
+  };
+
   programs.ast-grep.customLanguages =
     let
       parsers = pkgs.unstable.vimPlugins.nvim-treesitter-parsers;

@@ -43,6 +43,13 @@
         dlog = "-c diff.external=difft log --ext-diff";
         dshow = "-c diff.external=difft show --ext-diff";
         for-each-repo = ''!~/configs/nix-config/modules/home-manager/desktop/cli/git/for-each-repo.nu'';
+        gc-expire-all = ''
+          -c gc.pruneExpire=now
+          -c gc.reflogExpire=0
+          -c gc.reflogExpireUnreachable=0
+          -c gc.rerereresolved=0
+          -c gc.rerereunresolved=0
+          gc'';
       };
       branch = {
         sort = "-committerdate";

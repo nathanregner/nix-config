@@ -1,7 +1,6 @@
 {
   imports = [
     ./cache.nix
-    ./docker.nix
     ./gitea.nix
     ./github-actions.nix
     ./grafana

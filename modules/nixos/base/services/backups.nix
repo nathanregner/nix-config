@@ -1,69 +1,41 @@
 {
+  options,
   config,
   lib,
-  utils,
   ...
-}@args:
+}:
 with lib;
 let
-  inherit (utils.systemdUtils.unitOptions) unitOption;
   cfg = config.services.nregner.backup;
 in
 {
   options.services.nregner.backup.enable = mkOption {
-    default = !(args.options.virtualisation ? qemu);
+    default = !(options.virtualisation ? qemu);
   };
 
+  # TODO: error if no files
   options.services.nregner.backup.paths = mkOption {
     default = { };
     type = types.attrsOf (
-      types.submodule (
-        { config, name, ... }:
-        {
-          options = {
-            paths = mkOption {
-              type = types.listOf types.str;
-              default = null;
-              example = [
-                "/var/lib/postgresql"
-                "/home/user/backup"
-              ];
-            };
-
-            timerConfig = mkOption {
-              type = types.attrsOf unitOption;
-              default = {
-                OnCalendar = "3h";
-                Persistent = true;
-              };
-              description = lib.mdDoc ''
-                When to run the backup. See {manpage}`systemd.timer(5)` for details.
-              '';
-              example = {
-                OnCalendar = "00:05";
-                RandomizedDelaySec = "5h";
-                Persistent = true;
-              };
-            };
-
+      types.submodule {
+        options =
+          (lib.getAttrs [
+            "dynamicFilesFrom"
+            "paths"
+            "timerConfig"
+          ] (options.services.restic.backups.type.getSubOptions [ ]))
+          // {
             restic = mkOption {
-              type = types.attrsOf (
-                types.submodule (
-                  { config, name, ... }:
-                  {
-                    # options = {
-                    #   enable = mkOption {
-                    #     type = types.bool;
-                    #     default = true;
-                    #   };
-                    # };
-                  }
-                )
-              );
+              type = types.submodule {
+                options = {
+                  s3 = mkOption {
+                    type = types.attrs; # TODO
+                  };
+                };
+              };
             };
           };
-        }
-      )
+      }
     );
   };
 
@@ -81,12 +53,13 @@ in
       let
         defaults = {
           s3 = name: {
-            repository = "s3:s3.dualstack.us-west-2.amazonaws.com/nregner-restic/${args.config.networking.hostName}/${name}";
+            repository = "s3:s3.dualstack.us-west-2.amazonaws.com/nregner-restic/${config.networking.hostName}/${name}";
             initialize = true;
-            passwordFile = args.config.sops.secrets.restic-password.path;
-            environmentFile = args.config.sops.secrets.restic-s3-env.path;
+            passwordFile = config.sops.secrets.restic-password.path;
+            environmentFile = config.sops.secrets.restic-s3-env.path;
+            # https://restic.readthedocs.io/en/stable/060_forget.html#removing-snapshots-according-to-a-policy
             pruneOpts = [
-              "--keep-within 1w"
+              "--keep-within 7d"
               "--keep-within-daily 1m"
               "--keep-within-weekly 6m"
               "--keep-within-monthly 1y"
@@ -97,13 +70,12 @@ in
           (attrsets.mapAttrsToList (
             name:
             {
-              paths,
               restic ? { },
               ...
-            }:
+            }@opts:
             attrsets.mapAttrs' (type: job: {
               name = "${name}-${type}";
-              value = ((defaults.${type} or (_: { })) name) // job // { inherit paths; };
+              value = ((defaults.${type} or (_: { })) name) // job // (builtins.removeAttrs opts [ "restic" ]);
             }) restic
           ))
           (lists.foldl (acc: attrs: acc // attrs) { })

@@ -1,6 +1,7 @@
 # TODO: nix-update
 {
   lib,
+  cargo-update-script,
   fetchurl,
   git,
   gitea,
@@ -90,8 +91,11 @@ let
 
     inherit env;
 
-    passthru.devShell = mkRustShell {
-      inherit env pkg rustPlatform;
+    passthru = {
+      updateScript = cargo-update-script pkg { };
+      devShell = mkRustShell {
+        inherit pkg rustPlatform;
+      };
     };
   };
 in
