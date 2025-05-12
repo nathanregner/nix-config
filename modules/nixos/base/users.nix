@@ -22,6 +22,7 @@ in
         "docker"
         "libvirtd"
         "networkmanager"
+        "podman"
       ];
     openssh.authorizedKeys.keys = builtins.attrValues self.globals.ssh.userKeys.nregner;
   };
