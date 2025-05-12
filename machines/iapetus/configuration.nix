@@ -136,34 +136,19 @@
     [ config.boot.kernelPackages.perf ]
     ++ (with pkgs.unstable; [
       android-file-transfer # aft-mtp-mount ~/mnt
+      libmtp
       nautilus-python
       networkmanagerapplet
-      libmtp
       nvtopPackages.nvidia
+      podman-compose
       virt-manager
     ]);
 
-  # boot.binfmt.emulatedSystems = [ "aarch64-linux" ];
-
-  virtualisation.docker = {
+  virtualisation.podman = {
     enable = true;
-    enableOnBoot = false; # lazy start with docker.socket
-    # extraOptions = "--insecure-registry sagittarius:5000";
-    daemon.settings = {
-      insecure-registries = [
-        "http://sagittarius:5000"
-        "http://100.92.148.118:5000"
-      ];
-    };
-    storageDriver = "overlay2"; # https://github.com/moby/moby/issues/9939
+    dockerSocket.enable = true;
+    dockerCompat = true;
   };
-
-  # virtualisation.docker.rootless = {
-  #   enable = true;
-  #   setSocketVariable = true;
-  #   # enableOnBoot = false; # lazy start with docker.socket
-  #   daemon.settings = { insecure-registries = [ "sagittarius:5000" ]; };
-  # };
 
   services.printing.enable = true;
 
