@@ -1,3 +1,3 @@
-{
-  filterPackages = import ./filterPackages.nix;
+lib: {
+  filterPackagesRecursive = import ./filterPackagesRecursive.nix lib;
 }

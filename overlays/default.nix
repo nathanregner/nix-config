@@ -2,7 +2,7 @@
 let
   inherit (inputs.nixpkgs) lib;
 
-  inherit (import ../lib) filterPackages;
+  inherit (import ../lib lib) filterPackagesRecursive;
 
   assertVersion =
     version: pkg:
@@ -91,7 +91,7 @@ rec {
       inherit (prev.stdenv.hostPlatform) system;
     in
     {
-      local = filterPackages system outputs.legacyPackages.${system};
+      local = filterPackagesRecursive system outputs.legacyPackages.${system};
     };
 
   modifications =
@@ -105,7 +105,7 @@ rec {
       system = stableFinal.system;
       config.allowUnfree = true;
       overlays = [
-        # (final: prev: stableFinal._local)
+        (final: prev: stableFinal.local)
         sharedModifications
       ];
     };

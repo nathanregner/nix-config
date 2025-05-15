@@ -106,237 +106,234 @@
       inherit (self) outputs;
       inherit (nixpkgs) lib;
     in
-    flake-parts.lib.mkFlake { inherit inputs; } (
-      { withSystem, ... }:
-      {
-        systems = [
-          "aarch64-linux"
-          "x86_64-linux"
-          "aarch64-darwin"
-        ];
-        imports = [
-          inputs.pkgs-by-name-for-flake-parts.flakeModule
-          inputs.treefmt-nix.flakeModule
-        ];
+    flake-parts.lib.mkFlake { inherit inputs; } {
+      systems = [
+        "aarch64-linux"
+        "x86_64-linux"
+        "aarch64-darwin"
+      ];
+      imports = [
+        inputs.pkgs-by-name-for-flake-parts.flakeModule
+        inputs.treefmt-nix.flakeModule
+      ];
 
-        perSystem =
+      perSystem =
+        {
+          config,
+          system,
+          inputs',
+          pkgs,
+          ...
+        }:
+        {
+          # apply overlays to flake-parts: https://flake.parts/overlays#consuming-an-overlay
+          _module.args.pkgs = import inputs.nixpkgs-unstable (
+            { inherit system; } // (import ./nixpkgs.nix { inherit outputs; })
+          );
+
+          # custom packages
+          # https://github.com/drupol/pkgs-by-name-for-flake-parts
+          pkgsDirectory = ./pkgs;
+          pkgsNameSeparator = "-";
+
+          # devshells for flake development
+          devShells =
+            let
+              shells = import ./shells.nix {
+                inherit inputs' pkgs;
+                treefmt = config.treefmt.build.wrapper;
+              };
+            in
+            shells
+            // {
+              _aggregate = pkgs.releaseTools.aggregate {
+                constituents = lib.attrValues shells;
+                name = "devshell-${system}";
+              };
+            };
+
+          treefmt = import ./treefmt.nix { inherit pkgs; };
+        };
+
+      flake = rec {
+        globals = import ./globals.nix { inherit lib; };
+
+        # custom packages and modifications, exported as overlays
+        overlays = import ./overlays { inherit inputs outputs; };
+
+        nixosConfigurations =
           {
-            config,
-            system,
-            inputs',
-            pkgs,
-            ...
-          }:
-          {
-            # apply overlays to flake-parts: https://flake.parts/overlays#consuming-an-overlay
-            _module.args.pkgs = import inputs.nixpkgs-unstable (
-              { inherit system; } // (import ./nixpkgs.nix { inherit outputs; })
-            );
-
-            # custom packages
-            # https://github.com/drupol/pkgs-by-name-for-flake-parts
-            pkgsDirectory = ./pkgs;
-            pkgsNameSeparator = "-";
-
-            # devshells for flake development
-            devShells =
-              let
-                shells = import ./shells.nix {
-                  inherit inputs' pkgs;
-                  treefmt = config.treefmt.build.wrapper;
-                };
-              in
-              shells
-              // {
-                _aggregate = pkgs.releaseTools.aggregate {
-                  constituents = lib.attrValues shells;
-                  name = "devshell-${system}";
-                };
-              };
-
-            treefmt = import ./treefmt.nix { inherit pkgs; };
-          };
-
-        flake = rec {
-          globals = import ./globals.nix { inherit lib; };
-
-          # custom packages and modifications, exported as overlays
-          overlays = import ./overlays { inherit inputs outputs; };
-
-          nixosConfigurations =
-            {
-              # Desktop
-              iapetus = nixpkgs-unstable.lib.nixosSystem {
-                specialArgs = {
-                  inherit self inputs outputs;
-                };
-                modules = [
-                  ./machines/iapetus/configuration.nix
-                ];
-              };
-
-              # GE73VR Laptop
-              callisto = lib.nixosSystem {
-                specialArgs = {
-                  inherit self inputs outputs;
-                };
-                modules = [
-                  ./machines/callisto/configuration.nix
-                ];
-              };
-
-              # Server
-              sagittarius = lib.nixosSystem {
-                specialArgs = {
-                  inherit self inputs outputs;
-                };
-                modules = [
-                  ./machines/sagittarius/configuration.nix
-                ];
-              };
-
-              # Voron 2.4r2 Klipper machine
-              voron = lib.nixosSystem {
-                specialArgs = {
-                  inherit self inputs outputs;
-                };
-                modules = [
-                  ./machines/voron/configuration.nix
-                ];
-                system = "aarch64-linux";
-              };
-            }
-            // (import ./machines/print-farm {
-              inherit self inputs outputs;
-            });
-
-          darwinConfigurations = {
-            "enceladus" = nix-darwin.lib.darwinSystem {
+            # Desktop
+            iapetus = nixpkgs-unstable.lib.nixosSystem {
               specialArgs = {
                 inherit self inputs outputs;
               };
               modules = [
-                ./machines/enceladus/configuration.nix
+                ./machines/iapetus/configuration.nix
               ];
             };
-          };
 
-          homeConfigurations = {
-            "nregner@iapetus" = home-manager-unstable.lib.homeManagerConfiguration {
-              pkgs = withSystem "x86_64-linux" ({ pkgs, ... }: pkgs);
-              extraSpecialArgs = {
+            # GE73VR Laptop
+            callisto = lib.nixosSystem {
+              specialArgs = {
                 inherit self inputs outputs;
               };
               modules = [
-                ./machines/iapetus/home.nix
+                ./machines/callisto/configuration.nix
               ];
             };
-            "nregner@callisto" = home-manager-unstable.lib.homeManagerConfiguration {
-              pkgs = withSystem "x86_64-linux" ({ pkgs, ... }: pkgs);
-              extraSpecialArgs = {
+
+            # Server
+            sagittarius = lib.nixosSystem {
+              specialArgs = {
                 inherit self inputs outputs;
               };
               modules = [
-                ./machines/callisto/home.nix
+                ./machines/sagittarius/configuration.nix
               ];
             };
-            "nregner@enceladus" = home-manager-unstable.lib.homeManagerConfiguration {
-              pkgs = withSystem "aarch64-darwin" ({ pkgs, ... }: pkgs);
-              extraSpecialArgs = {
+
+            # Voron 2.4r2 Klipper machine
+            voron = lib.nixosSystem {
+              specialArgs = {
                 inherit self inputs outputs;
               };
               modules = [
-                ./machines/enceladus/home.nix
+                ./machines/voron/configuration.nix
               ];
+              system = "aarch64-linux";
             };
-          };
+          }
+          // (import ./machines/print-farm {
+            inherit self inputs outputs;
+          });
 
-          images = lib.mapAttrs (
-            name: nixosConfiguration:
-            let
-              inherit (nixosConfiguration) config pkgs;
-              inherit (config.nixpkgs.hostPlatform) system;
-            in
-            {
-              iso-installer = inputs.nixos-generators.nixosGenerate {
-                inherit system;
-                modules = [
-                  "${nixpkgs}/nixos/modules/installer/cd-dvd/installation-cd-graphical-gnome.nix"
-                  {
-                    environment.etc."nixos/flake".source = self.outPath;
-                    environment.systemPackages = [
-                      # copy system closure so we don't have to download/rebuild on the host
-                      config.system.build.toplevel
-                      (pkgs.runCommand "install-scripts" { } ''
-                        mkdir -p $out/bin
-                        cp ${config.system.build.formatScript} $out/bin/disko-format
-                        cp ${config.system.build.mountScript} $out/bin/disko-mount
-                        cp ${pkgs.writeShellScript "install" ''
-                          sudo nixos-install --root /mnt --flake ${self.outPath}#${name}
-                        ''} $out/bin/nixos-install-flake
-                      '')
-                    ];
-                    isoImage.squashfsCompression = "zstd -Xcompression-level 1";
-                  }
-                ];
-                format = "install-iso";
-              };
-            }
-          ) nixosConfigurations;
-
-          deploy.nodes =
-            let
-              homeProfiles = (
-                activate: hostName:
-                let
-                  homeConfiguration = homeConfigurations."nregner@${hostName}" or null;
-                in
-                if homeConfiguration != null then
-                  {
-                    home = {
-                      user = "nregner";
-                      path = activate homeConfiguration;
-                    };
-                  }
-                else
-                  { }
-              );
-              systemProfiles =
-                type:
-                lib.mapAttrs (
-                  name:
-                  { config, ... }@systemConfiguration:
-                  {
-                    hostname = config.networking.hostName;
-                    profiles =
-                      let
-                        activate = deploy-rs.lib.${config.nixpkgs.hostPlatform.system}.activate;
-                      in
-                      {
-                        system = {
-                          user = "root";
-                          path = activate.${type} systemConfiguration;
-                        };
-                      }
-                      // (homeProfiles activate.home-manager config.networking.hostName);
-                  }
-                );
-            in
-            systemProfiles "nixos" nixosConfigurations // systemProfiles "darwin" darwinConfigurations;
-
-          hydraJobs = {
-            deploy = lib.mapAttrs (
-              name: { profiles, ... }: builtins.mapAttrs (_: { path, ... }: path) profiles
-            ) deploy.nodes;
-
-            devShells = lib.mapAttrs (system: { _aggregate, ... }: _aggregate) (
-              lib.getAttrs [
-                "x86_64-linux"
-                "aarch64-darwin"
-              ] outputs.devShells
-            );
+        darwinConfigurations = {
+          "enceladus" = nix-darwin.lib.darwinSystem {
+            specialArgs = {
+              inherit self inputs outputs;
+            };
+            modules = [
+              ./machines/enceladus/configuration.nix
+            ];
           };
         };
-      }
-    );
+
+        homeConfigurations = {
+          "nregner@iapetus" = home-manager-unstable.lib.homeManagerConfiguration {
+            pkgs = nixpkgs-unstable.legacyPackages.x86_64-linux;
+            extraSpecialArgs = {
+              inherit self inputs outputs;
+            };
+            modules = [
+              ./machines/iapetus/home.nix
+            ];
+          };
+          "nregner@callisto" = home-manager-unstable.lib.homeManagerConfiguration {
+            pkgs = nixpkgs-unstable.legacyPackages.x86_64-linux;
+            extraSpecialArgs = {
+              inherit self inputs outputs;
+            };
+            modules = [
+              ./machines/callisto/home.nix
+            ];
+          };
+          "nregner@enceladus" = home-manager-unstable.lib.homeManagerConfiguration {
+            pkgs = nixpkgs-unstable.legacyPackages.aarch64-darwin;
+            extraSpecialArgs = {
+              inherit self inputs outputs;
+            };
+            modules = [
+              ./machines/enceladus/home.nix
+            ];
+          };
+        };
+
+        images = lib.mapAttrs (
+          name: nixosConfiguration:
+          let
+            inherit (nixosConfiguration) config pkgs;
+            inherit (config.nixpkgs.hostPlatform) system;
+          in
+          {
+            iso-installer = inputs.nixos-generators.nixosGenerate {
+              inherit system;
+              modules = [
+                "${nixpkgs}/nixos/modules/installer/cd-dvd/installation-cd-graphical-gnome.nix"
+                {
+                  environment.etc."nixos/flake".source = self.outPath;
+                  environment.systemPackages = [
+                    # copy system closure so we don't have to download/rebuild on the host
+                    config.system.build.toplevel
+                    (pkgs.runCommand "install-scripts" { } ''
+                      mkdir -p $out/bin
+                      cp ${config.system.build.formatScript} $out/bin/disko-format
+                      cp ${config.system.build.mountScript} $out/bin/disko-mount
+                      cp ${pkgs.writeShellScript "install" ''
+                        sudo nixos-install --root /mnt --flake ${self.outPath}#${name}
+                      ''} $out/bin/nixos-install-flake
+                    '')
+                  ];
+                  isoImage.squashfsCompression = "zstd -Xcompression-level 1";
+                }
+              ];
+              format = "install-iso";
+            };
+          }
+        ) nixosConfigurations;
+
+        deploy.nodes =
+          let
+            homeProfiles = (
+              activate: hostName:
+              let
+                homeConfiguration = homeConfigurations."nregner@${hostName}" or null;
+              in
+              if homeConfiguration != null then
+                {
+                  home = {
+                    user = "nregner";
+                    path = activate homeConfiguration;
+                  };
+                }
+              else
+                { }
+            );
+            systemProfiles =
+              type:
+              lib.mapAttrs (
+                name:
+                { config, ... }@systemConfiguration:
+                {
+                  hostname = config.networking.hostName;
+                  profiles =
+                    let
+                      activate = deploy-rs.lib.${config.nixpkgs.hostPlatform.system}.activate;
+                    in
+                    {
+                      system = {
+                        user = "root";
+                        path = activate.${type} systemConfiguration;
+                      };
+                    }
+                    // (homeProfiles activate.home-manager config.networking.hostName);
+                }
+              );
+          in
+          systemProfiles "nixos" nixosConfigurations // systemProfiles "darwin" darwinConfigurations;
+
+        hydraJobs = {
+          deploy = lib.mapAttrs (
+            name: { profiles, ... }: builtins.mapAttrs (_: { path, ... }: path) profiles
+          ) deploy.nodes;
+
+          devShells = lib.mapAttrs (system: { _aggregate, ... }: _aggregate) (
+            lib.getAttrs [
+              "x86_64-linux"
+              "aarch64-darwin"
+            ] outputs.devShells
+          );
+        };
+      };
+    };
 }
