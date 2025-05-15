@@ -329,10 +329,16 @@
 
           devShells = lib.mapAttrs (system: { _aggregate, ... }: _aggregate) (
             lib.getAttrs [
-              "x86_64-linux"
               "aarch64-darwin"
+              "x86_64-linux"
             ] outputs.devShells
           );
+
+          packages = lib.getAttrs [
+            "aarch64-darwin"
+            "aarch64-linux"
+            "x86_64-linux"
+          ] outputs.packages;
         };
       };
     };
