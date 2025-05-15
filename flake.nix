@@ -161,7 +161,7 @@
           globals = import ./globals.nix { inherit lib; };
 
           # custom packages and modifications, exported as overlays
-          overlays = import ./overlays { inherit inputs withSystem; };
+          overlays = import ./overlays { inherit inputs outputs; };
 
           nixosConfigurations =
             {

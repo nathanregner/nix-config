@@ -1,12 +1,16 @@
-{ inputs, withSystem }:
+{ inputs, outputs }:
 let
   inherit (inputs.nixpkgs) lib;
+
+  inherit (import ../lib) filterPackages;
 
   assertVersion =
     version: pkg:
     lib.throwIf (
       version != pkg.version
     ) "${pkg.pname or "???"} has been updated: ${version} -> ${pkg.version}" pkg;
+
+  overrideAttrsWarnIfOutdated = drv: args: warnIfOutdated (drv.overrideAttrs args) drv;
 
   warnIfOutdated =
     prev: final:
@@ -83,12 +87,12 @@ in
 rec {
   additions =
     final: prev:
-    withSystem prev.stdenv.hostPlatform.system (
-      { config, ... }:
-      {
-        local = (lib.traceVal (config.packages));
-      }
-    );
+    let
+      inherit (prev.stdenv.hostPlatform) system;
+    in
+    {
+      local = filterPackages system outputs.legacyPackages.${system};
+    };
 
   modifications =
     final: prev:
