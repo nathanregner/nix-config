@@ -7,13 +7,13 @@
 }:
 let
   pname = "spring-javaformat";
-  version = "0.0.43";
+  version = "0.0.44";
   jar = maven.buildMavenPackage {
     inherit pname version;
     src = ./.;
 
-    buildOffline = true;
-    mvnHash = "sha256-wmzAcU4LuGswFEv616KMFLn8Z1gHJrgRIy1KhOCkjes=";
+    # buildOffline = true;
+    mvnHash = "sha256-Yz8tK3Vy6CBU4/nvyC1OSmgFDaFn+bl7KZYo5mJnP9Y=";
 
     installPhase = ''
       mv ./target/spring-format-cli-${version}.jar $out
