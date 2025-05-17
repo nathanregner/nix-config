@@ -94,7 +94,7 @@ let
     passthru = {
       updateScript = cargo-update-script pkg { };
       devShell = mkRustShell {
-        inherit pkg rustPlatform;
+        inherit pkg rustPlatform env;
       };
     };
 
