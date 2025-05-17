@@ -16,6 +16,7 @@
 
   services.hydra = {
     enable = true;
+    package = pkgs.unstable.hydra;
     hydraURL = "https://hydra.nregner.net";
     notificationSender = "hydra@nregner.net";
     useSubstitutes = true;
