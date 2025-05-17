@@ -107,6 +107,7 @@ in
         client-secret-file = config.sops.secrets.oauth2-proxy-client-secret.path;
       };
       keyFile = config.sops.templates.oauth2-proxy-env.path;
+      setXauthrequest = true;
     };
   };
 }

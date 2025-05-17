@@ -5,6 +5,7 @@ use http::{header::AUTHORIZATION, HeaderValue};
 use reqwest::header::HeaderMap;
 
 pub use gitea::types::Repository;
+use url::Url;
 
 #[derive(Clone)]
 pub struct Client {
@@ -14,7 +15,7 @@ pub struct Client {
 
 impl Client {
     pub fn new(
-        base_url: &str,
+        base_url: Url,
         access_token: String,
         github_access_token: String,
     ) -> eyre::Result<Self> {
@@ -26,7 +27,10 @@ impl Client {
         });
         Ok(Self {
             client: gitea::Client::new_with_client(
-                base_url,
+                base_url
+                    .as_str()
+                    .strip_suffix("/")
+                    .unwrap_or(base_url.as_str()),
                 reqwest::Client::builder()
                     .default_headers(headers)
                     .build()?,

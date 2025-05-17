@@ -13,6 +13,7 @@ mod sync;
 struct Config {
     github_token: String,
     gitea_token: String,
+    gitea_url: url::Url,
 }
 
 #[tokio::main]
@@ -24,7 +25,7 @@ async fn main() -> eyre::Result<()> {
 
     let github = github::Client::new(config.github_token.to_string())?;
     let gitea = gitea::Client::new(
-        "https://git.nregner.net/api/v1",
+        config.gitea_url,
         config.gitea_token,
         config.github_token.clone(),
     )?;
@@ -32,6 +33,7 @@ async fn main() -> eyre::Result<()> {
     tracing::info!("Syncing repos...");
     sync::sync_repos(&github, &gitea).await?;
 
+    // https://github.com/go-gitea/gitea/issues/21192
     tracing::info!("Updating access token...");
     access_token::update_access_token("/var/lib/gitea/repositories".into(), &config.github_token)?;
 
