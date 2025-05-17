@@ -39,8 +39,9 @@ require("conform").setup({
     markdown = { "prettierd", "injected" },
     nginx = { "nginxfmt" },
     nix = {
-      "nixfmt", --[[ "injected" ]]
-    }, -- FIXME: injected bash formatter broken
+      "nixfmt",
+      "injected",
+    },
     nu = { "topiary_nu" },
     query = { "topiary_tree_sitter_query" },
     rust = { "rustfmt" },
