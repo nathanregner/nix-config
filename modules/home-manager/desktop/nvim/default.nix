@@ -65,6 +65,7 @@ in
 
           # formatters/linters
           inherit (pkgs.unstable)
+            nginx-config-formatter
             nixfmt-rfc-style
             prettierd
             shfmt
