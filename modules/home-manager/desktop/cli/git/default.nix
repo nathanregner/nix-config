@@ -13,8 +13,16 @@
     maintenance.enable = true;
     extraConfig = {
       alias = {
-        # https://github.com/orgs/community/discussions/9632#discussioncomment-4702442
+        convert-to-worktrees = ''!${
+          lib.getExe (
+            pkgs.writeShellApplication {
+              name = "convert-to-worktrees";
+              text = (builtins.readFile ./convert-to-worktrees.sh);
+            }
+          )
+        }'';
         ddiff = "-c diff.external=difft diff";
+        # https://github.com/orgs/community/discussions/9632#discussioncomment-4702442
         diff-refactor = ''
           -c color.diff.oldMoved='white dim'
           -c color.diff.oldMovedAlternative='white dim'
@@ -85,6 +93,7 @@
       [
         ".direnv"
         "Session.vim"
+        ".neoconf.json"
       ]
       ++ lib.optionals pkgs.stdenv.isDarwin [
         ".DS_Store"

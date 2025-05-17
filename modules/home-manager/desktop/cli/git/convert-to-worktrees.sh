@@ -18,6 +18,6 @@ pushd "$name"
 
 default_branch="$(basename "$(git symbolic-ref --short refs/remotes/origin/HEAD)")"
 git worktree prune
-git worktree add "../$default_branch"
+git worktree add "$default_branch"
 
 popd

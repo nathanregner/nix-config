@@ -1,7 +1,7 @@
 { pkgs, ... }:
 {
   imports = [
-    ./git.nix
+    ./git
     ./k9s.nix
     ./lazygit.nix
     ./nix.nix
