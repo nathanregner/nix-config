@@ -218,11 +218,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1727547362,
-        "narHash": "sha256-NRBcHmZ8NIvL5HU3lQzlvh+lLoBTPf0v2XxGfj67WMs=",
+        "lastModified": 1747590985,
+        "narHash": "sha256-iXRkZsx7rVpbSZZk3nYrpQqQVfAR/rCLO0JRke2yODI=",
         "owner": "nathanregner",
         "repo": "hydra-sentinel",
-        "rev": "ef200a8af3a1188e0294e7bd68606f8b9de5ca9b",
+        "rev": "575829011451507b583b774306b673d974448dfb",
         "type": "github"
       },
       "original": {
