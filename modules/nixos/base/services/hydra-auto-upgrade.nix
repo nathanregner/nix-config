@@ -21,7 +21,7 @@ in
     };
   };
 
-  config = lib.mkIf cfg.enable ({
+  config = lib.mkIf cfg.enable {
     assertions = [
       {
         assertion = cfg.enable -> !config.system.autoUpgrade.enable;
@@ -50,5 +50,5 @@ in
       after = [ "network-online.target" ];
       wants = [ "network-online.target" ];
     };
-  });
+  };
 }

@@ -11,7 +11,7 @@ let
   # https://github.com/virtio-win/kvm-guest-drivers-windows
   win-virtio-iso = pkgs.stdenvNoCC.mkDerivation {
     name = "win-virtio-iso";
-    version = pkgs.win-virtio.version;
+    inherit (pkgs.win-virtio) version;
     src = pkgs.win-virtio;
     buildInputs = [ pkgs.cdrtools ];
     installPhase = ''

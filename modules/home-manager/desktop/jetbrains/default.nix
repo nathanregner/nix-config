@@ -10,15 +10,15 @@ let
   listFilesRecursive =
     root:
     builtins.map (file: {
-      name = (lib.removePrefix "./" (toString (lib.path.removePrefix (root) file)));
+      name = lib.removePrefix "./" (toString (lib.path.removePrefix root file));
       path = file;
     }) (lib.filesystem.listFilesRecursive root);
 
   linkConfigFiles =
     appName:
     let
-      commonConfig = (listFilesRecursive ./config/common);
-      appConfig = (listFilesRecursive (./config + "/${appName}"));
+      commonConfig = listFilesRecursive ./config/common;
+      appConfig = listFilesRecursive (./config + "/${appName}");
     in
     builtins.map (
       { name, path }:

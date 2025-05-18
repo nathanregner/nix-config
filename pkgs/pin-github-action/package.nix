@@ -2,7 +2,6 @@
   fetchFromGitHub,
   buildNpmPackage,
   nix-update-script,
-  writeShellScript,
 }:
 
 buildNpmPackage rec {

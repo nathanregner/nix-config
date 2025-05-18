@@ -36,7 +36,7 @@ let
           somewhatUniqueRepresentant =
             { package, attrPath }:
             {
-              updateScript = (get-script package);
+              updateScript = get-script package;
               # Some updaters use the same `updateScript` value for all packages.
               # Also compare `meta.description`.
               position = package.meta.position or null;
@@ -76,7 +76,7 @@ let
 
   # Recursively find all packages under `path` in `pkgs` with updateScript.
   packagesWithUpdateScript =
-    path: pkgs: packagesWithPath [ ] (path: pkg: (get-script pkg != null)) pkgs;
+    _path: pkgs: packagesWithPath [ ] (_path: pkg: (get-script pkg != null)) pkgs;
 
   packages = packagesWithUpdateScript "." pkgs;
 
@@ -88,7 +88,7 @@ let
     {
       name = updateScript.attrPath or attrPath;
       value = {
-        name = package.name;
+        inherit (package) name;
         pname = lib.getName package;
         oldVersion = lib.getVersion package;
         updateScript = map builtins.toString (lib.toList (updateScript.command or updateScript));

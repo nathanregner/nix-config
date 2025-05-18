@@ -15,8 +15,7 @@ let
   });
 in
 {
-  programs.neovim.lua.globals = (
-    let
+  programs.neovim.lua.globals = let
       parser_install_dir = "${config.xdg.dataHome}/${parserPrefix}";
     in
     {
@@ -25,8 +24,7 @@ in
         inherit parser_install_dir;
       };
       rtp = [ parser_install_dir ];
-    }
-  );
+    };
 
   xdg.configFile."nvim/after/queries" = {
     source = config.lib.file.mkFlakeSymlink ./queries;

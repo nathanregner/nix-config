@@ -4,7 +4,6 @@
   mkShell,
   rust-analyzer,
   rustfmt,
-  ...
 }:
 { pkg, rustPlatform, ... }@args:
 mkShell (

@@ -4,7 +4,6 @@
   stdenv,
   writeBabashkaApplication,
   writeText,
-  ...
 }:
 let
   targets = writeText "packages.json" (

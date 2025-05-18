@@ -66,10 +66,9 @@ in
       # FIXME
       # updateScript = ./update.sh;
 
-      devShell = (
-        # make O=build nconfig
-        # make O=build -j12
-        let
+      # make O=build nconfig
+      # make O=build -j12
+      devShell = let
           pkgsCross = pkgs.pkgsCross.aarch64-multiplatform;
         in
         pkgsCross.mkShell {
@@ -89,7 +88,6 @@ in
             pkgs.stdenv.cc
             pkgs.ubootTools
           ];
-        }
-      );
+        };
     };
   })

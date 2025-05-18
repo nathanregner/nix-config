@@ -2,7 +2,6 @@
   jq,
   stdenvNoCC,
   web-ext,
-  ...
 }:
 
 { pname, ... }@args:
@@ -17,7 +16,7 @@ stdenvNoCC.mkDerivation (
 
     patchPhase = ''
       runHook prePatch
-      jq '.browser_specific_settings.gecko.id = "${pname}"' manifest.json > manifest.temp.json
+      jq '.browser_specific_settings.gecko.id = "${pname}"' manifest.json >manifest.temp.json
       mv manifest.temp.json manifest.json
       runHook postPatch
     '';

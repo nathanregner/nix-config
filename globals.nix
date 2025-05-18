@@ -27,7 +27,7 @@
 
     allKeys = hostKeys // lib.mergeAttrsList (builtins.attrValues userKeys);
 
-    knownHosts = lib.mapAttrs (name: value: { publicKey = value; }) hostKeys;
+    knownHosts = lib.mapAttrs (_name: value: { publicKey = value; }) hostKeys;
   };
 }
 // builtins.fromJSON (builtins.readFile ./globals.json)

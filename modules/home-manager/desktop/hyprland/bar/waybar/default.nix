@@ -105,7 +105,7 @@
             ];
           };
           format-muted = "";
-          on-click = lib.getExe (pkgs.unstable.pavucontrol);
+          on-click = lib.getExe pkgs.unstable.pavucontrol;
           scroll-step = 10;
           tooltip = true;
         };

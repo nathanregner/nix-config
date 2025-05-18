@@ -6,7 +6,6 @@
   mkRustShell,
   nvd,
   rustPlatform,
-  ...
 }:
 let
   pkg = rustPlatform.buildRustPackage {
