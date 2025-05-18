@@ -22,7 +22,7 @@ let
       }
     );
 in
-(nodes {
+nodes {
   hostnames = [ "sunlu-s8-0" ];
   modules = [
     # ./hardware/orange-pi-zero2.nix
@@ -40,4 +40,4 @@ in
       }
     )
   ];
-})
+}

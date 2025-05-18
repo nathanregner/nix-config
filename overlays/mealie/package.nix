@@ -21,7 +21,7 @@ let
   frontend = callPackage (import ./mealie-frontend.nix src version) { };
 
   pythonpkgs = python3Packages;
-  python = pythonpkgs.python;
+  inherit (pythonpkgs) python;
 in
 
 pythonpkgs.buildPythonApplication rec {

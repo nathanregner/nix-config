@@ -10,7 +10,7 @@ let
 in
 {
   nixpkgs.overlays = [
-    (final: prev: { ffmpeg = prev.ffmpeg.override { ffmpegVariant = "headless"; }; })
+    (_final: prev: { ffmpeg = prev.ffmpeg.override { ffmpegVariant = "headless"; }; })
   ];
 
   services.octoprint = {

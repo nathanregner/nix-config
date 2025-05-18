@@ -19,13 +19,13 @@
           nixpkgs-git.to = {
             owner = "NixOS";
             repo = "nixpkgs";
-            rev = inputs.nixpkgs-unstable.rev;
+            inherit (inputs.nixpkgs-unstable) rev;
             type = "github";
           };
           nixpkgs-stable-git.to = {
             owner = "NixOS";
             repo = "nixpkgs";
-            rev = inputs.nixpkgs.rev;
+            inherit (inputs.nixpkgs) rev;
             type = "github";
           };
         };

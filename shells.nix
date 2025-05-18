@@ -1,17 +1,18 @@
 {
   inputs',
   pkgs,
-  treefmt,
+  config,
 }:
 {
   default = pkgs.mkShellNoCC {
+    inputsFrom = [
+      config.treefmt.build.devShell
+    ];
     packages = with pkgs.unstable; [
-      age
       inputs'.deploy-rs.packages.default
+      local.generate-sops-keys
       sops
-      ssh-to-age
       tenv
-      treefmt
     ];
   };
 

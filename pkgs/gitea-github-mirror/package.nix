@@ -14,7 +14,6 @@
   runCommand,
   rustPlatform,
   swagger-codegen3,
-  ...
 }:
 let
   env = {
@@ -34,22 +33,22 @@ let
           ];
         }
         ''
-          cat '${src}/templates/swagger/v1_json.tmpl' \
-            | jq '.info.version="${version}"' \
-            | jq '.basePath="localhost"' \
-            | jq '.definitions.Repository.required=["owner", "name"]' \
-            > swagger.json
+          cat '${src}/templates/swagger/v1_json.tmpl' |
+            jq '.info.version="${version}"' |
+            jq '.basePath="localhost"' |
+            jq '.definitions.Repository.required=["owner", "name"]' \
+              >swagger.json
 
           swagger-codegen3 generate \
             -l openapi-yaml \
             -i swagger.json \
             -o openapi
 
-          remarshal -if yaml -i openapi/openapi.yaml -of json \
-            | jq 'del(.paths[][].requestBody.content.["text/plain"])' \
-            | openapi-tools filter --path "repos/migrate" --path "repos/search" \
-            | jq '.components.schemas.Repository.properties.licenses.nullable=true' \
-            > $out
+          remarshal -if yaml -i openapi/openapi.yaml -of json |
+            jq 'del(.paths[][].requestBody.content.["text/plain"])' |
+            openapi-tools filter --path "repos/migrate" --path "repos/search" |
+            jq '.components.schemas.Repository.properties.licenses.nullable=true' \
+              >$out
         '';
 
     GITHUB_OPENAPI =
@@ -67,8 +66,8 @@ let
           ];
         }
         ''
-          jq 'del(.paths[][].requestBody.content.["application/x-www-form-urlencoded"])' ${openapi} \
-            | openapi-tools filter --path "/user/repos" > $out
+          jq 'del(.paths[][].requestBody.content.["application/x-www-form-urlencoded"])' ${openapi} |
+            openapi-tools filter --path "/user/repos" >$out
         '';
   };
 

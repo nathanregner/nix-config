@@ -97,7 +97,7 @@
   };
 
   formatConfigs.install-iso =
-    { config, ... }:
+    _:
     {
       networking.wireless.enable = false;
       isoImage.squashfsCompression = "zstd"; # -Xcompression-level 1

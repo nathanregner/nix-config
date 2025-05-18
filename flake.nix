@@ -121,8 +121,7 @@
           );
 
           devShells = import ./shells.nix {
-            inherit inputs' pkgs;
-            treefmt = config.treefmt.build.wrapper;
+            inherit inputs' pkgs config;
           };
 
           # https://github.com/drupol/pkgs-by-name-for-flake-parts
@@ -260,8 +259,7 @@
 
         deploy.nodes =
           let
-            homeProfiles = (
-              activate: hostName:
+            homeProfiles = activate: hostName:
               let
                 homeConfiguration = homeConfigurations."nregner@${hostName}" or null;
               in
@@ -273,18 +271,17 @@
                   };
                 }
               else
-                { }
-            );
+                { };
             systemProfiles =
               type:
               lib.mapAttrs (
-                name:
+                _name:
                 { config, ... }@systemConfiguration:
                 {
                   hostname = config.networking.hostName;
                   profiles =
                     let
-                      activate = deploy-rs.lib.${config.nixpkgs.hostPlatform.system}.activate;
+                      inherit (deploy-rs.lib.${config.nixpkgs.hostPlatform.system}) activate;
                     in
                     {
                       system = {
@@ -304,7 +301,7 @@
           in
           {
             deploy = lib.mapAttrs (
-              name: { profiles, ... }: builtins.mapAttrs (_: { path, ... }: path) profiles
+              _name: { profiles, ... }: builtins.mapAttrs (_: { path, ... }: path) profiles
             ) deploy.nodes;
 
             devShells = mkAggregates "devShells" [

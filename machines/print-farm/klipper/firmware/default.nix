@@ -12,9 +12,7 @@ let
       inherit firmwareConfig;
     }).overrideAttrs
       (prev: {
-        nativeBuildInputs = (
-          builtins.filter (pkg: builtins.match "wxwidgets.*" pkg.name == null) prev.nativeBuildInputs
-        );
+        nativeBuildInputs = builtins.filter (pkg: builtins.match "wxwidgets.*" pkg.name == null) prev.nativeBuildInputs;
         patches = prev.patches or [ ] ++ [ ./0001-Add-default-klipper.elf.hex-target.patch ];
         installPhase = ''
           cp out/klipper.elf.hex $out

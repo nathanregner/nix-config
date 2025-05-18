@@ -17,7 +17,7 @@
           lib.getExe (
             pkgs.writeShellApplication {
               name = "convert-to-worktrees";
-              text = (builtins.readFile ./convert-to-worktrees.sh);
+              text = builtins.readFile ./convert-to-worktrees.sh;
             }
           )
         }'';
