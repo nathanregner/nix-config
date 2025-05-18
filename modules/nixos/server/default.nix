@@ -19,4 +19,5 @@
   };
 
   system.hydra-auto-upgrade.enable = lib.mkDefault true;
+
 }
