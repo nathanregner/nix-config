@@ -2,7 +2,6 @@
   fetchFromGitHub,
   nix-update-script,
   stdenvNoCC,
-  ...
 }:
 stdenvNoCC.mkDerivation {
   pname = "node-exporter-full.json";

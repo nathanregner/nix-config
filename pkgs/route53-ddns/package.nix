@@ -3,7 +3,6 @@
   cargo-update-script,
   mkRustShell,
   rustPlatform,
-  ...
 }:
 let
   pkg = rustPlatform.buildRustPackage {

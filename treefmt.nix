@@ -3,6 +3,7 @@
   projectRootFile = "flake.nix";
 
   programs = {
+    deadnix.enable = true;
     nixfmt = {
       enable = true;
     };
@@ -12,10 +13,10 @@
       excludes = [
         "**/*-lock.json"
         "**/secrets.yaml"
-        "dashboards/*.json"
       ];
     };
     shfmt.enable = true;
+    statix.enable = true;
     stylua.enable = true;
     taplo.enable = true;
     terraform.enable = true;
