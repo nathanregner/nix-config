@@ -32,6 +32,8 @@ in
       })
     ];
     extraConfig = ''
+      private = 1
+      # readonly_ips = 127.0.0.1
       evaluator_workers = 10
       max_output_size = ${toString (4 * 1024 * 1024 * 1024)}
       always_supported_system_types = ${
