@@ -24,7 +24,7 @@
 
   system.primaryUser = "nregner";
 
-  services.nregner.hydra-builder.enable = true;
+  local.services.hydra-builder.enable = true;
 
   services.tailscale = {
     enable = true;

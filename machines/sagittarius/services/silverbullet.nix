@@ -24,7 +24,7 @@
     };
   };
 
-  services.nregner.backup.paths.silverbullet = {
+  local.services.backup.paths.silverbullet = {
     paths = [ config.services.silverbullet.spaceDir ];
     restic = {
       s3 = { };
