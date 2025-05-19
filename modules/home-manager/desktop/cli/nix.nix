@@ -21,6 +21,7 @@
   };
 
   home.packages = with pkgs; [
+    (pkgs.writers.writeNuBin "nix-add-gc-roots" ./nix-add-gc-roots.nu)
     nvd # nix closure diff
   ];
 
