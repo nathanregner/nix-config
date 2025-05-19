@@ -26,7 +26,6 @@
       };
 
       home.packages = with pkgs.unstable; [
-        deploy-rs
         nix-tree
         nix-du
       ];
