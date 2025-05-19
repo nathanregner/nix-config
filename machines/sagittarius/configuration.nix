@@ -9,7 +9,7 @@
 
   networking.hostName = "sagittarius";
 
-  programs.nregner.home-manager.enable = true;
+  local.programs.home-manager.enable = true;
 
   sops.defaultSopsFile = ./secrets.yaml;
 

@@ -15,7 +15,7 @@
     "!factorio"
   ];
 
-  services.nregner.backup.paths.factorio = {
+  local.services.backup.paths.factorio = {
     paths = [ "/home/factorio" ];
     restic = {
       s3 = { };

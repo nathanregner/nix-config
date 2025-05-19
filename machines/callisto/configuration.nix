@@ -6,7 +6,7 @@
     ./hardware-configuration.nix
   ];
 
-  services.nregner.backup.enable = false;
+  local.services.backup.enable = false;
 
   # bootloader
   boot.loader.systemd-boot.enable = true;

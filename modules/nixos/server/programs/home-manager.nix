@@ -10,7 +10,7 @@
 {
   imports = [ inputs.home-manager.nixosModules.home-manager ];
 
-  options.programs.nregner.home-manager = {
+  options.local.programs.home-manager = {
     enable = lib.mkEnableOption "Enable minimal home-manager profile for server usage";
   };
 
