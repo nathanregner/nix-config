@@ -2,6 +2,12 @@
   # https://nix-darwin.github.io/nix-darwin/manual/index.html
   # defaults read  ~/Library/Preferences/.GlobalPreferences
   system.defaults = {
+    CustomUserPreferences = {
+      NSGlobalDomain = {
+        ApplePersistence = false;
+      };
+    };
+
     NSGlobalDomain = {
       "com.apple.keyboard.fnState" = true;
       ApplePressAndHoldEnabled = false;
