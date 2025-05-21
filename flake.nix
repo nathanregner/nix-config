@@ -318,18 +318,7 @@
           {
             deploy = lib.mapAttrs (
               _name: { profiles, ... }: builtins.mapAttrs (_: { path, ... }: path) profiles
-            ) deploy.nodes;
-
-            devShells = mkAggregates "devShells" [
-              "aarch64-darwin"
-              "x86_64-linux"
-            ] outputs.devShells;
-
-            packages = mkAggregates "packages" [
-              "aarch64-darwin"
-              "aarch64-linux"
-              "x86_64-linux"
-            ] outputs.legacyPackages;
+            ) (lib.getAttrs [ "sagittarius" ] deploy.nodes);
           };
       };
     };
