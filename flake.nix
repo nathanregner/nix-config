@@ -1,7 +1,7 @@
 {
   inputs = {
     # Nix
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-24.11";
+    nixpkgs.url = "github:nixos/nixpkgs/25.05-pre";
     nixpkgs-unstable.url = "github:nixos/nixpkgs/nixpkgs-unstable";
     nixos-hardware.url = "github:nixos/nixos-hardware";
     home-manager = {
@@ -259,7 +259,8 @@
 
         deploy.nodes =
           let
-            homeProfiles = activate: hostName:
+            homeProfiles =
+              activate: hostName:
               let
                 homeConfiguration = homeConfigurations."nregner@${hostName}" or null;
               in
