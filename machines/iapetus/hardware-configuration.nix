@@ -128,11 +128,7 @@
     powerManagement.enable = true;
 
     # Optionally, you may need to select the appropriate driver version for your specific GPU.
-    package =
-      if config.vfio.enable then
-        config.boot.kernelPackages.nvidiaPackages.stable
-      else
-        config.boot.kernelPackages.nvidiaPackages.beta;
+    package = config.boot.kernelPackages.nvidiaPackages.stable;
   };
 
   # Fix issues with suspend/resume on wayland
