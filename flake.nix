@@ -309,26 +309,11 @@
           in
           systemProfiles "nixos" nixosConfigurations // systemProfiles "darwin" darwinConfigurations;
 
-        hydraJobs =
-          let
-            mkAggregates = import ./lib/mkAggregates.nix nixpkgs;
-          in
-          {
-            deploy = lib.mapAttrs (
-              _name: { profiles, ... }: builtins.mapAttrs (_: { path, ... }: path) profiles
-            ) deploy.nodes;
-
-            devShells = mkAggregates "devShells" [
-              "aarch64-darwin"
-              "x86_64-linux"
-            ] outputs.devShells;
-
-            packages = mkAggregates "packages" [
-              "aarch64-darwin"
-              "aarch64-linux"
-              "x86_64-linux"
-            ] outputs.legacyPackages;
-          };
+        hydraJobs = {
+          deploy = lib.mapAttrs (
+            _name: { profiles, ... }: builtins.mapAttrs (_: { path, ... }: path) profiles
+          ) (lib.getAttrs [ "sagittarius" ] deploy.nodes);
+        };
       };
     };
 }
