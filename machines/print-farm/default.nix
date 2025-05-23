@@ -36,7 +36,8 @@ nodes {
           productId = "614e";
           vendorId = "1d50";
         };
-        environment.systemPackages = [ (pkgs.callPackage ./klipper/firmware { }).flash-sunlu-s8 ];
+        # FIXME
+        # environment.systemPackages = [ (pkgs.callPackage ./klipper/firmware { }).flash-sunlu-s8 ];
       }
     )
   ];
