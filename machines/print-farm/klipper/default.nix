@@ -1,4 +1,5 @@
 {
+  self,
   config,
   lib,
   pkgs,
@@ -59,6 +60,11 @@ in
     services.udev.extraRules = ''
       ACTION=="add", ATTRS{idProduct}=="614e", ATTRS{idVendor}=="1d50", RUN+="${pkgs.systemd}/bin/systemctl restart klipper.service"
     '';
+
+    services.prometheus.exporters.klipper = {
+      enable = true;
+      inherit (self.globals.services.prometheus.klipper) port;
+    };
 
     # moonraker
     services.moonraker = {

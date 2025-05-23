@@ -11,6 +11,9 @@
   pkgs,
   ...
 }:
+let
+  prometheusAddress = "127.0.0.1:9198";
+in
 {
   imports = [ inputs.hydra-sentinel.nixosModules.server ];
 
@@ -38,12 +41,23 @@
           "aarch64-darwin"
         ]
       }
+
+      queue_runner_metrics_address = ${prometheusAddress}
     '';
   };
+
+  services.prometheus.exporters.postgres.enable = true;
 
   services.postgresql.identMap = ''
     hydra-users nregner hydra
   '';
+
+  services.prometheus.scrapeConfigs = [
+    {
+      job_name = "hydra";
+      static_configs = [ { targets = [ prometheusAddress ]; } ];
+    }
+  ];
 
   sops.secrets.hydra-github-webhook-secret = {
     key = "hydra/github_webhook_secret";
