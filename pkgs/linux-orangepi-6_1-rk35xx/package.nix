@@ -55,7 +55,7 @@ in
   // extraArgs
 )).overrideAttrs
   (old: {
-    meta.platforms = lib.platforms.linux;
+    meta.platforms = [ "aarch64-linux" ];
 
     name = "k"; # dodge uboot length limits
 
@@ -68,7 +68,8 @@ in
 
       # make O=build nconfig
       # make O=build -j12
-      devShell = let
+      devShell =
+        let
           pkgsCross = pkgs.pkgsCross.aarch64-multiplatform;
         in
         pkgsCross.mkShell {

@@ -27,15 +27,12 @@ let
       patches = (oldAttrs.patches or [ ]) ++ [
         ./hydra/feat-add-always_supported_system_types-option.patch
       ];
-      checkPhase = "";
+      doCheck = false;
     });
 
     # FIXME: hack to bypass "FATAL: Module ahci not found" error
     # https://github.com/NixOS/nixpkgs/issues/154163#issuecomment-1350599022
     makeModulesClosure = x: prev.makeModulesClosure (x // { allowMissing = true; });
-
-    # TODO: remove once https://github.com/NixOS/nixpkgs/issues/402498
-    mealie = final.callPackage ./mealie/package.nix { };
 
     # TODO: upstream https://github.com/Arksine/moonraker/issues/401
     moonraker = prev.moonraker.overrideAttrs (oldAttrs: {
