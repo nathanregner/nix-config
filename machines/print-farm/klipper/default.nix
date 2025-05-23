@@ -60,6 +60,8 @@ in
       ACTION=="add", ATTRS{idProduct}=="614e", ATTRS{idVendor}=="1d50", RUN+="${pkgs.systemd}/bin/systemctl restart klipper.service"
     '';
 
+    services.prometheus.exporters.klipper.enable = true;
+
     # moonraker
     services.moonraker = {
       enable = true;

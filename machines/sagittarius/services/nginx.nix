@@ -59,6 +59,11 @@ in
         }) config.nginx.subdomain;
     };
 
+    services.prometheus.exporters = {
+      nginx.enable = true;
+      nginxlog.enable = true;
+    };
+
     networking.firewall.allowedTCPPorts = [
       80
       443

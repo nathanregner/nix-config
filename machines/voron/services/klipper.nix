@@ -31,6 +31,8 @@
     ACTION=="add", ATTRS{idProduct}=="614e", ATTRS{idVendor}=="1d50", RUN+="${pkgs.systemd}/bin/systemctl restart klipper.service"
   '';
 
+  services.prometheus.exporters.klipper.enable = true;
+
   # use bleeding edge
   disabledModules = [ "services/misc/klipper.nix" ];
   imports = [ "${inputs.nixpkgs-unstable}/nixos/modules/services/misc/klipper.nix" ];
