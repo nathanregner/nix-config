@@ -98,7 +98,7 @@
 
   # Adds to `environment.pathsToLink` the path: `/share/nautilus-python/extensions`
   # needed for nautilus Python extensions to work.
-  services.gnome.core-utilities.enable = true;
+  services.gnome.core-apps.enable = true;
 
   services.udisks2.enable = true;
 
