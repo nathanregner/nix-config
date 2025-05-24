@@ -27,18 +27,15 @@ nodes {
   modules = [
     # ./hardware/orange-pi-zero2.nix
     ./hardware/raspberry-pi-zero2w.nix
-    (
-      { pkgs, ... }:
-      {
-        print-farm.klipper = {
-          enable = true;
-          configFile = ./klipper/sunlu-s8.cfg;
-          productId = "614e";
-          vendorId = "1d50";
-        };
-        # FIXME
-        # environment.systemPackages = [ (pkgs.callPackage ./klipper/firmware { }).flash-sunlu-s8 ];
-      }
-    )
+    {
+      print-farm.klipper = {
+        enable = true;
+        configFile = ./klipper/sunlu-s8.cfg;
+        productId = "614e";
+        vendorId = "1d50";
+      };
+      # FIXME
+      # environment.systemPackages = [ (pkgs.callPackage ./klipper/firmware { }).flash-sunlu-s8 ];
+    }
   ];
 }
