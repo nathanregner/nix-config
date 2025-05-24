@@ -8,6 +8,34 @@ set incsearch
 set ic
 set smartcase
 set surround
+set commentary
+
+" https://github.com/JetBrains/ideavim/blob/master/doc/sethandler.md
+sethandler <C-A> a:vim
+sethandler <C-B> a:ide
+sethandler <C-C> a:ide
+sethandler <C-D> a:vim
+sethandler <C-E> a:ide
+sethandler <C-F> a:vim
+sethandler <C-G> a:vim
+sethandler <C-H> a:vim
+sethandler <C-I> a:vim
+sethandler <C-J> a:vim
+sethandler <C-K> a:ide
+sethandler <C-M> a:vim
+sethandler <C-N> a:ide
+sethandler <C-O> a:vim
+sethandler <C-P> a:ide
+sethandler <C-Q> a:ide
+sethandler <C-R> a:vim
+sethandler <C-S> a:vim
+sethandler <C-T> a:vim
+sethandler <C-U> a:vim
+sethandler <C-V> a:vim
+sethandler <C-W> a:vim
+sethandler <C-X> a:vim
+sethandler <C-Y> a:vim
+sethandler <C-Z> a:vim
 
 " https://github.com/JetBrains/ideavim/blob/master/doc/sethandler.md
 sethandler <C-A> a:vim
@@ -53,7 +81,7 @@ nnoremap gr :action GotoDeclaration<CR>
 nnoremap gD :action GotoSuperMethod<CR>
 nnoremap gI :action GotoImplementation<CR>
 nnoremap <leader>ca :action ShowIntentionActions<CR>
-noremap gcc :action CommentByLineComment<CR>
+nnoremap gx gd
 " nnoremap <C-q> :action FindUsages<CR>
 
 " Editing
@@ -73,4 +101,3 @@ nnoremap <leader>hr :action Vcs.RollbackChangedLines<CR>
 
 " Debugging
 nnoremap <leader>b :action ToggleLineBreakpoint<CR>
-
