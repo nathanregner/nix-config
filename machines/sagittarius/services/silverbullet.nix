@@ -16,12 +16,6 @@
     nginx.virtualHosts."notes.nregner.net" = {
       allowed_emails = [ "nathanregner@gmail.com" ];
     };
-    extraConfig = {
-      whitelist-domain = [
-        "nregner.net"
-        "notes.nregner.net"
-      ];
-    };
   };
 
   local.services.backup.paths.silverbullet = {
