@@ -649,14 +649,21 @@ require("lazy").setup({
   },
 
   { -- Theme
-    -- https://github.com/catppuccin/nvim
-    "catppuccin/nvim",
+    -- "catppuccin/nvim",
+    "comfysage/ctp-nvim",
+    branch = "feat/snacks/nvchad",
     name = "catppuccin",
     priority = 1000,
     opts = {
       flavour = "mocha",
       styles = {
         conditionals = {}, -- disable italics
+      },
+      integrations = {
+        snacks = {
+          enabled = true,
+          picker_style = "nvchad",
+        },
       },
     },
     init = function() vim.cmd.colorscheme("catppuccin") end,
