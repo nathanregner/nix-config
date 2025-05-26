@@ -311,15 +311,11 @@
           in
           systemProfiles "nixos" nixosConfigurations // systemProfiles "darwin" darwinConfigurations;
 
-        hydraJobs =
-          let
-            mkAggregates = import ./lib/mkAggregates.nix nixpkgs;
-          in
-          {
-            deploy = lib.mapAttrs (
-              _name: { profiles, ... }: builtins.mapAttrs (_: { path, ... }: path) profiles
-            ) (lib.getAttrs [ "sagittarius" ] deploy.nodes);
-          };
+        hydraJobs = {
+          deploy = lib.mapAttrs (
+            _name: { profiles, ... }: builtins.mapAttrs (_: { path, ... }: path) profiles
+          ) (lib.getAttrs [ "sagittarius" ] deploy.nodes);
+        };
       };
     };
 }
