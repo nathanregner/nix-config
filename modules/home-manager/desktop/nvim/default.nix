@@ -138,7 +138,7 @@ in
         description = "Open diffview.nvim";
         context = "files";
         loadingText = "opening diffview.nvim";
-        subprocess = true;
+        output = "terminal";
       }
     ];
   };
