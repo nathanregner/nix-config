@@ -13,7 +13,13 @@
   };
 
   home.packages = with pkgs; [
-    nvd # nix closure diff
+    (pkgs.writers.writeNuBin "nix-add-gc-roots" ./nix-add-gc-roots.nu)
+    deploy-rs
+    nix-diff
+    nix-du
+    nix-init
+    nix-tree
+    nurl
   ];
 
   # https://discourse.nixos.org/t/nvd-simple-nix-nixos-version-diff-tool/12397/6

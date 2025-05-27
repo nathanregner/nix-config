@@ -26,13 +26,13 @@ in
     programs.neovim = {
       extraPackages = with pkgs.unstable; [
         jdt-language-server
-        spring-javaformat
+        local.spring-javaformat
       ];
 
       lua.globals.jdtls = {
         lombok = pkgs.fetchurl {
-          url = "https://repo1.maven.org/maven2/org/projectlombok/lombok/1.18.36/lombok-1.18.36.jar";
-          sha256 = "sha256-c7awW2otNltwC6sI0w+U3p0zZJC8Cszlthgf70jL8Y4=";
+          url = "https://repo1.maven.org/maven2/org/projectlombok/lombok/1.18.38/lombok-1.18.38.jar";
+          sha256 = "sha256-Hh5CfDb/Y8RP0w7yktnnc+oxVEYKtiZdP+1+b1vFD7k=";
         };
         settings = {
           java = {

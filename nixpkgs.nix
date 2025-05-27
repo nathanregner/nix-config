@@ -7,13 +7,14 @@
   config = {
     allowUnfree = true;
     # Workaround for https://github.com/nix-community/home-manager/issues/2942
-    allowUnfreePredicate = (_: true);
+    allowUnfreePredicate = _: true;
   };
 
   overlays = [
     outputs.overlays.additions
     outputs.overlays.modifications
     outputs.overlays.unstable-packages
-  ] ++ overlays;
+    (_: _: { inherit outputs; })
+  ];
 }
 // (if system != null then { inherit system; } else { })

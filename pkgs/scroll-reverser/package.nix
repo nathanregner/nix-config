@@ -1,4 +1,5 @@
 {
+  lib,
   fetchurl,
   nix-update-script,
   stdenvNoCC,
@@ -31,4 +32,6 @@ stdenvNoCC.mkDerivation rec {
   '';
 
   passthru.updateScript = nix-update-script { };
+
+  meta.platforms = lib.platforms.darwin;
 }

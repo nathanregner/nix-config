@@ -1,11 +1,11 @@
 {
   inputs = {
     # Nix
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-24.11";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-25.05";
     nixpkgs-unstable.url = "github:nixos/nixpkgs/nixpkgs-unstable";
     nixos-hardware.url = "github:nixos/nixos-hardware";
     home-manager = {
-      url = "github:nix-community/home-manager/release-24.11";
+      url = "github:nix-community/home-manager/release-25.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     home-manager-unstable = {
@@ -13,8 +13,8 @@
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
     nix-darwin = {
-      url = "github:LnL7/nix-darwin";
-      inputs.nixpkgs.follows = "nixpkgs-unstable";
+      url = "github:LnL7/nix-darwin/nix-darwin-25.05";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
     flake-compat.url = "github:edolstra/flake-compat";
 
@@ -28,6 +28,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     flake-parts.url = "github:hercules-ci/flake-parts";
+    pkgs-by-name-for-flake-parts.url = "github:drupol/pkgs-by-name-for-flake-parts";
     hydra-sentinel = {
       url = "github:nathanregner/hydra-sentinel";
       inputs = {
@@ -39,17 +40,6 @@
     mac-app-util = {
       url = "github:hraban/mac-app-util";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
-    };
-    neovim-nightly-overlay = {
-      url = "github:nix-community/neovim-nightly-overlay";
-      inputs = {
-        flake-compat.follows = "flake-compat";
-        flake-parts.follows = "flake-parts";
-        git-hooks.follows = "";
-        hercules-ci-effects.follows = "";
-        nixpkgs.follows = "nixpkgs-unstable";
-        treefmt-nix.follows = "";
-      };
     };
     nix-index-database = {
       url = "github:Mic92/nix-index-database";
@@ -116,7 +106,10 @@
         "x86_64-linux"
         "aarch64-darwin"
       ];
-      imports = [ inputs.treefmt-nix.flakeModule ];
+      imports = [
+        inputs.pkgs-by-name-for-flake-parts.flakeModule
+        inputs.treefmt-nix.flakeModule
+      ];
 
       perSystem =
         {
@@ -128,28 +121,16 @@
         }:
         {
           # apply overlays to flake-parts: https://flake.parts/overlays#consuming-an-overlay
-          _module.args.pkgs = import inputs.nixpkgs (
+          _module.args.pkgs = import inputs.nixpkgs-unstable (
             { inherit system; } // (import ./nixpkgs.nix { inherit outputs; })
           );
 
-          # custom packages
-          packages = import ./pkgs { inherit pkgs lib; };
+          devShells = import ./shells.nix {
+            inherit inputs' pkgs config;
+          };
 
-          # devshells for flake development
-          devShells =
-            let
-              shells = import ./shells.nix {
-                inherit inputs' pkgs;
-                treefmt = config.treefmt.build.wrapper;
-              };
-            in
-            shells
-            // {
-              _aggregate = pkgs.releaseTools.aggregate {
-                constituents = lib.attrValues shells;
-                name = "devshell-${system}";
-              };
-            };
+          # https://github.com/drupol/pkgs-by-name-for-flake-parts
+          pkgsDirectory = ./pkgs;
 
           treefmt = import ./treefmt.nix { inherit pkgs; };
         };
@@ -158,7 +139,7 @@
         globals = import ./globals.nix { inherit lib; };
 
         # custom packages and modifications, exported as overlays
-        overlays = import ./overlays { inherit inputs; };
+        overlays = import ./overlays { inherit inputs outputs; };
 
         nixosConfigurations =
           {
@@ -283,7 +264,7 @@
 
         deploy.nodes =
           let
-            homeProfiles = (
+            homeProfiles =
               activate: hostName:
               let
                 homeConfiguration = homeConfigurations."nregner@${hostName}" or null;
@@ -296,18 +277,17 @@
                   };
                 }
               else
-                { }
-            );
+                { };
             systemProfiles =
               type:
               lib.mapAttrs (
-                name:
+                _name:
                 { config, ... }@systemConfiguration:
                 {
                   hostname = config.networking.hostName;
                   profiles =
                     let
-                      activate = deploy-rs.lib.${config.nixpkgs.hostPlatform.system}.activate;
+                      inherit (deploy-rs.lib.${config.nixpkgs.hostPlatform.system}) activate;
                     in
                     {
                       system = {
@@ -321,18 +301,26 @@
           in
           systemProfiles "nixos" nixosConfigurations // systemProfiles "darwin" darwinConfigurations;
 
-        hydraJobs = {
-          deploy = lib.mapAttrs (
-            name: { profiles, ... }: builtins.mapAttrs (_: { path, ... }: path) profiles
-          ) deploy.nodes;
+        hydraJobs =
+          let
+            mkAggregates = import ./lib/mkAggregates.nix nixpkgs;
+          in
+          {
+            deploy = lib.mapAttrs (
+              _name: { profiles, ... }: builtins.mapAttrs (_: { path, ... }: path) profiles
+            ) deploy.nodes;
 
-          devShells = lib.mapAttrs (system: { _aggregate, ... }: _aggregate) (
-            lib.getAttrs [
-              "x86_64-linux"
+            devShells = mkAggregates "devShells" [
               "aarch64-darwin"
-            ] outputs.devShells
-          );
-        };
+              "x86_64-linux"
+            ] outputs.devShells;
+
+            packages = mkAggregates "packages" [
+              "aarch64-darwin"
+              "aarch64-linux"
+              "x86_64-linux"
+            ] outputs.legacyPackages;
+          };
       };
     };
 }

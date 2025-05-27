@@ -1,9 +1,6 @@
 {
   self,
   inputs,
-  config,
-  pkgs,
-  lib,
   ...
 }:
 {
@@ -16,17 +13,6 @@
     ./preferences.nix
     ./sops.nix
   ];
-
-  nix = {
-    settings = {
-      # https://github.com/NixOS/nix/issues/7273
-      auto-optimise-store = lib.mkForce false;
-    };
-    gc = {
-      automatic = true;
-      options = "--delete-older-than 7d";
-    };
-  };
 
   # Create /etc/zshrc that loads the nix-darwin environment.
   programs.zsh.enable = true;

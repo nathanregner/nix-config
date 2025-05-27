@@ -6,15 +6,15 @@
 }:
 with lib;
 let
-  cfg = config.services.nregner.backup;
+  cfg = config.local.services.backup;
 in
 {
-  options.services.nregner.backup.enable = mkOption {
+  options.local.services.backup.enable = mkOption {
     default = !(options.virtualisation ? qemu);
   };
 
   # TODO: error if no files
-  options.services.nregner.backup.paths = mkOption {
+  options.local.services.backup.paths = mkOption {
     default = { };
     type = types.attrsOf (
       types.submodule {
@@ -42,7 +42,7 @@ in
   config = lib.mkMerge [
     {
       # https://discourse.nixos.org/t/psa-pinning-users-uid-is-important-when-reinstalling-nixos-restoring-backups/21819
-      services.nregner.backup.paths.nixos = {
+      local.services.backup.paths.nixos = {
         paths = [ "/var/lib/nixos" ];
         restic = {
           s3 = { };

@@ -59,6 +59,11 @@ in
         }) config.nginx.subdomain;
     };
 
+    services.prometheus.exporters = {
+      nginx.enable = true;
+      nginxlog.enable = true;
+    };
+
     networking.firewall.allowedTCPPorts = [
       80
       443
@@ -102,12 +107,12 @@ in
         domain = "nregner.net";
         secret = null;
       };
+      approvalPrompt = "auto";
       extraConfig = {
-        # disable old approval_prompt parameter: https://developers.google.com/identity/openid-connect/openid-connect#prompt
-        approval-prompt = null;
         client-secret-file = config.sops.secrets.oauth2-proxy-client-secret.path;
       };
       keyFile = config.sops.templates.oauth2-proxy-env.path;
+      setXauthrequest = true;
     };
   };
 }

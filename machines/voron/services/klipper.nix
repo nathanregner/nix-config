@@ -17,7 +17,7 @@
   };
 
   environment.etc = {
-    "klipper/KAMP".source = pkgs.klipper-adaptive-meshing-purging;
+    "klipper/KAMP".source = pkgs.local.klipper-adaptive-meshing-purging;
     "klipper/printer.cfg".source = pkgs.writeText "printer.immutable.cfg" ''
       [include ${./printer.cfg}]
       [include ${./kamp.cfg}]
@@ -31,12 +31,14 @@
     ACTION=="add", ATTRS{idProduct}=="614e", ATTRS{idVendor}=="1d50", RUN+="${pkgs.systemd}/bin/systemctl restart klipper.service"
   '';
 
+  services.prometheus.exporters.klipper.enable = true;
+
   # use bleeding edge
   disabledModules = [ "services/misc/klipper.nix" ];
   imports = [ "${inputs.nixpkgs-unstable}/nixos/modules/services/misc/klipper.nix" ];
 
   nixpkgs.overlays = [
-    (final: prev: {
+    (final: _prev: {
       # build without massive gui dependencies
       # TODO: submit patch to nixpkgs to make optional?
       klipper-firmware = final.unstable.klipper-firmware.overrideAttrs (prev: {

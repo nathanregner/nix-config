@@ -43,7 +43,7 @@ in
     };
 
     environment.etc = {
-      "klipper/KAMP".source = pkgs.klipper-adaptive-meshing-purging;
+      "klipper/KAMP".source = pkgs.local.klipper-adaptive-meshing-purging;
       "klipper/adxl.cfg".source = ./adxl.cfg;
       "klipper/printer.cfg".source = pkgs.writeText "printer.immutable.cfg" ''
         [include ${cfg.configFile}]
@@ -59,6 +59,8 @@ in
     services.udev.extraRules = ''
       ACTION=="add", ATTRS{idProduct}=="614e", ATTRS{idVendor}=="1d50", RUN+="${pkgs.systemd}/bin/systemctl restart klipper.service"
     '';
+
+    services.prometheus.exporters.klipper.enable = true;
 
     # moonraker
     services.moonraker = {

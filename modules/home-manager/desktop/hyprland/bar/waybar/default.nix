@@ -105,14 +105,14 @@
             ];
           };
           format-muted = "";
-          on-click = lib.getExe (pkgs.unstable.pavucontrol);
+          on-click = lib.getExe pkgs.unstable.pavucontrol;
           scroll-step = 10;
           tooltip = true;
         };
 
         "custom/storage" = {
           exec = lib.getExe (
-            pkgs.writeBabashkaApplication {
+            pkgs.local.writeBabashkaApplication {
               name = "waybar-storage";
               text = builtins.readFile ./modules/storage.clj;
               runtimeInputs = [ pkgs.coreutils ];

@@ -9,13 +9,13 @@
     recursive = true;
   };
 
-  home.packages = [ pkgs.hammerspoon ];
+  home.packages = [ pkgs.local.hammerspoon ];
 
   launchd.agents."hammerspoon" = {
     enable = true;
     config = {
       ProgramArguments = [
-        "${pkgs.hammerspoon}/Applications/Hammerspoon.app/Contents/MacOS/Hammerspoon"
+        "${pkgs.local.hammerspoon}/Applications/Hammerspoon.app/Contents/MacOS/Hammerspoon"
       ];
       KeepAlive.SuccessfulExit = false;
       WatchPaths = [

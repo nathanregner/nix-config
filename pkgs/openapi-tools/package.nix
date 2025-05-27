@@ -8,7 +8,6 @@
   remarshal,
   runCommand,
   rustPlatform,
-  ...
 }:
 let
   env = {
@@ -42,7 +41,7 @@ let
         inherit env pkg rustPlatform;
 
         SWAGGER_PETSTORE = runCommand "swagger-petstore.json" { nativeBuildInputs = [ remarshal ]; } ''
-          remarshal ${
+          remarshal${
             fetchurl {
               url = "https://raw.githubusercontent.com/swagger-api/swagger-petstore/a0f12dd24efcf2fd68faa59c371ea5e35a90bbd1/src/main/resources/openapi.yaml";
               sha256 = "sha256-n9dTzphU0HbFhKSRKvngqEntjxXVcslNVFydTaqIvJI=";

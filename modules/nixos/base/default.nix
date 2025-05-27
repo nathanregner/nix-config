@@ -8,7 +8,6 @@
   imports = [
     inputs.catppuccin-nix.nixosModules.catppuccin
     inputs.nixos-generators.nixosModules.all-formats
-    ./docker.nix
     ./keyd.nix
     ./networking.nix
     ./nix.nix
@@ -38,15 +37,19 @@
 
   boot.tmp.cleanOnBoot = true;
 
+  programs.vim = {
+    defaultEditor = true;
+    enable = true;
+  };
+
+  programs.nano.enable = false;
+
   # basic system utilities
   environment.systemPackages = with pkgs.unstable; [
-    git # needed by flakes
-
     # text manipulation
     gawk
     gnused
     ripgrep
-    vim
 
     # filesystem
     dua

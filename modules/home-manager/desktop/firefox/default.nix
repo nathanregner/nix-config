@@ -44,7 +44,7 @@
       ];
     };
     profiles.dev-edition-default = {
-      extensions.packages = [ pkgs.firefox-aws-cli-sso ];
+      extensions.packages = [ pkgs.local.firefox-extensions.aws-cli-sso ];
       settings = {
         "browser.aboutConfig.showWarning" = false;
 

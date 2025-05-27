@@ -6,7 +6,7 @@
     ./hardware-configuration.nix
   ];
 
-  services.nregner.backup.enable = false;
+  local.services.backup.enable = false;
 
   # bootloader
   boot.loader.systemd-boot.enable = true;
@@ -34,12 +34,12 @@
     displayManager.gdm.wayland = false;
     desktopManager.gnome.enable = true;
 
-    layout = "us";
-    xkbVariant = "";
+    xkb.layout = "us";
+    xkb.variant = "";
   };
 
-  services.xserver.displayManager.autoLogin.enable = true;
-  services.xserver.displayManager.autoLogin.user = "nregner";
+  services.displayManager.autoLogin.enable = true;
+  services.displayManager.autoLogin.user = "nregner";
 
   # workaround for GNOME autologin: https://github.com/NixOS/nixpkgs/issues/103746#issuecomment-945091229
   systemd.services."getty@tty1".enable = false;
@@ -96,12 +96,10 @@
     freeMemThreshold = 1; # no swap, let it get pretty full...
   };
 
-  formatConfigs.install-iso =
-    { config, ... }:
-    {
-      networking.wireless.enable = false;
-      isoImage.squashfsCompression = "zstd"; # -Xcompression-level 1
-    };
+  formatConfigs.install-iso = _: {
+    networking.wireless.enable = false;
+    isoImage.squashfsCompression = "zstd"; # -Xcompression-level 1
+  };
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions

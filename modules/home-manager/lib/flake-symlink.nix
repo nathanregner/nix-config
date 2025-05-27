@@ -14,15 +14,13 @@
   };
 
   config = {
-    lib.file.mkFlakeSymlink = (
-      path:
+    lib.file.mkFlakeSymlink = path:
       assert lib.assertMsg (builtins.isPath path)
         "Argument is of type ${builtins.typeOf path}, but a path was expected'";
 
       if config.home.flakePath != "" then
         config.lib.file.mkOutOfStoreSymlink "${config.home.flakePath}/${lib.head (builtins.match "/nix/store/[^/]+/(.*)" (toString path))}"
       else
-        path
-    );
+        path;
   };
 }

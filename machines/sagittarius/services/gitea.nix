@@ -17,15 +17,30 @@
       };
       service = {
         DISABLE_REGISTRATION = true;
+        ENABLE_REVERSE_PROXY_AUTHENTICATION = true;
+        ENABLE_REVERSE_PROXY_AUTO_REGISTRATION = true;
+        ENABLE_REVERSE_PROXY_EMAIL = true;
       };
     };
   };
 
   nginx.subdomain.git."/" = {
     proxyPass = "http://127.0.0.1:${toString config.services.gitea.settings.server.HTTP_PORT}/";
-    extraConfig = ''
-      client_max_body_size 0;
-    '';
+    # https://oauth2-proxy.github.io/oauth2-proxy/configuration/integration/
+    # https://docs.gitea.com/administration/config-cheat-sheet?_highlight=reverse_proxy_authentication_email#security-security
+    extraConfig = # nginx
+      ''
+        client_max_body_size 0;
+
+        proxy_set_header X-WEBAUTH-USER $user;
+        proxy_set_header X-WEBAUTH-EMAIL $email;
+      '';
+  };
+
+  services.oauth2-proxy = {
+    nginx.virtualHosts."git.nregner.net" = {
+      allowed_emails = [ "nathanregner@gmail.com" ];
+    };
   };
 
   sops.secrets.gitea-github-mirror = { };
@@ -44,17 +59,21 @@
     after = [ "network-online.target" ];
     requires = [ "network-online.target" ];
 
+    environment = {
+      GITEA_URL = "http://localhost:${toString config.services.gitea.settings.server.HTTP_PORT}/api/v1";
+    };
+
     serviceConfig = {
       EnvironmentFile = config.sops.secrets.gitea-github-mirror.path;
       User = "gitea";
     };
 
     script = ''
-      ${pkgs.gitea-github-mirror}/bin/gitea-github-mirror
+      ${pkgs.local.gitea-github-mirror}/bin/gitea-github-mirror
     '';
   };
 
-  services.nregner.backup.paths.gitea = {
+  local.services.backup.paths.gitea = {
     paths = [ config.services.gitea.stateDir ];
     restic = {
       s3 = { };

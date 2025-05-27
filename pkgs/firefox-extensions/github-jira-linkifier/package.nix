@@ -1,9 +1,7 @@
 {
   fetchFromGitHub,
   mkFirefoxExtension,
-  ...
 }:
-
 mkFirefoxExtension rec {
   pname = "github-jira-linkifier@nregner.net";
   version = "728488028fbb753437402de8ea6292baff57b4cf";

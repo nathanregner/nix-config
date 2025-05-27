@@ -24,7 +24,7 @@
 
   sops.defaultSopsFile = ./secrets.yaml;
 
-  programs.nregner.home-manager.enable = true;
+  local.programs.home-manager.enable = true;
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions

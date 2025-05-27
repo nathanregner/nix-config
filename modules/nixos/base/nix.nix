@@ -21,7 +21,7 @@
         "flakes"
       ];
       # https://github.com/NixOS/nix/issues/9087
-      flake-registry = pkgs.flake-registry;
+      inherit (pkgs.local) flake-registry;
       trusted-users = [
         "@wheel"
         "nregner"
@@ -34,9 +34,7 @@
     };
   };
 
-  warnings = (
-    lib.optional (lib.versionOlder config.nix.package.version pkgs.nix.version) "`nix.package` is outdated (${config.nix.package.version} < ${pkgs.nix.version})"
-  );
+  warnings = lib.optional (lib.versionOlder config.nix.package.version pkgs.nix.version) "`nix.package` is outdated (${config.nix.package.version} < ${pkgs.nix.version})";
 
   # show config changes on switch
   # https://discourse.nixos.org/t/nvd-simple-nix-nixos-version-diff-tool/12397/33

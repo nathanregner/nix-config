@@ -1,6 +1,16 @@
 <application>
   <component name="ProjectManager">
     <defaultProject>
+      <component name="IssueNavigationConfiguration">
+        <option name="links">
+          <list>
+            <IssueNavigationLink>
+              <option name="issueRegexp" value="[A-Z]+\-\d+" />
+              <option name="linkRegexp" value="https://clickbank.atlassian.net/browse/$0" />
+            </IssueNavigationLink>
+          </list>
+        </option>
+      </component>
       <component name="PrettierConfiguration">
         <option name="myConfigurationMode" value="AUTOMATIC" />
         <option name="myRunOnSave" value="true" />

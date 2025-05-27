@@ -10,7 +10,7 @@ in
 {
   disabledModules = [ "services/web-apps/mealie.nix" ];
   imports = [ "${inputs.nixpkgs-unstable}/nixos/modules/services/web-apps/mealie.nix" ];
-  nixpkgs.overlays = [ (final: prev: { nltk-data = final.unstable.nltk-data; }) ];
+  nixpkgs.overlays = [ (final: _prev: { inherit (final.unstable) nltk-data; }) ];
 
   services.mealie = {
     enable = true;
@@ -22,7 +22,7 @@ in
     "/".proxyPass = "http://127.0.0.1:${toString config.services.mealie.port}/";
   };
 
-  services.nregner.backup.paths.mealie = {
+  local.services.backup.paths.mealie = {
     dynamicFilesFrom = "realpath ${dataDir}";
     restic = {
       s3 = { };

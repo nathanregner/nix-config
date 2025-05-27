@@ -55,7 +55,10 @@ in
   // extraArgs
 )).overrideAttrs
   (old: {
+    meta.platforms = [ "aarch64-linux" ];
+
     name = "k"; # dodge uboot length limits
+
     nativeBuildInputs = old.nativeBuildInputs ++ [ ubootTools ];
 
     passthru = old.passthru // {
@@ -63,9 +66,9 @@ in
       # FIXME
       # updateScript = ./update.sh;
 
-      devShell = (
-        # make O=build nconfig
-        # make O=build -j12
+      # make O=build nconfig
+      # make O=build -j12
+      devShell =
         let
           pkgsCross = pkgs.pkgsCross.aarch64-multiplatform;
         in
@@ -86,7 +89,6 @@ in
             pkgs.stdenv.cc
             pkgs.ubootTools
           ];
-        }
-      );
+        };
     };
   })
