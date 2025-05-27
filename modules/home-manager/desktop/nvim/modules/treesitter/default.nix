@@ -15,7 +15,8 @@ let
   });
 in
 {
-  programs.neovim.lua.globals = let
+  programs.neovim.lua.globals =
+    let
       parser_install_dir = "${config.xdg.dataHome}/${parserPrefix}";
     in
     {
@@ -75,9 +76,7 @@ in
         library = parsers.hcl;
       };
       dtd = {
-        extensions = [
-          "xml"
-        ];
+        extensions = [ "xml" ];
         library = parsers.dtd;
       };
     };

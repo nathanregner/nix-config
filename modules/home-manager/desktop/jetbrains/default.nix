@@ -18,9 +18,15 @@ let
     appName:
     let
       commonConfig = listFilesRecursive ./config/common;
-      appConfig = listFilesRecursive (./config + "/${appName}");
+      appConfig = (listFilesRecursive (./config + "/${appName}"));
+      plugins = lib.map (plugin: {
+        "JetBrains/${appName}/config/plugins/${plugin.name}" = {
+          source = "${plugin}";
+          force = true;
+        };
+      }) cfg.plugins;
     in
-    builtins.map (
+    (builtins.map (
       { name, path }:
       {
         "JetBrains/${appName}/config/${name}" = {
@@ -28,13 +34,19 @@ let
           force = true;
         };
       }
-    ) (commonConfig ++ appConfig);
+    ) (commonConfig ++ appConfig))
+    ++ plugins;
 in
 {
   options.programs.jetbrains = {
     enable = lib.mkOption {
       type = lib.types.bool;
       default = true;
+    };
+
+    plugins = lib.mkOption {
+      type = lib.types.listOf lib.types.package;
+      default = [ ];
     };
   };
 

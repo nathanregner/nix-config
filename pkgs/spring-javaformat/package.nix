@@ -1,19 +1,25 @@
 {
-  # buildGraalvmNativeImage,
   jre,
+  lib,
+  jdk,
+  temurin-bin-24,
+  jsvc,
   maven,
   writeShellApplication,
   ...
 }:
 let
   pname = "spring-javaformat";
-  version = "0.0.44";
+  version = "0.0.45";
   jar = maven.buildMavenPackage {
     inherit pname version;
     src = ./.;
 
     # buildOffline = true;
-    mvnHash = "sha256-Yz8tK3Vy6CBU4/nvyC1OSmgFDaFn+bl7KZYo5mJnP9Y=";
+    mvnHash = "sha256-uMGyztJtfY5EpmIOfdIW80p9h+wZhajWfXtzBeLaeGg=";
+    mvnParameters = lib.escapeShellArgs [
+      "-Daether.connector.https.securityMode=insecure"
+    ];
 
     installPhase = ''
       mv ./target/spring-format-cli-${version}.jar $out
@@ -22,29 +28,24 @@ let
 in
 writeShellApplication {
   name = "spring-javaformat";
-  runtimeInputs = [ jre ];
+  runtimeInputs = [
+    (jsvc.overrideAttrs {
+      # makeFlags = [ "-DJSVC_UMASK=022" ];
+    })
+  ];
   text = ''
-    java -jar ${jar} "$@"
+    exec jsvc \
+      -user "$USER" \
+      -home "$HOME" \
+      -server \
+      -java-home ${jdk}/Library/Java/JavaVirtualMachines/zulu-21.jdk/Contents/Home \
+      -pidfile ~/.cache/spring-javaformat.pid \
+      -wait 90 \
+      -cp ${jar} \
+      -outfile "$(pwd)/out.txt" \
+      -errfile "$(pwd)/err.txt" \
+      -debug -verbose \
+      io.spring.format.cli.SimpleDaemon
   '';
+  passthru = { inherit jar; };
 }
-# in
-# buildGraalvmNativeImage {
-#   inherit pname version;
-#
-#   src = jar;
-#
-#   executable = "spring-javaformat";
-#
-#   extraNativeImageBuildArgs = [
-#     "-Ob"
-#     # "-Os"
-#     ''-H:IncludeResources=".*"''
-#   ];
-#
-#   doInstallCheck = true;
-#
-#   installCheckPhase = ''
-#     file=${jar.src}/src/main/java/io/spring/format/cli/SpringJavaFormat.java
-#     echo $file | $out/bin/spring-javaformat $file
-#   '';
-# }
