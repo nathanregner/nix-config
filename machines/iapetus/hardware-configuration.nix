@@ -14,8 +14,15 @@
   ];
 
   boot = {
-    loader.systemd-boot.enable = true;
-    loader.efi.canTouchEfiVariables = true;
+    loader.grub = {
+      enable = true;
+      device = "nodev";
+      efiSupport = true;
+      efi = {
+        canTouchEfiVariables = true;
+        efiSysMountPoint = "/boot/efi";
+      };
+    };
     supportedFilesystems = lib.mkForce [
       "vfat"
       "fat32"
@@ -99,6 +106,12 @@
                 "noatime"
               ];
             };
+            "boot/efi" = {
+              mountpoint = "/boot/efi";
+              mountOptions = [
+                "noatime"
+              ];
+            };
           };
         };
       };
@@ -107,6 +120,7 @@
 
   # https://github.com/nix-community/disko/issues/192
   fileSystems."/boot".neededForBoot = true;
+  fileSystems."/boot/efi".neededForBoot = true;
   fileSystems."/var/log".neededForBoot = true;
 
   swapDevices = [ ];
