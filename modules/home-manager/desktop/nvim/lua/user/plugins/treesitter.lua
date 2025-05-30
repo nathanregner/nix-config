@@ -142,6 +142,10 @@ return {
           selection = { node = "selection", ordinal = "name" },
           variable = { node = "variable_definition", ordinal = "name" },
         },
+        helm = {
+          keys = { node = "block_mapping_pair" },
+          list = { node = "block_sequence_item" },
+        },
         java = {
           annotation_array = { node = "class_literal" },
           annotation_element = { node = "element_value_pair" },
