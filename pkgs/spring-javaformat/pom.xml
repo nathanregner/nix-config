@@ -6,7 +6,7 @@
 
     <groupId>io.spring.javaformat</groupId>
     <artifactId>spring-format-cli</artifactId>
-    <version>0.0.45</version>
+    <version>0.0.44</version>
 
     <properties>
         <maven.compiler.source>21</maven.compiler.source>
@@ -18,17 +18,12 @@
         <dependency>
             <groupId>io.spring.javaformat</groupId>
             <artifactId>spring-javaformat-formatter</artifactId>
-            <version>0.0.45</version>
+            <version>0.0.44</version>
         </dependency>
         <dependency>
             <groupId>io.spring.javaformat</groupId>
             <artifactId>spring-javaformat-formatter-eclipse-runtime</artifactId>
-            <version>0.0.45</version>
-        </dependency>
-        <dependency>
-            <groupId>commons-daemon</groupId>
-            <artifactId>commons-daemon</artifactId>
-            <version>1.4.1</version>
+            <version>0.0.44</version>
         </dependency>
     </dependencies>
 

@@ -3,8 +3,6 @@ package io.spring.format.cli;
 import io.spring.javaformat.config.JavaFormatConfig;
 import io.spring.javaformat.formatter.StreamsFormatter;
 
-import java.io.IOException;
-import java.net.ServerSocket;
 import java.nio.file.Paths;
 
 public final class SpringJavaFormat {
