@@ -1,6 +1,69 @@
 {
+  self,
+  config,
+  lib,
+  ...
+}:
+let
+  inherit (lib) mkOption types;
+  cfg = config.local.users;
+in
+{
   imports = [
     ./craigslist.nix
     ./factorio.nix
+    ./minecraft.nix
   ];
+
+  options.local.users = mkOption {
+    default = { };
+    type = types.attrsOf (
+      types.submodule {
+        options = {
+          backupDir = mkOption {
+            type = types.str;
+            default = ".local/state/backup";
+          };
+        };
+      }
+    );
+  };
+
+  config = {
+    users.users = builtins.mapAttrs (_name: _cfg': {
+      isNormalUser = true;
+      openssh.authorizedKeys.keys = builtins.attrValues self.globals.ssh.userKeys.nregner;
+      linger = true;
+    }) cfg;
+
+    # home-manager.users = builtins.mapAttrs (_user: _cfg': {
+    #   imports = [ ../../../modules/home-manager/server ];
+    #   home.stateVersion = "23.05";
+    # }) cfg;
+
+    systemd.user.services.nixos-activation.unitConfig.ConditionUser = builtins.map (user: "!${user}") (
+      builtins.attrNames cfg
+    );
+
+    systemd.tmpfiles.rules = lib.mapAttrsToList (
+      user: cfg':
+      let
+        inherit (config.users.users.${user}) home;
+      in
+      "d '${home}/${cfg'.backupDir}' 0770 ${user} - - -"
+    ) cfg;
+
+    local.services.backup.paths = builtins.mapAttrs (
+      user: cfg':
+      let
+        inherit (config.users.users.${user}) home;
+      in
+      {
+        paths = [ "${home}/${cfg'.backupDir}" ];
+        restic = {
+          s3 = { };
+        };
+      }
+    ) cfg;
+  };
 }
