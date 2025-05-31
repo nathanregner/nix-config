@@ -54,6 +54,10 @@ return {
             ["il"] = "@loop.inner",
             ["at"] = "@tag.outer",
             ["it"] = "@tag.inner",
+            ["aP"] = "@pair.outer",
+            ["iP"] = "@pair.inner",
+            ["ae"] = "@element.inner",
+            ["aE"] = "@element.outer",
           },
         },
         move = {
