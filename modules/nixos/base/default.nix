@@ -54,6 +54,7 @@
     dua
     fd
     file
+    pv
     rsync
     tree
     which

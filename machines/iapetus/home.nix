@@ -74,7 +74,6 @@
     gh
     jq
     nushell
-    pv
     rclone
     restic
     screen
