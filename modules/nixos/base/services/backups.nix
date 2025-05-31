@@ -23,6 +23,7 @@ in
             "dynamicFilesFrom"
             "paths"
             "timerConfig"
+            "user"
           ] (options.services.restic.backups.type.getSubOptions [ ]))
           // {
             restic = mkOption {
