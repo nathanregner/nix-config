@@ -14,12 +14,14 @@
     extraConfig = {
       alias = {
         convert-to-worktrees = ''!${
-          lib.getExe (
-            pkgs.writeShellApplication {
-              name = "convert-to-worktrees";
-              text = builtins.readFile ./convert-to-worktrees.sh;
-            }
-          )
+          pkgs.writers.writeNu "git-convert-to-worktrees" {
+            makeWrapperArgs = [
+              "--prefix"
+              "PATH"
+              ":"
+              "${lib.makeBinPath [ pkgs.trash-cli ]}"
+            ];
+          } ./convert-to-worktrees.nu
         }'';
         ddiff = "-c diff.external=difft diff";
         # https://github.com/orgs/community/discussions/9632#discussioncomment-4702442
