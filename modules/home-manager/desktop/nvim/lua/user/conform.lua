@@ -40,7 +40,7 @@ require("conform").setup({
     nginx = { "nginxfmt" },
     nix = {
       "nixfmt",
-      "injected",
+      -- "injected",
     },
     nu = { "topiary_nu" },
     query = { "topiary_tree_sitter_query" },
