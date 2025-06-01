@@ -101,5 +101,9 @@
         ".DS_Store"
       ];
   };
-  home.packages = with pkgs.unstable; [ difftastic ];
+
+  home.packages = with pkgs.unstable; [
+    difftastic
+    git-filter-repo
+  ];
 }
