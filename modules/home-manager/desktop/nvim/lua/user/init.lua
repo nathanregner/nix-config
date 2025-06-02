@@ -723,7 +723,7 @@ require("lazy").setup({
   {
     "max397574/better-escape.nvim",
     opts = {
-      default_mappings = true,
+      default_mappings = false,
       mappings = {
         i = { j = { k = "<Esc>" } },
         c = { j = { k = "<Esc>" } },
