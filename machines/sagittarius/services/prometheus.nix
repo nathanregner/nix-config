@@ -1,4 +1,4 @@
-{ self, ... }:
+{ self, config, ... }:
 {
   # https://wiki.nixos.org/wiki/Prometheus
   # https://nixos.org/manual/nixos/stable/#module-services-prometheus-exporters-configuration
@@ -12,7 +12,7 @@
           builtins.map
             (node: {
               targets = [
-                "${node}:${toString self.globals.services.prometheus.port}"
+                "${node}:${toString self.globals.services.prometheus.node.port}"
               ];
             })
             [
@@ -21,6 +21,32 @@
               "sunlu-s8-0"
               "voron"
             ];
+      }
+      {
+        job_name = "klipper";
+        static_configs =
+          builtins.map
+            (node: {
+              targets = [
+                "${node}:${toString self.globals.services.prometheus.klipper.port}"
+              ];
+            })
+            [
+              "sunlu-s8-0"
+              "voron"
+            ];
+      }
+      {
+        job_name = "nginx";
+        static_configs = [
+          { targets = [ "localhost:${toString config.services.prometheus.exporters.nginx.port}" ]; }
+        ];
+      }
+      {
+        job_name = "nginxlog";
+        static_configs = [
+          { targets = [ "localhost:${toString config.services.prometheus.exporters.nginxlog.port}" ]; }
+        ];
       }
     ];
   };

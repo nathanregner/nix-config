@@ -52,6 +52,28 @@ in
     hydra-users nregner hydra
   '';
 
+  local.services.backup.paths.hydra = {
+    dynamicFilesFrom = ''${pkgs.writers.writeNu "pg_dump-hydra"
+      {
+        makeWrapperArgs = [
+          "--prefix"
+          "PATH"
+          ":"
+          "${lib.makeBinPath [ config.services.postgresql.finalPackage ]}"
+        ];
+      }
+      # nu
+      ''
+        let tmp = mktemp -d
+        pg_dump -d hydra -Z zstd -Fd -f $tmp
+        $tmp
+      ''
+    }'';
+    restic = {
+      s3 = { };
+    };
+  };
+
   services.prometheus.scrapeConfigs = [
     {
       job_name = "hydra";

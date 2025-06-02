@@ -81,10 +81,23 @@ in
           (lists.foldl (acc: attrs: acc // attrs) { })
         ];
       in
-
       {
-        sops.secrets.restic-password.key = "restic_password";
-        sops.secrets.restic-s3-env.key = "restic/s3_env";
+        sops.secrets = {
+          restic-password = {
+            key = "restic_password";
+            group = "restic";
+            mode = "0440";
+          };
+          restic-s3-env = {
+            key = "restic/s3_env";
+            group = "restic";
+            mode = "0440";
+          };
+        };
+
+        users.groups.restic = {
+        };
+
         services.restic.backups = resticJobs;
       }
     ))

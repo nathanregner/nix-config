@@ -24,23 +24,28 @@ resource "tailscale_acl" "acl" {
     }
 
     # https://tailscale.com/kb/1337/acl-syntax#acls
-    acls = [
-      {
-        action = "accept"
-        src    = ["group:admin", "tag:admin"]
-        dst    = ["*:*"]
-      },
-      {
-        action = "accept"
-        src    = ["sagittarius"]
-        dst    = ["*:${jsondecode(file("../../globals.json")).services.prometheus.port}"] # prometheus
-      },
-      {
-        action = "accept"
-        src    = ["group:admin", "tag:admin", "sagittarius"]
-        dst    = ["tag:builder:22"]
-      },
-    ]
+    acls = concat(
+      [
+        {
+          action = "accept"
+          src    = ["group:admin", "tag:admin"]
+          dst    = ["*:*"]
+        },
+        {
+          action = "accept"
+          src    = ["group:admin", "tag:admin", "sagittarius"]
+          dst    = ["tag:builder:22"]
+        },
+      ],
+      [
+        for exporter in jsondecode(file("../../globals.json")).services.prometheus :
+        {
+          action = "accept"
+          src    = ["sagittarius"]
+          dst    = ["*:${exporter.port}"]
+        }
+      ],
+    )
 
     # https://tailscale.com/kb/1337/acl-syntax#ssh
     ssh = [

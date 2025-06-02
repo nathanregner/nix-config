@@ -1,5 +1,8 @@
 {
   "services": {
-    "prometheus": { "port": 9001 }
+    "prometheus": {
+      "klipper": { "port": 9002 },
+      "node": { "port": 9001 }
+    }
   }
 }
