@@ -1,3 +1,4 @@
+{ config, ... }:
 {
   programs.direnv = {
     enable = true;
@@ -8,7 +9,7 @@
   };
 
   xdg.configFile."direnv/direnvrc" = {
-    source = ./direnvrc;
+    source = config.lib.file.mkFlakeSymlink ./direnvrc;
     force = true;
   };
 }
