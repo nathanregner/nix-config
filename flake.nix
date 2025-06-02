@@ -51,8 +51,11 @@
     };
     poetry2nix = {
       url = "github:nix-community/poetry2nix";
-      inputs.nixpkgs.follows = "nixpkgs-unstable";
-      inputs.treefmt-nix.follows = "treefmt-nix";
+      inputs = {
+        nix-github-actions.follows = "";
+        nixpkgs.follows = "nixpkgs-unstable";
+        treefmt-nix.follows = "treefmt-nix";
+      };
     };
     sops-nix = {
       url = "github:Mic92/sops-nix";

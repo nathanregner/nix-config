@@ -13,15 +13,6 @@
     maintenance.enable = true;
     extraConfig = {
       alias = {
-        # https://morgan.cugerone.com/blog/workarounds-to-git-worktree-using-bare-repository-and-cannot-fetch-remote-branches/
-        clone-for-worktrees = ''!${
-          lib.getExe (
-            pkgs.writeShellApplication {
-              name = "clone-for-worktrees";
-              text = (builtins.readFile ./clone-for-worktrees.sh);
-            }
-          )
-        }'';
         convert-to-worktrees = ''!${
           lib.getExe (
             pkgs.writeShellApplication {
