@@ -24,7 +24,7 @@ let
     };
 
     # FIXME: Remove once https://github.com/newren/git-filter-repo/issues/659 is released
-    git-filter-repo = (assertVersion "2.47.0" prev.git-filter-repo).overrideAttrs (oldAttrs: {
+    git-filter-repo = (assertVersion "2.47.0" prev.git-filter-repo).overrideAttrs (_oldAttrs: {
       src = final.fetchFromGitHub {
         owner = "newren";
         repo = "git-filter-repo";
