@@ -118,8 +118,7 @@ return {
     { "<leader>z", function() Snacks.zen() end, desc = "Toggle Zen Mode" },
     { "<leader>Z", function() Snacks.zen.zoom() end, desc = "Toggle Zoom" },
     { "<leader>.", function() Snacks.scratch() end, desc = "Toggle Scratch Buffer" },
-    -- { "<leader>S", function() Snacks.scratch.select() end, desc = "Select Scratch Buffer" },
-    { "<leader>N", function() Snacks.notifier.show_history() end, desc = "Notification History" },
+    { "<leader>S", function() Snacks.scratch.select() end, desc = "Select Scratch Buffer" },
     { "<leader>bd", function() Snacks.bufdelete() end, desc = "Delete Buffer" },
     {
       "<leader>bD",
@@ -137,6 +136,7 @@ return {
       desc = "Delete Other Buffer",
     },
     { "<leader>cR", function() Snacks.rename.rename_file() end, desc = "Rename File" },
+    { "<leader>gB", function() Snacks.gitbrowse() end, desc = "Git Browse", mode = { "n", "v" } },
     { "<leader>gg", function() Snacks.lazygit() end, desc = "Lazygit" },
     { "<leader>un", function() Snacks.notifier.hide() end, desc = "Dismiss All Notifications" },
     { "<c-_>", function() Snacks.terminal() end, desc = "Toggle Terminal" },

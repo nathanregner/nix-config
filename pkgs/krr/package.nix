@@ -1,4 +1,9 @@
-{ inputs, pkgs, ... }:
+{
+  inputs,
+  pkgs,
+  nix-update-script,
+  ...
+}:
 let
   inherit (inputs.poetry2nix.lib.mkPoetry2Nix { inherit pkgs; })
     defaultPoetryOverrides
@@ -36,4 +41,8 @@ mkPoetryApplication {
 
   dontCheckRuntimeDeps = true;
   doCheck = false;
+
+  passthru = {
+    updateScript = nix-update-script { };
+  };
 }

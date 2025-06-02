@@ -18,12 +18,13 @@
   };
 
   security.pam.services.sudo_local = {
-    enable = true;
     touchIdAuth = true;
     reattach = true;
   };
 
-  services.nregner.hydra-builder.enable = true;
+  system.primaryUser = "nregner";
+
+  local.services.hydra-builder.enable = true;
 
   services.tailscale = {
     enable = true;
@@ -31,7 +32,7 @@
   };
 
   environment.systemPackages = [
-    pkgs.hydra-auto-upgrade
+    pkgs.local.hydra-auto-upgrade
   ];
 
   nix.distributedBuilds = true;

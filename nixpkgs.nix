@@ -1,8 +1,4 @@
-{
-  outputs,
-  overlays ? [ ],
-  system ? null,
-}:
+{ outputs }:
 {
   config = {
     allowUnfree = true;
@@ -17,4 +13,3 @@
     (_: _: { inherit outputs; })
   ];
 }
-// (if system != null then { inherit system; } else { })

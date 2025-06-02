@@ -5,7 +5,7 @@
 }:
 stdenv.mkDerivation {
   pname = "topiary-nushell";
-  version = "latest";
+  version = "0-unstable-2025-04-25";
   src = fetchFromGitHub {
     owner = "blindFS";
     repo = "topiary-nushell";
