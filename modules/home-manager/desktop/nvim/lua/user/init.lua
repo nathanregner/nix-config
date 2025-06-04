@@ -242,12 +242,20 @@ require("lazy").setup({
         dir = vim.g.nix.luasnip.dir,
         pin = true,
         dependencies = {
-          -- https://github.com/rafamadriz/friendly-snippets
+          "rafamadriz/friendly-snippets",
           {
-            "rafamadriz/friendly-snippets",
-            config = function() require("luasnip.loaders.from_vscode").lazy_load() end,
+            "chrisgrieser/nvim-scissors",
+            opts = {
+              snippetDir = vim.fn.stdpath("config") .. "/snippets",
+            },
           },
         },
+        config = function()
+          require("luasnip.loaders.from_vscode").lazy_load()
+          require("luasnip.loaders.from_vscode").lazy_load({
+            paths = { vim.fn.stdpath("config") .. "/snippets" },
+          })
+        end,
       },
       "saadparwaiz1/cmp_luasnip",
       "hrsh7th/cmp-nvim-lsp",
