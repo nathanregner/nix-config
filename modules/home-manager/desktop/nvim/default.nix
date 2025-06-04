@@ -98,6 +98,10 @@ in
           source = config.lib.file.mkFlakeSymlink ./lua;
           force = true;
         };
+        "nvim/snippets" = {
+          source = config.lib.file.mkFlakeSymlink ./snippets;
+          force = true;
+        };
       }
       // lib.listToAttrs (
         builtins.map (source: {
