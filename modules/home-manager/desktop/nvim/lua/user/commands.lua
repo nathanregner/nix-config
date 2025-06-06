@@ -2,9 +2,7 @@ vim.api.nvim_create_user_command("JSONParse", function()
   local ts_utils = require("nvim-treesitter.ts_utils")
   local current_node = ts_utils.get_node_at_cursor()
 
-  if not current_node or not current_node:type() == "string" then
-    return
-  end
+  if not current_node or not current_node:type() == "string" then return end
 
   local json = ts_utils.get_node_text(current_node)[1]
   local cmd = vim.system({ "node", "-e", "console.log(JSON.parse(fs.readFileSync(0, 'utf-8')))" }, {

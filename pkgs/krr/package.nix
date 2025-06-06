@@ -15,7 +15,7 @@ let
     prometheus-api-client = [ "setuptools" ];
   };
   overrides = defaultPoetryOverrides.extend (
-    final: prev:
+    _final: prev:
     builtins.mapAttrs (
       package: build-requirements:
       (builtins.getAttr package prev).overridePythonAttrs (old: {

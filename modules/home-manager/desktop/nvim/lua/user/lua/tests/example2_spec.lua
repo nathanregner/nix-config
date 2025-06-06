@@ -8,6 +8,8 @@ local h = autoload("nvim-test.helpers")
 local c = autoload("nfnl.core")
 c.keys(vim.g.sexp_filetypes)
 c.merge(c.assoc({}, "a", "b", "c", "asdfasdfasdfasdffa"), c.assoc({}, "d", 1))
-do local _ = (1 + 2 + 3) end
+do
+  local _ = (1 + 2 + 3)
+end
 --[[ vim.v.lpath (c.keys (require "nvim-test.helpers")) ]]
 return nil

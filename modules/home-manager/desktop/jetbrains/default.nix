@@ -18,7 +18,7 @@ let
     appName:
     let
       commonConfig = listFilesRecursive ./config/common;
-      appConfig = (listFilesRecursive (./config + "/${appName}"));
+      appConfig = listFilesRecursive (./config + "/${appName}");
       plugins = lib.map (plugin: {
         "JetBrains/${appName}/config/plugins/${plugin.name}" = {
           source = "${plugin}";

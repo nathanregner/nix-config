@@ -81,17 +81,13 @@ create_postfix({
           (member_expression)
         ] @prefix
       ]],
-  expand = function(match)
-    return sn(nil, fmt("console.log('{1}', {1});", { t(match) }))
-  end,
+  expand = function(match) return sn(nil, fmt("console.log('{1}', {1});", { t(match) })) end,
 })
 
 create_postfix({
   trig = ".cl",
   query = expression,
-  expand = function(match)
-    return sn(nil, fmt("console.log({1});", { t(match) }))
-  end,
+  expand = function(match) return sn(nil, fmt("console.log({1});", { t(match) })) end,
 })
 
 create_postfix({
@@ -105,9 +101,7 @@ create_postfix({
 create_postfix({
   trig = ".json",
   query = expression,
-  expand = function(match)
-    return sn(nil, fmt("JSON.stringify({}, undefined, 2)", { t(match) }))
-  end,
+  expand = function(match) return sn(nil, fmt("JSON.stringify({}, undefined, 2)", { t(match) })) end,
 })
 
 for lang, lang_snippets in pairs(snippets) do

@@ -28,7 +28,7 @@ nodes {
     # ./hardware/orange-pi-zero2.nix
     ./hardware/raspberry-pi-zero2w.nix
     (
-      { pkgs, ... }:
+      _:
       {
         print-farm.klipper = {
           enable = true;

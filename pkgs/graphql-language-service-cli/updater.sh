@@ -9,14 +9,14 @@ set -euo pipefail
 owner="graphql"
 repo="graphiql"
 version=$(
-    curl -s ${GITHUB_TOKEN:+" -u \":$GITHUB_TOKEN\""} "https://api.github.com/repos/graphql/graphiql/git/refs/tags/graphql-language-service-cli" |
-        jq 'map(.ref | capture("refs/tags/graphql-language-service-cli@(?<version>[0-9.]+)").version) | .[]' -r |
-        sort --reverse --version-sort | head -n1
+  curl -s ${GITHUB_TOKEN:+" -u \":$GITHUB_TOKEN\""} "https://api.github.com/repos/graphql/graphiql/git/refs/tags/graphql-language-service-cli" |
+    jq 'map(.ref | capture("refs/tags/graphql-language-service-cli@(?<version>[0-9.]+)").version) | .[]' -r |
+    sort --reverse --version-sort | head -n1
 )
 
-if [[ "$UPDATE_NIX_OLD_VERSION" == "$version" ]]; then
-    echo "Already up to date!"
-    exit 0
+if [[ $UPDATE_NIX_OLD_VERSION == "$version" ]]; then
+  echo "Already up to date!"
+  exit 0
 fi
 
 nix-update graphql-language-service-cli --version $version

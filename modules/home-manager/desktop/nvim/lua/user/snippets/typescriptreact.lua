@@ -8,11 +8,13 @@ local fmt = require("luasnip.extras.fmt").fmt
 ls.add_snippets("typescriptreact", {
   s(
     "rfc",
-    d(1, function(_, parent)
-      return sn(
-        nil,
-        fmt(
-          [[
+    d(
+      1,
+      function(_, parent)
+        return sn(
+          nil,
+          fmt(
+            [[
             type {1}Props = {{
               {2}
             }}
@@ -25,11 +27,12 @@ ls.add_snippets("typescriptreact", {
               )
             }}
           ]],
-          { i(1, parent.env.TM_FILENAME_BASE), i(2, ""), i(3, "") },
-          { repeat_duplicates = true }
+            { i(1, parent.env.TM_FILENAME_BASE), i(2, ""), i(3, "") },
+            { repeat_duplicates = true }
+          )
         )
-      )
-    end),
+      end
+    ),
     { priority = 1000 }
   ), -- nil
 }, {
