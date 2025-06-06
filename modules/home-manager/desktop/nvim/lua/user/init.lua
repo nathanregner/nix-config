@@ -592,6 +592,8 @@ require("lazy").setup({
 
   {
     "folke/noice.nvim",
+    priority = 999,
+    lazy = false,
     dependencies = {
       "MunifTanjim/nui.nvim",
     },
@@ -864,7 +866,7 @@ require("lazy").setup({
       "nvim-treesitter/nvim-treesitter",
       -- Adapters
       "marilari88/neotest-vitest",
-      "nvim-neotest/neotest-jest",
+      { "nvim-neotest/neotest-jest", dir = vim.g.nix["neotest-jest"].dir },
       "rouge8/neotest-rust",
     },
     config = function()
