@@ -42,6 +42,14 @@ in
 
       lua.globals = {
         luasnip.dir = "${pkgs.unstable.vimPlugins.luasnip}";
+        neotest-jest.dir = "${pkgs.unstable.vimPlugins.neotest-jest.overrideAttrs {
+          patches = [
+            (pkgs.fetchpatch2 {
+              url = "https://patch-diff.githubusercontent.com/raw/nvim-neotest/neotest-jest/pull/141.patch";
+              hash = "sha256-IxgnjB2TzqLi/TFGruR52ia3R/AnrgJAZKAqY5lIX4A=";
+            })
+          ];
+        }}";
       };
 
       extraPackages = builtins.attrValues (
