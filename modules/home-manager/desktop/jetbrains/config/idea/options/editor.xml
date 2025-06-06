@@ -6,6 +6,7 @@
     <option name="ADD_UNAMBIGIOUS_IMPORTS_ON_THE_FLY" value="true" />
     <EXCLUDED_PACKAGE NAME="org.assertj.core.api.AssertionsForClassTypes" />
     <EXCLUDED_PACKAGE NAME="org.assertj.core.api.AssertionsForInterfaceTypes" />
+    <EXCLUDED_PACKAGE NAME="org.assertj.core.api.BDDAssumptions" />
     <EXCLUDED_PACKAGE NAME="org.assertj.core.api.ClassBasedNavigableIterableAssert" />
     <EXCLUDED_PACKAGE NAME="org.assertj.core.api.ClassBasedNavigableListAssert" />
     <EXCLUDED_PACKAGE NAME="org.assertj.core.api.FactoryBasedNavigableIterableAssert" />

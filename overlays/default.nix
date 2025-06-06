@@ -41,6 +41,13 @@ let
       ];
     });
 
+    nix-prefetch = prev.nix-prefetch.overrideAttrs (oldAttrs: {
+      patches = oldAttrs.patches or [ ] ++ [
+        # https://github.com/msteen/nix-prefetch/pull/34
+        ./nix-prefetch/34.patch
+      ];
+    });
+
     nix-update-script =
       args:
       [
