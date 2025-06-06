@@ -25,7 +25,8 @@ in
       readOnly = true;
       default = pkgs.runCommand "topiary" { nativeBuildInputs = [ pkgs.makeWrapper ]; } ''
         makeWrapper ${lib.getExe package} $out/bin/topiary \
-          --set TOPIARY_LANGUAGE_DIR "${config.xdg.configHome}/topiary/languages"
+          --set TOPIARY_LANGUAGE_DIR "${config.xdg.configHome}/topiary/languages" \
+          --set TOPIARY_CONFIG_FILE "${config.xdg.configHome}/topiary/languages.ncl"
       '';
     };
 
@@ -80,7 +81,8 @@ in
           name: language: if language.queries != null then "cp ${language.queries} $out/${name}.scm" else ""
         ) cfg.languages
       )}
-    ''}";
+
+''}";
 
     xdg.configFile."topiary/languages.ncl".text =
       let
