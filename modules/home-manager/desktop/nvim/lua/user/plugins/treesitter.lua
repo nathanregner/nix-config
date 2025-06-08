@@ -6,16 +6,9 @@ return {
     "nvim-treesitter/nvim-treesitter",
     dir = vim.g.nix.nvim_treesitter.dir,
     pin = true,
+    -- FIXME: load after?
     dependencies = {
-      "nvim-treesitter/nvim-treesitter-context",
       "nvim-treesitter/nvim-treesitter-textobjects",
-    },
-    keys = {
-      {
-        "[C",
-        function() require("treesitter-context").go_to_context(vim.v.count1) end,
-        silent = true,
-      },
     },
     lazy = false,
     opts = {
@@ -107,11 +100,6 @@ return {
     },
     config = function(_, opts)
       require("nvim-treesitter.configs").setup(opts)
-      require("treesitter-context").setup({
-        max_lines = 10,
-        multiline_threshold = 1,
-        -- mode = "topline",
-      })
 
       local ts_repeat_move = require("nvim-treesitter.textobjects.repeatable_move")
 
@@ -219,6 +207,25 @@ return {
         -- level = vim.log.levels.TRACE,
         -- outfile = "~/tssorter.log", -- nil prints to messages, or add a path to a file to output logs there
       },
+    },
+  },
+  {
+    "nvim-treesitter/nvim-treesitter-context",
+    dependencies = { "nvim-treesitter/nvim-treesitter" },
+    lazy = false,
+    keys = {
+      {
+        "[C",
+        function() require("treesitter-context").go_to_context(vim.v.count1) end,
+        silent = true,
+      },
+    },
+    opts = {
+      enable = true,
+      max_lines = 10,
+      mode = "cursor",
+      multiline_threshold = 1,
+      multiwindow = true,
     },
   },
   {
