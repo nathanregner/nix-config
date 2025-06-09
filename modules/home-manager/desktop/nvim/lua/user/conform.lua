@@ -43,6 +43,11 @@ require("conform").setup({
       -- "injected",
     },
     nu = { "topiary_nu" },
+    python = {
+      "ruff_fix",
+      "ruff_format",
+      "ruff_organize_imports",
+    },
     query = { "topiary_tree_sitter_query" },
     rust = { "rustfmt" },
     sh = { "shfmt" },
