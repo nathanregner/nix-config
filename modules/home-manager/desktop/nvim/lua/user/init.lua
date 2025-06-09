@@ -1035,6 +1035,7 @@ require("lazy").setup({
 
   { -- REPL
     "Olical/conjure",
+    branch = "main",
     dependencies = {
       -- https://github.com/guns/vim-sexp
       "guns/vim-sexp",
