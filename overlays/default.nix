@@ -23,6 +23,20 @@ let
       };
     };
 
+    # FIXME: Remove once https://github.com/newren/git-filter-repo/issues/659 is released
+    git-filter-repo = (assertVersion "2.47.0" prev.git-filter-repo).overrideAttrs (_oldAttrs: {
+      src = final.fetchFromGitHub {
+        owner = "newren";
+        repo = "git-filter-repo";
+        rev = "2d391462dca14cd18b8faaefce34dc91dc1ae150";
+        hash = "sha256-2jws/s36GuZrthODzj3OvlR9lDU9Nr1XIGNWRyO+0wA=";
+      };
+
+      checkPhase = ''
+        make test
+      '';
+    });
+
     hydra = prev.hydra.overrideAttrs (oldAttrs: {
       patches = (oldAttrs.patches or [ ]) ++ [
         ./hydra/feat-add-always_supported_system_types-option.patch

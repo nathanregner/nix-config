@@ -39,6 +39,20 @@ vim.g.fugitive_legacy_commands = 0
 
 local leet_arg = "leetcode.nvim"
 
+---@param spec LazyPluginSpec
+---@return LazyPluginSpec
+local function nix_spec(spec)
+  local name = vim.fs.basename(spec[1])
+  if name == nil then return spec end
+
+  local nix = vim.g.nix[string.lower(name)]
+  if nix == nil then return spec end
+
+  spec.dir = nix.dir
+  spec.pin = true
+  return spec
+end
+
 -- https://github.com/folke/lazy.nvim#-plugin-spec
 require("lazy").setup({
   -- Git
@@ -237,16 +251,15 @@ require("lazy").setup({
     lazy = false,
     dependencies = {
       -- Snippet Engine & its associated nvim-cmp source
-      {
+      nix_spec({
         "L3MON4D3/LuaSnip",
-        dir = vim.g.nix.luasnip.dir,
-        pin = true,
         dependencies = {
           "rafamadriz/friendly-snippets",
           {
             "chrisgrieser/nvim-scissors",
             opts = {
               snippetDir = vim.fn.stdpath("config") .. "/snippets",
+              jsonFormatter = { "prettierd", "dummy.json" },
             },
           },
         },
@@ -256,7 +269,7 @@ require("lazy").setup({
             paths = { vim.fn.stdpath("config") .. "/snippets" },
           })
         end,
-      },
+      }),
       "saadparwaiz1/cmp_luasnip",
       "hrsh7th/cmp-nvim-lsp",
       "hrsh7th/cmp-path",
@@ -784,7 +797,6 @@ require("lazy").setup({
     },
     opts = {
       keymaps = {
-        ["Gr"] = function() require("oil").open(find_git_root()) end,
         ["gd"] = function()
           local oil = require("oil")
           if #require("oil.config").columns == 1 then
@@ -866,7 +878,7 @@ require("lazy").setup({
       "nvim-treesitter/nvim-treesitter",
       -- Adapters
       "marilari88/neotest-vitest",
-      { "nvim-neotest/neotest-jest", dir = vim.g.nix["neotest-jest"].dir },
+      nix_spec({ "nvim-neotest/neotest-jest" }),
       "rouge8/neotest-rust",
     },
     config = function()

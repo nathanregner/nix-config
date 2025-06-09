@@ -81,7 +81,8 @@ in
           name: language: if language.queries != null then "cp ${language.queries} $out/${name}.scm" else ""
         ) cfg.languages
       )}
-    ''}";
+
+''}";
 
     xdg.configFile."topiary/languages.ncl".text =
       let

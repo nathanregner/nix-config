@@ -14,12 +14,14 @@
     extraConfig = {
       alias = {
         convert-to-worktrees = ''!${
-          lib.getExe (
-            pkgs.writeShellApplication {
-              name = "convert-to-worktrees";
-              text = builtins.readFile ./convert-to-worktrees.sh;
-            }
-          )
+          pkgs.writers.writeNu "git-convert-to-worktrees" {
+            makeWrapperArgs = [
+              "--prefix"
+              "PATH"
+              ":"
+              "${lib.makeBinPath [ pkgs.trash-cli ]}"
+            ];
+          } ./convert-to-worktrees.nu
         }'';
         ddiff = "-c diff.external=difft diff";
         # https://github.com/orgs/community/discussions/9632#discussioncomment-4702442
@@ -100,9 +102,13 @@
         ".DS_Store"
       ];
   };
-  home.packages = with pkgs.unstable; [ difftastic ];
 
   programs.zsh.initContent = ''
     alias for-each-repo="~/configs/nix-config/modules/home-manager/desktop/cli/git/for-each-repo.nu"
   '';
+
+  home.packages = with pkgs.unstable; [
+    difftastic
+    git-filter-repo
+  ];
 }

@@ -148,7 +148,7 @@ in
     programs.lazygit.settings.customCommands = [
       {
         key = "M";
-        command = "nvim -c DiffviewOpen";
+        command = "nvim -c DiffviewOpen .";
         description = "Open diffview.nvim";
         context = "files";
         loadingText = "opening diffview.nvim";
