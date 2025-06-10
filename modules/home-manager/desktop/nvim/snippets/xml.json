@@ -1,4 +1,36 @@
 {
+  "maven-enforcer-plugin": {
+    "body": [
+      "<plugin>",
+      "   <groupId>org.apache.maven.plugins</groupId>",
+      "   <artifactId>maven-enforcer-plugin</artifactId>",
+      "   <executions>",
+      "     <execution>",
+      "       <id>enforce-banned-dependencies</id>",
+      "       <goals>",
+      "         <goal>enforce</goal>",
+      "       </goals>",
+      "       <configuration>",
+      "         <rules>",
+      "           <requireMavenVersion>",
+      "             <version>3.6.3</version>",
+      "           </requireMavenVersion>",
+      "           <bannedDependencies>",
+      "             <excludes>",
+      "               <!-- using spring-boot-starter-log4j2 instead -->",
+      "               <!-- https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#howto.logging.log4j -->",
+      "               <exclude>org.springframework.boot:spring-boot-starter-logging</exclude>",
+      "             </excludes>",
+      "           </bannedDependencies>",
+      "         </rules>",
+      "         <fail>true</fail>",
+      "       </configuration>",
+      "     </execution>",
+      "   </executions>",
+      " </plugin>"
+    ],
+    "prefix": "maven-enforcer-plugin"
+  },
   "maven-plugin-spring-javaformat": {
     "body": [
       "<plugin>",
@@ -38,34 +70,5 @@
       "</profile>"
     ],
     "prefix": "netty-resolver-dns-native-macos-aarch64"
-  },
-  "maven-enforcer-plugin": {
-    "body": [
-      "<plugin>",
-      "  <groupId>org.apache.maven.plugins</groupId>",
-      "  <artifactId>maven-enforcer-plugin</artifactId>",
-      "  <executions>",
-      "    <execution>",
-      "      <id>enforce-banned-dependencies</id>",
-      "      <goals>",
-      "        <goal>enforce</goal>",
-      "      </goals>",
-      "      <configuration>",
-      "        <rules>",
-      "          <bannedDependencies>",
-      "            <!-- using spring-boot-starter-log4j2 instead -->",
-      "            <!-- https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#howto.logging.log4j -->",
-      "            <excludes>",
-      "              <exclude>org.springframework.boot:spring-boot-starter-logging</exclude>",
-      "            </excludes>",
-      "          </bannedDependencies>",
-      "        </rules>",
-      "        <fail>true</fail>",
-      "      </configuration>",
-      "    </execution>",
-      "  </executions>",
-      "</plugin>"
-    ],
-    "prefix": "maven-enforcer-plugin"
   }
 }
