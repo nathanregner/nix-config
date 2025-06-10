@@ -1,5 +1,6 @@
 {
   "maven-enforcer-plugin": {
+    "prefix": "maven-enforcer-plugin",
     "body": [
       "<plugin>",
       "   <groupId>org.apache.maven.plugins</groupId>",
@@ -28,29 +29,10 @@
       "     </execution>",
       "   </executions>",
       " </plugin>"
-    ],
-    "prefix": "maven-enforcer-plugin"
-  },
-  "maven-plugin-spring-javaformat": {
-    "body": [
-      "<plugin>",
-      "  <groupId>io.spring.javaformat</groupId>",
-      "  <artifactId>spring-javaformat-maven-plugin</artifactId>",
-      "  <version>0.0.45</version>",
-      "  <executions>",
-      "    <execution>",
-      "      <phase>validate</phase>",
-      "      <inherited>true</inherited>",
-      "      <goals>",
-      "        <goal>validate</goal>",
-      "      </goals>",
-      "    </execution>",
-      "  </executions>",
-      "</plugin>"
-    ],
-    "prefix": "maven-plugin-spring-javaformat"
+    ]
   },
   "maven-profile-netty-resolver-dns-native-macos-aarch64": {
+    "prefix": "netty-resolver-dns-native-macos-aarch64",
     "body": [
       "<profile>",
       "    <id>maven-profile-netty-resolver-dns-native-macos-aarch64</id>",
@@ -68,7 +50,25 @@
       "        </dependency>",
       "    </dependencies>",
       "</profile>"
+    ]
+  },
+  "maven-plugin-spring-javaformat": {
+    "body": [
+      "<plugin>",
+      "  <groupId>io.spring.javaformat</groupId>",
+      "  <artifactId>spring-javaformat-maven-plugin</artifactId>",
+      "  <version>0.0.46</version>",
+      "  <executions>",
+      "    <execution>",
+      "      <phase>validate</phase>",
+      "      <inherited>true</inherited>",
+      "      <goals>",
+      "        <goal>validate</goal>",
+      "      </goals>",
+      "    </execution>",
+      "  </executions>",
+      "</plugin>"
     ],
-    "prefix": "netty-resolver-dns-native-macos-aarch64"
+    "prefix": "maven-plugin-spring-javaformat"
   }
 }
