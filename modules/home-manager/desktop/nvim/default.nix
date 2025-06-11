@@ -93,16 +93,6 @@ in
             vtsls
             yaml-language-server
             ;
-
-          # formatters/linters
-          inherit (pkgs.unstable)
-            nginx-config-formatter
-            nixfmt-rfc-style
-            prettierd
-            shfmt
-            stylua
-            taplo
-            ;
         }
         // lib.optionalAttrs pkgs.stdenv.isLinux {
           inherit (pkgs.unstable)
@@ -115,6 +105,14 @@ in
     home.packages = with pkgs.unstable; [
       # test runners
       cargo-nextest # for rouge8/neotest-rust
+
+      # formatters/linters
+      nginx-config-formatter
+      nixfmt-rfc-style
+      prettierd
+      shfmt
+      stylua
+      taplo
     ];
 
     xdg.configFile =
