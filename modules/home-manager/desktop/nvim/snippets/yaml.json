@@ -1,0 +1,16 @@
+{
+  "spring-profile-groups": {
+    "prefix": "spring-profile-groups",
+    "body": [
+      "group:",
+      "  local: clickbank",
+      "  dev: clickbank",
+      "  staging: clickbank",
+      "  prod: clickbank",
+      "  sphere-local: sphere",
+      "  sphere-dev: sphere",
+      "  sphere-staging: sphere",
+      "  sphere-prod: sphere"
+    ]
+  }
+}
