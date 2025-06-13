@@ -7,4 +7,4 @@ if lib.isDerivation value then
   in
   !isBroken && (builtins.elem system platforms) && !(builtins.elem system badPlatforms)
 else
-  builtins.match "write[[:upper:]].*" name != null
+  lib.isFunction value
