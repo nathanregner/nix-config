@@ -1,6 +1,7 @@
 {
   self,
   config,
+  pkgs,
   lib,
   ...
 }:
@@ -34,12 +35,8 @@ in
       isNormalUser = true;
       openssh.authorizedKeys.keys = builtins.attrValues self.globals.ssh.userKeys.nregner;
       linger = true;
+      shell = pkgs.unstable.zsh;
     }) cfg;
-
-    # home-manager.users = builtins.mapAttrs (_user: _cfg': {
-    #   imports = [ ../../../modules/home-manager/server ];
-    #   home.stateVersion = "23.05";
-    # }) cfg;
 
     systemd.user.services.nixos-activation.unitConfig.ConditionUser = builtins.map (user: "!${user}") (
       builtins.attrNames cfg
