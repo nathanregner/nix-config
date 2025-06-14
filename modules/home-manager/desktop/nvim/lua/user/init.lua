@@ -777,6 +777,17 @@ require("lazy").setup({
           end
           oil.close()
         end,
+        ["gd"] = {
+          desc = "Toggle file detail view",
+          callback = function()
+            detail = not detail
+            if detail then
+              require("oil").set_columns({ "icon", "permissions", "size", "mtime" })
+            else
+              require("oil").set_columns({ "icon" })
+            end
+          end,
+        },
         ["g-"] = function()
           local oil = require("oil")
           local cwd = oil.get_current_dir()
