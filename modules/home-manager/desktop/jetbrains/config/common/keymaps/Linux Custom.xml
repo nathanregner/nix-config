@@ -1,10 +1,28 @@
 <keymap version="1" name="Linux Custom" parent="macOS For All">
+  <action id="$LRU">
+    <keyboard-shortcut first-keystroke="shift ctrl alt comma" />
+  </action>
   <action id="Back">
     <keyboard-shortcut first-keystroke="ctrl alt left" />
     <keyboard-shortcut first-keystroke="ctrl open_bracket" />
     <mouse-shortcut keystroke="button4" />
     <keyboard-shortcut first-keystroke="alt open_bracket" />
   </action>
+  <action id="ChooseRunConfiguration">
+    <keyboard-shortcut first-keystroke="shift ctrl alt r" />
+    <keyboard-shortcut first-keystroke="shift f10" />
+  </action>
+  <action id="CloseAllEditorsButActive">
+    <keyboard-shortcut first-keystroke="shift alt w" />
+  </action>
+  <action id="Debug">
+    <keyboard-shortcut first-keystroke="ctrl alt d" />
+    <keyboard-shortcut first-keystroke="shift f9" />
+  </action>
+  <action id="Editor LRU">
+    <keyboard-shortcut first-keystroke="shift ctrl alt comma" />
+  </action>
+  <action id="EditorCutLineEnd" />
   <action id="EditorEnter">
     <keyboard-shortcut first-keystroke="enter" />
   </action>
@@ -17,9 +35,13 @@
     <mouse-shortcut keystroke="button5" />
     <keyboard-shortcut first-keystroke="alt close_bracket" />
   </action>
+  <action id="GotoClass">
+    <keyboard-shortcut first-keystroke="alt o" />
+  </action>
   <action id="NextInlineCompletionSuggestionAction" />
   <action id="PrevInlineCompletionSuggestionAction" />
   <action id="SelectInProjectView">
     <keyboard-shortcut first-keystroke="shift alt 1" />
   </action>
+  <action id="tasks.close" />
 </keymap>
