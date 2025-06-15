@@ -5,28 +5,36 @@
   ...
 }:
 let
+  inherit (lib)
+    concatLists
+    filesystem
+    map
+    mapAttrsToList
+    mkIf
+    mkMerge
+    mkOption
+    optionals
+    path
+    types
+    ;
+
   cfg = config.programs.jetbrains;
 
   listFilesRecursive =
     root:
-    builtins.map (file: {
-      name = lib.removePrefix "./" (toString (lib.path.removePrefix root file));
+    map (file: {
+      name = lib.removePrefix "./" (toString (path.removePrefix root file));
       path = file;
-    }) (lib.filesystem.listFilesRecursive root);
+    }) (filesystem.listFilesRecursive root);
 
   linkConfigFiles =
     appName:
+    { plugins, ... }:
     let
       commonConfig = listFilesRecursive ./config/common;
       appConfig = listFilesRecursive (./config + "/${appName}");
-      plugins = lib.map (plugin: {
-        "JetBrains/${appName}/config/plugins/${plugin.name}.jar" = {
-          source = "${plugin}";
-          force = true;
-        };
-      }) cfg.plugins;
     in
-    builtins.map (
+    (map (
       { name, path }:
       {
         "JetBrains/${appName}/config/${name}" = {
@@ -34,17 +42,38 @@ let
           force = true;
         };
       }
-    ) (commonConfig ++ appConfig);
+    ) (commonConfig ++ appConfig))
+    ++ map (plugin: {
+      "JetBrains/${appName}/config/plugins/${plugin.name}.jar" = {
+        source = "${plugin}";
+        force = true;
+      };
+    }) plugins;
 in
 {
   options.programs.jetbrains = {
-    enable = lib.mkOption {
-      type = lib.types.bool;
+    enable = mkOption {
+      type = types.bool;
       default = true;
+    };
+
+    tools = mkOption {
+      default = {
+      };
+      type = types.attrsOf (
+        types.submodule {
+          options = {
+            plugins = mkOption {
+              type = types.listOf types.package;
+              default = [ ];
+            };
+          };
+        }
+      );
     };
   };
 
-  config = lib.mkIf cfg.enable {
+  config = mkIf cfg.enable {
     home.file.".ideavimrc".source = config.lib.file.mkFlakeSymlink ./ideavimrc;
 
     home.packages =
@@ -76,11 +105,6 @@ in
       datagrip = "open -na ~/Applications/DataGrip\\*.app/Contents/MacOS/datagrip --args";
     };
 
-    xdg.configFile = lib.mkMerge (
-      builtins.concatMap linkConfigFiles [
-        "idea"
-        "datagrip"
-      ]
-    );
+    xdg.configFile = mkMerge (concatLists (mapAttrsToList linkConfigFiles cfg.tools));
   };
 }
