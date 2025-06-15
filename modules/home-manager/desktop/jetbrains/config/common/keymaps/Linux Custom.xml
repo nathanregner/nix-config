@@ -1,25 +1,79 @@
 <keymap version="1" name="Linux Custom" parent="macOS For All">
+  <action id="$LRU">
+    <keyboard-shortcut first-keystroke="shift ctrl alt comma" />
+  </action>
   <action id="Back">
     <keyboard-shortcut first-keystroke="ctrl alt left" />
     <keyboard-shortcut first-keystroke="ctrl open_bracket" />
     <mouse-shortcut keystroke="button4" />
     <keyboard-shortcut first-keystroke="alt open_bracket" />
   </action>
+  <action id="ChangesView.GroupBy.Module" />
+  <action id="CloseAllEditorsButActive">
+    <keyboard-shortcut first-keystroke="shift alt w" />
+  </action>
+  <action id="CloseContent">
+    <keyboard-shortcut first-keystroke="alt w" />
+  </action>
+  <action id="CodeInspection.OnEditor" />
+  <action id="Console.Open" />
+  <action id="Debug">
+    <keyboard-shortcut first-keystroke="ctrl alt d" />
+    <keyboard-shortcut first-keystroke="shift f9" />
+  </action>
+  <action id="Editor LRU">
+    <keyboard-shortcut first-keystroke="shift ctrl alt comma" />
+  </action>
+  <action id="EditorAddCaretPerSelectedLine" />
+  <action id="EditorCutLineEnd" />
   <action id="EditorEnter">
     <keyboard-shortcut first-keystroke="enter" />
   </action>
   <action id="EditorEscape">
     <keyboard-shortcut first-keystroke="escape" />
   </action>
+  <action id="EditorMatchBrace" />
+  <action id="ExternalSystem.ProjectRefreshAction">
+    <keyboard-shortcut first-keystroke="shift ctrl o" />
+    <keyboard-shortcut first-keystroke="shift ctrl i" />
+    <keyboard-shortcut first-keystroke="shift alt i" />
+  </action>
+  <action id="FindPrevious" />
+  <action id="FindUsages">
+    <keyboard-shortcut first-keystroke="alt f7" />
+    <keyboard-shortcut first-keystroke="shift alt f7" />
+  </action>
+  <action id="ForceStepInto" />
   <action id="Forward">
     <keyboard-shortcut first-keystroke="ctrl alt right" />
     <keyboard-shortcut first-keystroke="ctrl close_bracket" />
     <mouse-shortcut keystroke="button5" />
     <keyboard-shortcut first-keystroke="alt close_bracket" />
   </action>
+  <action id="GotoClass">
+    <keyboard-shortcut first-keystroke="alt o" />
+  </action>
+  <action id="Jdbc.OpenConsole.Any" />
+  <action id="Jpa.OpenConsole" />
   <action id="NextInlineCompletionSuggestionAction" />
   <action id="PrevInlineCompletionSuggestionAction" />
+  <action id="Rerun">
+    <keyboard-shortcut first-keystroke="ctrl r" />
+    <keyboard-shortcut first-keystroke="shift f10" />
+    <keyboard-shortcut first-keystroke="ctrl f5" />
+  </action>
+  <action id="RunClass">
+    <keyboard-shortcut first-keystroke="shift ctrl c" />
+    <keyboard-shortcut first-keystroke="shift ctrl f10" />
+  </action>
   <action id="SelectInProjectView">
     <keyboard-shortcut first-keystroke="shift alt 1" />
   </action>
+  <action id="TodoViewGroupByShowModules" />
+  <action id="UsageGrouping.Module" />
+  <action id="Vcs.ShowTabbedFileHistory">
+    <keyboard-shortcut first-keystroke="shift alt g" second-keystroke="shift alt h" />
+  </action>
+  <action id="hg4idea.QGotoFromPatches" />
+  <action id="tasks.close" />
 </keymap>
