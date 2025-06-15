@@ -29,7 +29,7 @@ sethandler <C-P> a:ide
 sethandler <C-Q> a:ide
 sethandler <C-R> a:vim
 sethandler <C-S> a:vim
-sethandler <C-T> a:vim
+sethandler <C-T> a:ide
 sethandler <C-U> a:vim
 sethandler <C-V> a:vim
 sethandler <C-W> a:vim
@@ -55,6 +55,7 @@ nnoremap gD :action GotoSuperMethod<CR>
 nnoremap gI :action GotoImplementation<CR>
 nnoremap <leader>ca :action ShowIntentionActions<CR>
 nnoremap gx gd
+nnoremap <leader>e :action ShowErrorDescription<CR>
 " nnoremap <C-q> :action FindUsages<CR>
 
 " Editing
