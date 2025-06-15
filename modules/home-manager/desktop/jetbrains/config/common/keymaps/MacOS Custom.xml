@@ -90,6 +90,9 @@
     <keyboard-shortcut first-keystroke="shift alt j" />
   </action>
   <action id="NextProjectWindow" />
+  <action id="NextTab">
+    <keyboard-shortcut first-keystroke="shift meta close_bracket" />
+  </action>
   <action id="OpenFile">
     <keyboard-shortcut first-keystroke="alt f" second-keystroke="o" />
   </action>
@@ -104,6 +107,9 @@
     <keyboard-shortcut first-keystroke="shift alt k" />
   </action>
   <action id="PreviousProjectWindow" />
+  <action id="PreviousTab">
+    <keyboard-shortcut first-keystroke="shift meta open_bracket" />
+  </action>
   <action id="QuickJavaDoc">
     <keyboard-shortcut first-keystroke="ctrl j" />
     <mouse-shortcut keystroke="control button2" />
