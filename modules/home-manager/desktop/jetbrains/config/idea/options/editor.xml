@@ -6,6 +6,7 @@
     <option name="ADD_UNAMBIGIOUS_IMPORTS_ON_THE_FLY" value="true" />
     <EXCLUDED_PACKAGE NAME="org.assertj.core.api.AssertionsForClassTypes" />
     <EXCLUDED_PACKAGE NAME="org.assertj.core.api.AssertionsForInterfaceTypes" />
+    <EXCLUDED_PACKAGE NAME="org.assertj.core.api.BDDAssumptions" />
     <EXCLUDED_PACKAGE NAME="org.assertj.core.api.ClassBasedNavigableIterableAssert" />
     <EXCLUDED_PACKAGE NAME="org.assertj.core.api.ClassBasedNavigableListAssert" />
     <EXCLUDED_PACKAGE NAME="org.assertj.core.api.FactoryBasedNavigableIterableAssert" />
@@ -92,6 +93,9 @@
   </component>
   <component name="InlineCompletionOnboarding">
     <option name="onboardingFinished" value="true" />
+  </component>
+  <component name="JetEditorOptions">
+    <option name="donTShowConversionDialog" value="true" />
   </component>
   <component name="SqlCodeCompletionSettings" AUTO_ALIAS_TABLE="true" INVERT_ON_ORDER="true">
     <option name="autoAliasTable" value="true" />
