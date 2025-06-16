@@ -1,1 +1,6 @@
-{}
+{
+  "format-prettier": {
+    "body": "\"format\": \"prettier --ignore-pattern .gitignore --write \\\"**/*.+(js|jsx|json|yml|yaml|css|md)\\\"\",",
+    "prefix": "format-prettier"
+  }
+}
