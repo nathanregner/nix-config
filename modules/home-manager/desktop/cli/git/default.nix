@@ -106,8 +106,5 @@
   home.packages = with pkgs.unstable; [
     difftastic
     git-filter-repo
-    (writers.writeNuBin "g-" ''
-      cd (git rev-parse --show-toplevel)
-    '')
   ];
 }
