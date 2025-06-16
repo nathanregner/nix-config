@@ -103,10 +103,6 @@
       ];
   };
 
-  programs.zsh.initContent = ''
-    alias for-each-repo="~/configs/nix-config/modules/home-manager/desktop/cli/git/for-each-repo.nu"
-  '';
-
   home.packages = with pkgs.unstable; [
     difftastic
     git-filter-repo
