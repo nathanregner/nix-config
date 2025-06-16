@@ -12,11 +12,10 @@ vim.diagnostic.config({
 
 vim.opt.listchars = "eol:$,space:-,tab:>#,trail:~"
 
-local function find_git_root()
+local function get_buffer_cwd()
   -- Use the current buffer's path as the starting point for the git search
   local current_file = vim.api.nvim_buf_get_name(0)
   current_file = string.gsub(current_file, "^oil://", "")
-  local current_dir
   local cwd = vim.fn.getcwd()
   -- If the buffer is not associated with a file, return nil
   if current_file == "" then
@@ -25,12 +24,17 @@ local function find_git_root()
     -- Extract the directory from the current file's path
     current_dir = vim.fn.fnamemodify(current_file, ":h")
   end
+  return current_dir
+end
+
+local function get_git_root(current_dir)
+  if current_dir == nil then current_dir = get_buffer_cwd() end
 
   -- Find the Git root directory from the current file's path
   local git_root = vim.fn.systemlist("git -C " .. vim.fn.escape(current_dir, " ") .. " rev-parse --show-toplevel")[1]
   if vim.v.shell_error ~= 0 then
     print("Not a git repository. Searching on current working directory")
-    return cwd
+    return nil
   end
   return git_root
 end
@@ -813,6 +817,24 @@ require("lazy").setup({
             if choice == 1 then oil.save() end
           end
           oil.close()
+        end,
+        ["gd"] = {
+          desc = "Toggle file detail view",
+          callback = function()
+            detail = not detail
+            if detail then
+              require("oil").set_columns({ "icon", "permissions", "size", "mtime" })
+            else
+              require("oil").set_columns({ "icon" })
+            end
+          end,
+        },
+        ["g-"] = function()
+          local oil = require("oil")
+          local cwd = oil.get_current_dir()
+          local git_root = get_git_root(cwd)
+          if git_root == cwd then git_root = get_git_root(vim.fs.dirname(git_root)) end
+          if git_root then oil.open(git_root) end
         end,
       },
     },
