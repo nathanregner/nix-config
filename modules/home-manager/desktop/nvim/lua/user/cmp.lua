@@ -38,6 +38,24 @@ local lspkind = require("lspkind")
 
 local compare = cmp.config.compare
 
+---@param entry cmp.Entry
+local is_emmet_snippet = function(entry)
+  return entry.source.source.client and entry.source.source.client.name == "emmet_language_server"
+end
+
+---offset: Entries with smaller offset will be ranked higher.
+---@type cmp.ComparatorFunction
+local penalize_emmet = function(entry1, entry2)
+  -- if
+  --   entry1.completion_item.kind == types.lsp.CompletionItemKind.Snippet
+  --   and entry2.completion_item.kind == types.lsp.CompletionItemKind.Snippet
+  -- then
+  --   if is_emmet_snippet(entry1) and not is_emmet_snippet(entry2) then return false end
+  --   if is_emmet_snippet(entry2) and not is_emmet_snippet(entry1) then return true end
+  -- end
+  return nil
+end
+
 cmp.setup({
   completion = { completeopt = "menu,menuone,noinsert" },
 
@@ -115,21 +133,13 @@ cmp.setup({
   sorting = {
     priority_weight = 2,
     comparators = {
-      -- cmp.config.compare.exact,
-      -- cmp.config.compare.score,
-      -- cmp.config.compare.recently_used,
-      -- cmp.config.compare.offset,
-      -- cmp.config.compare.kind,
-
-      -- compare.score_offset, -- not good at all
+      -- penalize_emmet,
       compare.exact,
       compare.score, -- based on :  score = score + ((#sources - (source_index - 1)) * sorting.priority_weight)
       compare.locality,
       compare.recently_used,
       compare.offset,
-      -- compare.scopes, -- what?
       compare.sort_text,
-      -- compare.kind,
     },
   },
   sources = {

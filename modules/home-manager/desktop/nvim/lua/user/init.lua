@@ -386,6 +386,7 @@ require("lazy").setup({
           root_dir = util.root_pattern("project.clj", "deps.edn", "bb.edn", ".git"),
         },
         -- https://github.com/olrtg/emmet-language-server
+        -- https://code.visualstudio.com/docs/editor/emmet#_emmet-configuration
         emmet_language_server = {
           filetypes = {
             "css",
@@ -393,17 +394,18 @@ require("lazy").setup({
             "javascript",
             "javascriptreact",
             "less",
+            "pug",
             "sass",
             "scss",
-            "pug",
             "typescriptreact",
+            "xml",
           },
           init_options = {
             showSuggestionsAsSnippets = true,
-            showExpandedAbbreviation = "inMarkupAndStylesheetFilesOnly",
+            showExpandedAbbreviation = "always",
             includeLanguages = {
               javascript = "javascriptreact",
-              typescript = "typescriptreact",
+              -- typescript = "typescriptreact",
             },
           },
         },

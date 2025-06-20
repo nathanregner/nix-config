@@ -1,6 +1,6 @@
 {
   # buildGraalvmNativeImage,
-  jre_headless,
+  jre,
   maven,
   writeShellApplication,
   ...
@@ -22,7 +22,7 @@ let
 in
 writeShellApplication {
   name = "spring-javaformat";
-  runtimeInputs = [ jre_headless ];
+  runtimeInputs = [ jre ];
   text = ''
     java -jar ${jar} "$@"
   '';

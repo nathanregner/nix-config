@@ -43,38 +43,49 @@ local expression = [[
 
 -- require("luasnip.session.snippet_collection").clear_snippets("javascript") -- TODO
 
--- -- ls.filetype_extend("ecma", { "javascript", "typescript", "javascriptreact", "typescriptreact" })
+-- ls.filetype_extend("ecma", { "javascript", "typescript", "javascriptreact", "typescriptreact" })
 -- ls.filetype_extend("javascript", { "ecma" })
-ls.filetype_extend("javascriptreact", { "javascript" })
+-- ls.filetype_extend("javascriptreact", { "ecma" })
+-- -- ls.filetype_extend("javascriptreact", { "javascript" })
 -- ls.filetype_extend("typescript", { "ecma" })
-ls.filetype_extend("typescriptreact", { "typescript" })
+-- ls.filetype_extend("typescriptreact", { "ecma" })
+-- -- ls.filetype_extend("typescriptreact", { "typescript" })
 
 local snippets = {
-  typescript = {},
   javascript = {},
+  javascriptreact = {},
+  typescript = {},
+  typescriptreact = {},
 }
 
-local create_postfix = function(opts)
-  for _, lang in ipairs(opts.langs or { "javascript", "typescript" }) do
-    local snippet = treesitter_postfix({
-      trig = opts.trig,
-      matchTSNode = {
-        query = opts.query,
-        query_lang = lang,
-      },
-      reparseBuffer = "live",
-    }, {
-      d(1, function(_, parent)
-        local match = parent.snippet.env.LS_TSMATCH
-        return opts.expand(match)
-      end),
-    })
-    table.insert(snippets[lang], snippet)
+local ft_ts_lang = {
+  javascriptreact = "javascript",
+  typescriptreact = "typescript",
+}
+
+local define_postfix = function(opts)
+  for _, lang in ipairs(opts.langs or { "javascript", "javascriptreact", "typescript", "typescriptreact" }) do
+    for _, trig in ipairs(opts.trig) do
+      local snippet = treesitter_postfix({
+        trig = trig,
+        matchTSNode = {
+          query = opts.query,
+          query_lang = ft_ts_lang[lang] or lang,
+        },
+        reparseBuffer = "live",
+      }, {
+        d(1, function(_, parent)
+          local match = parent.snippet.env.LS_TSMATCH
+          return opts.expand(match)
+        end),
+      })
+      table.insert(snippets[lang], snippet)
+    end
   end
 end
 
-create_postfix({
-  trig = ".clv",
+define_postfix({
+  trig = { ".clv", ".logv" },
   query = [[
         [
           (identifier)
@@ -84,22 +95,22 @@ create_postfix({
   expand = function(match) return sn(nil, fmt("console.log('{1}', {1});", { t(match) })) end,
 })
 
-create_postfix({
-  trig = ".cl",
+define_postfix({
+  trig = { ".cl", ".log" },
   query = expression,
   expand = function(match) return sn(nil, fmt("console.log({1});", { t(match) })) end,
 })
 
-create_postfix({
-  trig = ".forof",
+define_postfix({
+  trig = { ".forof" },
   query = expression,
   expand = function(match)
     return sn(nil, fmt("for (const {} of {}) {{\n  {}\n}}", { i(1, "iterator"), t(match), i(2, {}, "") }))
   end,
 })
 
-create_postfix({
-  trig = ".json",
+define_postfix({
+  trig = { ".json" },
   query = expression,
   expand = function(match) return sn(nil, fmt("JSON.stringify({}, undefined, 2)", { t(match) })) end,
 })
@@ -110,3 +121,8 @@ for lang, lang_snippets in pairs(snippets) do
     default_priority = 1000,
   })
 end
+
+-- require("luasnip").get_snippets("javascriptreact")
+
+-- require("luasnip.session").loaded_fts
+-- require("luasnip.session").ft_redirect

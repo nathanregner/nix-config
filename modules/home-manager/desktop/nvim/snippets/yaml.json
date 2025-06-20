@@ -12,5 +12,9 @@
       "  sphere-staging: sphere",
       "  sphere-prod: sphere"
     ]
+  },
+  "ecr-image-nregner": {
+    "body": "image: 557126177626.dkr.ecr.us-west-2.amazonaws.com/nregner",
+    "prefix": "ecr-image-nregner"
   }
 }
