@@ -29,6 +29,7 @@
     xkb.variant = "";
   };
 
+  # TODO: Launch directly
   programs.hyprland = {
     enable = true;
     package = pkgs.unstable.hyprland;
