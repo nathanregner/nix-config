@@ -29,7 +29,7 @@
       }
       {
         name = "desc:Ancor Communications Inc VG248 J6LMQS041978";
-        resolution = "1920x1080@144";
+        resolution = "1920x1080@60";
         position = "1920x0";
         workspaces = [
           6
