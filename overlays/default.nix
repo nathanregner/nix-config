@@ -63,13 +63,6 @@ let
       ]
       ++ (lib.lists.tail (prev.nix-update-script args));
 
-    # FIXME https://github.com/NixOS/nixpkgs/issues/418689
-    python3 = prev.python3.override {
-      packageOverrides = pyfinal: pyprev: {
-        lxml = prev.python3.pkgs.callPackage ./lxml { };
-      };
-    };
-
     wrapNeovimUnstable =
       args: neovim-unwrapped:
       (prev.wrapNeovimUnstable args neovim-unwrapped).overrideAttrs {
