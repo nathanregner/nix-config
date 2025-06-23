@@ -1,4 +1,4 @@
-{ outputs }:
+{ inputs, outputs }:
 {
   config = {
     allowUnfree = true;
@@ -7,6 +7,7 @@
   };
 
   overlays = [
+    inputs.devshell.overlays.default
     outputs.overlays.additions
     outputs.overlays.modifications
     outputs.overlays.unstable-packages
