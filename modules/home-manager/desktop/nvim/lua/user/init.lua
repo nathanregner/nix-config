@@ -267,10 +267,12 @@ require("lazy").setup({
           },
         },
         config = function()
+          require("luasnip").config.setup({ enable_autosnippets = true })
           require("luasnip.loaders.from_vscode").lazy_load()
           require("luasnip.loaders.from_vscode").lazy_load({
             paths = { vim.fn.stdpath("config") .. "/snippets" },
           })
+          require("user.snippets")
         end,
       }),
       "saadparwaiz1/cmp_luasnip",
