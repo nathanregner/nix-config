@@ -4,27 +4,33 @@
   config,
 }:
 {
-  default = pkgs.mkShellNoCC {
-    inputsFrom = [
+  default = pkgs.devshell.mkShell {
+    packagesFrom = [
       config.treefmt.build.devShell
     ];
     packages = with pkgs.unstable; [
       inputs'.deploy-rs.packages.default
       local.generate-sops-keys
       sops
-      tenv
+      # tenv
     ];
   };
 
-  bootstrap = pkgs.mkShellNoCC {
-    NIX_CONFIG = "experimental-features = nix-command flakes";
-    nativeBuildInputs = with pkgs.unstable; [
-      nixVersions.latest
-      git
+  bootstrap = pkgs.devshell.mkShell {
+    env = [
+      {
+        name = "NIX_CONFIG";
+        value = "experimental-features = nix-command flakes";
+      }
     ];
-    packages = [
-      pkgs.local.generate-sops-keys
-      inputs'.home-manager.packages.home-manager
-    ] ++ pkgs.lib.optionals pkgs.stdenv.isDarwin [ inputs'.nix-darwin.packages.darwin-rebuild ];
+    packages =
+      with pkgs.unstable;
+      [
+        nixVersions.latest
+        git
+        pkgs.local.generate-sops-keys
+        inputs'.home-manager.packages.home-manager
+      ]
+      ++ pkgs.lib.optionals pkgs.stdenv.isDarwin [ inputs'.nix-darwin.packages.darwin-rebuild ];
   };
 }

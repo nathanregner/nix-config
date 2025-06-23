@@ -23,6 +23,10 @@
       url = "github:serokell/deploy-rs";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    devshell = {
+      url = "github:numtide/devshell";
+      inputs.nixpkgs.follows = "nixpkgs-unstable";
+    };
     disko = {
       url = "github:nix-community/disko";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -128,7 +132,7 @@
         {
           # apply overlays to flake-parts: https://flake.parts/overlays#consuming-an-overlay
           _module.args.pkgs = import inputs.nixpkgs-unstable (
-            { inherit system; } // (import ./nixpkgs.nix { inherit outputs; })
+            { inherit system; } // (import ./nixpkgs.nix { inherit inputs outputs; })
           );
 
           devShells = import ./shells.nix {

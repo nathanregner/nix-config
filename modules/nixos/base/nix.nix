@@ -1,12 +1,13 @@
 {
-  outputs,
+  inputs,
   config,
-  lib,
   pkgs,
+  lib,
+  outputs,
   ...
 }:
 {
-  nixpkgs = import ../../../nixpkgs.nix { inherit outputs; };
+  nixpkgs = import ../../../nixpkgs.nix { inherit inputs outputs; };
 
   nix = {
     package = pkgs.unstable.nixVersions.latest;

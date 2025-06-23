@@ -1,4 +1,4 @@
-{ outputs, ... }:
+{ inputs, outputs, ... }:
 {
   imports = [
     ../base
@@ -15,7 +15,7 @@
   ];
 
   # standalone install - reimport nixpkgs
-  nixpkgs = import ../../../nixpkgs.nix { inherit outputs; };
+  nixpkgs = import ../../../nixpkgs.nix { inherit inputs outputs; };
 
   # Allow home-manager to manage itself
   programs.home-manager.enable = true;
