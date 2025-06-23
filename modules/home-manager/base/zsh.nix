@@ -36,7 +36,7 @@
 
         nr = "${nixRebuild} --flake .";
         nrb = "${nr} build";
-        snr = if pkgs.stdenv.isDarwin then "sudo ${nr}" else "${nr} --use-remote-sudo";
+        snr = if pkgs.stdenv.isDarwin then "sudo ${nr}" else "${nr} --sudo";
         snrb = "${snr} boot";
         snrs = "${snr} switch";
         snrt = "${snr} test";
@@ -44,7 +44,7 @@
         hm = "home-manager --flake .";
         hmb = "${hm} build";
         hms = "${hm} switch";
-        "g-" = "cd $(git rev-parse --show-toplevel)";
+        "g-" = ''cd "$(git rev-parse --show-toplevel)"'';
 
         # https://www.reddit.com/r/NixOS/comments/8m1n3d/comment/dzkfwhl/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button
         "nix-stray-roots" =
