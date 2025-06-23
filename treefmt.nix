@@ -28,7 +28,7 @@
         def main [...paths: string] {
           for path in $paths {
             let contents = ${pkgs.joker}/bin/joker --format $path
-            $contents | save -f $path
+            $"($contents)\n" | save -f $path
           }
         }
       '';
