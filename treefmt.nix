@@ -24,16 +24,14 @@
 
   settings.formatter = {
     joker = {
-      command = "${pkgs.bash}/bin/bash";
-      options = [
-        "-euc"
-        ''
-          for file in "$@"; do
-            ${pkgs.joker}/bin/joker --format $file | ${pkgs.moreutils}/bin/sponge $file
-          done
-        ''
-        "--" # bash swallows the second argument when using -c
-      ];
+      command = pkgs.writers.writeNuBin "treefmt-joker" ''
+        def main [...paths: string] {
+          for path in $paths {
+            let contents = ${pkgs.joker}/bin/joker --format $path
+            $contents | save -f $path
+          }
+        }
+      '';
       includes = [ "*.clj" ];
     };
   };
