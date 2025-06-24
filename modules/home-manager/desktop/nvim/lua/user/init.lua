@@ -471,7 +471,7 @@ require("lazy").setup({
             -- diagnostics = { disable = { 'missing-fields' } },
           },
         },
-        -- nil_ls = {},
+        nil_ls = {},
         nixd = {},
         nushell = {},
         omnisharp = {
