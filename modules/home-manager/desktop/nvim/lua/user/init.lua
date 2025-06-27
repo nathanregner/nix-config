@@ -10,7 +10,15 @@ vim.diagnostic.config({
   virtual_text = { current_line = true },
 })
 
-vim.opt.listchars = "eol:$,space:-,tab:>#,trail:~"
+vim.opt.listchars = "tab:\\t,extends:>,precedes:<,trail:·"
+
+-- auto-reload files when modified externally
+-- https://unix.stackexchange.com/a/383044
+vim.o.autoread = true
+vim.api.nvim_create_autocmd({ "BufEnter", "CursorHold", "CursorHoldI", "FocusGained" }, {
+  command = "if mode() != 'c' | checktime | endif",
+  pattern = { "*" },
+})
 
 local function get_buffer_cwd()
   -- Use the current buffer's path as the starting point for the git search
