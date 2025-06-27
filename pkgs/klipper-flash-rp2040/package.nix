@@ -31,7 +31,7 @@ let
           cp out/klipper.elf $out
         '';
 
-        meta.platforms = lib.platforms.unix;
+        meta.platforms = lib.platforms.linux;
       };
 in
 writeShellApplication {
