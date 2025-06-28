@@ -7,8 +7,12 @@
 {
   programs.firefox = {
     enable = true;
-    package = if pkgs.stdenv.isDarwin then null else pkgs.unstable.firefox-devedition-bin;
+    package = pkgs.unstable.firefox-devedition;
     # name must start with "dev-edition-"? https://github.com/nix-community/home-manager/issues/4703
+    profiles.default = {
+      id = 1;
+      isDefault = false;
+    };
     profiles.dev-edition-default = {
       extensions.packages = [ pkgs.local.firefox-extensions.aws-cli-sso ];
       settings = {

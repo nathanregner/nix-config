@@ -82,6 +82,8 @@ in
             stylua
             taplo
             ;
+
+          inherit (pkgs.unstable) git;
         }
         // lib.optionalAttrs pkgs.stdenv.isLinux {
           inherit (pkgs.unstable)
