@@ -21,7 +21,7 @@
   home = {
     username = "nregner";
     homeDirectory = "/Users/nregner";
-    flakePath = "/Users/nregner/nix-config";
+    flakePath = "/Users/nregner/nix-config/local";
     # Use a case-sensitive file system for nix builds
     sessionVariables = {
       TMPDIR = "/Volumes/tmp";

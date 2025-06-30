@@ -6,21 +6,17 @@
   writeText,
 }:
 let
-  targets = writeText "packages.json" (
-    builtins.toJSON (
-      import ./find-pkgs.nix {
-        inherit lib;
-        pkgs = outputs.packages.${stdenv.hostPlatform.system};
-      }
-    )
-  );
+  targets = import ./find-pkgs.nix {
+    inherit lib;
+    pkgs = outputs.packages.${stdenv.hostPlatform.system};
+  };
 in
 writeBabashkaApplication {
   name = "update-pkgs";
   text = builtins.readFile ./update_pkgs.clj;
 
   passthru = {
-    inherit targets;
+    targets = writeText "packages.json" (builtins.toJSON targets);
     attrs = builtins.attrNames targets;
   };
 }
