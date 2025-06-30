@@ -67,6 +67,7 @@
   <action id="Git.Branches">
     <keyboard-shortcut first-keystroke="shift ctrl back_quote" />
   </action>
+  <action id="Git.CreateNewBranch" />
   <action id="Git.Fetch">
     <keyboard-shortcut first-keystroke="shift meta g" second-keystroke="shift meta f" />
   </action>
