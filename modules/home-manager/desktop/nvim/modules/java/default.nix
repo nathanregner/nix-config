@@ -30,11 +30,7 @@ in
       ];
 
       lua.globals.jdtls = {
-        # https://projectlombok.org/changelog
-        lombok = pkgs.fetchurl {
-          url = "https://repo1.maven.org/maven2/org/projectlombok/lombok/1.18.38/lombok-1.18.38.jar";
-          sha256 = "sha256-Hh5CfDb/Y8RP0w7yktnnc+oxVEYKtiZdP+1+b1vFD7k=";
-        };
+        lombok = pkgs.local.lombok;
         settings = {
           java = {
             format.settings.url = "file://${config.xdg.configHome}/${formatterConfigPath}";
