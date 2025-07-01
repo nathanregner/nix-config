@@ -62,8 +62,6 @@
   };
 
   services.oauth2-proxy = {
-    nginx.virtualHosts."grafana.nregner.net" = {
-      allowed_emails = [ "nathanregner@gmail.com" ];
-    };
+    nginx.virtualHosts."grafana.nregner.net" = { };
   };
 }
