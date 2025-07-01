@@ -38,9 +38,7 @@
   };
 
   services.oauth2-proxy = {
-    nginx.virtualHosts."git.nregner.net" = {
-      allowed_emails = [ "nathanregner@gmail.com" ];
-    };
+    nginx.virtualHosts."git.nregner.net" = { };
   };
 
   sops.secrets.gitea-github-mirror = { };
