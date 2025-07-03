@@ -231,9 +231,8 @@ require("lazy").setup({
 
   {
     "AndrewRadev/bufferize.vim",
-    keys = {
-      -- { "<leader>n", function() vim.cmd("Bufferize Fidget history") end, desc = "Notification History" },
-    },
+    event = "CmdlineEnter",
+    config = function() vim.api.nvim_create_user_command("Msgs", "Bufferize messages", { desc = "Bufferize messages" }) end,
   },
 
   { "towolf/vim-helm", ft = "helm" },
