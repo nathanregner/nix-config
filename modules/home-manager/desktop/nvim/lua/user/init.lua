@@ -129,41 +129,9 @@ require("lazy").setup({
 
   -- Autoclose/Autoescape
   {
-    "altermo/ultimate-autopair.nvim",
-    event = { "InsertEnter", "CmdlineEnter" },
-    branch = "v0.6",
-    opts = function()
-      return {
-        cmap = false,
-        close = {
-          enable = true,
-          map = "<C-S-Enter>",
-          cmap = "<C-S-Enter>",
-          conf = {},
-        },
-        extensions = {
-          cond = {
-            cond = function(fn) return not fn.in_node("comment") end,
-          },
-          filetype = { nft = { "TelescopePrompt", "snacks_picker_input" } },
-        },
-        internal_pairs = {
-          {
-            "''",
-            "''",
-            newline = true,
-            ft = { "nix" },
-            cond = function(fn)
-              return not fn.in_node({
-                "indented_string_expression",
-                "string_fragment",
-              })
-            end,
-          },
-          unpack(require("ultimate-autopair.default").conf.internal_pairs),
-        },
-      }
-    end,
+    "windwp/nvim-autopairs",
+    event = "InsertEnter",
+    config = function() require("user.pairs") end,
   },
 
   {
