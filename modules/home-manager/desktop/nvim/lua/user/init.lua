@@ -130,40 +130,35 @@ require("lazy").setup({
 
   -- Autoclose/Autoescape
   {
-    "altermo/ultimate-autopair.nvim",
-    event = { "InsertEnter", "CmdlineEnter" },
-    branch = "v0.6",
-    opts = function()
-      return {
-        cmap = false,
-        close = {
-          enable = true,
-          map = "<C-S-Enter>",
-          cmap = "<C-S-Enter>",
-          conf = {},
-        },
-        extensions = {
-          cond = {
-            cond = function(fn) return not fn.in_node("comment") end,
-          },
-          filetype = { nft = { "TelescopePrompt", "snacks_picker_input" } },
-        },
-        --[[ internal_pairs = {
-          {
-            "''",
-            "''",
-            newline = true,
-            ft = { "nix" },
-            cond = function(fn)
-              return not fn.in_node({
-                "indented_string_expression",
-                "string_fragment",
-              })
-            end,
-          },
-          unpack(require("ultimate-autopair.default").conf.internal_pairs),
-        }, ]]
-      }
+    "windwp/nvim-autopairs",
+    event = "InsertEnter",
+    config = function()
+      local npairs = require("nvim-autopairs")
+      local Rule = require("nvim-autopairs.rule")
+      local cond = require("nvim-autopairs.conds")
+
+      npairs.setup({
+        disabled_filetype = { "TelescopePrompt", "snacks_picker_input" },
+        check_ts = true,
+        break_undo = true,
+      })
+
+      -- https://github.com/windwp/nvim-autopairs/wiki/Custom-rules
+
+      -- lisp quoting
+      table.insert(npairs.get_rules("'")[1].not_filetypes, { "clojure", "lisp" })
+
+      -- generics
+      npairs.add_rule(Rule("<", ">", {
+        "-html",
+        "-javascriptreact",
+        "-typescriptreact",
+        "-xml",
+      }):with_pair(
+        -- regex will make it so that it will auto-pair on `a<` but not `a <`
+        -- The `:?:?` part makes it also work on Rust generics like `some_func::<T>()`
+        cond.before_regex("%a+:?:?$", 3)
+      ):with_move(function(opts) return opts.char == ">" end))
     end,
   },
 
