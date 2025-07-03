@@ -1,0 +1,195 @@
+diff --git c/lua/tssorter/sorter.lua i/lua/tssorter/sorter.lua
+index a9e55e6..08e843d 100644
+--- c/lua/tssorter/sorter.lua
++++ i/lua/tssorter/sorter.lua
+@@ -7,6 +7,7 @@ local M = {}
+ ---@class SorterOpts
+ ---@field sortable? string
+ ---@field reverse? boolean
++---@field range? 'paragraph' | Range
+ 
+ --- Return a list of lines from the given nodes
+ ---@param nodes TSNode[]
+@@ -122,6 +123,36 @@ local function place_sorted_lines_in_pos(sorted_lines, positions)
+   -- TODO: clean up extmarks?
+ end
+ 
++---@return Range4
++local function get_current_paragraph()
++  local start_line = vim.api.nvim_win_get_cursor(0)[1]
++  print('curr', start_line)
++
++  local end_line = start_line
++
++  while start_line > 1 do
++    local line = vim.api.nvim_buf_get_lines(0, start_line - 2, start_line - 1, false)[1]
++    if line == '' then
++      break
++    end
++    start_line = start_line - 1
++  end
++
++  local total_lines = vim.api.nvim_buf_line_count(0)
++  while end_line < total_lines do
++    local line = vim.api.nvim_buf_get_lines(0, end_line, end_line + 1, false)[1]
++    if line == '' then
++      print('line', line)
++      break
++    end
++    end_line = end_line + 1
++  end
++
++  -- start: convert to 0-indexed to match TSNode
++  -- end: inclusive
++  return { start_line - 1, 0, end_line, 0 }
++end
++
+ --- Main function of sorter, by default sorts current line under
+ ---@param opts SorterOpts
+ M.sort = function(opts)
+@@ -148,7 +179,15 @@ M.sort = function(opts)
+     sortables = sortables,
+   })
+ 
+-  local sortable_name, sortable_nodes = tshelper.find_sortables(sortables)
++  ---@type Range
++  local range
++  if opts.range == 'paragraph' then
++    range = get_current_paragraph()
++  else
++    range = opts.range
++  end
++
++  local sortable_name, sortable_nodes = tshelper.find_sortables(sortables, range)
+ 
+   logger.trace('Returned from find_sortables', { num_nodes = sortable_nodes and #sortable_nodes or 0 })
+ 
+diff --git c/lua/tssorter/tshelper.lua i/lua/tssorter/tshelper.lua
+index 881d705..4948415 100644
+--- c/lua/tssorter/tshelper.lua
++++ i/lua/tssorter/tshelper.lua
+@@ -193,11 +193,69 @@ M.get_text = function(node)
+   return vim.trim(lines)
+ end
+ 
++--- stolen from vim.treesitter._range
++---@param a_row integer
++---@param a_col integer
++---@param b_row integer
++---@param b_col integer
++---@return integer
++--- 1: a > b
++--- 0: a == b
++--- -1: a < b
++local function cmp_pos(a_row, a_col, b_row, b_col)
++  if a_row == b_row then
++    if a_col > b_col then
++      return 1
++    elseif a_col < b_col then
++      return -1
++    else
++      return 0
++    end
++  elseif a_row > b_row then
++    return 1
++  end
++
++  return -1
++end
++
++--- stolen from vim.treesitter._range
++---@param r Range
++---@return integer, integer, integer, integer
++local function unpack4(r)
++  if #r == 2 then
++    return r[1], 0, r[2], 0
++  end
++  local off_1 = #r == 6 and 1 or 0
++  return r[1], r[2], r[3 + off_1], r[4 + off_1]
++end
++
++--- stolen from vim.treesitter._range
++---@param r1 Range
++---@param r2 Range
++---@return boolean whether r1 contains r2
++local function contains(r1, r2)
++  local srow_1, scol_1, erow_1, ecol_1 = unpack4(r1)
++  local srow_2, scol_2, erow_2, ecol_2 = unpack4(r2)
++
++  -- start doesn't fit
++  if cmp_pos(srow_1, scol_1, srow_2, scol_2) == 1 then
++    return false
++  end
++
++  -- end doesn't fit
++  if cmp_pos(erow_1, ecol_1, erow_2, ecol_2) == -1 then
++    return false
++  end
++
++  return true
++end
++
+ --- Look for the nearest sortable under the current node
+ ---@param sortables SortableCfg
++---@param range? Range
+ ---@return string? sortable_name
+ ---@return TSNode[]?
+-M.find_sortables = function(sortables)
++M.find_sortables = function(sortables, range)
+   local name, sortable_node = find_nearest_sortable(sortables)
+ 
+   if not sortable_node then
+@@ -205,6 +263,28 @@ M.find_sortables = function(sortables)
+     return
+   end
+ 
++  local in_range = function()
++    return true
++  end
++  if range then
++    ---@param node TSNode
++    in_range = function(node)
++      vim.print('check node', {
++        range,
++        vim.treesitter.get_node_text(node, 0),
++        { vim.treesitter.get_range(node) },
++        { unpack4(vim.treesitter.get_range(node)) },
++        contains(range, vim.treesitter.get_range(node)),
++      })
++      return contains(range, vim.treesitter.get_range(node))
++    end
++  end
++
++  if not in_range(sortable_node) then
++    logger.warn('Node out of range')
++    return
++  end
++
+   local parent = sortable_node:parent()
+ 
+   if not parent then
+@@ -216,7 +296,7 @@ M.find_sortables = function(sortables)
+   local target_type = sortable_node:type()
+ 
+   for possible_sortable in parent:iter_children() do
+-    if possible_sortable:type() == target_type then
++    if possible_sortable:type() == target_type and in_range(possible_sortable) then
+       table.insert(sortable_nodes, possible_sortable)
+     end
+   end
+diff --git c/test/test.lua i/test/test.lua
+index 60b572d..48a3741 100644
+--- c/test/test.lua
++++ i/test/test.lua
+@@ -3,9 +3,10 @@
+ local array_vals = { 'val1', 'first item', 'zee last item', 'some middle item' }
+ 
+ local array_vals = {
+-  'val1',
+   'first item',
++  'val1',
+   'zee last item',
++
+   'some middle item',
+ }
+ 
