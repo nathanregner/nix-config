@@ -5,6 +5,19 @@
 }:
 let
   parserPrefix = "nvim/nvim-treesitter";
+
+  grammarOverrides = {
+    # # FIXME: https://github.com/nix-community/tree-sitter-nix/pull/131
+    # nix = old: {
+    #   src = pkgs.fetchFromGitHub {
+    #     owner = "nix-community";
+    #     repo = "tree-sitter-nix";
+    #     rev = "6c986c0076cebde9169fe8aedecbac0ecf5b9f24";
+    #     hash = "sha256-HOfRadzgjRR3HZR/i0+tx130INTMvcDmc4n/4XExSDY=";
+    #   };
+    # };
+  };
+
   package = pkgs.unstable.vimPlugins.nvim-treesitter.withAllGrammars.overrideAttrs (old: {
     patches = old.patches or [ ] ++ [
       (pkgs.fetchpatch {
@@ -37,11 +50,13 @@ in
       grammar:
       let
         language = builtins.elemAt (builtins.match "vimplugin-treesitter-grammar-(.*)" grammar.name) 0;
+        override = grammarOverrides.${language} or null;
+        finalGrammar = if override != null then grammar.overrideAttrs override else grammar;
       in
       {
         name = "${parserPrefix}/parser/${language}.so";
         value = {
-          source = "${grammar}/parser/${language}.so";
+          source = "${finalGrammar}/parser/${language}.so";
           force = true;
         };
       }
