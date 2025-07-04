@@ -127,20 +127,23 @@ return {
     end,
   },
   {
-    "mtrajano/tssorter.nvim",
+    -- "mtrajano/tssorter.nvim",
+    "nathanregner/tssorter.nvim",
     keys = function()
       return {
-        { "<leader>st", require("tssorter").sort, desc = "[S]ort [t]ree" },
+        { "<leader>st", function() require("tssorter").sort({ range = "paragraph" }) end, desc = "[S]ort [t]ree" },
+        { "<leader>sT", require("tssorter").sort, desc = "[S]ort full [t]ree" },
       }
     end,
     opts = {
       sortables = {
         graphql = {
           argument = { node = "argument", ordinal = "name" },
-          field = { node = "field_definition", ordinal = "name" },
-          fragments = { node = "definition", ordinal = "fragment_definition" },
           selection = { node = "selection", ordinal = "name" },
+
+          fragments = { node = "definition", ordinal = "fragment_definition" },
           variable = { node = "variable_definition", ordinal = "name" },
+          field = { node = "field_definition", ordinal = "name" },
         },
         java = {
           annotation_array = { node = "class_literal" },
