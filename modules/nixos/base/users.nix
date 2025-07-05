@@ -20,6 +20,7 @@ in
       ]
       ++ ifTheyExist [
         "docker"
+        "keyd"
         "libvirtd"
         "networkmanager"
         "podman"
