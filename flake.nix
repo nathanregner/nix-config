@@ -9,7 +9,8 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     home-manager-unstable = {
-      url = "github:nix-community/home-manager/master";
+      # FIXME:
+      url = "github:nix-community/home-manager/863842639722dd12ae9e37ca83bcb61a63b36f6c";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
     nix-darwin = {
