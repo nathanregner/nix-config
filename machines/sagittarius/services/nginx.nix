@@ -79,6 +79,10 @@ in
       key = "oauth2-proxy/cookie-secret";
       owner = oauth2-proxy-user;
     };
+    sops.secrets.oauth2-proxy-emails = {
+      key = "oauth2-proxy/emails";
+      owner = oauth2-proxy-user;
+    };
     sops.secrets.oauth2-proxy-google-service-account = {
       key = "oauth2-proxy/google-service-account";
       owner = oauth2-proxy-user;
@@ -95,9 +99,6 @@ in
       nginx = {
         domain = "nregner.net";
       };
-      email.addresses = ''
-        nathanregner@gmail.com
-      '';
       clientID = "397693947419-n7dljfbjdrs7da82o1mpa9fhoafo7467.apps.googleusercontent.com";
       clientSecret = null;
       google = {
@@ -109,6 +110,7 @@ in
       };
       approvalPrompt = "auto";
       extraConfig = {
+        authenticated-emails-file = config.sops.secrets.oauth2-proxy-emails.path;
         client-secret-file = config.sops.secrets.oauth2-proxy-client-secret.path;
       };
       keyFile = config.sops.templates.oauth2-proxy-env.path;
