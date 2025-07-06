@@ -151,8 +151,9 @@ return {
           shorthand = { node = "shorthand_property_identifier" },
         },
         nix = {
-          -- attr = { node = { "identifier" } }, -- inherit(a) b c d;
-          binding = { node = { "binding" }, ordinal = { "attrpath" } }, -- let, attrset
+          -- TODO: inherit(a) b c d;
+          -- attr = { node = { "attr" } },
+          attrset = { node = { "binding" } },
           formal = {
             node = { "formal" },
             order_by = function(node1, node2)
@@ -163,8 +164,6 @@ return {
                 "self",
                 "inputs",
                 "inputs'",
-                "outputs",
-                "outputs'",
                 "sources",
                 "config",
                 "pkgs",
