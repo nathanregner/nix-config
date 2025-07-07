@@ -33,12 +33,6 @@ let
     let
       commonConfig = listFilesRecursive ./config/common;
       appConfig = listFilesRecursive (./config + "/${appName}");
-      plugins = lib.map (plugin: {
-        "JetBrains/${appName}/config/plugins/${plugin.name}.jar" = {
-          source = "${plugin}";
-          force = true;
-        };
-      }) cfg.plugins;
     in
     (map (
       { name, path }:
