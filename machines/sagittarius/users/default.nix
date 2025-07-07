@@ -42,13 +42,18 @@ in
       builtins.attrNames cfg
     );
 
-    systemd.tmpfiles.rules = lib.mapAttrsToList (
-      user: cfg':
-      let
-        inherit (config.users.users.${user}) home;
-      in
-      "d '${home}/${cfg'.backupDir}' 0770 ${user} - - -"
-    ) cfg;
+    systemd.tmpfiles.rules = lib.concatLists (
+      lib.mapAttrsToList (
+        user: cfg':
+        let
+          inherit (config.users.users.${user}) home;
+        in
+        [
+          "d '${home}/${cfg'.backupDir}' 0770 ${user} - - -"
+          "d '/vol/backup/home/${user}' 0770 ${user} - - -"
+        ]
+      ) cfg
+    );
 
     local.services.backup.paths = builtins.mapAttrs (
       user: cfg':

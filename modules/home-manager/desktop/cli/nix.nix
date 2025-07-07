@@ -18,6 +18,7 @@
     nix-diff
     nix-du
     nix-init
+    nix-prefetch
     nix-tree
     nurl
   ];
