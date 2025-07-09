@@ -152,6 +152,9 @@
     <keyboard-shortcut first-keystroke="shift alt n" />
   </action>
   <action id="UsageFiltering.WriteAccess" />
+  <action id="Vcs.GetVersion">
+    <keyboard-shortcut first-keystroke="g" />
+  </action>
   <action id="Vcs.Log.FocusTextFilter" />
   <action id="Vcs.Log.GetVersion">
     <keyboard-shortcut first-keystroke="ctrl meta alt g" />
