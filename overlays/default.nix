@@ -53,6 +53,7 @@ let
       doCheck = false;
     });
 
+    # https://github.com/NixOS/nixpkgs/pull/420949
     jdt-language-server = overrideAttrsThrowIfOutdated prev.jdt-language-server {
       version = "1.48.0";
       src = final.fetchurl {
