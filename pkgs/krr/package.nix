@@ -28,21 +28,18 @@ let
     ) pypkgs-build-requirements
   );
 in
-mkPoetryApplication {
-  # TODO: nvfetcher
+mkPoetryApplication rec {
+  version = "1.24.0";
   projectDir = pkgs.fetchFromGitHub {
     owner = "robusta-dev";
     repo = "krr";
-    rev = "v1.16.0";
-    fetchSubmodules = false;
-    sha256 = "sha256-jPTSp/IBhhWzRg0qjakE7HOCgXAcgFJejePVRFIzAs0=";
+    rev = "v${version}";
+    sha256 = "sha256-2Kj94Co+4JV/ikLBUFqV4BdwFJSzvsbchf6As9U7LpQ=";
   };
   inherit overrides;
 
   dontCheckRuntimeDeps = true;
   doCheck = false;
 
-  passthru = {
-    updateScript = nix-update-script { };
-  };
+  passthru.updateScript = nix-update-script { };
 }
