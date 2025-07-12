@@ -4,13 +4,8 @@
     nixpkgs.url = "github:nixos/nixpkgs/nixos-25.05";
     nixpkgs-unstable.url = "github:nixos/nixpkgs/nixpkgs-unstable";
     nixos-hardware.url = "github:nixos/nixos-hardware";
-    home-manager = {
-      url = "github:nix-community/home-manager/release-25.05";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
     home-manager-unstable = {
-      # FIXME:
-      url = "github:nix-community/home-manager/863842639722dd12ae9e37ca83bcb61a63b36f6c";
+      url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
     nix-darwin = {
@@ -99,7 +94,6 @@
     {
       deploy-rs,
       flake-parts,
-      home-manager,
       home-manager-unstable,
       nix-darwin,
       nixpkgs,
