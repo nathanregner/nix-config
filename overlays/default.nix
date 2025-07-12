@@ -108,7 +108,17 @@ rec {
       inherit (stableFinal) system;
       config.allowUnfree = true;
       overlays = [
-        (_final: _prev: { inherit (stableFinal) local; })
+        (final: prev: {
+          inherit (stableFinal) local;
+
+          nixVersions = prev.nixVersions // {
+            latest = (assertLaterVersion prev.nixVersions.nix_2_30 prev.nixVersions.latest);
+          };
+
+          tailscale = prev.tailscale.overrideAttrs {
+            doCheck = !prev.stdenv.hostPlatform.isDarwin;
+          };
+        })
         sharedModifications
       ];
     };

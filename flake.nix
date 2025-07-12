@@ -9,8 +9,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     home-manager-unstable = {
-      # FIXME:
-      url = "github:nix-community/home-manager/863842639722dd12ae9e37ca83bcb61a63b36f6c";
+      url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
     nix-darwin = {
@@ -99,7 +98,6 @@
     {
       deploy-rs,
       flake-parts,
-      home-manager,
       home-manager-unstable,
       nix-darwin,
       nixpkgs,
