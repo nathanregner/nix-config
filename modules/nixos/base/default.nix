@@ -8,7 +8,7 @@
   imports = [
     inputs.catppuccin-nix.nixosModules.catppuccin
     inputs.nixos-generators.nixosModules.all-formats
-    ./keyd.nix
+    ./keyd
     ./networking.nix
     ./nix.nix
     ./services
@@ -33,8 +33,6 @@
   };
 
   system.configurationRevision = self.rev or self.dirtyRev or null;
-
-  boot.tmp.cleanOnBoot = true;
 
   programs.vim = {
     defaultEditor = true;
