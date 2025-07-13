@@ -1100,16 +1100,23 @@ require("lazy").setup({
           return name
         end
       end
+      vim.api.nvim_create_autocmd("StdinReadPre", {
+        callback = function() vim.g.using_stdin = true end,
+      })
       vim.api.nvim_create_autocmd("VimEnter", {
         callback = function()
-          -- Only load the session if nvim was started with no args
-          if vim.fn.argc(-1) == 0 then
+          -- Only load the session if nvim was started with no args and without reading from stdin
+          if vim.fn.argc(-1) == 0 and not vim.g.using_stdin then
             resession.load(get_session_name(), { dir = "dirsession", silence_errors = true })
           end
         end,
       })
       vim.api.nvim_create_autocmd("VimLeavePre", {
-        callback = function() resession.save(get_session_name(), { dir = "dirsession", notify = false }) end,
+        callback = function()
+          if resession.get_current() ~= nil then
+            resession.save(get_session_name(), { dir = "dirsession", notify = false })
+          end
+        end,
       })
       vim.api.nvim_create_user_command(
         "Mksession",
