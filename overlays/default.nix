@@ -9,6 +9,12 @@ let
       version != pkg.version
     ) "${pkg.pname or "???"} has been updated: ${version} -> ${pkg.version}" pkg;
 
+  assertLaterVersion =
+    final: prev:
+    lib.throwIf (lib.versionAtLeast prev.version final.version)
+      "${prev.pname or "???"} has been updated: ${final.version} -> ${prev.version}"
+      final;
+
   sharedModifications = final: prev: rec {
     # FIXME
     # https://github.com/NixOS/nixpkgs/issues/305779
@@ -108,7 +114,13 @@ rec {
       inherit (stableFinal) system;
       config.allowUnfree = true;
       overlays = [
-        (_final: _prev: { inherit (stableFinal) local; })
+        (final: prev: {
+          inherit (stableFinal) local;
+
+          nixVersions = prev.nixVersions // {
+            latest = (assertLaterVersion prev.nixVersions.nix_2_30 prev.nixVersions.latest);
+          };
+        })
         sharedModifications
       ];
     };
