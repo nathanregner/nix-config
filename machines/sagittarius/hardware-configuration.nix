@@ -12,6 +12,13 @@
     inputs.nixos-hardware.nixosModules.common-pc-ssd
   ];
 
+  assertions = [
+    {
+      assertion = lib.versionAtLeast config.nix.package.version "2.30.0";
+      message = "${config.nix.package.version} < 2.30.0";
+    }
+  ];
+
   boot = {
     loader.systemd-boot.enable = true;
     loader.efi.canTouchEfiVariables = true;
@@ -83,6 +90,14 @@
   fileSystems."/boot" = {
     device = "/dev/disk/by-uuid/A652-29E4";
     fsType = "vfat";
+  };
+
+  fileSystems."/tmp" = {
+    device = "none";
+    fsType = "tmpfs";
+    options = [
+      "size=32G"
+    ];
   };
 
   fileSystems."/vol/data" = {
