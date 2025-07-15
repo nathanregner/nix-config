@@ -1,0 +1,80 @@
+{
+  "args": [
+    "-e",
+    "/nix/store/vj1c3wf9c11a0qs6p3ymfvrnsdgsdcbq-source-stdenv.sh",
+    "/nix/store/shkw4qm9qcw5sc5n1k5jznc83ny02r39-default-builder.sh"
+  ],
+  "builder": "/nix/store/nravshvfviv75plf26nwfwzg8ldl3z8s-bash-5.2p37/bin/bash",
+  "env": {
+    "__darwinAllowLocalNetworking": "",
+    "__impureHostDeps": "/bin/sh /usr/lib/libSystem.B.dylib /usr/lib/system/libunc.dylib /dev/zero /dev/random /dev/urandom /bin/sh",
+    "__propagatedImpureHostDeps": "",
+    "__propagatedSandboxProfile": "",
+    "__sandboxProfile": "",
+    "__structuredAttrs": "",
+    "buildCommand": "mkdir -p $out\n\necho \"25.11\" > $out/hm-version\n\ncp /nix/store/qp2mx3z6x5v251z5xf8jhkgm8igsp5fz-activation-script $out/activate\n\nmkdir $out/bin\nln -s $out/activate $out/bin/home-manager-generation\n\nsubstituteInPlace $out/activate \\\n  --subst-var-by GENERATION_DIR $out\n\nln -s /nix/store/v07s41ic9dhqxc5ykx6cy5fgw9fhlkbf-home-manager-files $out/home-files\nln -s /nix/store/nhdjn4baj60yd86fgz2j11fgd5a5j5c7-home-manager-path $out/home-path\n\ncp \"$extraDependenciesPath\" \"$out/extra-dependencies\"\n\nln -s \"/nix/store/8ma8dljyxfmbpyd1n9x4f66r7j4k6mcf-home-manager-agents\" $out/LaunchAgents\n\n",
+    "buildInputs": "",
+    "builder": "/nix/store/nravshvfviv75plf26nwfwzg8ldl3z8s-bash-5.2p37/bin/bash",
+    "cmakeFlags": "",
+    "configureFlags": "",
+    "depsBuildBuild": "",
+    "depsBuildBuildPropagated": "",
+    "depsBuildTarget": "",
+    "depsBuildTargetPropagated": "",
+    "depsHostHost": "",
+    "depsHostHostPropagated": "",
+    "depsTargetTarget": "",
+    "depsTargetTargetPropagated": "",
+    "doCheck": "",
+    "doInstallCheck": "",
+    "enableParallelBuilding": "1",
+    "enableParallelChecking": "1",
+    "enableParallelInstalling": "1",
+    "extraDependencies": "",
+    "mesonFlags": "",
+    "name": "home-manager-generation",
+    "nativeBuildInputs": "",
+    "out": "/nix/store/7w257nqd8kn59adlwsfmk9sx36z7i91b-home-manager-generation",
+    "outputs": "out",
+    "passAsFile": "buildCommand extraDependencies",
+    "patches": "",
+    "preferLocalBuild": "1",
+    "propagatedBuildInputs": "",
+    "propagatedNativeBuildInputs": "",
+    "stdenv": "/nix/store/h2mfmyzgdjlym84291gqz1v8cc9bsjcw-stdenv-darwin",
+    "strictDeps": "",
+    "system": "aarch64-darwin"
+  },
+  "inputDrvs": {
+    "/nix/store/59g6v42w3pr84v9ry8hgcqpdax2jgfdr-home-manager-path.drv": {
+      "dynamicOutputs": {},
+      "outputs": ["out"]
+    },
+    "/nix/store/8w142jsd3qcz6yyq3594jsr4qvzzsny9-home-manager-agents.drv": {
+      "dynamicOutputs": {},
+      "outputs": ["out"]
+    },
+    "/nix/store/cm2161i35pk8bz79h1cn2w6yil30k6xf-bash-5.2p37.drv": {
+      "dynamicOutputs": {},
+      "outputs": ["out"]
+    },
+    "/nix/store/fr5hiy1cdjdkd7iiim3wwvs1qylfc6ph-stdenv-darwin.drv": {
+      "dynamicOutputs": {},
+      "outputs": ["out"]
+    },
+    "/nix/store/r9dyxs8y7xkppmgili2qskd45fw7wc2d-home-manager-files.drv": {
+      "dynamicOutputs": {},
+      "outputs": ["out"]
+    },
+    "/nix/store/v2f1gm91xiajkmnymw4yynp81d24qr6q-activation-script.drv": {
+      "dynamicOutputs": {},
+      "outputs": ["out"]
+    }
+  },
+  "inputSrcs": [],
+  "name": "home-manager-generation",
+  "outputs": {
+    "out": {}
+  },
+  "system": "aarch64-darwin"
+}

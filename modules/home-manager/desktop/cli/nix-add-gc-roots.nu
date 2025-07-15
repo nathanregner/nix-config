@@ -30,6 +30,7 @@ def remove [
 
 def main [
   --prefix: string = "auto"
+  --single_root
   --remove
   --deref
   ...paths: string
@@ -43,5 +44,16 @@ def main [
     let removed = remove $gcroots ($linked | columns)
     $result = $result | merge {removed: $removed}
   }
-  $result
+
+  if $single_root {
+    print {
+      inputDrvs: {
+        "/nix/store/6lkh5yi7nlb7l6dr8fljlli5zfd9hq58-curl-7.73.0.drv": ["dev"]
+        "/nix/store/fn3kgnfzl5dzym26j8g907gq3kbm8bfh-unzip-6.0.drv": ["out"]
+      }
+    }
+  }
+
+  # $result
+  return
 }
