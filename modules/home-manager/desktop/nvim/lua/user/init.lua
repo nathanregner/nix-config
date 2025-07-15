@@ -988,6 +988,19 @@ require("lazy").setup({
             if ticket and #ticket < 20 then return "https://" .. jira_domain .. "/browse/" .. ticket end
           end,
         },
+        flake_inputs = {
+          name = "flake_inputs",
+          -- filename = "flake.nix",
+          handle = function(mode, line, _)
+            -- https://nixos-and-flakes.thiscute.world/other-usage-of-flakes/inputs
+            local owner_repo, ref = string.match(line, '"github:([^/]+/[^/]+/?)([^/]*)"')
+            if owner_repo then
+              local url = "https://github.com/" .. owner_repo
+              if ref ~= "" then return url .. "tree/" .. ref end
+              return url
+            end
+          end,
+        },
         rust = {
           name = "rust",
           filename = "Cargo.toml",
