@@ -4,28 +4,6 @@
   programs.k9s = {
     enable = true;
     package = pkgs.unstable.k9s;
-    plugin.plugins = {
-      stern = {
-        args = [
-          "--tail"
-          50
-          "$FILTER"
-          "-n"
-          "$NAMESPACE"
-          "--context"
-          "$CONTEXT"
-        ];
-        background = false;
-        command = "stern";
-        confirm = false;
-        description = "Logs <Stern>";
-        scopes = [
-          "pods"
-          "deployments"
-        ];
-        shortCut = "Ctrl-Y";
-      };
-    };
   };
 
   xdg.enable = true;
