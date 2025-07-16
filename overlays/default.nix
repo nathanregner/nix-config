@@ -3,7 +3,7 @@ let
   inherit (inputs.nixpkgs) lib;
   filterPackagesRecursive = import ../lib/filterPackagesRecursive.nix lib;
 
-  overrideAttrsThrowIfOutdated =
+  overrideAttrsWarnIfOutdated =
     prev: args:
     let
       final = (prev.overrideAttrs args);
@@ -17,6 +17,12 @@ let
     lib.throwIf (
       version != pkg.version
     ) "${pkg.pname or "???"} has been updated: ${version} -> ${pkg.version}" pkg;
+
+  assertLaterVersion =
+    final: prev:
+    lib.throwIf (lib.versionAtLeast prev.version final.version)
+      "${prev.pname or "???"} has been updated: ${final.version} -> ${prev.version}"
+      final;
 
   sharedModifications = final: prev: rec {
     # FIXME
@@ -52,15 +58,6 @@ let
       ];
       doCheck = false;
     });
-
-    # https://github.com/NixOS/nixpkgs/pull/420949
-    jdt-language-server = overrideAttrsThrowIfOutdated prev.jdt-language-server {
-      version = "1.48.0";
-      src = final.fetchurl {
-        url = "https://www.eclipse.org/downloads/download.php?file=/jdtls/milestones/1.48.0/jdt-language-server-1.48.0-202506271502.tar.gz";
-        sha256 = "1jb2vv0h0zp0h9qrx97xpqgn6jjxaaf71sjrdllz3jp2809gm9xh";
-      };
-    };
 
     # FIXME: hack to bypass "FATAL: Module ahci not found" error
     # https://github.com/NixOS/nixpkgs/issues/154163#issuecomment-1350599022
@@ -126,7 +123,13 @@ rec {
       inherit (stableFinal) system;
       config.allowUnfree = true;
       overlays = [
-        (_final: _prev: { inherit (stableFinal) local; })
+        (final: prev: {
+          inherit (stableFinal) local;
+
+          nixVersions = prev.nixVersions // {
+            latest = (assertLaterVersion prev.nixVersions.nix_2_30 prev.nixVersions.latest);
+          };
+        })
         sharedModifications
       ];
     };

@@ -1035,6 +1035,19 @@ require("lazy").setup({
             if ticket and #ticket < 20 then return "https://" .. jira_domain .. "/browse/" .. ticket end
           end,
         },
+        flake_inputs = {
+          name = "flake_inputs",
+          -- filename = "flake.nix",
+          handle = function(mode, line, _)
+            -- https://nixos-and-flakes.thiscute.world/other-usage-of-flakes/inputs
+            local owner_repo, ref = string.match(line, '"github:([^/]+/[^/]+/?)([^/]*)"')
+            if owner_repo then
+              local url = "https://github.com/" .. owner_repo
+              if ref ~= "" then return url .. "tree/" .. ref end
+              return url
+            end
+          end,
+        },
         rust = {
           name = "rust",
           filename = "Cargo.toml",
@@ -1162,10 +1175,13 @@ require("lazy").setup({
           return name
         end
       end
+      vim.api.nvim_create_autocmd("StdinReadPre", {
+        callback = function() vim.g.using_stdin = true end,
+      })
       vim.api.nvim_create_autocmd("VimEnter", {
         callback = function()
-          -- Only load the session if nvim was started with no args
-          if vim.fn.argc(-1) == 0 then
+          -- Only load the session if nvim was started with no args and without reading from stdin
+          if vim.fn.argc(-1) == 0 and not vim.g.using_stdin then
             resession.load(get_session_name(), { dir = "dirsession", silence_errors = true })
           end
         end,
