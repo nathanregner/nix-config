@@ -4,6 +4,7 @@
     ../../modules/home-manager/desktop
     ../../modules/home-manager/desktop/gnome
     ../../modules/home-manager/desktop/hyprland
+    ../../modules/home-manager/desktop/niri
   ];
 
   home = {
@@ -12,36 +13,40 @@
     flakePath = "/home/nregner/nix-config/iapetus";
   };
 
-  hyprland = {
+  local.niri = {
     enable = true;
-    monitors = [
-      {
-        name = "desc:Ancor Communications Inc VG248 JBLMQS148602";
-        resolution = "1920x1080@144";
-        position = "0x0";
-        workspaces = [
-          1
-          2
-          3
-          4
-          5
-        ];
-      }
-      {
-        name = "desc:Ancor Communications Inc VG248 J6LMQS041978";
-        resolution = "1920x1080@144";
-        position = "1920x0";
-        workspaces = [
-          6
-          7
-          8
-          9
-          0
-        ];
-      }
-    ];
-    wallpaper = ../../assets/planet-rise.png;
   };
+
+  # hyprland = {
+  #   enable = true;
+  #   monitors = [
+  #     {
+  #       name = "desc:Ancor Communications Inc VG248 JBLMQS148602";
+  #       resolution = "1920x1080@144";
+  #       position = "0x0";
+  #       workspaces = [
+  #         1
+  #         2
+  #         3
+  #         4
+  #         5
+  #       ];
+  #     }
+  #     {
+  #       name = "desc:Ancor Communications Inc VG248 J6LMQS041978";
+  #       resolution = "1920x1080@144";
+  #       position = "1920x0";
+  #       workspaces = [
+  #         6
+  #         7
+  #         8
+  #         9
+  #         0
+  #       ];
+  #     }
+  #   ];
+  #   wallpaper = ../../assets/planet-rise.png;
+  # };
 
   # Prefer primary GPU if not captured by VFIO
   wayland.windowManager.hyprland.extraConfig = ''

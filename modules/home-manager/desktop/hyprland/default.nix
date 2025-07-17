@@ -12,6 +12,7 @@
     ./launcher/tofi.nix
     ./lock/hyprlock.nix
     ./notification/mako.nix
+    ../wayland
   ];
 
   options =
@@ -51,7 +52,6 @@
   config =
     let
       cfg = config.hyprland;
-      import-env = pkgs.writeShellScriptBin "import-env" (builtins.readFile ./import-env.sh);
     in
     lib.mkIf cfg.enable {
       catppuccin.hyprland.enable = true;
@@ -73,8 +73,8 @@
             ) monitor.workspaces)
           ) cfg.monitors}
 
-          exec-once = ${lib.getExe import-env} tmux
-          exec-once = ${lib.getExe import-env} system
+          exec-once = import-env tmux
+          exec-once = import-env system
           exec-once = nm-applet --indicator
           exec-once = blueman-applet
           exec-once = "systemctl --user start waybar.service"
@@ -105,15 +105,9 @@
       };
 
       home.packages = with pkgs.unstable; [
-        nautilus
         hyprpaper
         hyprpicker
-        import-env
-        wl-clipboard
 
-        # screenshot
-        grim
-        slurp
       ];
 
       # auto mount disks
