@@ -32,9 +32,10 @@
     desktopManager.gnome.enable = true;
   };
 
-  programs.hyprland = {
+  # TODO: Launch directly
+  programs.niri = {
     enable = true;
-    package = pkgs.unstable.hyprland;
+    package = pkgs.unstable.niri;
   };
 
   services.displayManager = {
@@ -43,7 +44,7 @@
       user = "nregner";
     };
 
-    defaultSession = "hyprland";
+    defaultSession = "niri";
 
     environment = {
       # https://wiki.hyprland.org/Configuring/Multi-GPU/
@@ -52,9 +53,13 @@
         "/dev/dri/by-path/pci-0000:24:00.0-card" # GTX 1060 (secondary)
       ];
     };
+
+    gdm.enable = true;
   };
 
   security.pam.services.hyprlock = { };
+
+  services.desktopManager.gnome.enable = true;
 
   # https://discourse.nixos.org/t/howto-disable-most-gnome-default-applications-and-what-they-are/13505/11
   environment.gnome.excludePackages = with pkgs; [
@@ -132,6 +137,7 @@
     networkmanagerapplet
     libmtp
     virt-manager
+    xwayland-satellite
   ]);
 
   # boot.binfmt.emulatedSystems = [ "aarch64-linux" ];
