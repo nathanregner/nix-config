@@ -4,12 +4,17 @@
     ../../modules/home-manager/desktop
     ../../modules/home-manager/desktop/gnome
     ../../modules/home-manager/desktop/hyprland
+    ../../modules/home-manager/desktop/niri
   ];
 
   home = {
     username = "nregner";
     homeDirectory = "/home/nregner";
     flakePath = "/home/nregner/nix-config/iapetus";
+  };
+
+  local.niri = {
+    enable = true;
   };
 
   hyprland = {

@@ -35,31 +35,13 @@
     package = pkgs.unstable.hyprland;
   };
 
-  services.displayManager = {
-    autoLogin = {
-      enable = true;
-      user = "nregner";
-    };
+  services.getty.autologinUser = "nregner";
 
-    defaultSession = "hyprland";
-
-    environment = {
-      # https://wiki.hyprland.org/Configuring/Multi-GPU/
-      WLR_DRM_DEVICES = lib.concatStringsSep ":" [
-        "/dev/dri/by-path/pci-0000:2d:00.0-card" # RTX 2070 (primary)
-        "/dev/dri/by-path/pci-0000:24:00.0-card" # GTX 1060 (secondary)
-      ];
-    };
-
-    # https://wiki.hyprland.org/0.20.1beta/Getting-Started/Installation/
-    sddm = {
-      enable = true;
-      wayland.enable = true;
-      package = pkgs.unstable.kdePackages.sddm;
+  services.xserver = {
+    displayManager = {
+      startx.enable = true;
     };
   };
-
-  catppuccin.sddm.enable = true;
 
   security.pam.services.hyprlock = { };
 

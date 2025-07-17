@@ -2,18 +2,6 @@
 
 set -e
 
-# [[ -n $HYPRLAND_DEBUG_CONF ]] && exit 0
-USAGE="\
-Import environment variables
-
-Usgae: $0 <command>
-
-Commands:
-   tmux         import to tmux server
-   system       import to systemd and dbus user session
-   help         print this help
-"
-
 _envs=(
   # display
   WAYLAND_DISPLAY
@@ -33,6 +21,8 @@ _envs=(
   HYPRLAND_INSTANCE_SIGNATURE
   # sway
   SWAYSOCK
+  # niri
+  NIRI_SOCKET
   # misc
   XCURSOR_SIZE
   # toolkit
@@ -44,25 +34,14 @@ _envs=(
   SSH_AUTH_SOCK
 )
 
-case "$1" in
-system)
-  dbus-update-activation-environment --systemd "${_envs[@]}"
-  ;;
-tmux)
+dbus-update-activation-environment "${_envs[@]}"
+systemctl --user import-environment "${_envs[@]}"
+
+if [[ -n "$TMUX" ]]; then
   for v in "${_envs[@]}"; do
     if [[ -n ${!v} ]]; then
       echo "tmux setenv -g $v ${!v}"
       tmux setenv -g "$v" "${!v}"
     fi
   done
-  ;;
-help)
-  echo -n "$USAGE"
-  exit 0
-  ;;
-*)
-  echo "operation required"
-  echo "use \"$0 help\" to see usage help"
-  exit 1
-  ;;
-esac
+fi
