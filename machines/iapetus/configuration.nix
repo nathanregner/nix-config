@@ -30,9 +30,9 @@
   };
 
   # TODO: Launch directly
-  programs.hyprland = {
+  programs.niri = {
     enable = true;
-    package = pkgs.unstable.hyprland;
+    package = pkgs.unstable.niri;
   };
 
   services.displayManager = {
@@ -41,7 +41,7 @@
       user = "nregner";
     };
 
-    defaultSession = "hyprland";
+    defaultSession = "niri";
 
     environment = {
       # https://wiki.hyprland.org/Configuring/Multi-GPU/
@@ -141,6 +141,7 @@
       networkmanagerapplet
       libmtp
       virt-manager
+      xwayland-satellite
     ]);
 
   # boot.binfmt.emulatedSystems = [ "aarch64-linux" ];
