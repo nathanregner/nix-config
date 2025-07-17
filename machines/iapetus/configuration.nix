@@ -29,9 +29,10 @@
     xkb.variant = "";
   };
 
-  programs.hyprland = {
+  # TODO: Launch directly
+  programs.niri = {
     enable = true;
-    package = pkgs.unstable.hyprland;
+    package = pkgs.unstable.niri;
   };
 
   services.displayManager = {
@@ -40,7 +41,7 @@
       user = "nregner";
     };
 
-    defaultSession = "hyprland";
+    defaultSession = "niri";
 
     environment = {
       # https://wiki.hyprland.org/Configuring/Multi-GPU/
@@ -50,18 +51,12 @@
       ];
     };
 
-    # https://wiki.hyprland.org/0.20.1beta/Getting-Started/Installation/
-    sddm = {
-      enable = true;
-      wayland.enable = true;
-      package = pkgs.unstable.kdePackages.sddm;
-    };
+    gdm.enable = true;
   };
 
   security.pam.services.hyprlock = { };
 
-  # services.xserver.displayManager.gdm.enable = true;
-  services.xserver.desktopManager.gnome.enable = true;
+  services.desktopManager.gnome.enable = true;
 
   # https://discourse.nixos.org/t/howto-disable-most-gnome-default-applications-and-what-they-are/13505/11
   environment.gnome.excludePackages = with pkgs; [
@@ -139,6 +134,7 @@
     networkmanagerapplet
     libmtp
     virt-manager
+    xwayland-satellite
   ]);
 
   # boot.binfmt.emulatedSystems = [ "aarch64-linux" ];
