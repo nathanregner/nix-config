@@ -438,7 +438,7 @@ require("lazy").setup({
             },
           },
         },
-        pyright = {},
+        basedpyright = {},
         rust_analyzer = {
           -- https://rust-analyzer.github.io/manual.html#configuration
           settings = {
