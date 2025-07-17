@@ -29,9 +29,10 @@
     xkb.variant = "";
   };
 
-  programs.hyprland = {
+  # TODO: Launch directly
+  programs.niri = {
     enable = true;
-    package = pkgs.unstable.hyprland;
+    package = pkgs.unstable.niri;
   };
 
   services.displayManager = {
@@ -40,7 +41,7 @@
       user = "nregner";
     };
 
-    defaultSession = "hyprland";
+    defaultSession = "niri";
 
     environment = {
       # https://wiki.hyprland.org/Configuring/Multi-GPU/
@@ -132,15 +133,17 @@
   };
 
   # https://nixos.wiki/wiki/CCache#Derivation_CCache_2
-  environment.systemPackages =
-    [ config.boot.kernelPackages.perf ]
-    ++ (with pkgs.unstable; [
-      android-file-transfer # aft-mtp-mount ~/mnt
-      nautilus-python
-      networkmanagerapplet
-      libmtp
-      virt-manager
-    ]);
+  environment.systemPackages = [
+    config.boot.kernelPackages.perf
+  ]
+  ++ (with pkgs.unstable; [
+    android-file-transfer # aft-mtp-mount ~/mnt
+    nautilus-python
+    networkmanagerapplet
+    libmtp
+    virt-manager
+    xwayland-satellite
+  ]);
 
   # boot.binfmt.emulatedSystems = [ "aarch64-linux" ];
 
