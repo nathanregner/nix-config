@@ -1,11 +1,11 @@
+{ config, ... }:
 {
-  home.file = {
-    ".terraform.d/plugin-cache/.mkdir".text = "";
-    ".terraformrc".text =
-      # hcl
-      ''
-        plugin_cache_dir   = "$HOME/.terraform.d/plugin-cache"
-        disable_checkpoint = true
-      '';
-  };
+  xdg.cacheFile."terraform/plugins/.mkdir".text = "";
+
+  home.file.".terraformrc".text =
+    # hcl
+    ''
+      plugin_cache_dir = "${config.xdg.cacheHome}/terraform/plugins"
+      disable_checkpoint = true
+    '';
 }
