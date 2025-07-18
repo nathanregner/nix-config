@@ -16,6 +16,12 @@
     ];
   };
 
+  terraform = pkgs.devshell.mkShell {
+    packages = with pkgs.unstable; [
+      opentofu
+    ];
+  };
+
   bootstrap = pkgs.devshell.mkShell {
     env = [
       {

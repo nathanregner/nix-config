@@ -5,6 +5,7 @@
 # ssh builder@enceladus-linux-vm
 
 {
+  self,
   inputs,
   config,
   lib,
@@ -23,7 +24,7 @@ in
     hydraURL = "https://hydra.nregner.net";
     notificationSender = "hydra@nregner.net";
     useSubstitutes = true;
-    port = 3001;
+    port = self.globals.services.hydra.port;
     buildMachinesFiles = [
       "/var/lib/hydra/machines"
       (pkgs.writeTextFile {

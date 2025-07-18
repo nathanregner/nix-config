@@ -1,5 +1,6 @@
 {
   "services": {
+    "hydra": { "port": 3001 },
     "prometheus": {
       "klipper": { "port": 9002 },
       "node": { "port": 9001 }
