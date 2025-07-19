@@ -37,11 +37,11 @@ _envs=(
 dbus-update-activation-environment "${_envs[@]}"
 systemctl --user import-environment "${_envs[@]}"
 
-if [[ -n "$TMUX" ]]; then
-  for v in "${_envs[@]}"; do
-    if [[ -n ${!v} ]]; then
-      echo "tmux setenv -g $v ${!v}"
-      tmux setenv -g "$v" "${!v}"
-    fi
-  done
-fi
+# if [[ -n "$TMUX" ]]; then
+for v in "${_envs[@]}"; do
+  if [[ -n ${!v} ]]; then
+    echo "tmux setenv -g $v ${!v}"
+    tmux setenv -g "$v" "${!v}"
+  fi
+done
+# fi

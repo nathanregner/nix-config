@@ -12,6 +12,8 @@
     {
       enable = lib.mkEnableOption "Enable Niri configuration";
 
+      package = lib.mkPackageOption pkgs.unstable "niri" { };
+
       # monitors = mkOption {
       #   description = "https://wiki.hyprland.org/Configuring/Monitors/";
       #   type = types.listOf (
@@ -48,8 +50,32 @@
         };
       };
 
-      home.packages = with pkgs.unstable; [
-        niri
+      home.packages = [
+        cfg.package
+        # (pkgs.writers.writeNuBin "niri-select-window" ./select-window.nu)
       ];
+
+      services.gnome-keyring.enable = true;
+      xdg.portal = {
+        enable = true;
+        extraPortals = [ pkgs.xdg-desktop-portal-gnome ];
+        configPackages = [ cfg.package ];
+      };
+
+      # programs.fuzzel.enable = true;
+      # catppuccin.fuzzel.enable = true;
+      catppuccin.rofi.enable = true;
+      programs.rofi = {
+        enable = true;
+        package = pkgs.unstable.rofi-wayland;
+      };
+
+      programs.niriswitcher = {
+        enable = true;
+        settings = {
+          current_output_only = false;
+          separate_workspaces = false;
+        };
+      };
     };
 }
