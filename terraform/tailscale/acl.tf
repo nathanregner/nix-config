@@ -1,12 +1,15 @@
 # https://registry.terraform.io/providers/tailscale/tailscale/latest/docs
 # https://tailscale.com/kb/1337/acl-syntax
 
+locals {
+  globals = jsondecode(file("../../globals.json"))
+}
+
 resource "tailscale_acl" "acl" {
   acl = jsonencode({
     groups = {
       "group:admin" = [
         "nathanregner@gmail.com",
-        "regnerbrian@gmail.com",
       ]
     }
     tagOwners = {
@@ -36,9 +39,14 @@ resource "tailscale_acl" "acl" {
           src    = ["group:admin", "tag:admin", "sagittarius"]
           dst    = ["tag:builder:22"]
         },
+        {
+          action = "accept"
+          src    = ["tag:server"]
+          dst    = ["sagittarius:${local.globals.services.hydra.port}"]
+        }
       ],
       [
-        for exporter in jsondecode(file("../../globals.json")).services.prometheus :
+        for exporter in local.globals.services.prometheus :
         {
           action = "accept"
           src    = ["sagittarius"]

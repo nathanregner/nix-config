@@ -5,6 +5,7 @@
 # ssh builder@enceladus-linux-vm
 
 {
+  self,
   inputs,
   config,
   lib,
@@ -23,7 +24,7 @@ in
     hydraURL = "https://hydra.nregner.net";
     notificationSender = "hydra@nregner.net";
     useSubstitutes = true;
-    port = 3001;
+    port = self.globals.services.hydra.port;
     buildMachinesFiles = [
       "/var/lib/hydra/machines"
       (pkgs.writeTextFile {
@@ -154,7 +155,8 @@ in
     '';
 
   nginx.subdomain.hydra = {
-    "/".proxyPass = "http://127.0.0.1:${toString config.services.hydra.port}/";
+    "/".extraConfig = # nginx
+      "return 302 http://sagittarius:${toString config.services.hydra.port}$request_uri;";
     "/github/webhook".proxyPass =
       "http://127.0.0.1:${toString config.services.hydra-sentinel-server.listenPort}/webhook";
   };
