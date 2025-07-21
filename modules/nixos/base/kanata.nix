@@ -15,7 +15,7 @@
             caps)
 
           (deflayermap (default-layer)
-            caps (tap-hold-press 0 100 esc lctl))
+            caps (tap-hold-press 0 250 esc lctl))
         '';
     };
   };
