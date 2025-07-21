@@ -62,11 +62,14 @@ in
         ps: propagateBuildInputs [ ps.busted ];
 
       lua.globals = {
-        luasnip.dir = "${pkgs.unstable.vimPlugins.luasnip}";
+        luasnip = {
+          dir = "${pkgs.unstable.vimPlugins.luasnip}";
+          extraModules = lib.mkDefault [ ];
+        };
         neotest-jest.dir = "${pkgs.unstable.vimPlugins.neotest-jest.overrideAttrs {
           patches = [
             (pkgs.fetchpatch2 {
-              url = "https://patch-diff.githubusercontent.com/raw/nvim-neotest/neotest-jest/pull/141.patch";
+              url = "https://github.com/nvim-neotest/neotest-jest/pull/141.patch";
               hash = "sha256-IxgnjB2TzqLi/TFGruR52ia3R/AnrgJAZKAqY5lIX4A=";
             })
           ];
@@ -121,15 +124,18 @@ in
           source = config.lib.file.mkFlakeSymlink ./lazy-lock.json;
           force = true;
         };
-        "nvim/lua" = {
-          source = config.lib.file.mkFlakeSymlink ./lua;
-          force = true;
-        };
         "nvim/snippets" = {
           source = config.lib.file.mkFlakeSymlink ./snippets;
           force = true;
         };
       }
+      // lib.mapAttrs' (source: _: {
+        name = "nvim/lua/user/${source}";
+        value = {
+          source = config.lib.file.mkFlakeSymlink ./lua/user + "/${source}";
+          force = true;
+        };
+      }) (builtins.readDir ./lua/user)
       // lib.listToAttrs (
         builtins.map (source: {
           name = "nvim/after/ftplugin/${builtins.baseNameOf source}";
