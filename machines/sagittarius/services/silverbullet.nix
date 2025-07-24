@@ -13,14 +13,11 @@
   };
 
   services.oauth2-proxy = {
-    nginx.virtualHosts."notes.nregner.net" = {
-    };
+    nginx.virtualHosts."notes.nregner.net" = { };
   };
 
-  local.services.backup.paths.silverbullet = {
+  local.services.backup.restic.silverbullet = {
     paths = [ config.services.silverbullet.spaceDir ];
-    restic = {
-      s3 = { };
-    };
+    s3 = { };
   };
 }
