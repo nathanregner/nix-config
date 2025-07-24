@@ -2,7 +2,8 @@
   "services": {
     "prometheus": {
       "klipper": { "port": 9002 },
-      "node": { "port": 9001 }
+      "node": { "port": 9001 },
+      "pushgateway": { "port": 9091 }
     }
   }
 }

@@ -1,4 +1,7 @@
 { self, config, ... }:
+let
+  cfg = self.globals.services.prometheus;
+in
 {
   # https://wiki.nixos.org/wiki/Prometheus
   # https://nixos.org/manual/nixos/stable/#module-services-prometheus-exporters-configuration
@@ -12,7 +15,7 @@
           builtins.map
             (node: {
               targets = [
-                "${node}:${toString self.globals.services.prometheus.node.port}"
+                "${node}:${toString cfg.node.port}"
               ];
             })
             [
@@ -28,7 +31,7 @@
           builtins.map
             (node: {
               targets = [
-                "${node}:${toString self.globals.services.prometheus.klipper.port}"
+                "${node}:${toString cfg.klipper.port}"
               ];
             })
             [
@@ -49,5 +52,12 @@
         ];
       }
     ];
+  };
+
+  services.prometheus.pushgateway = {
+    enable = true;
+    web = {
+      listenAddress = ":${toString cfg.pushgateway.port}";
+    };
   };
 }
