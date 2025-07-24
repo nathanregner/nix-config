@@ -53,7 +53,7 @@ in
     hydra-users nregner hydra
   '';
 
-  local.services.backup.paths.hydra = {
+  local.services.backup.restic.hydra = {
     dynamicFilesFrom = ''${pkgs.writers.writeNu "pg_dump-hydra"
       {
         makeWrapperArgs = [
@@ -70,9 +70,7 @@ in
         $tmp
       ''
     }'';
-    restic = {
-      s3 = { };
-    };
+    s3 = { };
   };
 
   services.prometheus.scrapeConfigs = [
