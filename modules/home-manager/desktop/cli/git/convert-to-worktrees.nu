@@ -3,7 +3,6 @@ def setup-bare-repo [src: path] {
   cd $temp
 
   cp -r $"($src)/.git" ".git"
-  "gitdir: ./.git" | save -f .git
   git config core.git true
   git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
 
