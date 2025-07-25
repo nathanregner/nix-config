@@ -13,16 +13,7 @@
     maintenance.enable = true;
     extraConfig = {
       alias = {
-        convert-to-worktrees = ''!${
-          pkgs.writers.writeNu "git-convert-to-worktrees" {
-            makeWrapperArgs = [
-              "--prefix"
-              "PATH"
-              ":"
-              "${lib.makeBinPath [ pkgs.trash-cli ]}"
-            ];
-          } ./convert-to-worktrees.nu
-        }'';
+        convert-to-worktrees = ''!${lib.getExe pkgs.local.git-convert-to-worktrees}'';
         ddiff = "-c diff.external=difft diff";
         # https://github.com/orgs/community/discussions/9632#discussioncomment-4702442
         diff-refactor = ''
@@ -92,15 +83,14 @@
         sort = "version:refname";
       };
     };
-    ignores =
-      [
-        ".direnv"
-        "Session.vim"
-        ".neoconf.json"
-      ]
-      ++ lib.optionals pkgs.stdenv.isDarwin [
-        ".DS_Store"
-      ];
+    ignores = [
+      ".direnv"
+      "Session.vim"
+      ".neoconf.json"
+    ]
+    ++ lib.optionals pkgs.stdenv.isDarwin [
+      ".DS_Store"
+    ];
   };
 
   home.packages = with pkgs.unstable; [
