@@ -5,6 +5,7 @@
   ...
 }:
 {
+
   options.local.niri = {
     enable = lib.mkEnableOption "Enable Niri configuration";
     package = lib.mkPackageOption pkgs.unstable "niri" { };

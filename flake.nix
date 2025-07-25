@@ -78,6 +78,13 @@
       url = "github:catppuccin/nix";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
+    niri = {
+      url = "github:YaLTeR/niri";
+      inputs = {
+        nixpkgs.follows = "nixpkgs-unstable";
+        rust-overlay.follows = "";
+      };
+    };
     # hyprland = {
     #   url = "github:hyprwm/Hyprland";
     #   inputs.nixpkgs.follows = "nixpkgs";

@@ -1,4 +1,5 @@
 {
+  inputs,
   config,
   pkgs,
   lib,
@@ -32,7 +33,7 @@
   # TODO: Launch directly
   programs.niri = {
     enable = true;
-    package = pkgs.unstable.niri;
+    package = inputs.niri.packages.${pkgs.system}.niri;
   };
 
   services.displayManager = {

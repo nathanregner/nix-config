@@ -603,3 +603,8 @@ layer-rule {
         color "#00000064"
     }
 }
+
+// https://github.com/YaLTeR/niri/issues/1948
+// debug {
+//     deactivate-unfocused-windows
+// }
