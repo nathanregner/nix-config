@@ -16,6 +16,9 @@
       # share connections
       controlMaster = "auto";
       controlPersist = "10m";
+      matchBlocks."*" = {
+        sendEnv = [ "TMUX" ];
+      };
     };
 
     home.packages = with pkgs.unstable; [
