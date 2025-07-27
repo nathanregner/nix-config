@@ -233,8 +233,6 @@ layout {
 
 // This line starts waybar, a commonly used bar for Wayland compositors.
 // spawn-at-startup "waybar"
-spawn-at-startup "niriswitcher"
-spawn-at-startup "swww img ~/.config/hypr/assets/wallpaper.png"
 
 spawn-at-startup "xwayland-satellite"
 environment {
