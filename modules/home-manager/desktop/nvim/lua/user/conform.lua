@@ -76,6 +76,12 @@ require("conform").setup({
       args = { "$FILENAME" },
       stdin = true,
     },
+    taplo = {
+      command = "taplo",
+      args = { "fmt", "-" },
+      cwd = function(_, ctx) return ctx.dirname end,
+      stdin = true,
+    },
     topiary_nu = {
       command = "topiary",
       args = { "format", "--language", "nu" },
