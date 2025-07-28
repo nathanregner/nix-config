@@ -119,7 +119,7 @@ return {
     end,
   },
   {
-    "mtrajano/tssorter.nvim",
+    "nathanregner/tssorter.nvim",
     keys = function()
       return {
         { "<leader>st", function() require("tssorter").sort({ range = "paragraph" }) end, desc = "[S]ort [t]ree" },
@@ -135,10 +135,6 @@ return {
           fragments = { node = "definition", ordinal = "fragment_definition" },
           variable = { node = "variable_definition", ordinal = "name" },
           field = { node = "field_definition", ordinal = "name" },
-        },
-        helm = {
-          keys = { node = "block_mapping_pair" },
-          list = { node = "block_sequence_item" },
         },
         java = {
           annotation_array = { node = "class_literal" },
@@ -213,25 +209,6 @@ return {
         -- level = vim.log.levels.TRACE,
         -- outfile = "~/tssorter.log", -- nil prints to messages, or add a path to a file to output logs there
       },
-    },
-  },
-  {
-    "nvim-treesitter/nvim-treesitter-context",
-    dependencies = { "nvim-treesitter/nvim-treesitter" },
-    lazy = false,
-    keys = {
-      {
-        "[C",
-        function() require("treesitter-context").go_to_context(vim.v.count1) end,
-        silent = true,
-      },
-    },
-    opts = {
-      enable = true,
-      max_lines = 10,
-      mode = "cursor",
-      multiline_threshold = 1,
-      multiwindow = true,
     },
   },
   {
