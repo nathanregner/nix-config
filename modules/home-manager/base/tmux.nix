@@ -14,5 +14,7 @@
     plugins = with pkgs.unstable.tmuxPlugins; [ yank ];
   };
 
+  programs.zsh.initContent = builtins.readFile ./tmux.sh;
+
   home.packages = with pkgs.unstable; [ tmux-sessionizer ];
 }
