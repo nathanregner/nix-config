@@ -36,6 +36,11 @@
     <option name="AUTOREPARSE_DELAY" value="0" />
   </component>
   <component name="DeclarativeInlayHintsSettings">
+    <option name="enabledOptions">
+      <map>
+        <entry key="js.type.hints#function.returns" value="false" />
+      </map>
+    </option>
     <option name="providerIdToEnabled">
       <map>
         <entry key="java.implicit.types" value="true" />

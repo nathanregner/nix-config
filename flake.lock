@@ -190,11 +190,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1753479839,
-        "narHash": "sha256-E/rPVh7vyPMJUFl2NAew+zibNGfVbANr8BP8nLRbLkQ=",
+        "lastModified": 1753592768,
+        "narHash": "sha256-oV695RvbAE4+R9pcsT9shmp6zE/+IZe6evHWX63f2Qg=",
         "owner": "nix-community",
         "repo": "home-manager",
-        "rev": "0b9bf983db4d064764084cd6748efb1ab8297d1e",
+        "rev": "fc3add429f21450359369af74c2375cb34a2d204",
         "type": "github"
       },
       "original": {
@@ -548,6 +548,7 @@
         "disko": "disko",
         "flake-compat": "flake-compat_2",
         "flake-parts": "flake-parts",
+        "home-manager": "home-manager",
         "home-manager-unstable": "home-manager-unstable",
         "hydra-sentinel": "hydra-sentinel",
         "mac-app-util": "mac-app-util",

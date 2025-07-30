@@ -30,11 +30,15 @@ def copy-worktree [$bare: path, $worktree: record] {
   let branch = $worktree.branch | str replace 'refs/heads/' ''
   let dest = $"../($branch)"
 
-  git worktree add --quiet $dest
-  $dest | save -f $"($bare)/worktrees/($branch)/gitdir"
+  git worktree add --relative-paths --quiet --force $dest $branch
 
-  cp -r ...(glob $"($worktree.worktree)/*") $dest
-  $"gitdir: ../.git/worktrees/($branch)" | save -f $"($dest)/.git"
+  cd $dest
+  git checkout $branch
+  let temp = mktemp
+  mv .git $temp
+  cp -r ...(glob $"($worktree.worktree)/*") .
+  rm -rf .git
+  mv $temp .git
 
   $branch
 }

@@ -11,16 +11,16 @@ def main [out: string] {
   git commit -m "initial commit"
   touch untracked.txt .untracked
 
-  git worktree add -B a (mktemp -d)
-  git branch b
+  git worktree add -B feature/a (mktemp -d)
+  git branch bugfix/a
 
   cd (git-convert-to-worktrees)
 
   cd .git
   assert equal (git rev-parse --is-bare-repository) "true"
   assert equal (git branch | lines) [
-    "+ a"
-    "  b"
+    "  bugfix/a"
+    "+ feature/a"
     "* master"
   ]
   ls
@@ -29,6 +29,6 @@ def main [out: string] {
   assert equal (git rev-parse --abbrev-ref HEAD) "master"
   cat .untracked master.txt untracked.txt
 
-  cd ../a
-  assert equal (git rev-parse --abbrev-ref HEAD) "a"
+  cd ../feature/a
+  assert equal (git rev-parse --abbrev-ref HEAD) "feature/a"
 }
