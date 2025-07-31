@@ -14,9 +14,7 @@
   </action>
   <action id="Back">
     <keyboard-shortcut first-keystroke="ctrl alt left" />
-    <keyboard-shortcut first-keystroke="ctrl open_bracket" />
     <mouse-shortcut keystroke="button4" />
-    <keyboard-shortcut first-keystroke="alt open_bracket" />
   </action>
   <action id="CloseAllEditorsButActive">
     <keyboard-shortcut first-keystroke="shift alt w" />
@@ -66,9 +64,7 @@
   </action>
   <action id="Forward">
     <keyboard-shortcut first-keystroke="ctrl alt right" />
-    <keyboard-shortcut first-keystroke="ctrl close_bracket" />
     <mouse-shortcut keystroke="button5" />
-    <keyboard-shortcut first-keystroke="alt close_bracket" />
   </action>
   <action id="Generate">
     <keyboard-shortcut first-keystroke="ctrl enter" />
@@ -92,11 +88,8 @@
   <action id="NextOccurence">
     <keyboard-shortcut first-keystroke="ctrl alt down" />
     <keyboard-shortcut first-keystroke="shift alt j" />
-    <keyboard-shortcut first-keystroke="close_bracket" second-keystroke="q" />
   </action>
-  <action id="NextTab">
-    <keyboard-shortcut first-keystroke="shift alt close_bracket" />
-  </action>
+  <action id="NextTab" />
   <action id="ParameterInfo">
     <keyboard-shortcut first-keystroke="alt p" />
   </action>
@@ -137,11 +130,9 @@
   </action>
   <action id="VcsShowNextChangeMarker">
     <keyboard-shortcut first-keystroke="shift ctrl alt down" />
-    <keyboard-shortcut first-keystroke="close_bracket" second-keystroke="c" />
   </action>
   <action id="VcsShowPrevChangeMarker">
     <keyboard-shortcut first-keystroke="shift ctrl alt up" />
-    <keyboard-shortcut first-keystroke="open_bracket" second-keystroke="c" />
   </action>
   <action id="WeighingNewGroup">
     <keyboard-shortcut first-keystroke="ctrl enter" />

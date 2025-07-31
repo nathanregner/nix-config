@@ -82,6 +82,7 @@ nnoremap gD :action GotoSuperMethod<CR>
 nnoremap gI :action GotoImplementation<CR>
 nnoremap <leader>ca :action ShowIntentionActions<CR>
 nnoremap gx gd
+nnoremap <leader>e :action ShowErrorDescription<CR>
 " nnoremap <C-q> :action FindUsages<CR>
 
 " Editing
