@@ -13,7 +13,7 @@
     maintenance.enable = true;
     extraConfig = {
       alias = {
-        convert-to-worktrees = ''!${pkgs.local.git-convert-to-worktrees}'';
+        convert-to-worktrees = ''!${lib.getExe pkgs.local.git-convert-to-worktrees}'';
         ddiff = "-c diff.external=difft diff";
         # https://github.com/orgs/community/discussions/9632#discussioncomment-4702442
         diff-refactor = ''

@@ -14,7 +14,7 @@ def setup-bare-repo [src: path] {
   let config = git config list --local
   | lines
   | where {|it| $it =~ '^(remote|branch)\.' }
-  | each {|remote| remote | split row --number 2 "=" }
+  | each {|entry| $entry | split row --number 2 "=" }
 
   let temp = mktemp -d $"(basename $src)-bare.XXXXXXXXXX" | path join ".git"
   git clone --bare --quiet $src $temp
