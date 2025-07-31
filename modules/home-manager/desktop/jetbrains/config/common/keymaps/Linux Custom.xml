@@ -6,6 +6,12 @@
     <keyboard-shortcut first-keystroke="alt 0" />
   </action>
   <action id="ActivateCommitToolWindow" />
+  <action id="Arrangement.Alias.Rule.Add">
+    <keyboard-shortcut first-keystroke="ctrl enter" />
+  </action>
+  <action id="Arrangement.Rule.Add">
+    <keyboard-shortcut first-keystroke="ctrl enter" />
+  </action>
   <action id="Back">
     <keyboard-shortcut first-keystroke="ctrl alt left" />
     <keyboard-shortcut first-keystroke="ctrl open_bracket" />
@@ -19,6 +25,7 @@
     <keyboard-shortcut first-keystroke="ctrl space" />
     <keyboard-shortcut first-keystroke="ctrl n" />
   </action>
+  <action id="Console.Open" />
   <action id="Debug">
     <keyboard-shortcut first-keystroke="ctrl alt d" />
     <keyboard-shortcut first-keystroke="shift f9" />
@@ -51,9 +58,7 @@
     <keyboard-shortcut first-keystroke="shift ctrl o" />
     <keyboard-shortcut first-keystroke="shift ctrl i" />
   </action>
-  <action id="FileChooser.NewFolder">
-    <keyboard-shortcut first-keystroke="alt insert" />
-  </action>
+  <action id="FileChooser.NewFolder" />
   <action id="FileChooser.TogglePathBar" />
   <action id="FindUsages">
     <keyboard-shortcut first-keystroke="alt f7" />
@@ -68,8 +73,20 @@
   <action id="Generate">
     <keyboard-shortcut first-keystroke="ctrl enter" />
   </action>
+  <action id="GotoNextError">
+    <keyboard-shortcut first-keystroke="f2" />
+  </action>
+  <action id="GotoPreviousError">
+    <keyboard-shortcut first-keystroke="shift f2" />
+  </action>
+  <action id="Jdbc.OpenConsole.Any" />
+  <action id="Jpa.OpenConsole" />
+  <action id="ModuleSettings">
+    <keyboard-shortcut first-keystroke="alt semicolon" />
+  </action>
   <action id="NewElement">
     <keyboard-shortcut first-keystroke="ctrl enter" />
+    <keyboard-shortcut first-keystroke="alt insert" />
   </action>
   <action id="NextInlineCompletionSuggestionAction" />
   <action id="NextOccurence">
@@ -90,16 +107,19 @@
   <action id="PreviousOccurence">
     <keyboard-shortcut first-keystroke="ctrl alt up" />
     <keyboard-shortcut first-keystroke="shift alt k" />
-    <keyboard-shortcut first-keystroke="open_bracket" second-keystroke="q" />
-  </action>
-  <action id="PreviousTab">
-    <keyboard-shortcut first-keystroke="shift alt open_bracket" />
   </action>
   <action id="QuickImplementations">
     <keyboard-shortcut first-keystroke="alt space" />
   </action>
+  <action id="Run">
+    <keyboard-shortcut first-keystroke="ctrl alt r" />
+    <keyboard-shortcut first-keystroke="shift ctrl f10" />
+  </action>
   <action id="SelectInProjectView">
     <keyboard-shortcut first-keystroke="shift alt 1" />
+  </action>
+  <action id="ServiceView.AddService">
+    <keyboard-shortcut first-keystroke="ctrl enter" />
   </action>
   <action id="ShowSettingsAndFindUsages">
     <keyboard-shortcut first-keystroke="shift ctrl alt f7" />
@@ -114,6 +134,17 @@
   </action>
   <action id="Vcs.CombinedDiff.CaretToNextBlock">
     <keyboard-shortcut first-keystroke="down" />
+  </action>
+  <action id="VcsShowNextChangeMarker">
+    <keyboard-shortcut first-keystroke="shift ctrl alt down" />
+    <keyboard-shortcut first-keystroke="close_bracket" second-keystroke="c" />
+  </action>
+  <action id="VcsShowPrevChangeMarker">
+    <keyboard-shortcut first-keystroke="shift ctrl alt up" />
+    <keyboard-shortcut first-keystroke="open_bracket" second-keystroke="c" />
+  </action>
+  <action id="WeighingNewGroup">
+    <keyboard-shortcut first-keystroke="ctrl enter" />
   </action>
   <action id="io.kotest.actions.PreviousTestAction" />
   <action id="tasks.close" />
