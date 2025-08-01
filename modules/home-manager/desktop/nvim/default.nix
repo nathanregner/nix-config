@@ -42,14 +42,6 @@ in
 
       lua.globals = {
         luasnip.dir = "${pkgs.unstable.vimPlugins.luasnip}";
-        neotest-jest.dir = "${pkgs.unstable.vimPlugins.neotest-jest.overrideAttrs {
-          patches = [
-            (pkgs.fetchpatch2 {
-              url = "https://patch-diff.githubusercontent.com/raw/nvim-neotest/neotest-jest/pull/141.patch";
-              hash = "sha256-IxgnjB2TzqLi/TFGruR52ia3R/AnrgJAZKAqY5lIX4A=";
-            })
-          ];
-        }}";
       };
 
       extraPackages = builtins.attrValues (
@@ -98,30 +90,29 @@ in
       cargo-nextest # for rouge8/neotest-rust
     ];
 
-    xdg.configFile =
-      {
-        "nvim/lazy-lock.json" = {
-          source = config.lib.file.mkFlakeSymlink ./lazy-lock.json;
+    xdg.configFile = {
+      "nvim/lazy-lock.json" = {
+        source = config.lib.file.mkFlakeSymlink ./lazy-lock.json;
+        force = true;
+      };
+      "nvim/lua" = {
+        source = config.lib.file.mkFlakeSymlink ./lua;
+        force = true;
+      };
+      "nvim/snippets" = {
+        source = config.lib.file.mkFlakeSymlink ./snippets;
+        force = true;
+      };
+    }
+    // lib.listToAttrs (
+      builtins.map (source: {
+        name = "nvim/after/ftplugin/${builtins.baseNameOf source}";
+        value = {
+          source = config.lib.file.mkFlakeSymlink source;
           force = true;
         };
-        "nvim/lua" = {
-          source = config.lib.file.mkFlakeSymlink ./lua;
-          force = true;
-        };
-        "nvim/snippets" = {
-          source = config.lib.file.mkFlakeSymlink ./snippets;
-          force = true;
-        };
-      }
-      // lib.listToAttrs (
-        builtins.map (source: {
-          name = "nvim/after/ftplugin/${builtins.baseNameOf source}";
-          value = {
-            source = config.lib.file.mkFlakeSymlink source;
-            force = true;
-          };
-        }) (lib.filesystem.listFilesRecursive ./after/ftplugin)
-      );
+      }) (lib.filesystem.listFilesRecursive ./after/ftplugin)
+    );
 
     programs.zsh.shellAliases.vimdiff = "nvim -d";
 

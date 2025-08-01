@@ -5,12 +5,12 @@
 }:
 stdenvNoCC.mkDerivation {
   pname = "node-exporter-full.json";
-  version = "0-unstable-2025-07-23";
+  version = "0-unstable-2025-07-27";
   src = fetchFromGitHub {
     owner = "rfmoz";
     repo = "grafana-dashboards";
-    rev = "925c74c8af03133a5c1969a73b5af8ef4fe1c488";
-    sha256 = "sha256-SiYaSNgXGFyEJaL0xbD8rXBcetl3P5ylA0CwOD4cJbU=";
+    rev = "33d1847cfd7be0814eee52048dc23f22ff130b11";
+    sha256 = "sha256-RZeOVxmtadZV6jKwpztyQPEtsEttQyjaLLbwq1twQc8=";
   };
 
   installPhase = ''

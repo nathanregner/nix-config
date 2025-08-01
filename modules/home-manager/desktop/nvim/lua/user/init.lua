@@ -836,7 +836,7 @@ require("lazy").setup({
       "nvim-treesitter/nvim-treesitter",
       -- Adapters
       "marilari88/neotest-vitest",
-      nix_spec({ "nvim-neotest/neotest-jest" }),
+      "nvim-neotest/neotest-jest",
       "rouge8/neotest-rust",
     },
     config = function()
