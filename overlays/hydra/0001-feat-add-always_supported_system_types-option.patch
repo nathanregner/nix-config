@@ -1,20 +1,20 @@
-From 0f280a8686cdb3faf51bcee5e4991572ff7c2220 Mon Sep 17 00:00:00 2001
+From e2f7c3bc456080dacacebec521ad6481d387bd31 Mon Sep 17 00:00:00 2001
 From: Nathan Regner <nathanregner@gmail.com>
 Date: Sat, 6 Apr 2024 11:34:44 -0600
-Subject: [PATCH 3/3] feat: add always_supported_system_types option
+Subject: [PATCH 1/2] feat: add always_supported_system_types option
 
 Don't immediately abort jobs for build machines that aren't online
 ---
  src/hydra-queue-runner/dispatcher.cc         | 4 ++++
- src/hydra-queue-runner/hydra-queue-runner.cc | 1 +
- src/hydra-queue-runner/state.hh              | 1 +
- 3 files changed, 6 insertions(+)
+ src/hydra-queue-runner/hydra-queue-runner.cc | 2 ++
+ src/hydra-queue-runner/state.hh              | 2 ++
+ 3 files changed, 8 insertions(+)
 
 diff --git a/src/hydra-queue-runner/dispatcher.cc b/src/hydra-queue-runner/dispatcher.cc
-index 6d738ded..ce879d33 100644
+index ada25dc6..75791d55 100644
 --- a/src/hydra-queue-runner/dispatcher.cc
 +++ b/src/hydra-queue-runner/dispatcher.cc
-@@ -345,6 +345,10 @@ void State::abortUnsupported()
+@@ -358,6 +358,10 @@ void State::abortUnsupported()
  
          bool supported = false;
          for (auto & machine : machines2) {
@@ -26,29 +26,31 @@ index 6d738ded..ce879d33 100644
                  step->state.lock()->lastSupported = now;
                  supported = true;
 diff --git a/src/hydra-queue-runner/hydra-queue-runner.cc b/src/hydra-queue-runner/hydra-queue-runner.cc
-index 0ee710cb..3de5edb6 100644
+index 7cdc04b3..ebe17839 100644
 --- a/src/hydra-queue-runner/hydra-queue-runner.cc
 +++ b/src/hydra-queue-runner/hydra-queue-runner.cc
-@@ -853,6 +853,7 @@ void State::run(BuildID buildOne)
-     _destStore = storeUri == "" ? localStore : openStore(storeUri);
+@@ -830,6 +830,8 @@ void State::run(BuildID buildOne)
  
      useSubstitutes = config->getBoolOption("use-substitutes", false);
-+    alwaysSupportedSystemTypes = tokenizeString<StringSet>(config->getStrOption("always_supported_system_types", ""), ",");
  
++    alwaysSupportedSystemTypes = tokenizeString<StringSet>(config->getStrOption("always_supported_system_types", ""), ",");
++
      // FIXME: hacky mechanism for configuring determinism checks.
      for (auto & s : tokenizeString<Strings>(config->getStrOption("xxx-jobset-repeats"))) {
+         auto s2 = tokenizeString<std::vector<std::string>>(s, ":");
 diff --git a/src/hydra-queue-runner/state.hh b/src/hydra-queue-runner/state.hh
-index cda238ae..a44697b9 100644
+index f7ab7de3..357270f9 100644
 --- a/src/hydra-queue-runner/state.hh
 +++ b/src/hydra-queue-runner/state.hh
-@@ -328,6 +328,7 @@ private:
-     nix::Path hydraData, logDir;
+@@ -325,6 +325,8 @@ private:
  
      bool useSubstitutes = false;
-+    std::set<std::string> alwaysSupportedSystemTypes;
  
++    nix::StringSet alwaysSupportedSystemTypes;
++
      /* The queued builds. */
      typedef std::map<BuildID, Build::ptr> Builds;
+     nix::Sync<Builds> builds;
 -- 
-2.40.1
+2.49.0
 
