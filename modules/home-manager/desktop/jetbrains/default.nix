@@ -47,21 +47,34 @@ in
   config = lib.mkIf cfg.enable {
     home.file.".ideavimrc".source = config.lib.file.mkFlakeSymlink ./ideavimrc;
 
-    home.packages = lib.optionals pkgs.stdenv.isLinux [
-      pkgs.unstable.jetbrains-toolbox
-    ];
+    home.packages =
+      optionals pkgs.stdenv.isLinux [
+        pkgs.unstable.jetbrains-toolbox
+      ]
+      ++ lib.optionals pkgs.stdenv.isLinux (
+        let
+          launchDetached =
+            name: bin:
+            pkgs.writeShellScriptBin name ''
+              nohup ${bin} "$@" &> /dev/null & disown %%
+            '';
+        in
+        [
+          (launchDetached "idea" "~/.local/share/JetBrains/Toolbox/apps/intellij-idea-ultimate/bin/idea")
+          (launchDetached "datagrip" "~/.local/share/JetBrains/Toolbox/apps/datagrip/bin/datagrip")
+        ]
+      );
 
-    programs.zsh.shellAliases =
-      if pkgs.stdenv.isLinux then
-        {
-          idea = "~/.local/share/JetBrains/Toolbox/apps/intellij-idea-ultimate/bin/idea";
-          datagrip = "~/.local/share/JetBrains/Toolbox/apps/datagrip/bin/datagrip";
-        }
-      else
-        {
-          idea = "open -na ~/Applications/IntelliJ\\ IDEA\\ Ultimate*.app/Contents/MacOS/idea --args";
-          datagrip = "open -na ~/Applications/DataGrip\\*.app/Contents/MacOS/datagrip --args";
-        };
+    programs.jetbrains.tools = {
+      datagrip = { };
+      idea = { };
+    };
+
+    # TODO: move to cfg.tools
+    programs.zsh.shellAliases = lib.optionalAttrs pkgs.stdenv.isDarwin {
+      idea = "open -na ~/Applications/IntelliJ\\ IDEA\\ Ultimate*.app/Contents/MacOS/idea --args";
+      datagrip = "open -na ~/Applications/DataGrip\\*.app/Contents/MacOS/datagrip --args";
+    };
 
     xdg.configFile = lib.mkMerge (
       builtins.concatMap linkConfigFiles [
