@@ -9,6 +9,10 @@
     plugins = with pkgs.unstable.reposilitePlugins; [
       checksum
     ];
+    extraArgs = [
+      "--token"
+      "admin:tailscale"
+    ];
   };
 
   nginx.subdomain.maven."/".extraConfig = # nginx
