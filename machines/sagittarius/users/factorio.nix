@@ -5,8 +5,10 @@
     allowedUDPPorts = [ 34197 ];
   };
 
-  local.services.backup.restic.factorio = {
+  local.services.backup.paths.factorio = {
     paths = [ "/home/factorio" ];
-    s3 = { };
+    restic = {
+      s3 = { };
+    };
   };
 }

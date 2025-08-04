@@ -17,9 +17,11 @@ in
     "/".proxyPass = "http://127.0.0.1:${toString config.services.mealie.port}/";
   };
 
-  local.services.backup.restic.mealie = {
+  local.services.backup.paths.mealie = {
     dynamicFilesFrom = "realpath ${dataDir}";
-    s3 = { };
+    restic = {
+      s3 = { };
+    };
   };
 
   assertions = [
