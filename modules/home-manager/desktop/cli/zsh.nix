@@ -4,5 +4,9 @@
     enable = true;
     initContent = builtins.readFile ./zshrc.zsh;
     syntaxHighlighting.enable = true;
+
+    history = {
+      ignoreAllDups = true;
+    };
   };
 }
