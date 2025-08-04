@@ -9,6 +9,7 @@
     plugins = with pkgs.unstable.reposilitePlugins; [
       checksum
     ];
+    # FIXME
     extraArgs = [
       "--token"
       "admin:tailscale"

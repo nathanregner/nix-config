@@ -5,7 +5,7 @@
   ...
 }:
 let
-  cfg = config.programs.jetbrains;
+  cfg = config.local.programs.jetbrains;
 
   listFilesRecursive =
     root:
@@ -37,7 +37,11 @@ let
     ) (commonConfig ++ appConfig);
 in
 {
-  options.programs.jetbrains = {
+  imports = [
+    ./gradle.nix
+  ];
+
+  options.local.programs.jetbrains = {
     enable = lib.mkOption {
       type = lib.types.bool;
       default = true;
@@ -45,6 +49,7 @@ in
   };
 
   config = lib.mkIf cfg.enable {
+
     home.file.".ideavimrc".source = config.lib.file.mkFlakeSymlink ./ideavimrc;
 
     home.packages = lib.optionals pkgs.stdenv.isLinux [
