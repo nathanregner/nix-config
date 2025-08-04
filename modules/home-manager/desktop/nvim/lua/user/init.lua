@@ -227,7 +227,7 @@ require("lazy").setup({
 
   { -- Autocompletion
     "hrsh7th/nvim-cmp",
-    lazy = false,
+    event = { "InsertEnter", "CmdlineEnter" },
     dependencies = {
       -- Snippet Engine & its associated nvim-cmp source
       nix_spec({
@@ -582,6 +582,7 @@ require("lazy").setup({
 
   { -- Autoformat
     "stevearc/conform.nvim",
+    event = "VeryLazy",
     dependencies = { "folke/neoconf.nvim" },
     config = function() require("user.conform") end,
   },
@@ -882,6 +883,49 @@ require("lazy").setup({
       "nvim-neotest/neotest-jest",
       "rouge8/neotest-rust",
     },
+    lazy = true,
+    keys = {
+      {
+        "<localleader>tt",
+        function(args)
+          local neotest = require("neotest")
+          neotest.run.run(args)
+          neotest.summary.open()
+        end,
+        "[T]est [T]his",
+      },
+
+      {
+        "<localleader>tf",
+        function()
+          local neotest = require("neotest")
+          neotest.run.run(vim.fn.expand("%"))
+          neotest.summary.open()
+        end,
+        "[T]est [F]ile",
+      },
+      {
+        "<localleader>tq",
+        function()
+          local neotest = require("neotest")
+          neotest.run.stop()
+          neotest.watch.stop()
+          neotest.summary.close()
+        end,
+        "[T]est [Q]uit",
+      },
+      {
+        "<localleader>twt",
+        function()
+          local neotest = require("neotest")
+          neotest.watch.watch()
+          neotest.summary.open()
+        end,
+        "[T]est [W]atch [T]his",
+      },
+      { "<localleader>twq", function() neotest.watch.stop() end, "[T]est [W]atch [Q]uit" },
+      { "<localleader>tr", function() neotest.output_panel.clear() end, "[T]est [R]eset logs" },
+    },
     config = function()
       local neotest = require("neotest")
       ---@diagnostic disable-next-line: missing-fields
@@ -903,34 +947,6 @@ require("lazy").setup({
           enter = true,
         },
       })
-
-      -- :run_all_tests "ta"
-      -- :run_current_ns_tests "tn"
-      -- :run_alternate_ns_tests "tN"
-      -- :run_current_test "tc"
-      local nmap = function(keys, func, desc) vim.keymap.set("n", keys, func, { desc = desc }) end
-
-      local show_summary = function() neotest.summary.open() end
-
-      nmap("<localleader>tt", function(args)
-        neotest.run.run(args)
-        show_summary()
-      end, "[T]est [T]his")
-      nmap("<localleader>tf", function()
-        neotest.run.run(vim.fn.expand("%"))
-        show_summary()
-      end, "[T]est [F]ile")
-      nmap("<localleader>tq", function()
-        neotest.run.stop()
-        neotest.watch.stop()
-        neotest.summary.close()
-      end, "[T]est [Q]uit")
-      nmap("<localleader>twt", function()
-        neotest.watch.watch()
-        show_summary()
-      end, "[T]est [W]atch [T]his")
-      nmap("<localleader>twq", function() neotest.watch.stop() end, "[T]est [W]atch [Q]uit")
-      nmap("<localleader>tr", function() neotest.output_panel.clear() end, "[T]est [R]eset logs")
     end,
   },
 
@@ -1219,14 +1235,6 @@ require("lazy").setup({
   performance = {
     rtp = { paths = vim.g.nix.rtp },
   },
-})
-
--- https://trstringer.com/neovim-auto-reopen-files/
-vim.api.nvim_create_autocmd("VimLeavePre", {
-  pattern = "*",
-  callback = function()
-    if vim.g.savesession then vim.api.nvim_command("mks!") end
-  end,
 })
 
 -- [[ Setting options ]]
