@@ -212,7 +212,13 @@ return {
     },
   },
   {
-    "nathanregner/nvim-ts-autotag", -- TODO
-    opts = {},
+    "tronikelis/ts-autotag.nvim",
+    event = "VeryLazy",
+    ft = { "javascriptreact", "typescriptreact", "html", "xml" },
+    opts = {
+      auto_rename = {
+        enabled = true,
+      },
+    },
   },
 }
