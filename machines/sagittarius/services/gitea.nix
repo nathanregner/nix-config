@@ -71,8 +71,10 @@
     '';
   };
 
-  local.services.backup.restic.gitea = {
+  local.services.backup.paths.gitea = {
     paths = [ config.services.gitea.stateDir ];
-    s3 = { };
+    restic = {
+      s3 = { };
+    };
   };
 }

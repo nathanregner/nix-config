@@ -55,14 +55,16 @@ in
       ) cfg
     );
 
-    local.services.backup.restic = builtins.mapAttrs (
+    local.services.backup.paths = builtins.mapAttrs (
       user: cfg':
       let
         inherit (config.users.users.${user}) home;
       in
       {
         paths = [ "${home}/${cfg'.backupDir}" ];
-        s3 = { };
+        restic = {
+          s3 = { };
+        };
       }
     ) cfg;
   };
