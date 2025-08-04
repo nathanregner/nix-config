@@ -1,7 +1,4 @@
 { self, config, ... }:
-let
-  cfg = self.globals.services.prometheus;
-in
 {
   # https://wiki.nixos.org/wiki/Prometheus
   # https://nixos.org/manual/nixos/stable/#module-services-prometheus-exporters-configuration
@@ -15,7 +12,7 @@ in
           builtins.map
             (node: {
               targets = [
-                "${node}:${toString cfg.node.port}"
+                "${node}:${toString self.globals.services.prometheus.node.port}"
               ];
             })
             [
@@ -31,7 +28,7 @@ in
           builtins.map
             (node: {
               targets = [
-                "${node}:${toString cfg.klipper.port}"
+                "${node}:${toString self.globals.services.prometheus.klipper.port}"
               ];
             })
             [
@@ -51,13 +48,6 @@ in
           { targets = [ "localhost:${toString config.services.prometheus.exporters.nginxlog.port}" ]; }
         ];
       }
-    ];
-  };
-
-  services.prometheus.pushgateway = {
-    enable = true;
-    extraFlags = [
-      "--web.listen-address=0.0.0.0:${toString cfg.pushgateway.port}"
     ];
   };
 }

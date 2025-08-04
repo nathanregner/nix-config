@@ -4,126 +4,81 @@
   lib,
   ...
 }:
+with lib;
 let
-  inherit (lib)
-    foldl
-    getAttrs
-    mapAttrs
-    mapAttrs'
-    mapAttrsToList
-    mkOption
-    trivial
-    types
-    ;
-
-  copyOption = builtins.intersectAttrs {
-    _type = null;
-    apply = null;
-    default = null;
-    defaultText = null;
-    description = null;
-    example = null;
-    internal = null;
-    readOnly = null;
-    relatedPackages = null;
-    type = null;
-    visible = null;
-  };
-  resticOptions = mapAttrs (_: copyOption) (
-    removeAttrs (options.services.restic.backups.type.getSubOptions [ ]) [ "_module" ]
-  );
-
   cfg = config.local.services.backup;
-  systemConfig = config;
-
-  toplevel = [
-    "dynamicFilesFrom"
-    "paths"
-    "pruneOpts"
-    "timerConfig"
-  ];
 in
 {
   options.local.services.backup.enable = mkOption {
     default = !(options.virtualisation ? qemu);
   };
 
-  # FIXME: define option to fix sops infrec?
-
-  options.local.services.backup.restic = mkOption {
+  # TODO: error if no files
+  options.local.services.backup.paths = mkOption {
     default = { };
     type = types.attrsOf (
-      types.submodule (
-        { name, config, ... }:
-        let
-          mkMerged = name: overrides: resticOptions.${name} // overrides;
-          mkDefault = name: default: resticOptions.${name} // { inherit default; };
-          # FIXME
-          # mkInherited = name: resticOptions.${name} // { default = config.${name}; };
-          mkInherited = name: resticOptions.${name};
-          mkReadOnly =
-            name: default:
-            (lib.trace name (lib.traceVal resticOptions.${name}))
-            // {
-              inherit default;
-              readOnly = true;
-            };
-        in
-        {
-          options =
-            (
-              (
-                (getAttrs toplevel resticOptions)
-                // (mapAttrs mkDefault {
-                  pruneOpts = [
-                    "--keep-within 7d"
-                    "--keep-within-daily 1m"
-                    "--keep-within-weekly 6m"
-                    "--keep-within-monthly 1y"
-                  ];
-                })
-              )
-            )
-            // {
-              s3 = mkOption {
-                type = types.submodule {
-                  options =
-                    { }
-                    // resticOptions
-                    # // (genAttrs toplevel mkInherited)
-                    // (mapAttrs mkReadOnly {
-                      repository = "s3:s3.dualstack.us-west-2.amazonaws.com/nregner-restic/${systemConfig.networking.hostName}/${name}";
-                      initialize = true;
-                      # passwordFile = systemConfig.sops.secrets.restic-password.path;
-                      # environmentFile = systemConfig.sops.secrets.restic-s3-env.path;
-                    });
+      types.submodule {
+        options =
+          (lib.getAttrs [
+            "dynamicFilesFrom"
+            "paths"
+            "timerConfig"
+          ] (options.services.restic.backups.type.getSubOptions [ ]))
+          // {
+            restic = mkOption {
+              type = types.submodule {
+                options = {
+                  s3 = mkOption {
+                    type = types.attrs; # TODO
+                  };
                 };
               };
             };
-        }
-      )
+          };
+      }
     );
   };
 
   config = lib.mkMerge [
     {
-      # https://discourse.nios.org/t/psa-pinning-users-uid-is-important-when-reinstalling-nios-restoring-backups/21819
-      local.services.backup.restic.nixos = {
+      # https://discourse.nixos.org/t/psa-pinning-users-uid-is-important-when-reinstalling-nixos-restoring-backups/21819
+      local.services.backup.paths.nixos = {
         paths = [ "/var/lib/nixos" ];
-        s3 = { };
+        restic = {
+          s3 = { };
+        };
       };
     }
     (lib.mkIf cfg.enable (
       let
-        resticJobs = trivial.pipe cfg.restic [
-          (mapAttrsToList (
-            name: repositories:
-            (mapAttrs' (type: opts: {
-              name = lib.traceVal "${name}-${type}";
-              value = lib.traceValSeqN 1 opts;
-            }) (builtins.removeAttrs repositories toplevel))
+        defaults = {
+          s3 = name: {
+            repository = "s3:s3.dualstack.us-west-2.amazonaws.com/nregner-restic/${config.networking.hostName}/${name}";
+            initialize = true;
+            passwordFile = config.sops.secrets.restic-password.path;
+            environmentFile = config.sops.secrets.restic-s3-env.path;
+            # https://restic.readthedocs.io/en/stable/060_forget.html#removing-snapshots-according-to-a-policy
+            pruneOpts = [
+              "--keep-within 7d"
+              "--keep-within-daily 1m"
+              "--keep-within-weekly 6m"
+              "--keep-within-monthly 1y"
+            ];
+          };
+        };
+        resticJobs = trivial.pipe cfg.paths [
+          (attrsets.mapAttrsToList (
+            name:
+            {
+              restic ? { },
+              ...
+            }@opts:
+            attrsets.mapAttrs' (type: job: {
+              name = "${name}-${type}";
+              value = ((defaults.${type} or (_: { })) name) // job // (builtins.removeAttrs opts [ "restic" ]);
+            }) restic
           ))
-          (foldl (acc: attrs: acc // attrs) { })
+          (lists.foldl (acc: attrs: acc // attrs) { })
         ];
       in
       {
@@ -143,7 +98,7 @@ in
         users.groups.restic = {
         };
 
-        services.restic.backups = lib.traceValSeqN 2 resticJobs;
+        services.restic.backups = resticJobs;
       }
     ))
   ];
