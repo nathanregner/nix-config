@@ -13,18 +13,18 @@ in
 
   users.users.nregner = {
     isNormalUser = true;
-    extraGroups =
-      [
-        "wheel"
-        "dialout"
-      ]
-      ++ ifTheyExist [
-        "docker"
-        "libvirtd"
-        "networkmanager"
-        "podman"
-        "restic"
-      ];
+    extraGroups = [
+      "wheel"
+      "dialout"
+    ]
+    ++ ifTheyExist [
+      "docker"
+      "libvirtd"
+      "networkmanager"
+      "podman"
+      "reposilite"
+      "restic"
+    ];
     openssh.authorizedKeys.keys = builtins.attrValues self.globals.ssh.userKeys.nregner;
   };
 
@@ -43,5 +43,4 @@ in
       }
     ];
   };
-
 }
