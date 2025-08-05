@@ -8,6 +8,7 @@
     };
     plugins = with pkgs.unstable.reposilitePlugins; [
       checksum
+      swagger
     ];
     # FIXME
     extraArgs = [
