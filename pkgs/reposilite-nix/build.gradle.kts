@@ -15,6 +15,9 @@ repositories {
     mavenCentral()
     maven {
         url = uri("https://maven.reposilite.com/releases/")
+        content {
+            includeGroup("com.reposilite")
+        }
     }
 }
 

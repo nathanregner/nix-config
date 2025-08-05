@@ -9,6 +9,7 @@
       config.treefmt.build.devShell
     ];
     packages = with pkgs.unstable; [
+      (python3.withPackages (ps: [ ps.requests ]))
       inputs'.deploy-rs.packages.default
       local.generate-sops-keys
       sops
