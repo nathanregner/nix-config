@@ -166,6 +166,9 @@
     <keyboard-shortcut first-keystroke="shift ctrl alt up" />
     <keyboard-shortcut first-keystroke="shift ctrl meta k" />
   </action>
+  <action id="VimFindActionIdAction">
+    <keyboard-shortcut first-keystroke="shift meta alt f1" />
+  </action>
   <action id="copilot.disposeInlays" />
   <action id="tasks.goto" />
 </keymap>
