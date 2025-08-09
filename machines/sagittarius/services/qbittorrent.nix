@@ -3,7 +3,7 @@
   services.qbittorrent = {
     enable = true;
     package = pkgs.unstable.qbittorrent-nox;
-    port = 8081;
+    webuiPort = 8081;
     openFirewall = false;
     settings = {
       Preferences = {
@@ -15,7 +15,7 @@
   };
 
   nginx.subdomain.qb."/".extraConfig = # nginx
-    "return 302 http://sagittarius:${toString config.services.qbittorrent.port}$request_uri;";
+    "return 302 http://sagittarius:${toString config.services.qbittorrent.webuiPort}$request_uri;";
 
   users.users.nregner.extraGroups = [ config.services.qbittorrent.group ];
 }
