@@ -9,6 +9,11 @@
         nix flake new -t github:NixOS/templates#''${1:-"utils-generic"} .
       }
 
+      flakify-parts() {
+        nix flake new -t github:numtide/devshell
+        # nix flake init -t github:hercules-ci/flake-parts
+      }
+
       nixify() {
         cp ${./templates}/{shell.nix,.envrc} .
         chmod +w {shell.nix,.envrc}
