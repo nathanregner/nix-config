@@ -5,11 +5,13 @@
     package = pkgs.unstable.qbittorrent-nox;
     webuiPort = 8081;
     openFirewall = false;
-    settings = {
+    serverConfig = {
       Preferences = {
-        "WebUI\\AuthSubnetWhitelist" = "100.0.0.0/8";
-        "WebUI\\AuthSubnetWhitelistEnabled" = "true";
-        "WebUI\\UseUPnP" = "false";
+        WebUI = {
+          AuthSubnetWhitelist = "100.0.0.0/8";
+          AuthSubnetWhitelistEnabled = "true";
+          UseUPnP = "false";
+        };
       };
     };
   };
