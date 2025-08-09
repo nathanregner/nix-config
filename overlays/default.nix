@@ -48,7 +48,7 @@ let
         ./hydra/0001-feat-add-always_supported_system_types-option.patch
         ./hydra/0002-feat-don-t-keep-failed-builds.patch
       ];
-      doCheck = false;
+      # doCheck = false;
     });
 
     # FIXME: hack to bypass "FATAL: Module ahci not found" error
