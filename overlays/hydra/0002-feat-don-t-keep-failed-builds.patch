@@ -1,0 +1,38 @@
+From 8885554a6e0e524f149b3ebeeb72d6bfd4bc6fe3 Mon Sep 17 00:00:00 2001
+From: Nathan Regner <nathanregner@gmail.com>
+Date: Fri, 16 Aug 2024 18:19:29 -0600
+Subject: [PATCH 2/2] feat: don't keep failed builds
+
+---
+ src/script/hydra-update-gc-roots | 15 ---------------
+ 1 file changed, 15 deletions(-)
+
+diff --git a/src/script/hydra-update-gc-roots b/src/script/hydra-update-gc-roots
+index 130cbb68..a7ff6901 100755
+--- a/src/script/hydra-update-gc-roots
++++ b/src/script/hydra-update-gc-roots
+@@ -131,21 +131,6 @@ foreach my $project ($db->resultset('Projects')->search({}, { order_by => ["name
+                 , order_by => "id desc", rows => $keepnr });
+         }
+ 
+-        # Note: we also keep the derivations of failed builds so that
+-        # they can be restarted.
+-        keepBuild($_, 1) foreach $jobset->builds->search(
+-            { "me.id" => { -in => $db->resultset('JobsetEvalMembers')->search({ eval => { -in => [@evals] } }, { select => "build" })->as_query }
+-            , finished => 1
+-            },
+-            {
+-                order_by => ["job", "me.id"],
+-                columns => [ @columns ],
+-                join      => 'jobset',
+-                '+select' => ['jobset.project', 'jobset.name'],
+-                '+as'     => ['jobset.project', 'jobset.name'],
+-            }
+-        );
+-
+         print STDERR "*** looking for the most recent successful builds of current jobs in ",
+             $project->name, ":", $jobset->name, "\n";
+ 
+-- 
+2.49.0
+

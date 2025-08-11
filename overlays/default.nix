@@ -3,15 +3,6 @@ let
   inherit (inputs.nixpkgs) lib;
   filterPackagesRecursive = import ../lib/filterPackagesRecursive.nix lib;
 
-  overrideAttrsWarnIfOutdated =
-    prev: args:
-    let
-      final = (prev.overrideAttrs args);
-    in
-    lib.warnIf (
-      (lib.versionOlder final.version prev.version) || (final.version == prev.version)
-    ) "${final.pname or "???"} has been updated: ${final.version} <= ${prev.version}" final;
-
   assertVersion =
     version: pkg:
     lib.throwIf (
@@ -54,9 +45,10 @@ let
 
     hydra = prev.hydra.overrideAttrs (oldAttrs: {
       patches = (oldAttrs.patches or [ ]) ++ [
-        ./hydra/feat-add-always_supported_system_types-option.patch
+        ./hydra/0001-feat-add-always_supported_system_types-option.patch
+        ./hydra/0002-feat-don-t-keep-failed-builds.patch
       ];
-      doCheck = false;
+      # doCheck = false;
     });
 
     # FIXME: hack to bypass "FATAL: Module ahci not found" error
@@ -69,13 +61,6 @@ let
         ./moonraker/0001-file_manager-Add-config-option-to-rename-duplicate-f.patch
       ];
     });
-
-    # nix-prefetch = prev.nix-prefetch.overrideAttrs (oldAttrs: {
-    #   patches = oldAttrs.patches or [ ] ++ [
-    #     # https://github.com/msteen/nix-prefetch/pull/34
-    #     ./nix-prefetch/34.patch
-    #   ];
-    # });
 
     nix-update-script =
       args:

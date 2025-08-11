@@ -1,74 +1,88 @@
 {
-  "maven-enforcer-plugin": {
-    "prefix": "maven-enforcer-plugin",
-    "body": [
-      "<plugin>",
-      "   <groupId>org.apache.maven.plugins</groupId>",
-      "   <artifactId>maven-enforcer-plugin</artifactId>",
-      "   <executions>",
-      "     <execution>",
-      "       <id>enforce-banned-dependencies</id>",
-      "       <goals>",
-      "         <goal>enforce</goal>",
-      "       </goals>",
-      "       <configuration>",
-      "         <rules>",
-      "           <requireMavenVersion>",
-      "             <version>3.6.3</version>",
-      "           </requireMavenVersion>",
-      "           <bannedDependencies>",
-      "             <excludes>",
-      "               <!-- using spring-boot-starter-log4j2 instead -->",
-      "               <!-- https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#howto.logging.log4j -->",
-      "               <exclude>org.springframework.boot:spring-boot-starter-logging</exclude>",
-      "             </excludes>",
-      "           </bannedDependencies>",
-      "         </rules>",
-      "         <fail>true</fail>",
-      "       </configuration>",
-      "     </execution>",
-      "   </executions>",
-      " </plugin>"
-    ]
-  },
-  "maven-profile-netty-resolver-dns-native-macos-aarch64": {
-    "prefix": "netty-resolver-dns-native-macos-aarch64",
-    "body": [
-      "<profile>",
-      "    <id>maven-profile-netty-resolver-dns-native-macos-aarch64</id>",
-      "    <activation>",
-      "        <os>",
-      "            <family>mac</family>",
-      "            <arch>aarch64</arch>",
-      "        </os>",
-      "    </activation>",
-      "    <dependencies>",
-      "        <dependency>",
-      "            <groupId>io.netty</groupId>",
-      "            <artifactId>netty-resolver-dns-native-macos</artifactId>",
-      "            <classifier>osx-aarch_64</classifier>",
-      "        </dependency>",
-      "    </dependencies>",
-      "</profile>"
-    ]
-  },
-  "maven-plugin-spring-javaformat": {
-    "body": [
-      "<plugin>",
-      "  <groupId>io.spring.javaformat</groupId>",
-      "  <artifactId>spring-javaformat-maven-plugin</artifactId>",
-      "  <version>0.0.46</version>",
-      "  <executions>",
-      "    <execution>",
-      "      <phase>validate</phase>",
-      "      <inherited>true</inherited>",
-      "      <goals>",
-      "        <goal>validate</goal>",
-      "      </goals>",
-      "    </execution>",
-      "  </executions>",
-      "</plugin>"
-    ],
-    "prefix": "maven-plugin-spring-javaformat"
-  }
+    "aws-sso": {
+        "body": [
+            "<dependency>",
+            "  <groupId>software.amazon.awssdk</groupId>",
+            "  <artifactId>sts</artifactId>",
+            "</dependency>",
+            "<dependency>",
+            "  <groupId>software.amazon.awssdk</groupId>",
+            "  <artifactId>sso</artifactId>",
+            "  <optional>true</optional>",
+            "</dependency>"
+        ],
+        "prefix": "aws-sso"
+    },
+    "maven-plugin-spring-javaformat": {
+        "body": [
+            "<plugin>",
+            "  <groupId>io.spring.javaformat</groupId>",
+            "  <artifactId>spring-javaformat-maven-plugin</artifactId>",
+            "  <version>0.0.47</version>",
+            "  <executions>",
+            "    <execution>",
+            "      <phase>validate</phase>",
+            "      <inherited>true</inherited>",
+            "      <goals>",
+            "        <goal>validate</goal>",
+            "      </goals>",
+            "    </execution>",
+            "  </executions>",
+            "</plugin>"
+        ],
+        "prefix": "maven-plugin-spring-javaformat"
+    },
+    "maven-enforcer-plugin": {
+        "body": [
+            "<plugin>",
+            "   <groupId>org.apache.maven.plugins</groupId>",
+            "   <artifactId>maven-enforcer-plugin</artifactId>",
+            "   <executions>",
+            "     <execution>",
+            "       <id>enforce-banned-dependencies</id>",
+            "       <goals>",
+            "         <goal>enforce</goal>",
+            "       </goals>",
+            "       <configuration>",
+            "         <rules>",
+            "           <requireMavenVersion>",
+            "             <version>3.6.3</version>",
+            "           </requireMavenVersion>",
+            "           <bannedDependencies>",
+            "             <excludes>",
+            "               <!-- using spring-boot-starter-log4j2 instead -->",
+            "               <!-- https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#howto.logging.log4j -->",
+            "               <exclude>org.springframework.boot:spring-boot-starter-logging</exclude>",
+            "             </excludes>",
+            "           </bannedDependencies>",
+            "         </rules>",
+            "         <fail>true</fail>",
+            "       </configuration>",
+            "     </execution>",
+            "   </executions>",
+            " </plugin>"
+        ],
+        "prefix": "maven-enforcer-plugin"
+    },
+    "maven-profile-netty-resolver-dns-native-macos-aarch64": {
+        "body": [
+            "<profile>",
+            "    <id>maven-profile-netty-resolver-dns-native-macos-aarch64</id>",
+            "    <activation>",
+            "        <os>",
+            "            <family>mac</family>",
+            "            <arch>aarch64</arch>",
+            "        </os>",
+            "    </activation>",
+            "    <dependencies>",
+            "        <dependency>",
+            "            <groupId>io.netty</groupId>",
+            "            <artifactId>netty-resolver-dns-native-macos</artifactId>",
+            "            <classifier>osx-aarch_64</classifier>",
+            "        </dependency>",
+            "    </dependencies>",
+            "</profile>"
+        ],
+        "prefix": "netty-resolver-dns-native-macos-aarch64"
+    }
 }

@@ -8,7 +8,7 @@
   imports = [
     inputs.catppuccin-nix.nixosModules.catppuccin
     inputs.nixos-generators.nixosModules.all-formats
-    ./keyd.nix
+    ./kanata.nix
     ./networking.nix
     ./nix.nix
     ./services

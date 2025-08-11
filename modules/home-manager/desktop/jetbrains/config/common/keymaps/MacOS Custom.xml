@@ -10,10 +10,6 @@
     <keyboard-shortcut first-keystroke="meta alt z" />
     <keyboard-shortcut first-keystroke="shift ctrl meta z" />
   </action>
-  <action id="ChooseRunConfiguration">
-    <keyboard-shortcut first-keystroke="ctrl alt r" />
-    <keyboard-shortcut first-keystroke="shift f10" />
-  </action>
   <action id="CloseAllEditorsButActive">
     <keyboard-shortcut first-keystroke="alt w" />
     <keyboard-shortcut first-keystroke="ctrl w" second-keystroke="o" />
@@ -123,6 +119,10 @@
   </action>
   <action id="RecentProjectListGroup">
     <keyboard-shortcut first-keystroke="shift ctrl meta comma" />
+  </action>
+  <action id="Rerun">
+    <keyboard-shortcut first-keystroke="meta r" />
+    <keyboard-shortcut first-keystroke="shift f10" />
   </action>
   <action id="RerunFailedTests">
     <keyboard-shortcut first-keystroke="shift ctrl meta r" />

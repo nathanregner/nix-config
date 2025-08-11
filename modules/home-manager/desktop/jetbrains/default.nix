@@ -6,15 +6,7 @@
 }:
 let
   inherit (lib)
-    concatLists
-    filesystem
-    map
-    mapAttrsToList
-    mkIf
-    mkMerge
     mkOption
-    optionals
-    path
     types
     ;
 
@@ -23,9 +15,9 @@ let
   listFilesRecursive =
     root:
     map (file: {
-      name = lib.removePrefix "./" (toString (path.removePrefix root file));
+      name = lib.removePrefix "./" (toString (lib.path.removePrefix root file));
       path = file;
-    }) (filesystem.listFilesRecursive root);
+    }) (lib.filesystem.listFilesRecursive root);
 
   linkConfigFiles =
     appName:
@@ -34,7 +26,7 @@ let
       commonConfig = listFilesRecursive ./config/common;
       appConfig = listFilesRecursive (./config + "/${appName}");
     in
-    (map (
+    (builtins.map (
       { name, path }:
       {
         "JetBrains/${appName}/config/${name}" = {
@@ -43,7 +35,7 @@ let
         };
       }
     ) (commonConfig ++ appConfig))
-    ++ map (plugin: {
+    ++ builtins.map (plugin: {
       "JetBrains/${appName}/config/plugins/${plugin.name}.jar" = {
         source = "${plugin}";
         force = true;
@@ -73,12 +65,23 @@ in
     };
   };
 
-  config = mkIf cfg.enable {
+  config = lib.mkIf cfg.enable {
     home.file.".ideavimrc".source = config.lib.file.mkFlakeSymlink ./ideavimrc;
 
-    home.packages = optionals pkgs.stdenv.isLinux [
-      pkgs.unstable.jetbrains-toolbox
-    ];
+    home.packages = lib.optionals pkgs.stdenv.isLinux (
+      let
+        launchDetached =
+          name: bin:
+          pkgs.writeShellScriptBin name ''
+            nohup ${bin} "$@" &> /dev/null & disown %%
+          '';
+      in
+      [
+        pkgs.unstable.jetbrains-toolbox
+        (launchDetached "idea" "~/.local/share/JetBrains/Toolbox/apps/intellij-idea-ultimate/bin/idea")
+        (launchDetached "datagrip" "~/.local/share/JetBrains/Toolbox/apps/datagrip/bin/datagrip")
+      ]
+    );
 
     programs.jetbrains.tools = {
       datagrip = { };
@@ -86,18 +89,11 @@ in
     };
 
     # TODO: move to cfg.tools
-    programs.zsh.shellAliases =
-      if pkgs.stdenv.isLinux then
-        {
-          idea = "~/.local/share/JetBrains/Toolbox/apps/intellij-idea-ultimate/bin/idea";
-          datagrip = "~/.local/share/JetBrains/Toolbox/apps/datagrip/bin/datagrip";
-        }
-      else
-        {
-          idea = "open -na ~/Applications/IntelliJ\\ IDEA\\ Ultimate*.app/Contents/MacOS/idea --args";
-          datagrip = "open -na ~/Applications/DataGrip\\*.app/Contents/MacOS/datagrip --args";
-        };
+    programs.zsh.shellAliases = lib.optionalAttrs pkgs.stdenv.isDarwin {
+      idea = "open -na ~/Applications/IntelliJ\\ IDEA\\ Ultimate*.app/Contents/MacOS/idea --args";
+      datagrip = "open -na ~/Applications/DataGrip\\*.app/Contents/MacOS/datagrip --args";
+    };
 
-    xdg.configFile = mkMerge (concatLists (mapAttrsToList linkConfigFiles cfg.tools));
+    xdg.configFile = lib.mkMerge (lib.concatLists (lib.mapAttrsToList linkConfigFiles cfg.tools));
   };
 }

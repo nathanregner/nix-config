@@ -36,6 +36,7 @@ def copy-worktree [$bare: path, $worktree: record] {
   git checkout $branch
   let temp = mktemp
   mv .git $temp
+  print -e $"($worktree.worktree)/*"
   cp -r ...(glob $"($worktree.worktree)/*") .
   rm -rf .git
   mv $temp .git
