@@ -16,8 +16,12 @@ vim.opt.listchars = "tab:\\t,extends:>,precedes:<,trail:·"
 -- https://unix.stackexchange.com/a/383044
 vim.o.autoread = true
 vim.api.nvim_create_autocmd({ "BufEnter", "CursorHold", "CursorHoldI", "FocusGained" }, {
-  command = "if mode() != 'c' | checktime | endif",
+  command = "if mode() !~ '\v(c|r.?|!|t)' && getcmdwintype() == '' | checktime | endif",
   pattern = { "*" },
+})
+vim.api.nvim_create_autocmd({ "FileChangedShellPost" }, {
+  pattern = "*",
+  callback = function() vim.notify("File changed on disk. Buffer reloaded.") end,
 })
 
 local function get_buffer_cwd()
