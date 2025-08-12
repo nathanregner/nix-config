@@ -70,6 +70,10 @@ let
       ]
       ++ (lib.lists.tail (prev.nix-update-script args));
 
+    tmux-sessionizer = assertLaterVersion (prev.callPackage ./tmux-sessionizer/package.nix
+      { }
+    ) prev.tmux-sessionizer;
+
     wrapNeovimUnstable =
       args: neovim-unwrapped:
       (prev.wrapNeovimUnstable args neovim-unwrapped).overrideAttrs {
