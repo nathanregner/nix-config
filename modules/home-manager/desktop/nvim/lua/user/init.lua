@@ -984,6 +984,8 @@ require("lazy").setup({
       )
       vim.keymap.set("n", "]x", next, { desc = "Trouble next" })
       vim.keymap.set("n", "[x", prev, { desc = "Trouble prev" })
+      vim.keymap.set("n", "]X", function() trouble.last({ jump = true }) end, { desc = "Trouble last" })
+      vim.keymap.set("n", "[X", function() trouble.first({ jump = true }) end, { desc = "Trouble first" })
     end,
     keys = {
       {
