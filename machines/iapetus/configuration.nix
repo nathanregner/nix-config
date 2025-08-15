@@ -29,12 +29,12 @@
     xkb.variant = "";
 
     displayManager.gdm.enable = true;
-    desktopManager.gnome.enable = true;
   };
 
-  programs.hyprland = {
+  # TODO: Launch directly, just use home-manager
+  programs.niri = {
     enable = true;
-    package = pkgs.unstable.hyprland;
+    package = pkgs.unstable.niri;
   };
 
   services.displayManager = {
@@ -42,54 +42,16 @@
       enable = true;
       user = "nregner";
     };
-
-    defaultSession = "hyprland";
-
-    environment = {
-      # https://wiki.hyprland.org/Configuring/Multi-GPU/
-      WLR_DRM_DEVICES = lib.concatStringsSep ":" [
-        "/dev/dri/by-path/pci-0000:2d:00.0-card" # RTX 2070 (primary)
-        "/dev/dri/by-path/pci-0000:24:00.0-card" # GTX 1060 (secondary)
-      ];
-    };
+    defaultSession = "niri";
   };
 
   security.pam.services.hyprlock = { };
-
-  # https://discourse.nixos.org/t/howto-disable-most-gnome-default-applications-and-what-they-are/13505/11
-  environment.gnome.excludePackages = with pkgs; [
-    adwaita-icon-theme
-    epiphany # web browser
-    gnome-backgrounds
-    gnome-bluetooth
-    gnome-calendar
-    gnome-color-manager
-    gnome-contacts
-    gnome-control-center
-    gnome-font-viewer
-    gnome-maps
-    gnome-menus
-    gnome-music
-    gnome-shell-extensions
-    gnome-system-monitor
-    gnome-text-editor
-    gnome-themes-extra
-    gnome-tour
-    gnome-user-docs
-    orca
-    simple-scan
-    yelp
-  ];
 
   # Workaround for GNOME autologin: https://github.com/NixOS/nixpkgs/issues/103746#issuecomment-945091229
   systemd.services."getty@tty1".enable = false;
   systemd.services."autovt@tty1".enable = false;
 
   programs.dconf.enable = true;
-
-  # Adds to `environment.pathsToLink` the path: `/share/nautilus-python/extensions`
-  # needed for nautilus Python extensions to work.
-  services.gnome.core-apps.enable = true;
 
   services.udisks2.enable = true;
 
@@ -122,7 +84,6 @@
     dates = null;
   };
 
-  # https://nixos.wiki/wiki/CCache#Derivation_CCache_2
   environment.systemPackages = [
     config.boot.kernelPackages.perf
   ]
@@ -132,6 +93,7 @@
     networkmanagerapplet
     libmtp
     virt-manager
+    xwayland-satellite
   ]);
 
   # boot.binfmt.emulatedSystems = [ "aarch64-linux" ];
