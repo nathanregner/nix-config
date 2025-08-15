@@ -1,4 +1,5 @@
 {
+  lib,
   fetchFromGitHub,
   nix-update-script,
   stdenvNoCC,
@@ -20,4 +21,6 @@ stdenvNoCC.mkDerivation {
   passthru.updateScript = nix-update-script {
     extraArgs = [ "--version=branch" ];
   };
+
+  meta.platforms = lib.platforms.unix;
 }
