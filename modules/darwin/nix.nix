@@ -5,10 +5,9 @@
     ../nixos/desktop/nix.nix
   ];
 
-  nix.gc = {
-    automatic = true;
-    options = "--delete-older-than 7d";
-  };
+  # https://github.com/nix-darwin/nix-darwin/issues/1307
+  nix.gc.automatic = lib.mkForce false;
+  nix.optimise.automatic = lib.mkForce false;
 
   # https://github.com/NixOS/nix/issues/4119#issuecomment-1734738812
   nix.settings = {
