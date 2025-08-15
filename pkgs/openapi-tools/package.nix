@@ -51,6 +51,8 @@ let
       };
       updateScript = cargo-update-script pkg { };
     };
+
+    meta.platforms = [ "x86_64-linux" ];
   };
 in
 pkg

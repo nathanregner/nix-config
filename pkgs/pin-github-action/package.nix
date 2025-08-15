@@ -26,4 +26,9 @@ buildNpmPackage rec {
     #   exec -a "$0" bash -c 'echo $0'
     # '')];
   };
+
+  meta.platforms = [
+    "x86_64-linux"
+    "aarch64-darwin"
+  ];
 }
