@@ -3,14 +3,12 @@
   imports = [
     ../base
     ./alacritty.nix
-    ./ast-grep
     ./cli
     ./firefox
     ./insync.nix
     ./jetbrains
     ./nvim
     ./sops.nix
-    ./terraform
     ./theme.nix
   ];
 

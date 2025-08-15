@@ -1,6 +1,7 @@
 { pkgs, ... }:
 {
   imports = [
+    ./ast-grep
     ./direnv.nix
     ./git
     ./k9s.nix
@@ -8,6 +9,7 @@
     ./nix.nix
     ./nushell
     ./starship.nix
+    ./terraform
     ./tmux-sessionizer.nix
     ./topiary.nix
     ./zoxide.nix

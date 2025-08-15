@@ -88,6 +88,9 @@
     # orca-slicer
     super-slicer-beta
 
+    # nix
+    xdot
+
     # rust
     cargo-autoinherit
     cargo-outdated
