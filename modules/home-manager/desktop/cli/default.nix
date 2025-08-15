@@ -25,6 +25,7 @@
     parallel
 
     # filesystem
+    dua
     fd
     file
     pv
@@ -34,11 +35,7 @@
     trash-cli
 
     # archive formats
-    gnutar
-    unzip
-    xz
-    zip
-    zstd
+    ouch
 
     # system monitoring
     htop-vim
