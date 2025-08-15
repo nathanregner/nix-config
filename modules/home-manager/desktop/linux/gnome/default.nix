@@ -1,25 +1,19 @@
 { lib, pkgs, ... }:
 {
+  imports = [
+    ../.
+  ];
+
   home.packages = with pkgs.unstable; [
     gnomeExtensions.tray-icons-reloaded
     gnomeExtensions.vitals
     gnomeExtensions.dash-to-panel
     gnomeExtensions.sound-output-device-chooser
     gnomeExtensions.space-bar
-
-    dconf2nix
   ];
 
   # Generated via dconf2nix: https://github.com/gvolpe/dconf2nix
   dconf.settings = with lib.hm.gvariant; {
-    "com/github/wwmm/easyeffects/streamoutputs/bassenhancer/0" = {
-      amount = 6.0;
-      bypass = false;
-      input-gain = -8.0;
-      listen = false;
-      output-gain = 0.0;
-    };
-
     "org/gnome/desktop/interface" = {
       clock = "12h";
       clock-format = "12h";

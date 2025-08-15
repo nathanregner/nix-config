@@ -1,14 +1,11 @@
 { lib, pkgs, ... }:
 {
   imports = [
-    ../../modules/home-manager/desktop
-    ../../modules/home-manager/desktop/gnome
-    ../../modules/home-manager/desktop/jetbrains
+    ../../modules/home-manager/desktop/linux/gnome
   ];
 
   home.packages = with pkgs; [
     # apps
-    insync
     openrgb
 
     # tools
@@ -22,8 +19,6 @@
       size = lib.mkForce 11;
     };
   };
-
-  services.easyeffects.enable = true;
 
   home = {
     username = "nregner";

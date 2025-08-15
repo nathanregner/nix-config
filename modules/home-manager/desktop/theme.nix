@@ -2,7 +2,6 @@
 {
   imports = [
     inputs.catppuccin-nix.homeModules.catppuccin
-    ./theme.linux.nix
   ];
 
   catppuccin = {
