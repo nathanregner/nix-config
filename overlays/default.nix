@@ -70,6 +70,10 @@ let
       ]
       ++ (lib.lists.tail (prev.nix-update-script args));
 
+    tailscale = (assertVersion "1.86.4" prev.tailscale).overrideAttrs {
+      doCheck = false;
+    };
+
     tmux-sessionizer = assertLaterVersion (prev.callPackage ./tmux-sessionizer/package.nix
       { }
     ) prev.tmux-sessionizer;
@@ -112,10 +116,21 @@ rec {
       inherit (stableFinal) system;
       config.allowUnfree = true;
       overlays = [
-        (final: prev: {
-          inherit (stableFinal) local;
-        })
+        (final: prev: { inherit (stableFinal) local; })
         sharedModifications
+        (
+          final: prev:
+          lib.optionalAttrs stableFinal.stdenv.isDarwin ({
+            tailscale = (assertVersion "1.86.4" prev.tailscale).overrideAttrs {
+              doCheck = false;
+            };
+          })
+          // {
+            hydra = (assertVersion "0-unstable-2025-08-12" prev.hydra).overrideAttrs {
+              doCheck = false;
+            };
+          }
+        )
       ];
     };
   };
