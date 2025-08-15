@@ -60,11 +60,7 @@
     which
 
     # archive formats
-    gnutar
-    unzip
-    xz
-    zip
-    zstd
+    ouch
 
     # system monitoring
     htop-vim

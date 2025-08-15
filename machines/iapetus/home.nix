@@ -88,12 +88,6 @@
     # orca-slicer
     super-slicer-beta
 
-    # nix
-    nix-output-monitor
-    nixfmt-rfc-style
-    nix-du # nix-du -s=500MB | xdot -
-    xdot
-
     # rust
     cargo-autoinherit
     cargo-outdated
