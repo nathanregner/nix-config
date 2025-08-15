@@ -414,6 +414,7 @@ require("lazy").setup({
             },
           },
         },
+        kotlin_lsp = {},
         lua_ls = {
           Lua = {
             workspace = { checkThirdParty = false },

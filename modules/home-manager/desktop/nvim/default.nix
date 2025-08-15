@@ -64,6 +64,9 @@ in
             vtsls
             yaml-language-server
             ;
+          inherit (pkgs.unstable.local)
+            kotlin-lsp
+            ;
 
           # formatters/linters
           inherit (pkgs.unstable)
