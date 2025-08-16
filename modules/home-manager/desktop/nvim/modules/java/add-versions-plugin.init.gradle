@@ -1,0 +1,25 @@
+initscript {
+  repositories {
+     gradlePluginPortal()
+  }
+
+  dependencies {
+    classpath 'com.github.ben-manes:gradle-versions-plugin:+'
+  }
+}
+
+def isStable = { String version ->
+  def stableKeyword = listOf("RELEASE", "FINAL", "GA").any { version.toUpperCase().contains(it) }
+  def stableVersion = version ==~ /^[0-9,.v-]+(-r)?$/
+  return stableKeyword || stableVersion
+}
+
+allprojects {
+  apply plugin: com.github.benmanes.gradle.versions.VersionsPlugin
+
+  tasks.named("dependencyUpdates").configure {
+    rejectVersionIf {
+      isStable(it.currentVersion) && !isStable(it.candidate.version)
+    }
+  }
+}
