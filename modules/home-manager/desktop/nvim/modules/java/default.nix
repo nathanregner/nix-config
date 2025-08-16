@@ -55,7 +55,9 @@ in
       };
     };
 
-    home.file.".gradle/init.d/add-versions-plugin.init.gradle.kts".source =
-      ./add-versions-plugin.init.gradle.kts;
+    home.file.".gradle/init.d/add-versions-plugin.init.gradle.kts" = {
+      source = ./add-versions-plugin.init.gradle.kts;
+      force = true;
+    };
   };
 }
