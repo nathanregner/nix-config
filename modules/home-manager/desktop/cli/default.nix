@@ -1,6 +1,7 @@
 { pkgs, ... }:
 {
   imports = [
+    ./ast-grep
     ./direnv.nix
     ./git
     ./k9s.nix
@@ -8,6 +9,7 @@
     ./nix.nix
     ./nushell
     ./starship.nix
+    ./terraform
     ./tmux-sessionizer.nix
     ./topiary.nix
     ./zoxide.nix
@@ -25,6 +27,7 @@
     parallel
 
     # filesystem
+    dua
     fd
     file
     pv
@@ -34,11 +37,7 @@
     trash-cli
 
     # archive formats
-    gnutar
-    unzip
-    xz
-    zip
-    zstd
+    ouch
 
     # system monitoring
     htop-vim

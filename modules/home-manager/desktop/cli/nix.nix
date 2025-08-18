@@ -18,9 +18,11 @@
     nix-diff
     nix-du
     nix-init
+    nix-output-monitor
     nix-prefetch
     nix-tree
     nurl
+    xdot
   ];
 
   # https://discourse.nixos.org/t/nvd-simple-nix-nixos-version-diff-tool/12397/6
