@@ -86,10 +86,6 @@ let
       ]
       ++ (lib.lists.tail (prev.nix-update-script args));
 
-    tailscale = (assertVersion "1.86.4" prev.tailscale).overrideAttrs {
-      doCheck = false;
-    };
-
     tmux-sessionizer = assertLaterVersion (prev.callPackage ./tmux-sessionizer/package.nix
       { }
     ) prev.tmux-sessionizer;
