@@ -35,7 +35,7 @@
   # TODO: Launch directly
   programs.niri = {
     enable = true;
-    package = pkgs.unstable.niri;
+    package = pkgs.niri;
   };
 
   services.displayManager = {
