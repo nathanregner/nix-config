@@ -51,20 +51,12 @@
       ];
     };
 
-    # https://wiki.hyprland.org/0.20.1beta/Getting-Started/Installation/
-    sddm = {
-      enable = true;
-      wayland.enable = true;
-      package = pkgs.unstable.kdePackages.sddm;
-    };
+    gdm.enable = true;
   };
-
-  catppuccin.sddm.enable = true;
 
   security.pam.services.hyprlock = { };
 
-  # services.xserver.displayManager.gdm.enable = true;
-  services.xserver.desktopManager.gnome.enable = true;
+  services.desktopManager.gnome.enable = true;
 
   # https://discourse.nixos.org/t/howto-disable-most-gnome-default-applications-and-what-they-are/13505/11
   environment.gnome.excludePackages = with pkgs; [
@@ -133,16 +125,17 @@
   };
 
   # https://nixos.wiki/wiki/CCache#Derivation_CCache_2
-  environment.systemPackages =
-    [ config.boot.kernelPackages.perf ]
-    ++ (with pkgs.unstable; [
-      android-file-transfer # aft-mtp-mount ~/mnt
-      nautilus-python
-      networkmanagerapplet
-      libmtp
-      virt-manager
-      xwayland-satellite
-    ]);
+  environment.systemPackages = [
+    config.boot.kernelPackages.perf
+  ]
+  ++ (with pkgs.unstable; [
+    android-file-transfer # aft-mtp-mount ~/mnt
+    nautilus-python
+    networkmanagerapplet
+    libmtp
+    virt-manager
+    xwayland-satellite
+  ]);
 
   # boot.binfmt.emulatedSystems = [ "aarch64-linux" ];
 
