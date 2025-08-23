@@ -28,16 +28,9 @@ local k = require("luasnip.nodes.key_indexer").new_key
 
 local treesitter_postfix = require("luasnip.extras.treesitter_postfix").treesitter_postfix
 
-ls.add_snippets("rust", {
-  s("ttfn", {
-    t({ "#[tokio::test]", "async fn " }),
-    i(1, "feature"),
-    t({ "() {", "" }),
-    i(2),
-    t("}"),
-  }),
-  s("ttfnr", {
-    t({ "#[tokio::test]", "async fn " }),
+local tfnr = function(attr, modifiers)
+  return {
+    t({ attr, modifiers .. " fn " }),
     i(1, "feature"),
     t("() -> "),
     d(2, function()
@@ -72,7 +65,19 @@ ls.add_snippets("rust", {
     t({ " {", "" }),
     i(3),
     t({ "    Ok(())", "}" }),
+  }
+end
+
+ls.add_snippets("rust", {
+  s("tfnr", tfnr("#[test]", "")),
+  s("ttfn", {
+    t({ "#[tokio::test]", "async fn " }),
+    i(1, "feature"),
+    t({ "() {", "" }),
+    i(2),
+    t("}"),
   }),
+  s("ttfnr", tfnr("#[tokio::test]", "async ")),
 }, {
   key = "user.rust",
   -- key = "__autosnippets__" .. ft .. "__" .. filename,
