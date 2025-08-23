@@ -7,12 +7,12 @@ local excond = require("luasnip.extras.expand_conditions")
 ls.add_snippets("all", {
   ms({
     common = { name = "shebang" },
-    {
+    --[[ {
       trig = "#!",
       regTrig = false,
       snippetType = "autosnippet",
       condition = excond.line_begin,
-    },
+    }, ]]
     { trig = "shebang", show_condition = function(line_to_cursor) return line_to_cursor == "s" end },
   }, {
     t("#!/usr/bin/env "),
