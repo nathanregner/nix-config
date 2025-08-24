@@ -19,6 +19,12 @@
   networking.networkmanager.enable = true;
   systemd.services.NetworkManager-wait-online.enable = false;
   services.blueman.enable = true;
+  services.resolved.enable = true;
+  security.polkit = {
+    enable = true;
+    debug = true;
+  };
+  environment.etc."polkit-1/rules.d/20-extra-rules.rules".source = ./polkit/rules.js;
 
   # Desktop environment
   services.xserver = {
