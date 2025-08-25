@@ -191,6 +191,8 @@ return {
           list = { node = "expression", ordinal = "literal_value" },
         },
         toml = {
+          array = { node = "string" },
+          pair = { node = "pair", ordinal = "bare_key" },
           table = { node = { "table" } },
         },
         typescript = {

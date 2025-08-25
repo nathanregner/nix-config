@@ -976,6 +976,8 @@ require("lazy").setup({
     }, -- for default options, refer to the configuration section for custom setup.
     cmd = "Trouble",
     init = function()
+      ---@type any
+      local trouble = require("trouble")
       local ts_repeat_move = require("nvim-treesitter.textobjects.repeatable_move")
       local trouble = require("trouble")
       local next, prev = ts_repeat_move.make_repeatable_move_pair(
