@@ -3,10 +3,29 @@
   pkgs,
   ...
 }:
+let
+  inherit (config.lib.file) mkFlakeSymlink;
+in
 {
-  home.file.".hammerspoon" = {
-    source = ./hammerspoon;
-    recursive = true;
+  home.file = {
+    ".hammerspoon/Spoons" = {
+      source = pkgs.symlinkJoin {
+        name = "Spoons";
+        paths = [
+          ./hammerspoon/Spoons
+          "${pkgs.local.hammerspoon-spoons}"
+        ];
+      };
+      force = true;
+    };
+    ".hammerspoon/init.lua" = {
+      source = mkFlakeSymlink ./hammerspoon/init.lua;
+      force = true;
+    };
+    ".hammerspoon/autolayout.lua" = {
+      source = mkFlakeSymlink ./hammerspoon/autolayout.lua;
+      force = true;
+    };
   };
 
   home.packages = [ pkgs.local.hammerspoon ];
