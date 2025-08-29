@@ -272,7 +272,7 @@ require("lazy").setup({
       "yioneko/nvim-vtsls",
     },
     config = function()
-      local on_attach = function(client, bufnr)
+      local on_attach = function(_, bufnr)
         local map = function(mode, keys, func, desc)
           if desc then desc = "LSP: " .. desc end
 
@@ -454,6 +454,30 @@ require("lazy").setup({
               },
             },
           },
+          capabilities = {
+            experimental = {
+              -- https://github.com/rust-lang/rust-analyzer/blob/6e59defe113522a412d33cff1d8eb5d46f31e298/docs/book/src/contributing/lsp-extensions.md#open-external-documentation
+              localDocs = true,
+            },
+          },
+          on_attach = function(_, bufnr)
+            vim.api.nvim_buf_create_user_command(bufnr, "LspExternalDocs", function()
+              vim.lsp.buf_request(
+                bufnr,
+                ---@diagnostic disable-next-line: param-type-mismatch
+                "experimental/externalDocs",
+                vim.lsp.util.make_position_params(nil, "utf-8"),
+                function(err, response)
+                  if err then
+                    vim.notify(tostring(err), vim.log.levels.ERROR)
+                  else
+                    local url = response["local"] or response["web"]
+                    vim.cmd({ cmd = "Browse", args = { url } })
+                  end
+                end
+              )
+            end, { desc = "Open external documentation" })
+          end,
         },
         terraformls = {
           root_dir = util.root_pattern(".terraform", ".terraform.lock.hcl", ".git"),
@@ -493,14 +517,22 @@ require("lazy").setup({
         },
       }
 
-      local capabilities = vim.lsp.protocol.make_client_capabilities()
-      capabilities = vim.tbl_deep_extend("force", capabilities, require("cmp_nvim_lsp").default_capabilities())
+      -- local capabilities = vim.lsp.protocol.make_client_capabilities()
+      -- capabilities = vim.tbl_deep_extend("force", capabilities, require("cmp_nvim_lsp").default_capabilities())
+
+      local capabilities = require("cmp_nvim_lsp").default_capabilities()
 
       for server_name, server_config in pairs(servers) do
+        if server_config.capabilities then
+          capabilities = vim.tbl_deep_extend("force", capabilities, server_config.capabilities)
+        end
         require("lspconfig")[server_name].setup({
           cmd = server_config.cmd,
           capabilities = capabilities,
-          on_attach = on_attach,
+          on_attach = function(...)
+            on_attach(...)
+            if server_config.on_attach then server_config.on_attach(...) end
+          end,
           settings = server_config.settings,
           filetypes = server_config.filetypes,
           init_options = server_config.init_options,
