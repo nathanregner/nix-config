@@ -866,6 +866,8 @@ require("lazy").setup({
     },
   },
 
+  -- TODO: auto-show output panel on failure
+  -- TODO: auto-show clear on run (watch)
   { -- Neotest
     "nvim-neotest/neotest",
     dependencies = {
@@ -879,34 +881,48 @@ require("lazy").setup({
     },
     lazy = true,
     keys = {
+      { "<leader>ts", function() require("neotest").summary.toggle() end, "Test summary" },
+      { "<leader>to", function() require("neotest").output_panel.toggle() end, "Test output" },
       {
         "<localleader>tt",
-        function(args)
+        function()
           local neotest = require("neotest")
-          neotest.run.run(args)
+          neotest.output_panel.clear()
+          neotest.run.run()
           neotest.summary.open()
         end,
-        "[T]est [T]his",
+        "Test This",
       },
-
+      {
+        "<localleader>tp",
+        function()
+          local neotest = require("neotest")
+          neotest.output_panel.clear()
+          neotest.run.run("last")
+          neotest.summary.open()
+        end,
+        "Test Previous",
+      },
       {
         "<localleader>tf",
         function()
           local neotest = require("neotest")
+          neotest.output_panel.clear()
           neotest.run.run(vim.fn.expand("%"))
           neotest.summary.open()
         end,
-        "[T]est [F]ile",
+        "Test File",
       },
       {
-        "<localleader>tq",
+        "<leader>tq",
         function()
           local neotest = require("neotest")
           neotest.run.stop()
           neotest.watch.stop()
           neotest.summary.close()
+          neotest.output_panel.close()
         end,
-        "[T]est [Q]uit",
+        "Test Quit",
       },
       {
         "<localleader>twt",
@@ -915,10 +931,18 @@ require("lazy").setup({
           neotest.watch.watch()
           neotest.summary.open()
         end,
-        "[T]est [W]atch [T]his",
+        "Test Watch This",
       },
-      { "<localleader>twq", function() neotest.watch.stop() end, "[T]est [W]atch [Q]uit" },
-      { "<localleader>tr", function() neotest.output_panel.clear() end, "[T]est [R]eset logs" },
+      {
+        "<localleader>to",
+        function()
+          local neotest = require("neotest")
+          neotest.output.open({ short = true, enter = true, auto_close = true })
+        end,
+        "Test Quit",
+      },
+      { "<leader>twq", function() require("neotest").watch.stop() end, "Test Watch Quit" },
+      { "<leader>tr", function() require("neotest").output_panel.clear() end, "Test Reset logs" },
     },
     config = function()
       local neotest = require("neotest")
@@ -937,10 +961,19 @@ require("lazy").setup({
         },
         ---@diagnostic disable-next-line: missing-fields
         output = {
-          open_on_run = true,
+          open_on_run = false,
           enter = true,
         },
       })
+    end,
+    init = function()
+      local ts_repeat_move = require("nvim-treesitter.textobjects.repeatable_move")
+      local next, prev = ts_repeat_move.make_repeatable_move_pair(
+        function() require("neotest").jump.next({ status = "failed" }) end,
+        function() require("neotest").jump.prev({ status = "failed" }) end
+      )
+      vim.keymap.set("n", "]n", next, { desc = "Next failed test" })
+      vim.keymap.set("n", "[n", prev, { desc = "Previous failed test" })
     end,
   },
 
