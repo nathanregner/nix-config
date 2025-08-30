@@ -3,10 +3,8 @@
   projectRootFile = "flake.nix";
 
   programs = {
-    deadnix.enable = true;
-    nixfmt = {
-      enable = true;
-    };
+    # deadnix.enable = true;
+    nixfmt.enable = true;
     prettier = {
       enable = true;
       package = pkgs.unstable.nodejs.pkgs.prettier;
@@ -24,15 +22,20 @@
 
   settings.formatter = {
     joker = {
-      command = pkgs.writers.writeNuBin "treefmt-joker" ''
-        def main [...paths: string] {
-          for path in $paths {
-            let contents = ${pkgs.joker}/bin/joker --format $path
-            $contents | save -f $path
-          }
-        }
-      '';
-      includes = [ "*.clj" ];
+      command =
+        pkgs.writers.writeNuBin "treefmt-joker"
+          # nu
+          ''
+            def main [...paths: string] {
+              for path in $paths {
+                ${pkgs.joker}/bin/joker --format $path | complete | get stdout o> $path
+              }
+            }
+          '';
+      includes = [
+        "*.clj"
+        "*.edn"
+      ];
     };
   };
 }

@@ -86,12 +86,13 @@ in
       '';
   };
   # give permission to move stateDir to stateDir.bkp when restoring backups
-  systemd.tmpfiles.rules =
-    [ "d '${rootDir}' - ${config.services.octoprint.user} ${config.services.octoprint.group} - -" ]
-    ++ (lib.mapAttrsToList (
-      path: _:
-      "L+ ${config.services.octoprint.stateDir}/printerProfiles/${path} - - - - ${./profiles + ("/" + path)}"
-    ) (builtins.readDir ./profiles));
+  systemd.tmpfiles.rules = [
+    "d '${rootDir}' - ${config.services.octoprint.user} ${config.services.octoprint.group} - -"
+  ]
+  ++ (lib.mapAttrsToList (
+    path: _:
+    "L+ ${config.services.octoprint.stateDir}/printerProfiles/${path} - - - - ${./profiles + ("/" + path)}"
+  ) (builtins.readDir ./profiles));
 
   systemd.paths.octoprint-watcher = {
     wantedBy = [ "multi-user.target" ];

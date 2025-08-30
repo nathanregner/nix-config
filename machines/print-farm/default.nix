@@ -17,7 +17,8 @@ let
         modules = [
           ./configuration.nix
           { networking.hostName = hostname; }
-        ] ++ modules;
+        ]
+        ++ modules;
         system = "aarch64-linux";
       }
     );
