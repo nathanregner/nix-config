@@ -152,7 +152,7 @@
 
         nixosConfigurations = {
           # Desktop
-          iapetus = nixpkgs-unstable.lib.nixosSystem {
+          iapetus = lib.nixosSystem {
             specialArgs = {
               inherit self inputs outputs;
             };

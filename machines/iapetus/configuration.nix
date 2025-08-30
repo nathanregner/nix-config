@@ -27,6 +27,9 @@
 
     xkb.layout = "us";
     xkb.variant = "";
+
+    displayManager.gdm.enable = true;
+    desktopManager.gnome.enable = true;
   };
 
   programs.hyprland = {
@@ -49,21 +52,9 @@
         "/dev/dri/by-path/pci-0000:24:00.0-card" # GTX 1060 (secondary)
       ];
     };
-
-    # https://wiki.hyprland.org/0.20.1beta/Getting-Started/Installation/
-    sddm = {
-      enable = true;
-      wayland.enable = true;
-      package = pkgs.unstable.kdePackages.sddm;
-    };
   };
 
-  catppuccin.sddm.enable = true;
-
   security.pam.services.hyprlock = { };
-
-  # services.xserver.displayManager.gdm.enable = true;
-  services.xserver.desktopManager.gnome.enable = true;
 
   # https://discourse.nixos.org/t/howto-disable-most-gnome-default-applications-and-what-they-are/13505/11
   environment.gnome.excludePackages = with pkgs; [
