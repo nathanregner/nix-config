@@ -8,12 +8,33 @@ local buffer = {
   name = "buffer",
   option = {
     get_bufnrs = function()
-      -- local bufs = {}
-      -- for _, win in ipairs(vim.api.nvim_list_wins()) do
-      --   bufs[vim.api.nvim_win_get_buf(win)] = true
-      -- end
-      -- return vim.tbl_keys(bufs)
-      return vim.api.nvim_list_bufs()
+      local bufs = {}
+      for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+        vim.print("consider buffer" .. buf)
+
+        if !vim.api.nvim_buf_is_loaded(buf) then
+          vim.print("skip unloaded buffer" .. buf)
+          goto continue
+        end
+
+        -- don't index large files
+        local byte_size = vim.api.nvim_buf_get_offset(buf, vim.api.nvim_buf_line_count(buf))
+        if byte_size > 5 * 1024 * 1024 then
+          vim.print("skip large buffer " .. buf)
+          goto continue
+        end
+
+        -- skip neotest buffers (results in many index out bounds errors?)
+        local filetype = vim.api.nvim_buf_get_option(buf, "filetype")
+        if string.match(filetype, "neotest.*") then
+          vim.print("ignore buffer " .. buf)
+          goto continue
+        end
+
+        ::continue::
+      end
+      vim.print("bufs ", vim.tbl_keys(bufs))
+      return vim.tbl_keys(bufs)
     end,
   },
   ---@param entry cmp.Entry
