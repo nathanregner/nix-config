@@ -24,7 +24,7 @@ in
     hydraURL = "https://hydra.nregner.net";
     notificationSender = "hydra@nregner.net";
     useSubstitutes = true;
-    port = self.globals.services.hydra.port;
+    inherit (self.globals.services.hydra) port;
     buildMachinesFiles = [
       "/var/lib/hydra/machines"
       (pkgs.writeTextFile {
