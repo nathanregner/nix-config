@@ -58,8 +58,6 @@
     };
   };
 
-  catppuccin.sddm.enable = true;
-
   security.pam.services.hyprlock = { };
 
   # services.xserver.displayManager.gdm.enable = true;
