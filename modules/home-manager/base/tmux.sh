@@ -5,7 +5,7 @@ _tmux=$(which tmux)
 
 # Name new sessions after pwd
 tmux() {
-  if [[ "$#" -eq 0 ]]; then
+  if [[ $# -eq 0 ]]; then
     pwd=$(pwd)
     session_name=$(basename "$pwd")
     $_tmux new-session -s "$session_name" || $_tmux attach -t "$session_name"
@@ -17,11 +17,11 @@ tmux() {
 # Auto-start tmux
 if command -v tmux &>/dev/null &&
   [ -n "$PS1" ] &&
-  [[ ! "$TERM" =~ screen ]] &&
-  [[ ! "$TERM" =~ tmux ]] &&
+  [[ ! $TERM =~ screen ]] &&
+  [[ ! $TERM =~ tmux ]] &&
   [ -z "$TMUX" ] &&
   [[ ! "$(tty)" =~ dev/tty[0-9] ]] &&
-  [[ ! "$TERMINAL_EMULATOR" =~ "JetBrains" ]]; then
+  [[ ! $TERMINAL_EMULATOR =~ "JetBrains" ]]; then
   $_tmux attach >&/dev/null
 fi
 

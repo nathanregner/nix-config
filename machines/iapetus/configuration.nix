@@ -132,15 +132,16 @@
   };
 
   # https://nixos.wiki/wiki/CCache#Derivation_CCache_2
-  environment.systemPackages =
-    [ config.boot.kernelPackages.perf ]
-    ++ (with pkgs.unstable; [
-      android-file-transfer # aft-mtp-mount ~/mnt
-      nautilus-python
-      networkmanagerapplet
-      libmtp
-      virt-manager
-    ]);
+  environment.systemPackages = [
+    config.boot.kernelPackages.perf
+  ]
+  ++ (with pkgs.unstable; [
+    android-file-transfer # aft-mtp-mount ~/mnt
+    nautilus-python
+    networkmanagerapplet
+    libmtp
+    virt-manager
+  ]);
 
   # boot.binfmt.emulatedSystems = [ "aarch64-linux" ];
 

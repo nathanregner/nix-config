@@ -25,7 +25,8 @@ in
   config = lib.mkIf cfg.enable {
     home.packages = [
       cfg.package
-    ] ++ (lib.optional cfg.extensions.nautilus.enable pkgs.insync-nautilus);
+    ]
+    ++ (lib.optional cfg.extensions.nautilus.enable pkgs.insync-nautilus);
 
     # adapted from https://aur.archlinux.org/packages/insync
     systemd.user.services.insync = {
