@@ -35,7 +35,7 @@
 
         nr = "${nixRebuild} --flake .";
         nrb = "${nr} build";
-        snr = if pkgs.stdenv.isDarwin then "sudo ${nr}" else "${nr} --sudo";
+        snr = "sudo ${nr}";
         snrb = "${snr} boot";
         snrs = "${snr} switch";
         snrt = "${snr} test";
