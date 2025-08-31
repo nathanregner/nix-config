@@ -1102,6 +1102,21 @@ require("lazy").setup({
             if crate then return "https://crates.io/crates/" .. crate end
           end,
         },
+        fen = {
+          handle = function(mode, line, _)
+            -- local test = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+            ---@param pattern vim.regex
+            local function find(pattern)
+              local i, j = pattern:match_str(line)
+              if i and require("gx.helper").check_if_cursor_on_url(mode, i, j) then
+                return string.sub(line, i + 1, j)
+              end
+            end
+
+            local fen = find(vim.regex([[\v\c([pnbrqk1-8]+/){7}[pnbrqk1-8]+ [wb] [-qk]+ (-|(\w\d)) \d+ \d+]]))
+            if fen then return "https://lichess.org/editor/" .. fen end
+          end,
+        },
       },
       handler_options = {
         search_engine = "google", -- you can select between google, bing, duckduckgo, ecosia and yandex
