@@ -41,6 +41,7 @@ in
       plugins = with pkgs.unstable.vimPlugins; [ lazy-nvim ];
 
       lua.globals = {
+        ${"blink.cmp"}.dir = "${pkgs.unstable.vimPlugins.blink-cmp}";
         luasnip.dir = "${pkgs.unstable.vimPlugins.luasnip}";
       };
 
