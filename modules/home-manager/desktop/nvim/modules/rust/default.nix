@@ -3,6 +3,7 @@
   home.packages = with pkgs.unstable; [
     cargo-autoinherit
     cargo-outdated
+    # cargo-nextest # for rouge8/neotest-rust
   ];
 
   # rustc -Z unstable-options --print target-spec-json | jq '.["llvm-target"]' -r
