@@ -438,50 +438,7 @@ require("lazy").setup({
             },
           },
         },
-        pyright = {},
-        rust_analyzer = {
-          -- https://rust-analyzer.github.io/manual.html#configuration
-          settings = {
-            ["rust-analyzer"] = {
-              cargo = {
-                allFeatures = true,
-              },
-              check = {
-                command = "clippy",
-              },
-              completion = {
-                autoimport = { enable = true },
-              },
-              files = {
-                excludeDirs = { ".direnv", ".git" },
-              },
-            },
-          },
-          capabilities = {
-            experimental = {
-              -- https://github.com/rust-lang/rust-analyzer/blob/6e59defe113522a412d33cff1d8eb5d46f31e298/docs/book/src/contributing/lsp-extensions.md#open-external-documentation
-              localDocs = true,
-            },
-          },
-          on_attach = function(_, bufnr)
-            vim.api.nvim_buf_create_user_command(bufnr, "LspExternalDocs", function()
-              vim.lsp.buf_request(
-                bufnr,
-                ---@diagnostic disable-next-line: param-type-mismatch
-                "experimental/externalDocs",
-                vim.lsp.util.make_position_params(nil, "utf-8"),
-                function(err, response)
-                  if err then
-                    vim.notify(tostring(err), vim.log.levels.ERROR)
-                  else
-                    local url = response["local"] or response["web"]
-                    vim.cmd({ cmd = "Browse", args = { url } })
-                  end
-                end
-              )
-            end, { desc = "Open external documentation" })
-          end,
-        },
+        basedpyright = {},
         terraformls = {
           root_dir = util.root_pattern(".terraform", ".terraform.lock.hcl", ".git"),
         },
@@ -891,8 +848,17 @@ require("lazy").setup({
           neotest.output_panel.clear()
           neotest.run.run()
           neotest.summary.open()
+          -- TODO: if `output_panel` not open in current window, show output
         end,
         "Test This",
+      },
+      {
+        "<localleader>tl",
+        function()
+          local neotest = require("neotest")
+          neotest.output_panel.clear()
+        end,
+        "Test Previous",
       },
       {
         "<localleader>tp",
@@ -908,7 +874,7 @@ require("lazy").setup({
         "<localleader>tf",
         function()
           local neotest = require("neotest")
-          neotest.output_panel.clear()
+          -- neotest.output_panel.clear()
           neotest.run.run(vim.fn.expand("%"))
           neotest.summary.open()
         end,
@@ -950,9 +916,7 @@ require("lazy").setup({
       ---@diagnostic disable-next-line: missing-fields
       neotest.setup({
         adapters = {
-          require("neotest-rust")({
-            args = { "--no-capture", "--cargo-quiet", "--cargo-quiet" },
-          }),
+          require("rustaceanvim.neotest"),
           require("neotest-jest")({}),
           require("neotest-vitest"),
         },
