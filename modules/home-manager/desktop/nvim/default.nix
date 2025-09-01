@@ -86,11 +86,6 @@ in
       );
     };
 
-    home.packages = with pkgs.unstable; [
-      # test runners
-      cargo-nextest # for rouge8/neotest-rust
-    ];
-
     xdg.configFile = {
       "nvim/lazy-lock.json" = {
         source = config.lib.file.mkFlakeSymlink ./lazy-lock.json;
