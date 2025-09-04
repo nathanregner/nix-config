@@ -2,25 +2,24 @@
 {
   programs.zsh = {
     enable = true;
-    initContent =
-      ''
-        bindkey -M viins 'jk' vi-cmd-mode
+    initContent = ''
+      bindkey -M viins 'jk' vi-cmd-mode
 
-        flakify() {
-          nix flake new -t github:NixOS/templates#''${1:-"utils-generic"} .
-        }
+      flakify() {
+        nix flake new -t github:NixOS/templates#''${1:-"utils-generic"} .
+      }
 
-        nixify() {
-          cp ${./templates}/{shell.nix,.envrc} .
-          chmod +w {shell.nix,.envrc}
-        }
+      nixify() {
+        cp ${./templates}/{shell.nix,.envrc} .
+        chmod +w {shell.nix,.envrc}
+      }
 
-        # https://github.com/NixOS/nixpkgs/issues/275770
-        complete -C aws_completer aws
-      ''
-      + lib.optionalString pkgs.stdenv.isDarwin ''
-        source ${./zsh/completions/_launchctl}
-      '';
+      # https://github.com/NixOS/nixpkgs/issues/275770
+      complete -C aws_completer aws
+    ''
+    + lib.optionalString pkgs.stdenv.isDarwin ''
+      source ${./zsh/completions/_launchctl}
+    '';
     # defaultKeymap = "viins";
     oh-my-zsh = {
       enable = true;
@@ -36,7 +35,7 @@
 
         nr = "${nixRebuild} --flake .";
         nrb = "${nr} build";
-        snr = if pkgs.stdenv.isDarwin then "sudo ${nr}" else "${nr} --sudo";
+        snr = "sudo ${nr}";
         snrb = "${snr} boot";
         snrs = "${snr} switch";
         snrt = "${snr} test";

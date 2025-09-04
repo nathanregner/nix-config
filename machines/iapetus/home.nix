@@ -59,14 +59,15 @@
     prismlauncher
     super-slicer-beta
 
-    # cli
-    awscli2
-    gh
-    nix-fast-build
-    nushell
-    rclone
-    xclip
+    # nix
     xdot
+
+    # rust
+    cargo-autoinherit
+    cargo-outdated
+
+    # rc
+    betaflight-configurator
   ];
 
   xdg.desktopEntries.discord = {

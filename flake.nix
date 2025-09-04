@@ -73,22 +73,6 @@
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
 
-    pyproject-build-systems = {
-      url = "github:pyproject-nix/build-system-pkgs";
-      inputs.pyproject-nix.follows = "pyproject-nix";
-      inputs.uv2nix.follows = "uv2nix";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    pyproject-nix = {
-      url = "github:pyproject-nix/pyproject.nix";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    uv2nix = {
-      url = "github:pyproject-nix/uv2nix";
-      inputs.pyproject-nix.follows = "pyproject-nix";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
     # Desktop
     catppuccin-nix = {
       url = "github:catppuccin/nix";
@@ -166,52 +150,51 @@
         # custom packages and modifications, exported as overlays
         overlays = import ./overlays { inherit inputs outputs; };
 
-        nixosConfigurations =
-          {
-            # Desktop
-            iapetus = nixpkgs-unstable.lib.nixosSystem {
-              specialArgs = {
-                inherit self inputs outputs;
-              };
-              modules = [
-                ./machines/iapetus/configuration.nix
-              ];
+        nixosConfigurations = {
+          # Desktop
+          iapetus = lib.nixosSystem {
+            specialArgs = {
+              inherit self inputs outputs;
             };
+            modules = [
+              ./machines/iapetus/configuration.nix
+            ];
+          };
 
-            # GE73VR Laptop
-            callisto = lib.nixosSystem {
-              specialArgs = {
-                inherit self inputs outputs;
-              };
-              modules = [
-                ./machines/callisto/configuration.nix
-              ];
+          # GE73VR Laptop
+          callisto = lib.nixosSystem {
+            specialArgs = {
+              inherit self inputs outputs;
             };
+            modules = [
+              ./machines/callisto/configuration.nix
+            ];
+          };
 
-            # Server
-            sagittarius = lib.nixosSystem {
-              specialArgs = {
-                inherit self inputs outputs;
-              };
-              modules = [
-                ./machines/sagittarius/configuration.nix
-              ];
+          # Server
+          sagittarius = lib.nixosSystem {
+            specialArgs = {
+              inherit self inputs outputs;
             };
+            modules = [
+              ./machines/sagittarius/configuration.nix
+            ];
+          };
 
-            # Voron 2.4r2 Klipper machine
-            voron = lib.nixosSystem {
-              specialArgs = {
-                inherit self inputs outputs;
-              };
-              modules = [
-                ./machines/voron/configuration.nix
-              ];
-              system = "aarch64-linux";
+          # Voron 2.4r2 Klipper machine
+          voron = lib.nixosSystem {
+            specialArgs = {
+              inherit self inputs outputs;
             };
-          }
-          // (import ./machines/print-farm {
-            inherit self inputs outputs;
-          });
+            modules = [
+              ./machines/voron/configuration.nix
+            ];
+            system = "aarch64-linux";
+          };
+        }
+        // (import ./machines/print-farm {
+          inherit self inputs outputs;
+        });
 
         darwinConfigurations = {
           "enceladus" = nix-darwin.lib.darwinSystem {

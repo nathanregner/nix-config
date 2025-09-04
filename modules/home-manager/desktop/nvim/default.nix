@@ -62,6 +62,7 @@ in
         ps: propagateBuildInputs [ ps.busted ];
 
       lua.globals = {
+        ${"blink.cmp"}.dir = "${pkgs.unstable.vimPlugins.blink-cmp}";
         luasnip = {
           dir = "${pkgs.unstable.vimPlugins.luasnip}";
           extraModules = lib.mkDefault [ ];
@@ -96,19 +97,6 @@ in
         }
       );
     };
-
-    home.packages = with pkgs.unstable; [
-      # test runners
-      cargo-nextest # for rouge8/neotest-rust
-
-      # formatters/linters
-      nginx-config-formatter
-      nixfmt-rfc-style
-      prettierd
-      shfmt
-      stylua
-      taplo
-    ];
 
     xdg.configFile = {
       "nvim/lazy-lock.json" = {

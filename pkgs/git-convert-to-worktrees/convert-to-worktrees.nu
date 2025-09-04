@@ -30,7 +30,7 @@ def copy-worktree [$bare: path, $worktree: record] {
   let branch = $worktree.branch | str replace 'refs/heads/' ''
   let dest = $"../($branch)"
 
-  git worktree add --quiet --force $dest $branch
+  git worktree add --relative-paths --quiet --force $dest $branch
 
   cd $dest
   git checkout $branch
@@ -59,12 +59,6 @@ def main [] {
   trash -v $src
   cd # reset pwd
   mv ($bare | path join .. | path expand) $src
-  # print -e (git worktree list --porcelain | parse-porcelain)
-  # git worktree list --porcelain | parse-porcelain | each {|worktree|
-  #   let branch = $worktree.branch | str replace 'refs/heads/' ''
-  #   let dest = $"../($branch)"
-  #   git worktree move $worktree.worktree $dest
-  # }
 
   $src
 }

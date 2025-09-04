@@ -112,15 +112,15 @@ rec {
       inherit (stableFinal) system;
       config.allowUnfree = true;
       overlays = [
-        (final: prev: { inherit (stableFinal) local; })
+        (_final: _prev: { inherit (stableFinal) local; })
         sharedModifications
         (
-          final: prev:
-          lib.optionalAttrs stableFinal.stdenv.isDarwin ({
+          _final: prev:
+          lib.optionalAttrs stableFinal.stdenv.isDarwin {
             tailscale = (assertVersion "1.86.4" prev.tailscale).overrideAttrs {
               doCheck = false;
             };
-          })
+          }
           // {
             hydra = (assertVersion "0-unstable-2025-08-12" prev.hydra).overrideAttrs {
               doCheck = false;

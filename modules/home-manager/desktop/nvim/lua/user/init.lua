@@ -57,12 +57,15 @@ local leet_arg = "leetcode.nvim"
 
 ---@param spec LazyPluginSpec
 ---@return LazyPluginSpec
-local function nix_spec(spec)
+function nix_spec(spec)
   local name = vim.fs.basename(spec[1])
   if name == nil then return spec end
 
   local nix = vim.g.nix[string.lower(name)]
-  if nix == nil then return spec end
+  if nix == nil then
+    vim.notify("Nix plugin not found " .. name, vim.log.levels.WARN)
+    return spec
+  end
 
   spec.dir = nix.dir
   spec.pin = true
@@ -229,41 +232,41 @@ require("lazy").setup({
     end,
   },
 
-  { -- Autocompletion
-    "hrsh7th/nvim-cmp",
-    event = { "InsertEnter", "CmdlineEnter" },
+  nix_spec({
+    "L3MON4D3/LuaSnip",
     dependencies = {
-      -- Snippet Engine & its associated nvim-cmp source
-      nix_spec({
-        "L3MON4D3/LuaSnip",
-        dependencies = {
-          "rafamadriz/friendly-snippets",
-          {
-            "chrisgrieser/nvim-scissors",
-            opts = {
-              snippetDir = vim.fn.stdpath("config") .. "/snippets",
-              jsonFormatter = { "prettierd", "dummy.json" },
-            },
-          },
+      "rafamadriz/friendly-snippets",
+      {
+        "chrisgrieser/nvim-scissors",
+        opts = {
+          snippetDir = vim.fn.stdpath("config") .. "/snippets",
+          jsonFormatter = { "prettierd", "dummy.json" },
         },
-        config = function()
-          require("luasnip").config.setup({ enable_autosnippets = true })
-          require("luasnip.loaders.from_vscode").lazy_load()
-          require("luasnip.loaders.from_vscode").lazy_load({
-            paths = { vim.fn.stdpath("config") .. "/snippets" },
-          })
-          require("user.snippets")
-        end,
-      }),
-      "saadparwaiz1/cmp_luasnip",
-      "hrsh7th/cmp-nvim-lsp",
-      "hrsh7th/cmp-path",
-      "hrsh7th/cmp-buffer",
-      "hrsh7th/cmp-cmdline",
-      "onsails/lspkind.nvim",
+      },
     },
-    config = function() require("user.cmp") end,
-  },
+    config = function()
+      require("luasnip").config.setup({ enable_autosnippets = true })
+      require("luasnip.loaders.from_vscode").lazy_load()
+      require("luasnip.loaders.from_vscode").lazy_load({
+        paths = { vim.fn.stdpath("config") .. "/snippets" },
+      })
+      require("user.snippets")
+    end,
+  }),
+
+  -- { -- Autocompletion
+  --   "hrsh7th/nvim-cmp",
+  --   event = { "InsertEnter", "CmdlineEnter" },
+  --   dependencies = {
+  --     "saadparwaiz1/cmp_luasnip",
+  --     "hrsh7th/cmp-nvim-lsp",
+  --     "hrsh7th/cmp-path",
+  --     "hrsh7th/cmp-buffer",
+  --     "hrsh7th/cmp-cmdline",
+  --     "onsails/lspkind.nvim",
+  --   },
+  --   config = function() require("user.cmp") end,
+  -- },
 
   { -- LSP Configuration & Plugins
     "neovim/nvim-lspconfig",
@@ -274,7 +277,7 @@ require("lazy").setup({
       "yioneko/nvim-vtsls",
     },
     config = function()
-      local on_attach = function(client, bufnr)
+      local on_attach = function(_, bufnr)
         local map = function(mode, keys, func, desc)
           if desc then desc = "LSP: " .. desc end
 
@@ -463,26 +466,7 @@ require("lazy").setup({
             },
           },
         },
-        pyright = {},
-        rust_analyzer = {
-          -- https://rust-analyzer.github.io/manual.html#configuration
-          settings = {
-            ["rust-analyzer"] = {
-              cargo = {
-                allFeatures = true,
-              },
-              check = {
-                command = "clippy",
-              },
-              completion = {
-                autoimport = { enable = true },
-              },
-              files = {
-                excludeDirs = { ".direnv", ".git" },
-              },
-            },
-          },
-        },
+        basedpyright = {},
         terraformls = {
           root_dir = util.root_pattern(".terraform", ".terraform.lock.hcl", ".git"),
         },
@@ -532,13 +516,19 @@ require("lazy").setup({
       }
 
       local capabilities = vim.lsp.protocol.make_client_capabilities()
-      capabilities = vim.tbl_deep_extend("force", capabilities, require("cmp_nvim_lsp").default_capabilities())
+      capabilities = vim.tbl_deep_extend("force", capabilities, require("blink.cmp").get_lsp_capabilities({}, false))
 
       for server_name, server_config in pairs(servers) do
+        if server_config.capabilities then
+          capabilities = vim.tbl_deep_extend("force", capabilities, server_config.capabilities)
+        end
         require("lspconfig")[server_name].setup({
           cmd = server_config.cmd,
           capabilities = capabilities,
-          on_attach = on_attach,
+          on_attach = function(...)
+            on_attach(...)
+            if server_config.on_attach then server_config.on_attach(...) end
+          end,
           settings = server_config.settings,
           filetypes = server_config.filetypes,
           init_options = server_config.init_options,
@@ -877,6 +867,8 @@ require("lazy").setup({
     },
   },
 
+  -- TODO: auto-show output panel on failure
+  -- TODO: auto-show clear on run (watch)
   { -- Neotest
     "nvim-neotest/neotest",
     dependencies = {
@@ -890,34 +882,57 @@ require("lazy").setup({
     },
     lazy = true,
     keys = {
+      { "<leader>ts", function() require("neotest").summary.toggle() end, "Test summary" },
+      { "<leader>to", function() require("neotest").output_panel.toggle() end, "Test output" },
       {
         "<localleader>tt",
-        function(args)
+        function()
           local neotest = require("neotest")
-          neotest.run.run(args)
+          neotest.output_panel.clear()
+          neotest.run.run()
+          neotest.summary.open()
+          -- TODO: if `output_panel` not open in current window, show output
+        end,
+        "Test This",
+      },
+      {
+        "<localleader>tl",
+        function()
+          local neotest = require("neotest")
+          neotest.output_panel.clear()
+        end,
+        "Test Previous",
+      },
+      {
+        "<localleader>tp",
+        function()
+          local neotest = require("neotest")
+          neotest.output_panel.clear()
+          neotest.run.run("last")
           neotest.summary.open()
         end,
-        "[T]est [T]his",
+        "Test Previous",
       },
-
       {
         "<localleader>tf",
         function()
           local neotest = require("neotest")
+          -- neotest.output_panel.clear()
           neotest.run.run(vim.fn.expand("%"))
           neotest.summary.open()
         end,
-        "[T]est [F]ile",
+        "Test File",
       },
       {
-        "<localleader>tq",
+        "<leader>tq",
         function()
           local neotest = require("neotest")
           neotest.run.stop()
           neotest.watch.stop()
           neotest.summary.close()
+          neotest.output_panel.close()
         end,
-        "[T]est [Q]uit",
+        "Test Quit",
       },
       {
         "<localleader>twt",
@@ -926,19 +941,25 @@ require("lazy").setup({
           neotest.watch.watch()
           neotest.summary.open()
         end,
-        "[T]est [W]atch [T]his",
+        "Test Watch This",
       },
-      { "<localleader>twq", function() neotest.watch.stop() end, "[T]est [W]atch [Q]uit" },
-      { "<localleader>tr", function() neotest.output_panel.clear() end, "[T]est [R]eset logs" },
+      {
+        "<localleader>to",
+        function()
+          local neotest = require("neotest")
+          neotest.output.open({ short = true, enter = true, auto_close = true })
+        end,
+        "Test Quit",
+      },
+      { "<leader>twq", function() require("neotest").watch.stop() end, "Test Watch Quit" },
+      { "<leader>tr", function() require("neotest").output_panel.clear() end, "Test Reset logs" },
     },
     config = function()
       local neotest = require("neotest")
       ---@diagnostic disable-next-line: missing-fields
       neotest.setup({
         adapters = {
-          require("neotest-rust")({
-            args = { "--no-capture", "--cargo-quiet", "--cargo-quiet" },
-          }),
+          require("rustaceanvim.neotest"),
           require("neotest-jest")({}),
           require("neotest-vitest"),
         },
@@ -948,10 +969,19 @@ require("lazy").setup({
         },
         ---@diagnostic disable-next-line: missing-fields
         output = {
-          open_on_run = true,
+          open_on_run = false,
           enter = true,
         },
       })
+    end,
+    init = function()
+      local ts_repeat_move = require("nvim-treesitter.textobjects.repeatable_move")
+      local next, prev = ts_repeat_move.make_repeatable_move_pair(
+        function() require("neotest").jump.next({ status = "failed" }) end,
+        function() require("neotest").jump.prev({ status = "failed" }) end
+      )
+      vim.keymap.set("n", "]n", next, { desc = "Next failed test" })
+      vim.keymap.set("n", "[n", prev, { desc = "Previous failed test" })
     end,
   },
 
@@ -1079,6 +1109,21 @@ require("lazy").setup({
           handle = function(mode, line, _)
             local crate = require("gx.helper").find(line, mode, "(%w+)%s-=%s")
             if crate then return "https://crates.io/crates/" .. crate end
+          end,
+        },
+        fen = {
+          handle = function(mode, line, _)
+            -- local test = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+            ---@param pattern vim.regex
+            local function find(pattern)
+              local i, j = pattern:match_str(line)
+              if i and require("gx.helper").check_if_cursor_on_url(mode, i, j) then
+                return string.sub(line, i + 1, j)
+              end
+            end
+
+            local fen = find(vim.regex([[\v\c([pnbrqk1-8]+/){7}[pnbrqk1-8]+ [wb] [-qk]+ (-|(\w\d)) \d+ \d+]]))
+            if fen then return "https://lichess.org/editor/" .. fen end
           end,
         },
       },

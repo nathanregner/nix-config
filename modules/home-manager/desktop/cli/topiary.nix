@@ -82,7 +82,7 @@ in
         ) cfg.languages
       )}
 
-''}";
+    ''}";
 
     xdg.configFile."topiary/languages.ncl".text =
       let
