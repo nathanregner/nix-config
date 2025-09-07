@@ -31,7 +31,7 @@ in
   config = {
     programs.neovim = {
       enable = true;
-      package = inputs.neovim-nightly-overlay.packages.${pkgs.system}.default;
+      package = pkgs.unstable.neovim-unwrapped;
       defaultEditor = true;
       extraConfig = builtins.readFile ./init.vim;
       extraLuaConfig = ''
