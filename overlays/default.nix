@@ -73,8 +73,10 @@ let
 
     nix-prefetch = prev.nix-prefetch.overrideAttrs (oldAttrs: {
       patches = oldAttrs.patches or [ ] ++ [
-        # https://github.com/msteen/nix-prefetch/pull/34
-        ./nix-prefetch/34.patch
+        (prev.fetchpatch2 {
+          url = "https://github.com/msteen/nix-prefetch/pull/34.patch";
+          hash = "sha256-r+b04fbO4++RPMINgL5Vfqf3ITHQgukOA1jljTCm5gA=";
+        })
       ];
     });
 
