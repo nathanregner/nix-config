@@ -20,6 +20,7 @@ in
           options = {
             rtp = mkOption {
               type = types.listOf types.str;
+              default = [ ];
             };
           };
         };
