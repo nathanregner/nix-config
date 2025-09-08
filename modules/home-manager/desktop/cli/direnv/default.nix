@@ -8,8 +8,5 @@
     nix-direnv.enable = true;
   };
 
-  xdg.configFile."direnv/direnvrc" = {
-    source = config.lib.file.mkFlakeSymlink ./direnvrc;
-    force = true;
-  };
+  xdg.configFile."direnv/lib/_layout.sh".source = config.lib.file.mkFlakeSymlink ./_layout.sh;
 }

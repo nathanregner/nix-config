@@ -2,7 +2,7 @@
 {
   imports = [
     ./ast-grep
-    ./direnv.nix
+    ./direnv
     ./git
     ./k9s.nix
     ./lazygit.nix
