@@ -4,15 +4,19 @@ return {
   {
     -- Highlight, edit, and navigate code
     "nvim-treesitter/nvim-treesitter",
-    dir = vim.g.nix.nvim_treesitter.dir,
-    pin = true,
-    -- FIXME: load after?
     dependencies = {
       "nvim-treesitter/nvim-treesitter-textobjects",
     },
+    build = ":TSUpdate",
+    keys = {
+      {
+        "[C",
+        function() require("treesitter-context").go_to_context(vim.v.count1) end,
+        silent = true,
+      },
+    },
     lazy = false,
     opts = {
-      parser_install_dir = vim.g.nix.nvim_treesitter.parser_install_dir,
       auto_install = true,
       highlight = { enable = true },
       indent = { enable = true },
