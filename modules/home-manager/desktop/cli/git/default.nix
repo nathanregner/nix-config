@@ -73,7 +73,6 @@
       };
       rebase = {
         autostash = true;
-        updateRefs = true;
       };
       rerere = {
         autoupdate = true;
