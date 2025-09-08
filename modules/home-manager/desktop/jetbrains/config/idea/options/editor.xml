@@ -39,11 +39,13 @@
     <option name="enabledOptions">
       <map>
         <entry key="js.type.hints#function.returns" value="false" />
+        <entry key="kotlin.lambdas.hints#hints.lambda.receivers.parameters" value="true" />
       </map>
     </option>
     <option name="providerIdToEnabled">
       <map>
         <entry key="java.implicit.types" value="true" />
+        <entry key="kotlin.lambdas.hints" value="true" />
       </map>
     </option>
   </component>
@@ -76,7 +78,7 @@
         <entry key="yaml" value="true" />
       </map>
     </option>
-    <option name="USE_SOFT_WRAPS" value="" />
+    <option name="USE_SOFT_WRAPS" value="CONSOLE" />
     <option name="IS_ENSURE_NEWLINE_AT_EOF" value="true" />
     <option name="IS_WHEEL_FONTCHANGE_ENABLED" value="true" />
     <option name="IS_WHEEL_FONTCHANGE_PERSISTENT" value="true" />
@@ -93,6 +95,9 @@
   </component>
   <component name="InlineCompletionOnboarding">
     <option name="onboardingFinished" value="true" />
+  </component>
+  <component name="JetEditorOptions">
+    <option name="donTShowConversionDialog" value="true" />
   </component>
   <component name="SqlCodeCompletionSettings" AUTO_ALIAS_TABLE="true" INVERT_ON_ORDER="true">
     <option name="autoAliasTable" value="true" />

@@ -44,6 +44,10 @@ in
       }
 
       queue_runner_metrics_address = ${prometheusAddress}
+
+      <webhooks>
+        Include ${config.sops.templates.hydra-webhook-secrets.path}
+      </webhooks>
     '';
   };
 
@@ -85,6 +89,17 @@ in
   sops.secrets.hydra-github-webhook-secret = {
     key = "hydra/github_webhook_secret";
     owner = "hydra-sentinel-server";
+  };
+
+  sops.templates.hydra-webhook-secrets = {
+    content = ''
+      <github>
+        secret = ${config.sops.placeholder.hydra-github-webhook-secret}
+      </github>
+    '';
+    owner = "hydra";
+    group = "hydra";
+    mode = "0660";
   };
 
   services.hydra-sentinel-server = {
@@ -158,7 +173,7 @@ in
     "/".extraConfig = # nginx
       "return 302 http://sagittarius:${toString config.services.hydra.port}$request_uri;";
     "/github/webhook".proxyPass =
-      "http://127.0.0.1:${toString config.services.hydra-sentinel-server.listenPort}/webhook";
+      "http://127.0.0.1:${toString config.services.hydra.port}/api/push-github";
   };
 }
 

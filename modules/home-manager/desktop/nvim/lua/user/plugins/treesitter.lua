@@ -163,6 +163,8 @@ return {
                 "self",
                 "inputs",
                 "inputs'",
+                "outputs",
+                "outputs'",
                 "sources",
                 "config",
                 "pkgs",

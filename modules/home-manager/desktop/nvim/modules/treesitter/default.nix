@@ -76,7 +76,9 @@ in
         library = parsers.hcl;
       };
       dtd = {
-        extensions = [ "xml" ];
+        extensions = [
+          "xml"
+        ];
         library = parsers.dtd;
       };
     };

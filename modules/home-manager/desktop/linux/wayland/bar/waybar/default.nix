@@ -25,11 +25,14 @@
         iconFormat = styleIcon "{icon}";
       in
       {
-        layer = "bottom";
+        layer = "top";
         position = "top";
         height = 30;
 
-        modules-left = [ "hyprland/workspaces" ];
+        modules-left = [
+          "hyprland/workspaces"
+          "niri/workspaces"
+        ];
         modules-center = [ "hyprland/window" ];
         modules-right = [
           "tray"
