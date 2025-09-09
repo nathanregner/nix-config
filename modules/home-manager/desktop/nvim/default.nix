@@ -99,6 +99,16 @@ in
       );
     };
 
+    home.packages = with pkgs.unstable; [
+      # formatters/linters
+      nginx-config-formatter
+      nixfmt-rfc-style
+      prettierd
+      shfmt
+      stylua
+      taplo
+    ];
+
     xdg.configFile = {
       "nvim/lazy-lock.json" = {
         source = config.lib.file.mkFlakeSymlink ./lazy-lock.json;
@@ -125,6 +135,7 @@ in
         };
       }) (lib.filesystem.listFilesRecursive ./after/ftplugin)
     );
+
 
     programs.zsh.shellAliases.vimdiff = "nvim -d";
 
