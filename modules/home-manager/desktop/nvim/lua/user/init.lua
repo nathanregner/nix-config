@@ -325,6 +325,7 @@ require("lazy").setup({
       --- @type { [string]: LspConfig }
       local servers = {
         ast_grep = {},
+        basedpyright = {},
         bashls = {},
         clangd = {
           cmd = { -- https://www.reddit.com/r/neovim/comments/12qbcua/multiple_different_client_offset_encodings/
@@ -424,13 +425,13 @@ require("lazy").setup({
             },
           },
         },
-        basedpyright = {},
         terraformls = {
           root_dir = util.root_pattern(".terraform", ".terraform.lock.hcl", ".git"),
         },
         tflint = {
           root_dir = util.root_pattern(".terraform", ".terraform.lock.hcl", ".git", ".tflint.hcl"),
         },
+        tinymist = {},
         vtsls = vim.tbl_deep_extend("error", require("vtsls").lspconfig.default_config, {
           settings = {
             -- https://github.com/microsoft/vscode/issues/13953
