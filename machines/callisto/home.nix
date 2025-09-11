@@ -23,7 +23,7 @@
   home = {
     username = "nregner";
     homeDirectory = "/home/nregner";
-    flakePath = "/home/nregner/nix-config/callisto";
+    flakePath = "/home/nregner/nix-config/local";
   };
 
   # Nicely reload system units when changing configs
