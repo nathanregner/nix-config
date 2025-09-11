@@ -9,8 +9,6 @@
   imports = [ inputs.nixos-hardware.nixosModules.common-pc-ssd ];
 
   boot = {
-    kernelPackages = pkgs.linuxKernel.packages.linux_6_16;
-
     supportedFilesystems = lib.mkForce [
       "vfat"
       "fat32"
@@ -24,6 +22,15 @@
     };
 
     initrd.includeDefaultModules = false;
+  };
+
+  local.kernel = {
+    enable = true;
+    dir = ./kernel;
+    packages = {
+      kernel = pkgs.linuxKernel.packages.linux_6_16.kernel;
+      linux = pkgs.linuxKernel;
+    };
   };
 
   assertions = [

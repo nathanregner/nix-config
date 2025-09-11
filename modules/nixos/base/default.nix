@@ -9,6 +9,7 @@
     inputs.catppuccin-nix.nixosModules.catppuccin
     inputs.nixos-generators.nixosModules.all-formats
     ./kanata.nix
+    ./kernel
     ./networking.nix
     ./nix.nix
     ./services
