@@ -63,7 +63,6 @@ in
         ps: propagateBuildInputs [ ps.busted ];
 
       lua.globals = {
-        ${"blink.cmp"}.dir = "${pkgs.unstable.vimPlugins.blink-cmp}";
         luasnip = {
           dir = "${pkgs.unstable.vimPlugins.luasnip}";
           extraModules = lib.mkDefault [ ];
@@ -135,7 +134,6 @@ in
         };
       }) (lib.filesystem.listFilesRecursive ./after/ftplugin)
     );
-
 
     programs.zsh.shellAliases.vimdiff = "nvim -d";
 
