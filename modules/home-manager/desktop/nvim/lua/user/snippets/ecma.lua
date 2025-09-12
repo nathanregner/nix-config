@@ -63,6 +63,12 @@ local ft_ts_lang = {
   typescriptreact = "typescript",
 }
 
+local define_all = function(snippet)
+  for lang, _ in pairs(snippets) do
+    table.insert(snippets[lang], snippet)
+  end
+end
+
 local define_postfix = function(opts)
   for _, lang in ipairs(opts.langs or { "javascript", "javascriptreact", "typescript", "typescriptreact" }) do
     for _, trig in ipairs(opts.trig) do
@@ -84,22 +90,34 @@ local define_postfix = function(opts)
   end
 end
 
-define_postfix({
-  trig = { ".clv", ".logv" },
-  query = [[
+for trig, method in pairs({
+  cl = "log",
+  clc = "count",
+  cld = "debug",
+  cldir = "dir",
+  cle = "error",
+  cli = "info",
+  clt = "trace",
+  clw = "warn",
+  log = "log",
+}) do
+  define_all(s(trig, { t("console." .. method .. "("), i(1), t(");") }))
+  define_postfix({
+    trig = { "." .. trig },
+    query = expression,
+    expand = function(match) return sn(nil, fmt("console." .. method .. "({1});", { t(match) })) end,
+  })
+  define_postfix({
+    trig = { "." .. trig .. "v" },
+    query = [[
         [
           (identifier)
           (member_expression)
         ] @prefix
       ]],
-  expand = function(match) return sn(nil, fmt("console.log('{1}', {1});", { t(match) })) end,
-})
-
-define_postfix({
-  trig = { ".cl", ".log" },
-  query = expression,
-  expand = function(match) return sn(nil, fmt("console.log({1});", { t(match) })) end,
-})
+    expand = function(match) return sn(nil, fmt("console." .. method .. "('{1}', {1});", { t(match) })) end,
+  })
+end
 
 define_postfix({
   trig = { ".forof" },
