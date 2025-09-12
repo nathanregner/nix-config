@@ -57,12 +57,15 @@ local leet_arg = "leetcode.nvim"
 
 ---@param spec LazyPluginSpec
 ---@return LazyPluginSpec
-local function nix_spec(spec)
+function nix_spec(spec)
   local name = vim.fs.basename(spec[1])
   if name == nil then return spec end
 
   local nix = vim.g.nix[string.lower(name)]
-  if nix == nil then return spec end
+  if nix == nil then
+    vim.notify("Nix plugin not found " .. name, vim.log.levels.WARN)
+    return spec
+  end
 
   spec.dir = nix.dir
   spec.pin = true
@@ -229,41 +232,41 @@ require("lazy").setup({
     end,
   },
 
-  { -- Autocompletion
-    "hrsh7th/nvim-cmp",
-    event = { "InsertEnter", "CmdlineEnter" },
+  nix_spec({
+    "L3MON4D3/LuaSnip",
     dependencies = {
-      -- Snippet Engine & its associated nvim-cmp source
-      nix_spec({
-        "L3MON4D3/LuaSnip",
-        dependencies = {
-          "rafamadriz/friendly-snippets",
-          {
-            "chrisgrieser/nvim-scissors",
-            opts = {
-              snippetDir = vim.fn.stdpath("config") .. "/snippets",
-              jsonFormatter = { "prettierd", "dummy.json" },
-            },
-          },
+      "rafamadriz/friendly-snippets",
+      {
+        "chrisgrieser/nvim-scissors",
+        opts = {
+          snippetDir = vim.fn.stdpath("config") .. "/snippets",
+          jsonFormatter = { "prettierd", "dummy.json" },
         },
-        config = function()
-          require("luasnip").config.setup({ enable_autosnippets = true })
-          require("luasnip.loaders.from_vscode").lazy_load()
-          require("luasnip.loaders.from_vscode").lazy_load({
-            paths = { vim.fn.stdpath("config") .. "/snippets" },
-          })
-          require("user.snippets")
-        end,
-      }),
-      "saadparwaiz1/cmp_luasnip",
-      "hrsh7th/cmp-nvim-lsp",
-      "hrsh7th/cmp-path",
-      "hrsh7th/cmp-buffer",
-      "hrsh7th/cmp-cmdline",
-      "onsails/lspkind.nvim",
+      },
     },
-    config = function() require("user.cmp") end,
-  },
+    config = function()
+      require("luasnip").config.setup({ enable_autosnippets = true })
+      require("luasnip.loaders.from_vscode").lazy_load()
+      require("luasnip.loaders.from_vscode").lazy_load({
+        paths = { vim.fn.stdpath("config") .. "/snippets" },
+      })
+      require("user.snippets")
+    end,
+  }),
+
+  -- { -- Autocompletion
+  --   "hrsh7th/nvim-cmp",
+  --   event = { "InsertEnter", "CmdlineEnter" },
+  --   dependencies = {
+  --     "saadparwaiz1/cmp_luasnip",
+  --     "hrsh7th/cmp-nvim-lsp",
+  --     "hrsh7th/cmp-path",
+  --     "hrsh7th/cmp-buffer",
+  --     "hrsh7th/cmp-cmdline",
+  --     "onsails/lspkind.nvim",
+  --   },
+  --   config = function() require("user.cmp") end,
+  -- },
 
   { -- LSP Configuration & Plugins
     "neovim/nvim-lspconfig",
@@ -512,10 +515,8 @@ require("lazy").setup({
         },
       }
 
-      -- local capabilities = vim.lsp.protocol.make_client_capabilities()
-      -- capabilities = vim.tbl_deep_extend("force", capabilities, require("cmp_nvim_lsp").default_capabilities())
-
-      local capabilities = require("cmp_nvim_lsp").default_capabilities()
+      local capabilities = vim.lsp.protocol.make_client_capabilities()
+      capabilities = vim.tbl_deep_extend("force", capabilities, require("blink.cmp").get_lsp_capabilities({}, false))
 
       for server_name, server_config in pairs(servers) do
         if server_config.capabilities then
