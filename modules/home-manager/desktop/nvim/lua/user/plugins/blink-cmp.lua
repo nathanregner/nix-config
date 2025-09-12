@@ -42,12 +42,16 @@ return nix_spec({
         buffer = {
           enabled = true, -- even if LSP completions are available
           opts = {
-            -- restrict to "normal" buffers
             get_bufnrs = function()
-              return vim.tbl_filter(function(bufnr)
-                local buftype = vim.bo[bufnr].buftype
-                return buftype == "" or buftype == "nofile"
-              end, vim.api.nvim_list_bufs())
+              return vim
+                .iter(vim.api.nvim_list_wins())
+                :map(function(win) return vim.api.nvim_win_get_buf(win) end)
+                :filter(function(bufnr)
+                  local buftype = vim.bo[bufnr].buftype
+                  local bufname = vim.api.nvim_buf_get_name(bufnr)
+                  return buftype == "" or string.match(bufname, "conjure-log-.*")
+                end)
+                :totable()
             end,
           },
           -- score_offset = function(ctx)
@@ -65,6 +69,7 @@ return nix_spec({
         },
 
         lsp = {
+          fallbacks = {},
           transform_items = function(_, items)
             -- exclude text items (duplicates buffer source)
             return vim.tbl_filter(
@@ -87,8 +92,8 @@ return nix_spec({
     },
 
     fuzzy = {
-      -- use_frecency = false,
-      -- use_proximity = false,
+      use_frecency = false,
+      use_proximity = false,
       prebuilt_binaries = {
         download = false,
       },
@@ -103,6 +108,5 @@ return nix_spec({
       },
     },
   },
-
-  opts_extend = { "sources.default" },
+  -- opts_extend = { "sources.default" },
 })
