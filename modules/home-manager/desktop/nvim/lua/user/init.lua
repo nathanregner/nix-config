@@ -254,20 +254,6 @@ require("lazy").setup({
     end,
   }),
 
-  -- { -- Autocompletion
-  --   "hrsh7th/nvim-cmp",
-  --   event = { "InsertEnter", "CmdlineEnter" },
-  --   dependencies = {
-  --     "saadparwaiz1/cmp_luasnip",
-  --     "hrsh7th/cmp-nvim-lsp",
-  --     "hrsh7th/cmp-path",
-  --     "hrsh7th/cmp-buffer",
-  --     "hrsh7th/cmp-cmdline",
-  --     "onsails/lspkind.nvim",
-  --   },
-  --   config = function() require("user.cmp") end,
-  -- },
-
   { -- LSP Configuration & Plugins
     "neovim/nvim-lspconfig",
     dependencies = {
