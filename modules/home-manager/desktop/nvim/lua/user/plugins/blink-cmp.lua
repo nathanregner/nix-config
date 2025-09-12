@@ -1,5 +1,7 @@
 -- https://cmp.saghen.dev/installation.html-
 
+local bufname_whitelist = vim.regex([[conjure-log-.*]])
+
 ---@module "lazy"
 ---@type LazySpec
 return nix_spec({
@@ -44,12 +46,12 @@ return nix_spec({
           opts = {
             get_bufnrs = function()
               return vim
-                .iter(vim.api.nvim_list_wins())
-                :map(function(win) return vim.api.nvim_win_get_buf(win) end)
+                .iter(vim.api.nvim_list_bufs())
                 :filter(function(bufnr)
+                  if not vim.api.nvim_buf_is_loaded(bufnr) then return false end
                   local buftype = vim.bo[bufnr].buftype
                   local bufname = vim.api.nvim_buf_get_name(bufnr)
-                  return buftype == "" or string.match(bufname, "conjure-log-.*")
+                  return buftype == "" or bufname_whitelist:match_str(bufname) ~= nil
                 end)
                 :totable()
             end,
@@ -97,15 +99,15 @@ return nix_spec({
       prebuilt_binaries = {
         download = false,
       },
-      sorts = {
-        function(a, b)
-          if (a.client_name == nil or b.client_name == nil) or (a.client_name == b.client_name) then return end
-          return b.client_name == "emmet_ls"
-        end,
-        -- default sorts
-        "score",
-        "sort_text",
-      },
+      -- sorts = {
+      --   function(a, b)
+      --     if (a.client_name == nil or b.client_name == nil) or (a.client_name == b.client_name) then return end
+      --     return b.client_name == "emmet_ls"
+      --   end,
+      --   -- default sorts
+      --   "score",
+      --   "sort_text",
+      -- },
     },
   },
   -- opts_extend = { "sources.default" },
