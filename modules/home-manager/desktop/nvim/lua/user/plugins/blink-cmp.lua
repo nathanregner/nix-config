@@ -94,11 +94,7 @@ return nix_spec({
     },
 
     fuzzy = {
-      use_frecency = false,
-      use_proximity = false,
-      prebuilt_binaries = {
-        download = false,
-      },
+      prebuilt_binaries = { download = false },
       -- sorts = {
       --   function(a, b)
       --     if (a.client_name == nil or b.client_name == nil) or (a.client_name == b.client_name) then return end
