@@ -2,6 +2,7 @@
 {
   imports = [
     ../base
+    ./kanata.nix
     ./fhs.nix
     ./nix.nix
   ];
