@@ -34,7 +34,7 @@
       catppuccin.rofi.enable = true;
       programs.rofi = {
         enable = true;
-        package = pkgs.unstable.rofi-wayland;
+        package = pkgs.unstable.rofi;
         terminal = lib.getExe config.programs.alacritty.package;
       };
 

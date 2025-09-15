@@ -79,10 +79,6 @@ let
       ]
       ++ (lib.lists.tail (prev.nix-update-script args));
 
-    tailscale = (assertVersion "1.86.4" prev.tailscale).overrideAttrs {
-      doCheck = false;
-    };
-
     wrapNeovimUnstable =
       args: neovim-unwrapped:
       (prev.wrapNeovimUnstable args neovim-unwrapped).overrideAttrs {
@@ -123,19 +119,11 @@ rec {
       overlays = [
         (_final: _prev: { inherit (stableFinal) local; })
         sharedModifications
-        (
-          _final: prev:
-          lib.optionalAttrs stableFinal.stdenv.isDarwin {
-            tailscale = (assertVersion "1.86.4" prev.tailscale).overrideAttrs {
-              doCheck = false;
-            };
-          }
-          // {
-            hydra = (assertVersion "0-unstable-2025-08-12" prev.hydra).overrideAttrs {
-              doCheck = false;
-            };
-          }
-        )
+        (_final: prev: {
+          hydra = (assertVersion "0-unstable-2025-08-12" prev.hydra).overrideAttrs {
+            doCheck = false;
+          };
+        })
       ];
     };
   };

@@ -1,5 +1,9 @@
 { lib, pkgs, ... }:
 {
+  imports = [
+    ../.
+  ];
+
   home.packages = with pkgs.unstable; [
     gnomeExtensions.tray-icons-reloaded
     gnomeExtensions.vitals

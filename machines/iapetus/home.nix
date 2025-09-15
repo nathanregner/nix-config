@@ -7,7 +7,7 @@
   home = {
     username = "nregner";
     homeDirectory = "/home/nregner";
-    flakePath = "/home/nregner/nix-config/iapetus";
+    flakePath = "/home/nregner/nix-config/local";
   };
 
   local.niri = {
