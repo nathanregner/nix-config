@@ -460,7 +460,7 @@ require("lazy").setup({
           root_dir = util.root_pattern(".terraform", ".terraform.lock.hcl", ".git", ".tflint.hcl"),
         },
         tinymist = {},
-        vtsls = vim.tbl_deep_extend("error", require("vtsls").lspconfig.default_config, {
+        vtsls = {
           capabilities = {
             workspace = {
               didChangeWorkspaceFolders = {
@@ -470,21 +470,30 @@ require("lazy").setup({
               },
             },
           },
-          handlers = {
-            ["textDocument/publishDiagnostics"] = function(err, result, ctx)
-              require("ts-error-translator").translate_diagnostics(err, result, ctx)
-              vim.lsp.diagnostic.on_publish_diagnostics(err, result, ctx)
-            end,
-            ["workspace/publishDiagnostics"] = function(err, result, ctx)
-              require("ts-error-translator").translate_diagnostics(err, result, ctx)
-              vim.lsp.diagnostic.on_publish_diagnostics(err, result, ctx)
-            end,
-          },
+          -- handlers = {
+          --   ["textDocument/publishDiagnostics"] = function(err, result, ctx)
+          --     require("ts-error-translator").translate_diagnostics(err, result, ctx)
+          --     vim.lsp.diagnostic.on_publish_diagnostics(err, result, ctx)
+          --   end,
+          --   ["workspace/publishDiagnostics"] = function(err, result, ctx)
+          --     require("ts-error-translator").translate_diagnostics(err, result, ctx)
+          --     vim.lsp.diagnostic.on_publish_diagnostics(err, result, ctx)
+          --   end,
+          -- },
           settings = {
-            -- https://github.com/microsoft/vscode/issues/13953
-            typescript = { tsserver = { experimental = { enableProjectDiagnostics = true } } },
+            javascript = {
+              updateImportsOnFileMove = "always",
+            },
+            typescript = {
+              updateImportsOnFileMove = "always",
+              -- https://github.com/microsoft/vscode/issues/13953
+              tsserver = { experimental = { enableProjectDiagnostics = true } },
+            },
+            vtsls = {
+              enableMoveToFileCodeAction = true,
+            },
           },
-        }),
+        },
         yamlls = {
           settings = {
             yaml = {
