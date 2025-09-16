@@ -868,6 +868,8 @@ require("lazy").setup({
   -- TODO: auto-show clear on run (watch)
   { -- Neotest
     "nvim-neotest/neotest",
+    -- https://github.com/nvim-neotest/neotest/issues/531
+    commit = "52fca6717ef972113ddd6ca223e30ad0abb2800c",
     dependencies = {
       "nvim-neotest/nvim-nio",
       "nvim-lua/plenary.nvim",
@@ -955,10 +957,20 @@ require("lazy").setup({
       local neotest = require("neotest")
       ---@diagnostic disable-next-line: missing-fields
       neotest.setup({
+        ---@diagnostic disable-next-line: missing-fields
+        discovery = {
+          enabled = false,
+        },
         adapters = {
           require("rustaceanvim.neotest"),
-          require("neotest-jest")({}),
-          require("neotest-vitest"),
+          require("neotest-jest")({
+            -- jestCommand = "npx jest --",
+            jest_test_discovery = true,
+            -- isTestFile = function(file_path)
+            --   return file_path:match("__tests__/") or file_path:match("%.test%.[jt]sx?$")
+            -- end,
+          }),
+          -- require("neotest-vitest"),
         },
         diagnostic = {
           enabled = true,
