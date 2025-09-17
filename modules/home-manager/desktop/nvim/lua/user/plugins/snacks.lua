@@ -54,6 +54,11 @@ return {
     },
     { "<leader>ff", function() Snacks.picker.files({ hidden = true }) end, desc = "Find Files" },
     { "<leader>fF", function() Snacks.picker.files({ hidden = true, ignored = true }) end, desc = "Find Files" },
+    {
+      "<leader>fR",
+      function() Snacks.picker.files({ hidden = true, ignored = true, dirs = vim.api.nvim_list_runtime_paths() }) end,
+      desc = "Find in RTP",
+    },
     -- { "<leader>fg", function() Snacks.picker.git_files() end, desc = "Find Git Files" },
     { "<leader>fp", function() Snacks.picker.projects() end, desc = "Projects" },
     { "<leader>fr", function() Snacks.picker.recent() end, desc = "Recent" },
@@ -69,6 +74,11 @@ return {
     { "<leader>sb", function() Snacks.picker.lines() end, desc = "Buffer Lines" },
     { "<leader>sB", function() Snacks.picker.grep_buffers() end, desc = "Grep Open Buffers" },
     { "<leader>sg", function() Snacks.picker.grep({ hidden = true }) end, desc = "Grep" },
+    {
+      "<leader>sR",
+      function() Snacks.picker.grep({ hidden = true, dirs = vim.api.nvim_list_runtime_paths() }) end,
+      desc = "Grep RTP",
+    },
     { "<leader>sw", function() Snacks.picker.grep_word() end, desc = "Visual selection or word", mode = { "n", "x" } },
     { '<leader>s"', function() Snacks.picker.registers() end, desc = "Registers" },
     { "<leader>s/", function() Snacks.picker.search_history() end, desc = "Search History" },
