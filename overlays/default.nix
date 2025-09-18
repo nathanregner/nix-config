@@ -1,7 +1,11 @@
 { inputs, outputs }:
 let
   inherit (inputs.nixpkgs) lib;
+
   filterPackagesRecursive = import ../lib/filterPackagesRecursive.nix lib;
+
+  readPatches =
+    root: builtins.map (path: root + "/${path}") ((builtins.attrNames (builtins.readDir root)));
 
   assertVersion =
     version: pkg:
@@ -44,11 +48,7 @@ let
     });
 
     hydra = prev.hydra.overrideAttrs (oldAttrs: {
-      patches = (oldAttrs.patches or [ ]) ++ [
-        ./hydra/0001-feat-add-always_supported_system_types-option.patch
-        ./hydra/0002-feat-don-t-keep-failed-builds.patch
-      ];
-      # doCheck = false;
+      patches = (oldAttrs.patches or [ ]) ++ (readPatches ./hydra);
     });
 
     # FIXME: hack to bypass "FATAL: Module ahci not found" error
@@ -59,15 +59,6 @@ let
     moonraker = prev.moonraker.overrideAttrs (oldAttrs: {
       patches = oldAttrs.patches or [ ] ++ [
         ./moonraker/0001-file_manager-Add-config-option-to-rename-duplicate-f.patch
-      ];
-    });
-
-    tofi = prev.tofi.overrideAttrs (oldAttrs: {
-      patches = oldAttrs.patches or [ ] ++ [
-        (prev.fetchpatch2 {
-          url = "https://github.com/philj56/tofi/pull/189.patch";
-          hash = "sha256-qsXRyNE9x1sSDrCq/LTQY/DTEMwYAJB3U0/dPXX/jw4=";
-        })
       ];
     });
 
@@ -87,6 +78,15 @@ let
         "--flake"
       ]
       ++ (lib.lists.tail (prev.nix-update-script args));
+
+    tofi = prev.tofi.overrideAttrs (oldAttrs: {
+      patches = oldAttrs.patches or [ ] ++ [
+        (prev.fetchpatch2 {
+          url = "https://github.com/philj56/tofi/pull/189.patch";
+          hash = "sha256-qsXRyNE9x1sSDrCq/LTQY/DTEMwYAJB3U0/dPXX/jw4=";
+        })
+      ];
+    });
 
     wrapNeovimUnstable =
       args: neovim-unwrapped:
