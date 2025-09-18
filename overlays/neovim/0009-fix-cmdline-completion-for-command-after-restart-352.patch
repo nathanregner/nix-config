@@ -1,0 +1,43 @@
+From 9cc26b75bcb24ff51232cff04aaa6e7df49ed682 Mon Sep 17 00:00:00 2001
+From: zeertzjq <zeertzjq@outlook.com>
+Date: Sat, 9 Aug 2025 09:25:14 +0800
+Subject: [PATCH 9/9] fix(cmdline): completion for command after :restart
+ (#35256)
+
+---
+ src/nvim/cmdexpand.c                       | 1 +
+ test/functional/editor/completion_spec.lua | 6 ++++++
+ 2 files changed, 7 insertions(+)
+
+diff --git a/src/nvim/cmdexpand.c b/src/nvim/cmdexpand.c
+index 50665740d7..dfb11148cb 100644
+--- a/src/nvim/cmdexpand.c
++++ b/src/nvim/cmdexpand.c
+@@ -1881,6 +1881,7 @@ static const char *set_context_by_cmdname(const char *cmd, cmdidx_T cmdidx, expa
+   case CMD_lockmarks:
+   case CMD_noautocmd:
+   case CMD_noswapfile:
++  case CMD_restart:
+   case CMD_rightbelow:
+   case CMD_sandbox:
+   case CMD_silent:
+diff --git a/test/functional/editor/completion_spec.lua b/test/functional/editor/completion_spec.lua
+index 8b22295b09..4e0baf8c6f 100644
+--- a/test/functional/editor/completion_spec.lua
++++ b/test/functional/editor/completion_spec.lua
+@@ -952,6 +952,12 @@ describe('completion', function()
+     end
+   end)
+ 
++  it('cmdline completion for :restart', function()
++    eq('qall', fn.getcompletion('restart +qa', 'cmdline')[1])
++    eq('edit', fn.getcompletion('restart +qall ed', 'cmdline')[1])
++    eq('edit', fn.getcompletion('restart ed', 'cmdline')[1])
++  end)
++
+   describe('from the commandline window', function()
+     it('is cleared after CTRL-C', function()
+       feed('q:')
+-- 
+2.51.0
+

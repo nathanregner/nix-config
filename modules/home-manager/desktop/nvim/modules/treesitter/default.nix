@@ -4,6 +4,8 @@
   ...
 }:
 let
+  parserPrefix = "nvim/nvim-treesitter";
+
   package = pkgs.unstable.vimPlugins.nvim-treesitter.withAllGrammars.overrideAttrs (old: {
     patches = old.patches or [ ] ++ [
       (pkgs.fetchpatch {
@@ -14,9 +16,17 @@ let
   });
 in
 {
-  programs.neovim.lua.globals = {
-    nvim-treesitter.dir = "${package}";
-  };
+  programs.neovim.lua.globals =
+    let
+      parser_install_dir = "${config.xdg.dataHome}/${parserPrefix}";
+    in
+    {
+      nvim_treesitter = {
+        dir = "${package}";
+        inherit parser_install_dir;
+      };
+      rtp = [ parser_install_dir ];
+    };
 
   xdg.configFile."nvim/after/queries" = {
     source = config.lib.file.mkFlakeSymlink ./queries;
