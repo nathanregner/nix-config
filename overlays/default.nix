@@ -62,14 +62,7 @@ let
       ];
     });
 
-    tofi = prev.tofi.overrideAttrs (oldAttrs: {
-      patches = oldAttrs.patches or [ ] ++ [
-        (prev.fetchpatch2 {
-          url = "https://github.com/philj56/tofi/pull/189.patch";
-          hash = "sha256-qsXRyNE9x1sSDrCq/LTQY/DTEMwYAJB3U0/dPXX/jw4=";
-        })
-      ];
-    });
+    mvnd = prev.callPackage ./mvnd/package.nix { };
 
     nix-update-script =
       args:
@@ -78,6 +71,15 @@ let
         "--flake"
       ]
       ++ (lib.lists.tail (prev.nix-update-script args));
+
+    tofi = prev.tofi.overrideAttrs (oldAttrs: {
+      patches = oldAttrs.patches or [ ] ++ [
+        (prev.fetchpatch2 {
+          url = "https://github.com/philj56/tofi/pull/189.patch";
+          hash = "sha256-qsXRyNE9x1sSDrCq/LTQY/DTEMwYAJB3U0/dPXX/jw4=";
+        })
+      ];
+    });
 
     wrapNeovimUnstable =
       args: neovim-unwrapped:
