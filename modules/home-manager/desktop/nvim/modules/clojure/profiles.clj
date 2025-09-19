@@ -1,3 +1,3 @@
-{:user {:plugins [[lein-ancient "1.0.0-RC3"]
-                  [cider/cider-nrepl "0.49.0"]]
-        :dependencies [[io.github.tonsky/clj-reload "0.7.0"]]}}
+{:user {:plugins []
+        ; https://github.com/tonsky/clj-reload/tags
+        :dependencies [[io.github.tonsky/clj-reload "1.0.0"]]}}
