@@ -128,11 +128,6 @@ rec {
       overlays = [
         (_final: _prev: { inherit (stableFinal) local; })
         sharedModifications
-        (_final: prev: {
-          hydra = (assertVersion "0-unstable-2025-08-12" prev.hydra).overrideAttrs {
-            doCheck = false;
-          };
-        })
       ];
     };
   };
