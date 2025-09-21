@@ -28,7 +28,9 @@
     enable = true;
     dir = ./kernel;
     packages = {
-      kernel = pkgs.linuxKernel.packages.linux_6_16.kernel;
+      kernel = pkgs.linuxKernel.packages.linux_6_16.kernel.overrideAttrs {
+        name = "k"; # dodge uboot length limits
+      };
       linux = pkgs.linuxKernel;
     };
   };
