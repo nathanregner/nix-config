@@ -48,60 +48,35 @@
 
   hardware = {
     enableRedistributableFirmware = true;
-    deviceTree = {
-      name = "rockchip/rk3588s-orangepi-5.dtb";
-      overlays = [
-        {
-          name = "orangepi5-sata-overlay";
-          dtsText = ''
-            // Orange Pi 5 Pcie M.2 to sata
-            /dts-v1/;
-            /plugin/;
+    deviceTree.overlays = [
+      {
+        name = "orangepi5-sata-overlay";
+        dtsText = ''
+          // Orange Pi 5 Pcie M.2 to sata
+          /dts-v1/;
+          /plugin/;
 
-            / {
-              compatible = "rockchip,rk3588s-orangepi-5";
+          / {
+            compatible = "xunlong,orangepi-5";
 
-              fragment@0 {
-                target = <&sata0>;
-
-                __overlay__ {
-                  status = "okay";
-                };
-              };
-
-              fragment@1 {
-                target = <&pcie2x1l2>;
-
-                __overlay__ {
-                  status = "disabled";
-                };
+            fragment@0 {
+              target = <&sata0>;
+              __overlay__ {
+                status = "okay";
               };
             };
-          '';
-        }
-        {
-          name = "orangepi5-i2c-overlay";
-          dtsText = ''
-            /dts-v1/;
-            /plugin/;
 
-            / {
-              compatible = "rockchip,rk3588s-orangepi-5";
+            fragment@1 {
+              target = <&pcie2x1l2>;
 
-              fragment@0 {
-                target = <&i2c1>;
-
-                __overlay__ {
-                  status = "okay";
-                  pinctrl-names = "default";
-                  pinctrl-0 = <&i2c1m2_xfer>;
-                };
+              __overlay__ {
+                status = "disabled";
               };
             };
-          '';
-        }
-      ];
-    };
+          };
+        '';
+      }
+    ];
   };
 
   networking.interfaces.end1.useDHCP = true;
