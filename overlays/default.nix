@@ -1,7 +1,11 @@
 { inputs, outputs }:
 let
   inherit (inputs.nixpkgs) lib;
+
   filterPackagesRecursive = import ../lib/filterPackagesRecursive.nix lib;
+
+  readPatches =
+    root: builtins.map (path: root + "/${path}") ((builtins.attrNames (builtins.readDir root)));
 
   assertVersion =
     version: pkg:
@@ -44,11 +48,7 @@ let
     });
 
     hydra = prev.hydra.overrideAttrs (oldAttrs: {
-      patches = (oldAttrs.patches or [ ]) ++ [
-        ./hydra/0001-feat-add-always_supported_system_types-option.patch
-        ./hydra/0002-feat-don-t-keep-failed-builds.patch
-      ];
-      # doCheck = false;
+      patches = (oldAttrs.patches or [ ]) ++ (readPatches ./hydra);
     });
 
     # FIXME: hack to bypass "FATAL: Module ahci not found" error
@@ -121,11 +121,6 @@ rec {
       overlays = [
         (_final: _prev: { inherit (stableFinal) local; })
         sharedModifications
-        (_final: prev: {
-          hydra = (assertVersion "0-unstable-2025-08-12" prev.hydra).overrideAttrs {
-            doCheck = false;
-          };
-        })
       ];
     };
   };
