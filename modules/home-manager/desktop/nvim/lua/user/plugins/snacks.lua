@@ -1,3 +1,7 @@
+local grep_exclude = {
+  ".yarn/**",
+}
+
 ---@module "lazy"
 ---@module "snacks"
 ---@type LazySpec
@@ -73,13 +77,18 @@ return {
     -- search
     { "<leader>sb", function() Snacks.picker.lines() end, desc = "Buffer Lines" },
     { "<leader>sB", function() Snacks.picker.grep_buffers() end, desc = "Grep Open Buffers" },
-    { "<leader>sg", function() Snacks.picker.grep({ hidden = true }) end, desc = "Grep" },
+    { "<leader>sg", function() Snacks.picker.grep({ hidden = true, exclude = grep_exclude }) end, desc = "Grep" },
     {
       "<leader>sR",
       function() Snacks.picker.grep({ hidden = true, dirs = vim.api.nvim_list_runtime_paths() }) end,
       desc = "Grep RTP",
     },
-    { "<leader>sw", function() Snacks.picker.grep_word() end, desc = "Visual selection or word", mode = { "n", "x" } },
+    {
+      "<leader>sw",
+      function() Snacks.picker.grep_word({ exclude = grep_exclude }) end,
+      desc = "Visual selection or word",
+      mode = { "n", "x" },
+    },
     { '<leader>s"', function() Snacks.picker.registers() end, desc = "Registers" },
     { "<leader>s/", function() Snacks.picker.search_history() end, desc = "Search History" },
     { "<leader>sa", function() Snacks.picker.autocmds() end, desc = "Autocmds" },
