@@ -3,9 +3,11 @@ local cond = require("nvim-autopairs.conds")
 local npairs = require("nvim-autopairs")
 
 npairs.setup({
-  disabled_filetype = { "TelescopePrompt", "snacks_picker_input" },
-  check_ts = true,
   break_undo = true,
+  check_ts = true,
+  disable_in_visualblock = true,
+  disabled_filetype = { "TelescopePrompt", "snacks_picker_input" },
+  enable_check_bracket_line = false,
 })
 
 -- https://github.com/windwp/nvim-autopairs/wiki/Custom-rules
