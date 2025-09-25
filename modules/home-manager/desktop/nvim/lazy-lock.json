@@ -49,7 +49,7 @@
   "text-case.nvim": { "branch": "main", "commit": "e898cfd46fa6cde0e83abb624a16e67d2ffc6457" },
   "todo-comments.nvim": { "branch": "main", "commit": "304a8d204ee787d2544d8bc23cd38d2f929e7cc5" },
   "toggle.nvim": { "branch": "main", "commit": "f2a8411628a32a92ebdafa7bdcd90282dbd64fb0" },
-  "trouble.nvim": { "branch": "main", "commit": "85bedb7eb7fa331a2ccbecb9202d8abba64d37b3" },
+  "trouble.nvim": { "branch": "main", "commit": "f176232e7759c4f8abd923c21e3e5a5c76cd6837" },
   "ts-autotag.nvim": { "branch": "master", "commit": "31a46c772962ce28965fd69c0ef7d9b2723e5b92" },
   "tssorter.nvim": { "branch": "main", "commit": "03f8e15ca4bdad34303ea5f552c0e39953536410" },
   "undotree": { "branch": "master", "commit": "fe9a9d0645f0f5532360b5e5f5c550d7bb4f1869" },
