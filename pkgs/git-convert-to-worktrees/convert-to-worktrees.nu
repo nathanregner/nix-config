@@ -5,7 +5,7 @@ def parse-porcelain [] {
     $row
     | lines
     | each {|line| split row --number 2 " " }
-    | reduce --fold {} {|entry, acc| $acc | insert $entry.0 $entry.1 }
+    | reduce --fold {} {|entry acc| $acc | insert $entry.0 $entry.1 }
   }
 }
 
@@ -25,7 +25,7 @@ def setup-bare-repo [src: path] {
   $temp
 }
 
-def copy-worktree [$bare: path, $worktree: record] {
+def copy-worktree [$bare: path $worktree: record] {
   cd $bare
   let branch = $worktree.branch | str replace 'refs/heads/' ''
   let dest = $"../($branch)"
