@@ -42,7 +42,7 @@ in
           "aarch64-darwin"
         ]
       }
-
+      allow_import_from_derivation = true
       queue_runner_metrics_address = ${prometheusAddress}
 
       <webhooks>
