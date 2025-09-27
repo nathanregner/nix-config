@@ -19,7 +19,7 @@
 
   programs.topiary.languages.nu = {
     extensions = [ "nu" ];
-    grammar.package = pkgs.tree-sitter-grammars.tree-sitter-nu;
-    queries = ./nu.scm;
+    grammar.package = pkgs.local.topiary-nushell.passthru.grammar;
+    queries = "${pkgs.local.topiary-nushell}";
   };
 }
