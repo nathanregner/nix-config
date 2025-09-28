@@ -9,7 +9,6 @@
       config.treefmt.build.devShell
     ];
     packages = with pkgs.unstable; [
-      inputs'.deploy-rs.packages.default
       local.generate-sops-keys
       sops
       # tenv
