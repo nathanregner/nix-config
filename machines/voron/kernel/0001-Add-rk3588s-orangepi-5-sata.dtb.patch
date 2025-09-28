@@ -1,0 +1,62 @@
+From 4b504f388b9934d37f8c2867c7127ad8026cbce5 Mon Sep 17 00:00:00 2001
+From: Nathan Regner <nathanregner@gmail.com>
+Date: Sun, 28 Sep 2025 10:12:14 -0600
+Subject: [PATCH] Add rk3588s-orangepi-5-sata.dtb
+
+---
+ arch/arm64/boot/dts/rockchip/Makefile         |  1 +
+ .../dts/rockchip/rk3588s-orangepi-5-sata.dts  | 30 +++++++++++++++++++
+ 2 files changed, 31 insertions(+)
+ create mode 100644 arch/arm64/boot/dts/rockchip/rk3588s-orangepi-5-sata.dts
+
+diff --git a/arch/arm64/boot/dts/rockchip/Makefile b/arch/arm64/boot/dts/rockchip/Makefile
+index 4bf84622db473..6fcd2dda8c16b 100644
+--- a/arch/arm64/boot/dts/rockchip/Makefile
++++ b/arch/arm64/boot/dts/rockchip/Makefile
+@@ -187,6 +187,7 @@ dtb-$(CONFIG_ARCH_ROCKCHIP) += rk3588s-nanopi-r6s.dtb
+ dtb-$(CONFIG_ARCH_ROCKCHIP) += rk3588s-nanopi-r6c.dtb
+ dtb-$(CONFIG_ARCH_ROCKCHIP) += rk3588s-odroid-m2.dtb
+ dtb-$(CONFIG_ARCH_ROCKCHIP) += rk3588s-orangepi-5.dtb
++dtb-$(CONFIG_ARCH_ROCKCHIP) += rk3588s-orangepi-5-sata.dtb
+ dtb-$(CONFIG_ARCH_ROCKCHIP) += rk3588s-orangepi-5b.dtb
+ dtb-$(CONFIG_ARCH_ROCKCHIP) += rk3588s-rock-5a.dtb
+ dtb-$(CONFIG_ARCH_ROCKCHIP) += rk3588s-rock-5c.dtb
+diff --git a/arch/arm64/boot/dts/rockchip/rk3588s-orangepi-5-sata.dts b/arch/arm64/boot/dts/rockchip/rk3588s-orangepi-5-sata.dts
+new file mode 100644
+index 0000000000000..13c98d99f6dc7
+--- /dev/null
++++ b/arch/arm64/boot/dts/rockchip/rk3588s-orangepi-5-sata.dts
+@@ -0,0 +1,30 @@
++// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
++/*
++ * Copyright (c) 2021 Rockchip Electronics Co., Ltd
++ *
++ */
++
++/dts-v1/;
++#include "rk3588s-orangepi-5.dts"
++
++&sata0 {
++	u-boot,dm-pre-reloc;
++	pinctrl-names = "default";
++	pinctrl-0 = <&sata_reset>;
++	status = "okay";
++};
++
++&pcie2x1l2 {
++	u-boot,dm-pre-reloc;
++	status = "disabled";
++};
++
++&pinctrl {
++	sata {
++		u-boot,dm-pre-reloc;
++		sata_reset: sata-reset {
++			u-boot,dm-pre-reloc;
++			rockchip,pins = <3 RK_PD1 RK_FUNC_GPIO &pcfg_pull_up>;
++		};
++	};
++};
+-- 
+2.51.0
+

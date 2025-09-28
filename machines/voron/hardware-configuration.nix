@@ -33,8 +33,8 @@
     };
     kernelPatches = [
       {
-        name = "Add-support-for-the-Orange-Pi-5-boards";
-        patch = ./kernel/0012-Add-support-for-the-Orange-Pi-5-boards.patch;
+        name = "Add-rk3588s-orangepi-5-sata";
+        patch = ./kernel/0001-Add-rk3588s-orangepi-5-sata.dtb.patch;
       }
     ];
   };
@@ -57,7 +57,7 @@
 
     deviceTree = {
       name = "rockchip/rk3588s-orangepi-5.dtb";
-      filter = "*rk3588s-orangepi-5.dtb";
+      # filter = "*rk3588s-orangepi-5*";
       overlays = [
         {
           name = "orangepi5-sata-overlay";
