@@ -46,37 +46,43 @@
 
   powerManagement.cpuFreqGovernor = "ondemand";
 
+  boot.loader.systemd-boot.installDeviceTree = true;
+
   hardware = {
     enableRedistributableFirmware = true;
-    deviceTree.overlays = [
-      {
-        name = "orangepi5-sata-overlay";
-        dtsText = ''
-          // Orange Pi 5 Pcie M.2 to sata
-          /dts-v1/;
-          /plugin/;
 
-          / {
-            compatible = "xunlong,orangepi-5";
+    deviceTree = {
+      name = "rockchip/rk3588s-orangepi-5-sata.dtb";
+      overlays = [
+        {
+          name = "orangepi5-sata-overlay";
+          dtsText = ''
+            // Orange Pi 5 Pcie M.2 to sata
+            /dts-v1/;
+            /plugin/;
 
-            fragment@0 {
-              target = <&sata0>;
-              __overlay__ {
-                status = "okay";
+            / {
+              compatible = "xunlong,orangepi-5";
+
+              fragment@0 {
+                target = <&sata0>;
+                __overlay__ {
+                  status = "okay";
+                };
+              };
+
+              fragment@1 {
+                target = <&pcie2x1l2>;
+
+                __overlay__ {
+                  status = "disabled";
+                };
               };
             };
-
-            fragment@1 {
-              target = <&pcie2x1l2>;
-
-              __overlay__ {
-                status = "disabled";
-              };
-            };
-          };
-        '';
-      }
-    ];
+          '';
+        }
+      ];
+    };
   };
 
   networking.interfaces.end1.useDHCP = true;
