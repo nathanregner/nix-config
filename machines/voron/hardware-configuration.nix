@@ -31,12 +31,6 @@
       # TODO: needed?
       name = "k"; # dodge uboot length limits
     };
-    kernelPatches = [
-      {
-        name = "Add-rk3588s-orangepi-5-sata";
-        patch = ./kernel/0001-Add-rk3588s-orangepi-5-sata.dtb.patch;
-      }
-    ];
   };
 
   assertions = [
