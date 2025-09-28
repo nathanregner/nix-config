@@ -1,4 +1,5 @@
 {
+  options,
   config,
   pkgs,
   lib,
@@ -18,20 +19,23 @@ in
   options = {
     local.kernel = {
       enable = mkEnableOption "custom kernel";
-      dir = mkOption { type = types.path; };
+      configDir = mkOption { type = types.path; };
       features = mkOption { type = types.attrsOf types.bool; };
       packages = mkOption {
         type = types.submodule {
           options = {
-            kernel = mkOption { type = types.package; };
-            linux = mkOption { };
+            kernel = mkOption {
+              type = types.package;
+              default = pkgs.linuxPackages.kernel;
+            };
+            linux = mkOption {
+              default = pkgs.linuxKernel;
+            };
           };
         };
-        default = {
-          kernel = pkgs.linuxPackages.kernel;
-          linux = pkgs.linuxKernel;
-        };
+        default = { };
       };
+      inherit (options.boot) kernelPatches;
       _devShell = mkReadOnlyOption (
         pkgs.mkShell {
           env = {
@@ -41,7 +45,7 @@ in
             ];
           };
           shellHook = ''
-            . ${./shell-hook.sh} ${lib.head (builtins.match "/nix/store/[^/]+/(.*)" (toString cfg.dir))}
+            . ${./shell-hook.sh} ${lib.head (builtins.match "/nix/store/[^/]+/(.*)" (toString cfg.configDir))}
           '';
           packages = with pkgs; [
             (pkgs.writers.writeNuBin "parse-config" ./parse-config.nu)
@@ -59,9 +63,10 @@ in
     boot.kernelPackages = cfg.packages.linux.packagesFor (
       (cfg.packages.linux.manualConfig rec {
         inherit (cfg.packages.kernel) src version;
-        config = builtins.fromJSON (builtins.readFile "${cfg.dir}/.config.json");
-        configfile = "${cfg.dir}/.config";
+        config = builtins.fromJSON (builtins.readFile "${cfg.configDir}/.config.json");
+        configfile = "${cfg.configDir}/.config";
         modDirVersion = lib.versions.pad 3 version;
+        inherit (cfg) kernelPatches;
       }).overrideAttrs
         (old: {
           passthru = old.passthru // {

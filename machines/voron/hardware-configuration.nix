@@ -26,13 +26,17 @@
 
   local.kernel = {
     enable = true;
-    dir = ./kernel;
-    packages = {
-      kernel = pkgs.linuxKernel.packages.linux_6_16.kernel.overrideAttrs {
-        name = "k"; # dodge uboot length limits
-      };
-      linux = pkgs.linuxKernel;
+    configDir = ./kernel;
+    packages.kernel = pkgs.linuxKernel.packages.linux_6_16.kernel.overrideAttrs {
+      # TODO: needed?
+      name = "k"; # dodge uboot length limits
     };
+    kernelPatches = [
+      {
+        name = "Add-support-for-the-Orange-Pi-5-boards";
+        patch = ./kernel/0012-Add-support-for-the-Orange-Pi-5-boards.patch;
+      }
+    ];
   };
 
   assertions = [
