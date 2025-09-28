@@ -52,7 +52,8 @@
     enableRedistributableFirmware = true;
 
     deviceTree = {
-      name = "rockchip/rk3588s-orangepi-5-sata.dtb";
+      name = "rockchip/rk3588s-orangepi-5.dtb";
+      filter = "*rk3588s-orangepi-5.dtb";
       overlays = [
         {
           name = "orangepi5-sata-overlay";
