@@ -22,6 +22,35 @@
 
     menuExtraClock.ShowSeconds = true;
 
+    CustomUserPreferences = {
+      # disable indexing of everything but apps
+      "com.apple.Spotlight" = {
+        EnabledPreferenceRules = [
+          "com.apple.AppStore"
+          "com.apple.iBooksX"
+          "com.apple.calculator"
+          "com.apple.iCal"
+          "com.apple.AddressBook"
+          "com.apple.Dictionary"
+          "com.apple.mail"
+          "com.microsoft.Outlook"
+          "com.apple.Notes"
+          "com.apple.Photos"
+          "com.apple.podcasts"
+          "com.apple.reminders"
+          "com.apple.Safari"
+          "com.apple.shortcuts"
+          "com.apple.systempreferences"
+          "com.apple.tips"
+          "com.apple.VoiceMemos"
+          "System.documents"
+          "System.folders"
+          "System.iphoneApps"
+          "System.menuItems"
+        ];
+      };
+    };
+
     # CustomUserPreferences =
     #   lib.trivial.pipe (lib.filesystem.listFilesRecursive ./preferences) [
     #     (builtins.filter
