@@ -30,7 +30,7 @@ in
   config = {
     programs.neovim = {
       enable = true;
-      package = pkgs.unstable.neovim-unwrapped;
+      package = inputs.neovim-nightly-overlay.packages.${pkgs.system}.default;
       defaultEditor = true;
       extraConfig = builtins.readFile ./init.vim;
       extraLuaConfig = ''
@@ -89,6 +89,7 @@ in
             vtsls
             yaml-language-server
             ;
+          inherit (pkgs.unstable) git;
         }
         // lib.optionalAttrs pkgs.stdenv.isLinux {
           inherit (pkgs.unstable)
@@ -134,7 +135,6 @@ in
         };
       }) (lib.filesystem.listFilesRecursive ./after/ftplugin)
     );
-
 
     programs.zsh.shellAliases.vimdiff = "nvim -d";
 

@@ -94,8 +94,6 @@ return nix_spec({
     },
 
     fuzzy = {
-      use_frecency = true,
-      use_proximity = true,
       prebuilt_binaries = {
         download = false,
       },

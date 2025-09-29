@@ -166,6 +166,7 @@ return {
                 "outputs",
                 "outputs'",
                 "sources",
+                "options",
                 "config",
                 "pkgs",
                 "lib",
