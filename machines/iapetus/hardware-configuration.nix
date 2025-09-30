@@ -43,7 +43,6 @@
     kernelModules = [ "kvm-amd" ];
     extraModulePackages = [ ];
   };
-
   disko.devices = {
     disk.main = {
       type = "disk";
