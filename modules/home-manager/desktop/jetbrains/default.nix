@@ -55,6 +55,12 @@ in
       type = types.attrsOf (
         types.submodule {
           options = {
+            toolboxFolder = mkOption {
+              type = types.str;
+            };
+            darwinAppGlob = mkOption {
+              type = types.str;
+            };
             plugins = mkOption {
               type = types.listOf types.package;
               default = [ ];
@@ -69,30 +75,43 @@ in
     home.file.".ideavimrc".source = config.lib.file.mkFlakeSymlink ./ideavimrc;
 
     home.packages = lib.optionals pkgs.stdenv.isLinux (
-      let
-        launchDetached =
-          name: bin:
-          pkgs.writeShellScriptBin name ''
-            nohup ${bin} "$@" &> /dev/null & disown %%
-          '';
-      in
       [
         pkgs.unstable.jetbrains-toolbox
-        (launchDetached "idea" "~/.local/share/JetBrains/Toolbox/apps/intellij-idea-ultimate/bin/idea")
-        (launchDetached "datagrip" "~/.local/share/JetBrains/Toolbox/apps/datagrip/bin/datagrip")
       ]
+      ++ (lib.mapAttrsToList (
+        name: cfg:
+        let
+          launchDetached =
+            name: bin:
+            pkgs.writeShellScriptBin name ''
+              nohup ${bin} "$@" &> /dev/null & disown %%
+            '';
+        in
+        launchDetached name "~/.local/share/JetBrains/Toolbox/apps/${cfg.toolboxFolder}/bin/${name}"
+      ) cfg.tools)
     );
 
     programs.jetbrains.tools = {
-      datagrip = { };
-      idea = { };
+      datagrip = {
+        toolboxFolder = "datagrip";
+        darwinAppGlob = "IntelliJ\\ IDEA\\ Ultimate*.app";
+      };
+      idea = {
+        toolboxFolder = "intellij-idea-ultimate";
+        darwinAppGlob = "DataGrip\\*.app";
+      };
+      rider = {
+        toolboxFolder = "rider";
+        darwinAppGlob = "Rider*.app";
+      };
     };
 
     # TODO: move to cfg.tools
-    programs.zsh.shellAliases = lib.optionalAttrs pkgs.stdenv.isDarwin {
-      idea = "open -na ~/Applications/IntelliJ\\ IDEA\\ Ultimate*.app/Contents/MacOS/idea --args";
-      datagrip = "open -na ~/Applications/DataGrip\\*.app/Contents/MacOS/datagrip --args";
-    };
+    programs.zsh.shellAliases = lib.optionalAttrs pkgs.stdenv.isDarwin (
+      builtins.mapAttrs (
+        name: cfg: "open -na ~/Applications/${cfg.darwinAppGlob}/Contents/MacOS/${name} --args"
+      ) cfg.tools
+    );
 
     xdg.configFile = lib.mkMerge (lib.concatLists (lib.mapAttrsToList linkConfigFiles cfg.tools));
   };
