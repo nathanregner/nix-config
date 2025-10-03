@@ -471,7 +471,7 @@ require("lazy").setup({
         if server_config.capabilities then
           capabilities = vim.tbl_deep_extend("force", capabilities, server_config.capabilities)
         end
-        vim.lsp.config(server_name, {
+        require("lspconfig")[server_name].setup({
           cmd = server_config.cmd,
           capabilities = capabilities,
           on_attach = function(...)
@@ -483,7 +483,6 @@ require("lazy").setup({
           init_options = server_config.init_options,
           root_dir = server_config.root_dir,
         })
-        vim.lsp.enable(server_name)
       end
     end,
   },
