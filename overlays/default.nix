@@ -20,6 +20,15 @@ let
       final;
 
   sharedModifications = final: prev: rec {
+    alacritty = prev.alacritty.overrideAttrs (oldAttrs: {
+      patches = (oldAttrs.patches or [ ]) ++ [
+        (prev.fetchpatch2 {
+          url = "https://patch-diff.githubusercontent.com/raw/alacritty/alacritty/pull/8700.patch";
+          hash = "sha256-/dKiZZB+ZFROLgNo4+JPaG2fr5HtEpQW1U2gK3I+m+g=";
+        })
+      ];
+    });
+
     # FIXME
     # https://github.com/NixOS/nixpkgs/issues/305779
     # https://github.com/betaflight/betaflight-configurator/issues/3947
