@@ -1222,6 +1222,8 @@ require("lazy").setup({
     opts = {},
   },
 
+  { "godlygeek/tabular" },
+
   { import = "user.plugins" },
 }, {
   dev = {
