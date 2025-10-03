@@ -6,7 +6,7 @@ keys:
   - &host_print_farm age16zk73cejuepyskjeq0625ecf727y3nmmw32qq0ta97q9e4uj2sqstq6240
   - &host_sagittarius age1yfflu4pxlt32sy4xaa04m5gs7kyrccyj9y5hh0qvndmxtrxrtpns7mf682
   - &host_server age1g2mgt0s80nc5yzkjnwmn6qwf8udnapx92vhwussjpa9d4et5v5zskgap5y
-  - &host_voron age1va7x5fxzs83agap49yjjf7f2rje0563lgckkcccf2sxxfsnr7qkqcf0749
+  - &host_voron age1umfkmuh36yaefgagfnummrgcyragzuhayq9fqsnujs67te07qeasnqfxa8
   - &user_nregner age1edzgfqhfrg5a6p9dgte7s8dqt87vu8a50up5mys0h34x3dsrj90qr743qw
   - &user_nregner_enceladus age1me7gswd8w750e30m8au67mv9npvkqtvjugz50ydn9tajezu0lccs9qw38c
 creation_rules:

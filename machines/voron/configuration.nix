@@ -1,7 +1,6 @@
 { modulesPath, config, ... }:
 {
   imports = [
-    "${modulesPath}/installer/sd-card/sd-image-aarch64.nix"
     "${modulesPath}/profiles/minimal.nix"
     ../../modules/nixos/server
     ./hardware-configuration.nix
