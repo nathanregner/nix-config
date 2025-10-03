@@ -20,6 +20,12 @@ let
       final;
 
   sharedModifications = final: prev: rec {
+    alacritty = (
+      lib.throwIf (
+        "0.15.1" != prev.alacritty.version
+      ) "alacritty has been updated: ${prev.alacritty.version}" prev.callPackage ./alacritty.nix { }
+    );
+
     # FIXME
     # https://github.com/NixOS/nixpkgs/issues/305779
     # https://github.com/betaflight/betaflight-configurator/issues/3947
