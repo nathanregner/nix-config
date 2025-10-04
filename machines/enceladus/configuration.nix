@@ -6,7 +6,7 @@
 {
   imports = [
     ../../modules/darwin
-    ./linux-builder.nix
+    # ./linux-builder.nix
   ];
 
   nixpkgs.hostPlatform = "aarch64-darwin";

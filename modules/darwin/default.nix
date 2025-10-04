@@ -6,8 +6,6 @@
 {
   imports = [
     inputs.mac-app-util.darwinModules.default
-    ../nixos/base/nix.nix
-    ../nixos/desktop/nix.nix
     ./hydra-builder.nix
     ./nix.nix
     ./preferences.nix

@@ -17,6 +17,17 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     flake-compat.url = "github:edolstra/flake-compat";
+    determinate = {
+      url = "https://flakehub.com/f/DeterminateSystems/determinate/*";
+      inputs = {
+        determinate-nixd-aarch64-darwin.follows = "";
+        determinate-nixd-aarch64-linux.follows = "";
+        determinate-nixd-x86_64-darwin.follows = "";
+        determinate-nixd-x86_64-linux.follows = "";
+        # nix.follows = "";
+        nixpkgs.follows = "nixpkgs";
+      };
+    };
 
     # Tools
     deploy-rs = {
