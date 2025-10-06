@@ -8,7 +8,7 @@
   catppuccin.alacritty.enable = true;
   programs.alacritty = {
     enable = true;
-    package = pkgs.unstable.alacritty;
+    package = pkgs.unstable.local.alacritty;
     # https://alacritty.org/config-alacritty.html
     settings = {
       env = {
