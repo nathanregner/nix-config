@@ -515,10 +515,18 @@ require("lazy").setup({
         if server_config.capabilities then
           capabilities = vim.tbl_deep_extend("force", capabilities, server_config.capabilities)
         end
-        server_config.capabilities = capabilities
-        server_config.on_attach = on_attach
-        vim.lsp.config(server_name, server_config)
-        vim.lsp.enable(server_name)
+        require("lspconfig")[server_name].setup({
+          cmd = server_config.cmd,
+          capabilities = capabilities,
+          on_attach = function(...)
+            on_attach(...)
+            if server_config.on_attach then server_config.on_attach(...) end
+          end,
+          settings = server_config.settings,
+          filetypes = server_config.filetypes,
+          init_options = server_config.init_options,
+          root_dir = server_config.root_dir,
+        })
       end
     end,
   },
@@ -1277,6 +1285,8 @@ require("lazy").setup({
     "MagicDuck/grug-far.nvim",
     opts = {},
   },
+
+  { "godlygeek/tabular" },
 
   { import = "user.plugins" },
 }, {
