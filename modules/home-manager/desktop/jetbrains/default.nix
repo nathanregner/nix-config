@@ -109,7 +109,7 @@ in
     # TODO: move to cfg.tools
     programs.zsh.shellAliases = lib.optionalAttrs pkgs.stdenv.isDarwin (
       builtins.mapAttrs (
-        _: cfg: "open -na ~/Applications/${cfg.darwinAppGlob}/Contents/MacOS/idea --args"
+        name: cfg: "open -na ~/Applications/${cfg.darwinAppGlob}/Contents/MacOS/${name} --args"
       ) cfg.tools
     );
 
