@@ -26,7 +26,7 @@ require("conform").setup({
     clojure = { "joker" },
     css = { "prettierd" },
     fennel = { "fnlfmt" },
-    gitcommit = { "prettier", "injected" }, -- FIXME: prettierd erroring out
+    gitcommit = { "injected" },
     go = { "gofmt" },
     graphql = { "prettierd" },
     html = { "prettierd" },
