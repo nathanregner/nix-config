@@ -1,6 +1,9 @@
 <application>
   <component name="ProjectManager">
     <defaultProject>
+      <component name="AutoImportSettings">
+        <option name="autoReloadType" value="ALL" />
+      </component>
       <component name="IssueNavigationConfiguration">
         <option name="links">
           <list>
@@ -15,7 +18,12 @@
         <option name="myConfigurationMode" value="AUTOMATIC" />
         <option name="myRunOnSave" value="true" />
       </component>
-      <component name="PropertiesComponent">{}</component>
+      <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "settings.build.tools.auto.reload": "ALL",
+    "settings.editor.selected.configurable": "build.tools"
+  }
+}]]></component>
       <component name="RunManager">
         <configuration default="true" type="JUnit" factoryName="JUnit">
           <extension name="com.fapiko.jetbrains.plugins.better_direnv.runconfigs.IdeaRunConfigurationExtension">
