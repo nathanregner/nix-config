@@ -7,7 +7,7 @@
 {
   programs.firefox = {
     enable = true;
-    package = if pkgs.stdenv.isDarwin then null else pkgs.unstable.firefox-devedition-bin;
+    package = if pkgs.stdenv.isDarwin then null else pkgs.unstable.firefox-devedition;
     # name must start with "dev-edition-"? https://github.com/nix-community/home-manager/issues/4703
     profiles.default = {
       id = 1;

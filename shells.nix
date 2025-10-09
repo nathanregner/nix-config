@@ -32,8 +32,6 @@
     packages =
       with pkgs.unstable;
       [
-        nixVersions.latest
-        git
         pkgs.local.generate-sops-keys
         inputs'.home-manager.packages.home-manager
       ]

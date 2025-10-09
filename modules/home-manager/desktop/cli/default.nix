@@ -24,7 +24,6 @@
     gnused
     jq
     ripgrep
-    parallel
 
     # filesystem
     dua

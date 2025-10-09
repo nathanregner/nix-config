@@ -6,6 +6,7 @@ provider "registry.opentofu.org/tailscale/tailscale" {
   constraints = ">= 0.15.0"
   hashes = [
     "h1:WlL7BJHtxnvC4uR7NyTI95Ej5IDJxKqoSAu6pCwVVRs=",
+    "h1:jtRN8X5NWpfQgnuxKvGOKdTDqWmDRtgOF85AFwKi690=",
     "zh:0ececf1715d6ece1983e773f8b8def68e8d2d455ff1e5d49fffa97a62c629661",
     "zh:36146ceadff77791297dfdffe3fa39a6a93b8efc5f0cf55e64f8ad9143685bb5",
     "zh:4e5304e0443fa6f99ac4c280c0d780078c09475c705581199e3dbd1c0b66fc51",

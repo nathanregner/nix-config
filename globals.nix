@@ -7,7 +7,7 @@
       enceladus-linux-vm = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJBWcxb/Blaqt1auOtE+F8QUWrUotiC5qBJ+UuEWdVCb";
       iapetus = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOhre0L0AW87qYkI5Os8U2+DS5yvAOnjpEY+Lmn5f0l7";
       sagittarius = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIQOaeRY07hRIPpeFYRWoQOzP+toxZjveC5jVHF+vpIj";
-      voron = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJwRmpXQaCQ57F9KBmWAd5nPLSNh0gEro7i8JPDal8XL";
+      voron = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKPtYcccv53Oae+tUde3hSsqlnyq33LZN/jr/vb6HNRf";
     };
 
     userKeys = {

@@ -246,8 +246,13 @@
           {
             iso-installer = inputs.nixos-generators.nixosGenerate {
               inherit system;
+              specialArgs = {
+                inherit self inputs outputs;
+              };
               modules = [
                 "${nixpkgs}/nixos/modules/installer/cd-dvd/installation-cd-graphical-gnome.nix"
+                ./modules/nixos/base/nix.nix
+                ./modules/nixos/base/kanata.nix
                 {
                   environment.etc."nixos/flake".source = self.outPath;
                   environment.systemPackages = [
