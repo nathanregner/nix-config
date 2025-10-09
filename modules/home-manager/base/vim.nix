@@ -1,5 +1,6 @@
+{ config, lib, ... }:
 {
-  programs.vim.enable = true;
+  programs.vim.enable = lib.mkDefault (!config.programs.neovim.enable);
 
   # expose file to ideavimrc
   home.file.".vimrc".text = ''
