@@ -16,7 +16,7 @@
 (defn terraform-output
   []
   (as-> (:out (shell {:out :string
-                      :dir script-root} "terraform output -json")) $
+                      :dir script-root} "tofu output -json")) $
     (json/parse-string $ true)
     (reduce-kv (fn [acc k {:keys [value]}] (assoc acc k value)) {} $)))
 
