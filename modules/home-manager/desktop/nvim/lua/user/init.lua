@@ -769,14 +769,14 @@ require("lazy").setup({
     },
     opts = {
       keymaps = {
-        ["gd"] = function()
-          local oil = require("oil")
-          if #require("oil.config").columns == 1 then
-            oil.set_columns({ "icon", "permissions", "size", "mtime" })
-          else
-            oil.set_columns({ "icon" })
-          end
-        end,
+        ["<C-cr>"] = { "actions.select", opts = { vertical = true } },
+        ["<C-h>"] = false,
+        ["<C-l>"] = false,
+        ["<C-p>"] = false,
+        ["<C-s>"] = { "actions.select", opts = { horizontal = true } },
+        ["<C-t>"] = { "actions.select", opts = { tab = true } },
+        ["<k>"] = "actions.preview",
+
         ["<Esc>"] = function()
           local oil = require("oil")
           local was_modified = vim.bo.modified
@@ -785,6 +785,13 @@ require("lazy").setup({
             if choice == 1 then oil.save() end
           end
           oil.close()
+        end,
+        ["g-"] = function()
+          local oil = require("oil")
+          local cwd = oil.get_current_dir()
+          local git_root = get_git_root(cwd)
+          if git_root == cwd then git_root = get_git_root(vim.fs.dirname(git_root)) end
+          if git_root then oil.open(git_root) end
         end,
         ["gd"] = {
           desc = "Toggle file detail view",
@@ -797,13 +804,6 @@ require("lazy").setup({
             end
           end,
         },
-        ["g-"] = function()
-          local oil = require("oil")
-          local cwd = oil.get_current_dir()
-          local git_root = get_git_root(cwd)
-          if git_root == cwd then git_root = get_git_root(vim.fs.dirname(git_root)) end
-          if git_root then oil.open(git_root) end
-        end,
       },
     },
   },
