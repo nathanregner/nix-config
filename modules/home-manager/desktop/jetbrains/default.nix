@@ -94,11 +94,11 @@ in
     programs.jetbrains.tools = {
       datagrip = {
         toolboxFolder = "datagrip";
-        darwinAppGlob = "IntelliJ\\ IDEA\\ Ultimate*.app";
+        darwinAppGlob = "DataGrip\\*.app";
       };
       idea = {
         toolboxFolder = "intellij-idea-ultimate";
-        darwinAppGlob = "DataGrip\\*.app";
+        darwinAppGlob = "IntelliJ\\ IDEA\\ Ultimate*.app";
       };
       rider = {
         toolboxFolder = "rider";
