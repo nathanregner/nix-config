@@ -20,6 +20,15 @@ let
       final;
 
   sharedModifications = final: prev: rec {
+    # https://github.com/NixOS/nixpkgs/issues/449891
+    basedpyright = prev.basedpyright.overrideAttrs (oldAttrs: {
+      nativeBuildInputs =
+        oldAttrs.nativeBuildInputs
+        ++ lib.optionals prev.stdenv.isDarwin [
+          prev.clang_20
+        ];
+    });
+
     # FIXME
     # https://github.com/NixOS/nixpkgs/issues/305779
     # https://github.com/betaflight/betaflight-configurator/issues/3947
