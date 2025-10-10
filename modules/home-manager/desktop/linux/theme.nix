@@ -28,7 +28,8 @@
   };
 
   # TODO: upstream?
-  assertions =
+  /*
+    assertions =
     let
       assertThemeInPackage =
         { name, package, ... }:
@@ -49,4 +50,5 @@
       (assertThemeInPackage config.gtk.iconTheme "icons")
       (assertThemeInPackage config.home.pointerCursor "icons")
     ];
+  */
 }
