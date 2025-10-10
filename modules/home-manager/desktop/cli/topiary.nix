@@ -10,6 +10,7 @@ let
   package = pkgs.topiary;
   json = pkgs.formats.json { };
 
+  parserPath = package: "${package}/parser";
 in
 {
   options.programs.topiary = {
@@ -77,21 +78,25 @@ in
       mkdir $out
       cp ${package}/share/queries/* $out/
       ${builtins.concatStringsSep "\n" (
-        lib.mapAttrsToList (
-          name: language: if language.queries != null then "cp ${language.queries} $out/${name}.scm" else ""
-        ) cfg.languages
-      )}
+        lib.mapAttrsToList (name: language: ''
+          if [ ! -f "${parserPath language.grammar.package}" ]; then
+            echo "Path ${parserPath language.grammar.package} does not exist."
+            exit 1
+          fi
 
+          ${lib.optionalString (language.queries != null) ''
+            if [ ! -f "${language.queries}" ]; then
+              echo "Path ${language.queries} does not exist."
+              exit 1
+            fi
+            cp "${language.queries}" $out/${name}.scm
+          ''}
+        '') cfg.languages
+      )}
     ''}";
 
     xdg.configFile."topiary/languages.ncl".text =
       let
-        parserPath =
-          package:
-          assert lib.assertMsg (
-            ((builtins.readDir package).parser or null) == "regular"
-          ) "Package does not appear to be a valid tree-sitter grammar: ${package.pname}";
-          "${package}/parser";
         languages = {
           languages = builtins.mapAttrs (
             _: language:

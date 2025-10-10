@@ -11,7 +11,7 @@ jobs:
     outputs:
       attrs: ${{ steps.attrs.outputs.attrs }}
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
         with:
           token: ${{ secrets.GH_TOKEN_FOR_UPDATES }}
           ref: next
@@ -26,7 +26,7 @@ jobs:
         attr: ${{ fromJSON(needs.nix-update-matrix.outputs.attrs) }}
     continue-on-error: true
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
         with:
           token: ${{ secrets.GH_TOKEN_FOR_UPDATES }}
           ref: next
