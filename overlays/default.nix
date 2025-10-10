@@ -60,6 +60,16 @@ let
       patches = (oldAttrs.patches or [ ]) ++ (readPatches ./hydra);
     });
 
+    ltrace = prev.ltrace.overrideAttrs (oldAttrs: {
+      patches = oldAttrs.patches ++ [
+        # print-instruction-pointer.exp doesn't expect ASLR
+        (prev.fetchurl {
+          url = "https://github.com/gentoo/gentoo/raw/a2eb7e103ec985ff90f59e722e0a8a43373972a2/dev-debug/ltrace/files/ltrace-0.7.3-print-test-pie.patch";
+          hash = "sha256-QRsUoN3WLzfiY5GDPwVYXtJPFMJt6rcc6eE96SAtI6Q=";
+        })
+      ];
+    });
+
     # FIXME: hack to bypass "FATAL: Module ahci not found" error
     # https://github.com/NixOS/nixpkgs/issues/154163#issuecomment-1350599022
     makeModulesClosure = x: prev.makeModulesClosure (x // { allowMissing = true; });
