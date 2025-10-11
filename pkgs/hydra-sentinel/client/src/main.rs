@@ -1,6 +1,5 @@
-use crate::app::UserEvent;
+use crate::app::Application;
 use crate::rate_limiter::RateLimiter;
-use crate::{app::Application, notification::NotificationManager};
 use backon::{ExponentialBuilder, Retryable};
 use futures_util::{SinkExt, StreamExt};
 use hydra_sentinel::{shutdown_signal, SentinelMessage};
@@ -8,8 +7,6 @@ use serde::Deserialize;
 use std::time::Duration;
 use tokio::sync::{oneshot, watch};
 use tokio_tungstenite::{connect_async, tungstenite::protocol::Message};
-use tracing::event;
-use winit::event_loop::{self, EventLoop, EventLoopBuilder};
 
 mod app;
 mod notification;
@@ -96,7 +93,7 @@ async fn run(
     })
     .retry(
         &ExponentialBuilder::default()
-            .with_max_delay(Duration::from_secs(15))
+            .with_max_delay(Duration::from_secs(10))
             .without_max_times()
             .with_jitter(),
     )
