@@ -5,9 +5,6 @@
   ];
 
   home.packages = with pkgs; [
-    # apps
-    openrgb
-
     # tools
     rclone
     restic
