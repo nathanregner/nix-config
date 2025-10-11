@@ -94,19 +94,21 @@ impl Application {
                     current_state = Some(state);
                     toggle.set_text(if state.enabled { "Disable" } else { "Enable" });
 
+                    #[cfg(target_os = "linux")]
                     tray_icon.set_title(Some(match state.connection_state {
                         ConnectionState::Connected { keep_awake: true } => "Keepawake requested",
                         ConnectionState::Connected { keep_awake: false } => "Connected",
                         ConnectionState::Disconnected => "Disconnected",
                     }));
 
-                    // if let Err(err) = tray_icon.set_tooltip(Some(match state.connection_state {
-                    //     ConnectionState::Connected { keep_awake: true } => "Keepawake requested",
-                    //     ConnectionState::Connected { keep_awake: false } => "Connected",
-                    //     ConnectionState::Disconnected => "Disconnected",
-                    // })) {
-                    //     tracing::warn!("Failed to update tooltip: {err}")
-                    // }
+                    #[cfg(not(target_os = "linux"))]
+                    if let Err(err) = tray_icon.set_tooltip(Some(match state.connection_state {
+                        ConnectionState::Connected { keep_awake: true } => "Keepawake requested",
+                        ConnectionState::Connected { keep_awake: false } => "Connected",
+                        ConnectionState::Disconnected => "Disconnected",
+                    })) {
+                        tracing::warn!("Failed to update tooltip: {err}")
+                    }
 
                     if let Err(err) = tray_icon.set_icon(Some(
                         match (state.connection_state, state.enabled) {
@@ -153,8 +155,9 @@ impl Application {
                     }
                 }
                 Event::UserEvent(UserEvent::Exit) | Event::LoopDestroyed => {
-                    tracing::debug!("Toggled");
+                    tracing::debug!("Exiting");
                     tray_icon.take();
+                    *control_flow = ControlFlow::ExitWithCode(0);
                 }
                 _ => {
                     tracing::trace!("Ignored event {event:?}")
