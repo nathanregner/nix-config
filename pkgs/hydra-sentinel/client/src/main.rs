@@ -1,5 +1,6 @@
-use crate::notification::NotificationManager;
+use crate::app::UserEvent;
 use crate::rate_limiter::RateLimiter;
+use crate::{app::Application, notification::NotificationManager};
 use backon::{ExponentialBuilder, Retryable};
 use futures_util::{SinkExt, StreamExt};
 use hydra_sentinel::{shutdown_signal, SentinelMessage};
@@ -7,7 +8,9 @@ use serde::Deserialize;
 use std::time::Duration;
 use tokio::sync::watch;
 use tokio_tungstenite::{connect_async, tungstenite::protocol::Message};
+use winit::event_loop::{self, EventLoop, EventLoopBuilder};
 
+mod app;
 mod notification;
 mod rate_limiter;
 
@@ -35,8 +38,15 @@ enum ConnectionState {
     Disconnected,
 }
 
+fn main() -> anyhow::Result<()> {
+    let event_loop = EventLoop::<UserEvent>::with_user_event().build().unwrap();
+    let app = Application::new();
+    app.run(event_loop)?;
+    anyhow::Ok(())
+}
+
 #[tokio::main(flavor = "current_thread")]
-async fn main() -> anyhow::Result<()> {
+async fn main2() -> anyhow::Result<()> {
     let config = hydra_sentinel::init::<Config>(&format!("{}=DEBUG", module_path!()))?;
 
     let (connection_state_tx, connection_state_rx) = watch::channel(ConnectionState::Disconnected);
@@ -62,12 +72,25 @@ async fn main() -> anyhow::Result<()> {
         anyhow::Ok(())
     };
 
+    let app = run_ui();
+
     let shutdown = shutdown_signal();
     tokio::select! {
+        r = app => r,
         r = run => r,
         r = update_notification => r,
         _ = shutdown => Ok(()),
     }
+}
+
+async fn run_ui() -> anyhow::Result<()> {
+    tokio::task::spawn_blocking(move || {
+        let event_loop = EventLoop::<UserEvent>::with_user_event().build().unwrap();
+        let app = Application::new();
+        app.run(event_loop)?;
+        anyhow::Ok(())
+    })
+    .await?
 }
 
 async fn run(

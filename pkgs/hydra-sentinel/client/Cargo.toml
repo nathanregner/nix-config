@@ -19,3 +19,5 @@ tracing-subscriber = { workspace = true, features = ["env-filter"] }
 tracing = { workspace = true }
 tray-icon = "0.18"
 image = "0.25"
+winit = "0.30.12"
+objc2-core-foundation = "0.3.2"
