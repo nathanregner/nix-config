@@ -4,20 +4,22 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-hydra-sentinel.path = "../lib/"
+hydra-sentinel = { workspace = true }
 
 anyhow = { workspace = true }
 backon = { workspace = true }
 futures-util = { workspace = true }
 humantime-serde = { workspace = true }
+image = { workspace = true }
 keepawake = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true }
 tokio = { workspace = true, features = ["macros", "rt-multi-thread", "sync"] }
 tokio-tungstenite = { workspace = true, features = ["native-tls"] }
-tracing-subscriber = { workspace = true, features = ["env-filter"] }
 tracing = { workspace = true }
-tray-icon = "0.18"
-image = "0.25"
-winit = "0.30.12"
-objc2-core-foundation = "0.3.2"
+tracing-subscriber = { workspace = true, features = ["env-filter"] }
+tray-icon = { workspace = true }
+winit = { workspace = true }
+
+[target.'cfg(target_os = "macos")'.dependencies]
+objc2-core-foundation = { workspace = true }
