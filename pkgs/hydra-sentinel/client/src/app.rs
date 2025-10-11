@@ -1,3 +1,6 @@
+use std::io::{BufReader, Cursor};
+
+use image::ImageReader;
 use tokio::sync::{oneshot, watch};
 use tray_icon::{
     menu::{Menu, MenuEvent, MenuItem},
@@ -84,13 +87,13 @@ impl Application {
     }
 
     fn new_tray_icon(&self) -> TrayIcon {
-        let path = concat!(env!("CARGO_MANIFEST_DIR"), "/src/output.png");
-        let icon = load_icon(std::path::Path::new(path));
+        let icon = dbg!(load_icon(include_bytes!("../assets/logo.png"))).expect("valid icon");
 
         TrayIconBuilder::new()
             .with_menu(Box::new(self.new_tray_menu().unwrap()))
             .with_tooltip("Hydra Sentinel")
             .with_icon(icon)
+            .with_icon_as_template(true)
             .build()
             .unwrap()
     }
@@ -173,14 +176,16 @@ impl ApplicationHandler<UserEvent> for Application {
     }
 }
 
-fn load_icon(path: &std::path::Path) -> tray_icon::Icon {
+fn load_icon(bytes: &[u8]) -> anyhow::Result<tray_icon::Icon> {
     let (icon_rgba, icon_width, icon_height) = {
-        let image = image::open(path)
-            .expect("Failed to open icon path")
-            .into_rgba8();
+        let image = image::load_from_memory(bytes)?.into_rgb8();
         let (width, height) = image.dimensions();
         let rgba = image.into_raw();
         (rgba, width, height)
     };
-    tray_icon::Icon::from_rgba(icon_rgba, icon_width, icon_height).expect("Failed to open icon")
+    Ok(tray_icon::Icon::from_rgba(
+        icon_rgba,
+        icon_width,
+        icon_height,
+    )?)
 }
