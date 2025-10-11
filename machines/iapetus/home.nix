@@ -25,7 +25,6 @@
     cura-appimage
     discord
     gimp
-    openrgb
     prismlauncher
     super-slicer-beta
 
