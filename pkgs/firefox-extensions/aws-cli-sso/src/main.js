@@ -13,7 +13,7 @@
     const button = document.querySelector(
       'button[data-testid="allow-access-button"]',
     );
-    if (button) {
+    if (button && !clicked) {
       clicked = true;
       button.click();
     }
