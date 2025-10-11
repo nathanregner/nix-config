@@ -6,8 +6,9 @@ use futures_util::{SinkExt, StreamExt};
 use hydra_sentinel::{shutdown_signal, SentinelMessage};
 use serde::Deserialize;
 use std::time::Duration;
-use tokio::sync::watch;
+use tokio::sync::{oneshot, watch};
 use tokio_tungstenite::{connect_async, tungstenite::protocol::Message};
+use tracing::event;
 use winit::event_loop::{self, EventLoop, EventLoopBuilder};
 
 mod app;
@@ -32,73 +33,56 @@ impl Config {
     }
 }
 
-#[derive(Clone, Copy, Debug)]
+#[derive(PartialEq, Eq, Clone, Copy, Debug)]
 enum ConnectionState {
     Connected { keep_awake: bool },
     Disconnected,
 }
 
 fn main() -> anyhow::Result<()> {
-    let event_loop = EventLoop::<UserEvent>::with_user_event().build().unwrap();
-    let app = Application::new();
-    app.run(event_loop)?;
-    anyhow::Ok(())
+    let rt = tokio::runtime::Builder::new_multi_thread()
+        .enable_all()
+        .build()?;
+    let (connection_state_tx, connection_state_rx) = watch::channel(ConnectionState::Disconnected);
+    let (enabled_tx, enabled_rx) = watch::channel(true);
+    let (shutdown_tx, shutdown_rx) = oneshot::channel::<()>();
+    rt.spawn(spawn(shutdown_tx, connection_state_tx, enabled_rx));
+    rt.block_on(async move { Application::run(shutdown_rx, connection_state_rx, enabled_tx) })
 }
 
-#[tokio::main(flavor = "current_thread")]
-async fn main2() -> anyhow::Result<()> {
+async fn spawn(
+    shutdown_tx: oneshot::Sender<()>,
+    connection_state_tx: watch::Sender<ConnectionState>,
+    enabled_rx: watch::Receiver<bool>,
+) -> anyhow::Result<()> {
     let config = hydra_sentinel::init::<Config>(&format!("{}=DEBUG", module_path!()))?;
-
-    let (connection_state_tx, connection_state_rx) = watch::channel(ConnectionState::Disconnected);
-    // Initialize notification manager
-    let (enabled_rx, notification_manager) = NotificationManager::new(connection_state_rx.clone())?;
-    let update_notification = notification_manager.spawn();
 
     let reconnect = RateLimiter::new(Duration::from_secs(30));
     let run = async move {
         loop {
             reconnect
-                .throttle(|| {
-                    run(
-                        &config,
-                        &connection_state_tx,
-                        &connection_state_rx,
-                        &enabled_rx,
-                    )
-                })
+                .throttle(|| run(&config, &connection_state_tx, &enabled_rx))
                 .await?;
         }
         #[allow(unreachable_code)]
         anyhow::Ok(())
     };
 
-    let app = run_ui();
-
     let shutdown = shutdown_signal();
-    tokio::select! {
-        r = app => r,
+    let res = tokio::select! {
         r = run => r,
-        r = update_notification => r,
         _ = shutdown => Ok(()),
-    }
-}
-
-async fn run_ui() -> anyhow::Result<()> {
-    tokio::task::spawn_blocking(move || {
-        let event_loop = EventLoop::<UserEvent>::with_user_event().build().unwrap();
-        let app = Application::new();
-        app.run(event_loop)?;
-        anyhow::Ok(())
-    })
-    .await?
+    };
+    drop(shutdown_tx);
+    res
 }
 
 async fn run(
     config: &Config,
     connection_state_tx: &watch::Sender<ConnectionState>,
-    connection_state_rx: &watch::Receiver<ConnectionState>,
     enabled_rx: &watch::Receiver<bool>,
 ) -> anyhow::Result<()> {
+    let connection_state_rx = connection_state_tx.subscribe();
     let (mut sender, mut receiver) = (|| async move {
         tracing::info!("Connecting to server: {}...", config.server_addr);
         let (stream, _response) = connect_async(format!(
@@ -110,9 +94,14 @@ async fn run(
         tracing::info!("Connected");
         anyhow::Ok(stream)
     })
-    .retry(&ExponentialBuilder::default().with_jitter())
+    .retry(
+        &ExponentialBuilder::default()
+            .with_max_delay(Duration::from_secs(15))
+            .without_max_times()
+            .with_jitter(),
+    )
     .notify(|err, dur| {
-        tracing::error!(?err, "Connect failed, retrying in {dur:?}");
+        tracing::warn!(?err, "Connect failed, retrying in {dur:?}");
         let _ = connection_state_tx.send(ConnectionState::Disconnected);
     })
     .await?
