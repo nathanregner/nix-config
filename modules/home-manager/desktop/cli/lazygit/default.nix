@@ -28,10 +28,6 @@
     );
     # https://github.com/jesseduffield/lazygit/blob/master/docs/Config.md
     settings = {
-      git = {
-        autoFetch = false;
-      };
-
       gui = {
         nerdFontsVersion = "3";
       };
@@ -56,4 +52,15 @@
       promptToReturnFromSubprocess = false;
     };
   };
+
+  home.packages = [
+    (pkgs.writeShellApplication {
+      name = "lazygit-large-repo";
+      runtimeInputs = [ config.programs.git.package ];
+      text = ''
+        git_dir="$(git rev-parse --git-common-dir)"
+        cp --no-preserve=all ${./large-repo.yml} "$git_dir/lazygit.yml"
+      '';
+    })
+  ];
 }
