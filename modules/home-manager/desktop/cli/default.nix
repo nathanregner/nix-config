@@ -5,7 +5,7 @@
     ./direnv
     ./git
     ./k9s.nix
-    ./lazygit.nix
+    ./lazygit
     ./nix.nix
     ./nushell
     ./starship.nix
