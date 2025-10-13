@@ -17,8 +17,9 @@ in
     import-env
   ]
   ++ (with pkgs.unstable; [
-    evince
-    nautilus
+    evince # documents
+    loupe # images
+    nautilus # files
     wl-clipboard
   ]);
 

@@ -25,6 +25,7 @@
     home.packages = with pkgs.unstable; [
       nix-tree
       nix-du
+      pik
     ];
 
     nix.gc = {
