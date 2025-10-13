@@ -24,7 +24,7 @@ in
       ];
 
       lua.globals.jdtls = {
-        lombok = pkgs.local.lombok;
+        lombok = "${pkgs.lombok}/share/java/lombok.jar";
         settings = {
         };
       };
