@@ -2,6 +2,18 @@
 
 local bufname_whitelist = vim.regex([[conjure-log-.*]])
 
+local border_chars = { "╭", "─", "╮", "│", "╯", "─", "╰", "│" }
+
+-- local log_once = (function()
+--   local logged = {}
+--   return function(msg)
+--     if not msg or logged[msg] then return end
+--     logged[msg] = true
+--
+--     vim.print(msg)
+--   end
+-- end)()
+
 ---@module "lazy"
 ---@type LazySpec
 return nix_spec({
@@ -19,8 +31,6 @@ return nix_spec({
       ["<C-y>"] = { "select_and_accept" },
       ["<M-k>"] = { "show_signature", "hide_signature", "fallback" },
     },
-    -- TODO
-    -- keymap = { preset = "default" },
 
     appearance = {
       use_nvim_cmp_as_default = true,
@@ -35,11 +45,31 @@ return nix_spec({
       completion = { menu = { auto_show = true } },
     },
 
+    completion = {
+      documentation = {
+        auto_show = true,
+        auto_show_delay_ms = 0,
+        window = {
+          border = border_chars,
+        },
+      },
+      ghost_text = {
+        enabled = true,
+      },
+      menu = {
+        -- border = border_chars,
+      },
+    },
+
+    signature = {
+      enabled = true,
+    },
+
     -- Default list of enabled providers defined so that you can extend it
     -- elsewhere in your config, without redefining it, due to `opts_extend`
     sources = {
       -- add lazydev to your completion providers
-      default = { "lazydev", "lsp", "path", "snippets", "buffer" },
+      default = { "lazydev", "snippets", "lsp", "path", "buffer" },
       providers = {
         buffer = {
           enabled = true, -- even if LSP completions are available
@@ -99,8 +129,10 @@ return nix_spec({
       },
       sorts = {
         function(a, b)
+          if a.source_id == "snippets" and b.client_name == "emmet_language_server" then return true end
+          if a.client_name == "emmet_language_server" and b.source_id == "snippets" then return false end
           if (a.client_name == nil or b.client_name == nil) or (a.client_name == b.client_name) then return end
-          return b.client_name == "emmet_ls"
+          return b.client_name == "emmet_language_server"
         end,
         -- default sorts
         "score",
