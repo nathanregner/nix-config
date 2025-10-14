@@ -15,22 +15,22 @@ end
 --   print(x:bundleID())
 -- end
 
-require("autolayout").start({
-  applications = {
-    ["Firefox"] = {
-      bundleID = "org.mozilla.firefoxdeveloperedition",
-      preferred_display = 2,
-      preferred_space = 1,
-    },
-    ["Slack"] = {
-      bundleID = "com.tinyspeck.slackmacgap",
-      preferred_display = 2,
-      preferred_space = 2,
-    },
-    ["Outlook"] = {
-      bundleID = "com.microsoft.Outlook",
-      preferred_display = 2,
-      preferred_space = 3,
-    },
-  },
-})
+-- require("autolayout").start({
+--   applications = {
+--     ["Firefox"] = {
+--       bundleID = "org.mozilla.firefoxdeveloperedition",
+--       preferred_display = 2,
+--       preferred_space = 1,
+--     },
+--     ["Slack"] = {
+--       bundleID = "com.tinyspeck.slackmacgap",
+--       preferred_display = 2,
+--       preferred_space = 2,
+--     },
+--     ["Outlook"] = {
+--       bundleID = "com.microsoft.Outlook",
+--       preferred_display = 2,
+--       preferred_space = 3,
+--     },
+--   },
+-- })
