@@ -21,7 +21,12 @@ vim.api.nvim_create_autocmd({ "BufEnter", "CursorHold", "CursorHoldI", "FocusGai
 })
 vim.api.nvim_create_autocmd({ "FileChangedShellPost" }, {
   pattern = "*",
-  callback = function() vim.notify("File changed on disk. Buffer reloaded.") end,
+  callback = function()
+    local filepath = vim.fn.expand("%:.")
+    -- bail if file no longer exists (seems to trigger repeatedly)
+    if vim.fn.filereadable(filepath) == 0 then return end
+    vim.notify("Reloaded " .. filepath, vim.log.levels.INFO, {})
+  end,
 })
 
 local function get_buffer_cwd()
