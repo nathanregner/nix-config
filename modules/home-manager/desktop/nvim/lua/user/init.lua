@@ -679,8 +679,13 @@ require("lazy").setup({
     },
   },
 
+  {
+    "brenoprata10/nvim-highlight-colors",
+    opts = {},
+    -- init = function() require("nvim-highlight-colors").turnOff() end,
+  },
+
   { -- Theme
-    -- https://github.com/catppuccin/nvim
     "catppuccin/nvim",
     version = "1.10.0", -- TODO: remove after https://github.com/catppuccin/nvim/discussions/903?
     name = "catppuccin",
@@ -689,6 +694,13 @@ require("lazy").setup({
       flavour = "mocha",
       styles = {
         conditionals = {}, -- disable italics
+      },
+      highlight_overrides = {
+        all = function(mocha)
+          return {
+            BlinkCmpKindText = { fg = mocha.subtext0 },
+          }
+        end,
       },
     },
     init = function() vim.cmd.colorscheme("catppuccin") end,
