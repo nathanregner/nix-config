@@ -14,12 +14,27 @@ in
       type = types.bool;
       default = false;
     };
+
+    finalPackage = mkOption {
+      type = types.nullOr types.package;
+      readOnly = true;
+      default = (
+        pkgs.unstable.writers.writeNuBin "jdtls" {
+          makeWrapperArgs = [
+            "--prefix"
+            "PATH"
+            ":"
+            "${lib.makeBinPath [ pkgs.unstable.jdt-language-server ]}"
+          ];
+        } ./jdtls.nu
+      );
+    };
   };
 
   config = mkIf cfg.enable {
     programs.neovim = {
       extraPackages = with pkgs.unstable; [
-        jdt-language-server
+        config.programs.neovim.modules.java.finalPackage
         local.spring-javaformat
       ];
 

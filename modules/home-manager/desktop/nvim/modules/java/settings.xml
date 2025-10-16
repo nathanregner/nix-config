@@ -1,0 +1,9 @@
+<profiles>
+    <profile>
+        <id>conf</id>
+        <build>
+            <directory>${buildDir}</directory>
+        </build>
+    </profile>
+</profiles>
+
