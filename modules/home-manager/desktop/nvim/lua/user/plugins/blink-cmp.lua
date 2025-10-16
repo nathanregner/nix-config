@@ -53,12 +53,6 @@ return nix_spec({
           border = border_chars,
         },
       },
-      ghost_text = {
-        enabled = true,
-      },
-      menu = {
-        -- border = border_chars,
-      },
     },
 
     signature = {
