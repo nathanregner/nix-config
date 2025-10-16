@@ -533,14 +533,29 @@ require("lazy").setup({
 
   {
     "folke/noice.nvim",
+    priority = 999,
+    lazy = false,
     dependencies = {
       "MunifTanjim/nui.nvim",
     },
     event = "VeryLazy",
     -- lazy = false,
+    ---@type NoiceConfig
     opts = {
       cmdline = { enabled = false },
       messages = { enabled = false },
+      routes = {
+        {
+          filter = {
+            any = {
+              --- jdtls
+              { event = "lsp", kind = "progress", find = "Validate documents" },
+              { event = "lsp", kind = "progress", find = "Publish Diagnostics" },
+            },
+          },
+          opts = { skip = true },
+        },
+      },
     },
   },
 
@@ -572,21 +587,6 @@ require("lazy").setup({
     event = "VeryLazy",
     dependencies = { "folke/neoconf.nvim" },
     config = function() require("user.conform") end,
-  },
-
-  {
-    "folke/noice.nvim",
-    priority = 999,
-    lazy = false,
-    dependencies = {
-      "MunifTanjim/nui.nvim",
-    },
-    event = "VeryLazy",
-    -- lazy = false,
-    opts = {
-      cmdline = { enabled = false },
-      messages = { enabled = false },
-    },
   },
 
   {
