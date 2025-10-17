@@ -950,9 +950,9 @@ require("lazy").setup({
       ---@diagnostic disable-next-line: missing-fields
       neotest.setup({
         ---@diagnostic disable-next-line: missing-fields
-        discovery = {
-          enabled = false,
-        },
+        -- discovery = {
+        --   enabled = false,
+        -- },
         adapters = {
           require("rustaceanvim.neotest"),
           require("neotest-jest")({
