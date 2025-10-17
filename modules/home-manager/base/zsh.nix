@@ -40,7 +40,7 @@
         snrs = "${snr} switch";
         snrt = "${snr} test";
 
-        hm = "home-manager --flake .";
+        hm = "HOME_MANAGER_BACKUP_OVERWRITE=true home-manager -b backup --flake .";
         hmb = "${hm} build";
         hms = "${hm} switch";
 
