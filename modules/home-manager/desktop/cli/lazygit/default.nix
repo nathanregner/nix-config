@@ -52,4 +52,15 @@
       promptToReturnFromSubprocess = false;
     };
   };
+
+  home.packages = [
+    (pkgs.writeShellApplication {
+      name = "lazygit-large-repo";
+      runtimeInputs = [ config.programs.git.package ];
+      text = ''
+        git_dir="$(git rev-parse --git-common-dir)"
+        cp --no-preserve=all ${./large-repo.yml} "$git_dir/lazygit.yml"
+      '';
+    })
+  ];
 }

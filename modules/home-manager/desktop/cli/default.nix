@@ -2,10 +2,12 @@
 {
   imports = [
     ./ast-grep
+    ./bat.nix
     ./direnv
+    ./eza.nix
     ./git
     ./k9s.nix
-    ./lazygit.nix
+    ./lazygit
     ./nix.nix
     ./nushell
     ./starship.nix

@@ -595,6 +595,21 @@ require("lazy").setup({
   },
 
   {
+    "folke/noice.nvim",
+    priority = 999,
+    lazy = false,
+    dependencies = {
+      "MunifTanjim/nui.nvim",
+    },
+    event = "VeryLazy",
+    -- lazy = false,
+    opts = {
+      cmdline = { enabled = false },
+      messages = { enabled = false },
+    },
+  },
+
+  {
     "folke/which-key.nvim",
     event = "VeryLazy",
     config = function()
@@ -974,9 +989,9 @@ require("lazy").setup({
       ---@diagnostic disable-next-line: missing-fields
       neotest.setup({
         ---@diagnostic disable-next-line: missing-fields
-        discovery = {
-          enabled = false,
-        },
+        -- discovery = {
+        --   enabled = false,
+        -- },
         adapters = {
           require("rustaceanvim.neotest"),
           require("neotest-jest")({

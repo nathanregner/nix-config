@@ -1,0 +1,10 @@
+$schema: https://raw.githubusercontent.com/jesseduffield/lazygit/master/schema/config.json
+
+git:
+  autoFetch: false
+  # --graph is expensive
+  branchLogCmd: git log --color=always --abbrev-commit --decorate --date=relative --pretty=short {{branchName}} --
+  log:
+    order: default # topoligical is expensive
+    showGraph: when-maximised
+  mainBranches: [] # unmerged commit check is expensive
