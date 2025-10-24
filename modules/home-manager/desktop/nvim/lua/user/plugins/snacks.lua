@@ -9,31 +9,36 @@ return {
   "folke/snacks.nvim",
   -- priority = 1000,
   lazy = false,
-  ---@type snacks.Config
-  opts = {
-    bigfile = { enabled = true },
-    -- dashboard = { enabled = true },
-    -- debug = { enabled = true },
-    git = { enabled = false },
-    indent = { enabled = false },
-    input = { enabled = false },
-    -- notifier = {
-    --   enabled = true,
-    --   timeout = 3000,
-    -- },
-    picker = { enabled = true },
-    quickfile = { enabled = true },
-    -- scope = { enabled = true },
-    -- scroll = { enabled = false },
-    -- statuscolumn = { enabled = true },
-    styles = {
-      notification = {
-        -- wo = { wrap = true } -- Wrap notifications
+  opts = function()
+    Snacks.toggle.profiler():map("<leader>pp")
+
+    ---@type snacks.Config
+    return {
+      bigfile = { enabled = true },
+      -- dashboard = { enabled = true },
+      -- debug = { enabled = true },
+      git = { enabled = false },
+      indent = { enabled = false },
+      input = { enabled = false },
+      -- notifier = {
+      --   enabled = true,
+      --   timeout = 3000,
+      -- },
+      picker = { enabled = true },
+      quickfile = { enabled = true },
+      -- scope = { enabled = true },
+      -- scroll = { enabled = false },
+      -- statuscolumn = { enabled = true },
+      styles = {
+        notification = {
+          -- wo = { wrap = true } -- Wrap notifications
+        },
       },
-    },
-    words = { enabled = false },
-  },
+      words = { enabled = false },
+    }
+  end,
   keys = {
+    { "<leader>ps", function() Snacks.profiler.scratch() end, desc = "Profiler Scratch Bufer" },
     -- top pickers
     { "<leader><space>", function() Snacks.picker.smart() end, desc = "Smart Find Files" },
     { "<leader>,", function() Snacks.picker.buffers() end, desc = "Buffers" },
