@@ -629,7 +629,7 @@ require("lazy").setup({
         map("n", "<leader>hD", function() gs.diffthis("~") end, { desc = "[H]unk [D]iff last commit" })
         map("n", "<leader>htd", gs.toggle_deleted, { desc = "[H]unk [T]oggle [D]eleted" })
 
-        local ts_repeat_move = require("nvim-treesitter.textobjects.repeatable_move")
+        local ts_repeat_move = require("nvim-treesitter-textobjects.repeatable_move")
 
         local next_hunk = function()
           if vim.wo.diff then
@@ -829,7 +829,7 @@ require("lazy").setup({
     dependencies = { "nvim-lua/plenary.nvim" },
     keys = function()
       local todo = require("todo-comments")
-      local ts_repeat_move = require("nvim-treesitter.textobjects.repeatable_move")
+      local ts_repeat_move = require("nvim-treesitter-textobjects.repeatable_move")
       local jump_next, jump_prev = ts_repeat_move.make_repeatable_move_pair(todo.jump_next, todo.jump_prev)
       return {
         { "]t", jump_next, desc = "Next [T]odo comment" },
@@ -976,7 +976,7 @@ require("lazy").setup({
       })
     end,
     init = function()
-      local ts_repeat_move = require("nvim-treesitter.textobjects.repeatable_move")
+      local ts_repeat_move = require("nvim-treesitter-textobjects.repeatable_move")
       local next, prev = ts_repeat_move.make_repeatable_move_pair(
         function() require("neotest").jump.next({ status = "failed" }) end,
         function() require("neotest").jump.prev({ status = "failed" }) end
@@ -1009,7 +1009,7 @@ require("lazy").setup({
     init = function()
       ---@type any
       local trouble = require("trouble")
-      local ts_repeat_move = require("nvim-treesitter.textobjects.repeatable_move")
+      local ts_repeat_move = require("nvim-treesitter-textobjects.repeatable_move")
       local next, prev = ts_repeat_move.make_repeatable_move_pair(
         function() trouble.next({ jump = true }) end,
         function() trouble.prev({ jump = true }) end
@@ -1357,7 +1357,7 @@ local function goto_error_diagnostic(f)
   end
 end
 
-local ts_repeat_move = require("nvim-treesitter.textobjects.repeatable_move")
+local ts_repeat_move = require("nvim-treesitter-textobjects.repeatable_move")
 local next_diag_error, prev_diag_error = ts_repeat_move.make_repeatable_move_pair(
   goto_error_diagnostic(vim.diagnostic.goto_next),
   goto_error_diagnostic(vim.diagnostic.goto_prev)

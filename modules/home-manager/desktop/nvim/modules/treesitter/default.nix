@@ -24,6 +24,9 @@ in
         dir = "${package}";
         inherit parser_install_dir;
       };
+      nvim-treesitter-textobjects = {
+        dir = "${pkgs.unstable.vimPlugins.nvim-treesitter-textobjects}";
+      };
       rtp = [ parser_install_dir ];
     };
 

@@ -8,7 +8,7 @@ return {
     pin = true,
     dependencies = {
       "nvim-treesitter/nvim-treesitter-context",
-      "nvim-treesitter/nvim-treesitter-textobjects",
+      nix_spec({ "nvim-treesitter/nvim-treesitter-textobjects" }),
     },
     keys = {
       {
@@ -20,7 +20,7 @@ return {
     lazy = false,
     opts = {
       parser_install_dir = vim.g.nix.nvim_treesitter.parser_install_dir,
-      auto_install = true,
+      auto_install = false,
       highlight = { enable = true },
       indent = { enable = true },
       disable = function(_lang, buf)
@@ -110,14 +110,16 @@ return {
       },
     },
     config = function(_, opts)
-      require("nvim-treesitter.configs").setup(opts)
-      require("treesitter-context").setup({
-        max_lines = 10,
-        multiline_threshold = 1,
-        -- mode = "topline",
+      require("nvim-treesitter").setup({
+        install_dir = vim.g.nix.nvim_treesitter.parser_install_dir,
       })
+      -- require("treesitter-context").setup({
+      --   max_lines = 10,
+      --   multiline_threshold = 1,
+      --   -- mode = "topline",
+      -- })
 
-      local ts_repeat_move = require("nvim-treesitter.textobjects.repeatable_move")
+      local ts_repeat_move = require("nvim-treesitter-textobjects.repeatable_move")
 
       -- vim way: ; goes to the direction you were moving.
       vim.keymap.set({ "n", "x", "o" }, ";", ts_repeat_move.repeat_last_move)
