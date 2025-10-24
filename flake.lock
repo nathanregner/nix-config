@@ -476,6 +476,62 @@
         "type": "github"
       }
     },
+    "nvim-treesitter": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1760866486,
+        "narHash": "sha256-ZeNCXy6+I18N+Nu2sKnEk2otVEb8V3tKhL8Jq95wS5k=",
+        "owner": "nvim-treesitter",
+        "repo": "nvim-treesitter",
+        "rev": "71bf1665f804d46f7e4b24ad7ffc11f6ea5b271a",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nvim-treesitter",
+        "ref": "main",
+        "repo": "nvim-treesitter",
+        "type": "github"
+      }
+    },
+    "nvim-treesitter-main": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs-unstable"
+        ],
+        "nvim-treesitter": "nvim-treesitter",
+        "nvim-treesitter-textobjects": "nvim-treesitter-textobjects"
+      },
+      "locked": {
+        "lastModified": 1760906917,
+        "narHash": "sha256-WJScDX0q/+PCRpvBSlJfV01kwvu9WCk5YDpzW2Zswj8=",
+        "owner": "iofq",
+        "repo": "nvim-treesitter-main",
+        "rev": "420c14c0523d65c6c7ce943e8f2fb896eff950e3",
+        "type": "github"
+      },
+      "original": {
+        "owner": "iofq",
+        "repo": "nvim-treesitter-main",
+        "type": "github"
+      }
+    },
+    "nvim-treesitter-textobjects": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1756368113,
+        "narHash": "sha256-+KmOpRi4JAqm6UqYdtk80jwFrJhLCs0lZM/Liofq0R4=",
+        "owner": "nvim-treesitter",
+        "repo": "nvim-treesitter-textobjects",
+        "rev": "1b2d85d3de6114c4bcea89ffb2cd1ce9e3a19931",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nvim-treesitter",
+        "ref": "main",
+        "repo": "nvim-treesitter-textobjects",
+        "type": "github"
+      }
+    },
     "orangepi-nix": {
       "inputs": {
         "nixpkgs": [
@@ -530,6 +586,7 @@
         "nixos-hardware": "nixos-hardware",
         "nixpkgs": "nixpkgs_2",
         "nixpkgs-unstable": "nixpkgs-unstable",
+        "nvim-treesitter-main": "nvim-treesitter-main",
         "orangepi-nix": "orangepi-nix",
         "pkgs-by-name-for-flake-parts": "pkgs-by-name-for-flake-parts",
         "sops-nix": "sops-nix",

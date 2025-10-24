@@ -135,6 +135,7 @@ rec {
       inherit (stableFinal) system;
       config.allowUnfree = true;
       overlays = [
+        inputs.nvim-treesitter-main.overlays.default
         (_final: _prev: { inherit (stableFinal) local; })
         sharedModifications
       ];
