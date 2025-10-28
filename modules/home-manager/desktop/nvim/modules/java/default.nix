@@ -38,9 +38,15 @@ in
         local.spring-javaformat
       ];
 
-      lua.globals.jdtls = {
-        lombok = "${pkgs.lombok}/share/java/lombok.jar";
-        settings = {
+      lua.globals = {
+        junit_jar = pkgs.fetchurl {
+          url = "https://repo1.maven.org/maven2/org/junit/platform/junit-platform-console-standalone/1.10.1/junit-platform-console-standalone-1.10.1.jar";
+          hash = "sha256-tC6qU9E1dtF9tfuLKAcipq6eNtr5X0JivG6W1Msgcl8=";
+        };
+        jdtls = {
+          lombok = "${pkgs.lombok}/share/java/lombok.jar";
+          settings = {
+          };
         };
       };
     };

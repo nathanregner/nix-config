@@ -909,6 +909,16 @@ require("lazy").setup({
       "marilari88/neotest-vitest",
       "nvim-neotest/neotest-jest",
       "rouge8/neotest-rust",
+      {
+        "rcasia/neotest-java",
+        ft = "java",
+        dependencies = {
+          "mfussenegger/nvim-jdtls",
+          -- "mfussenegger/nvim-dap", -- for the debugger
+          -- "rcarriga/nvim-dap-ui", -- recommended
+          -- "theHamsta/nvim-dap-virtual-text", -- recommended
+        },
+      },
     },
     lazy = true,
     keys = {
@@ -989,18 +999,22 @@ require("lazy").setup({
       ---@diagnostic disable-next-line: missing-fields
       neotest.setup({
         ---@diagnostic disable-next-line: missing-fields
-        -- discovery = {
-        --   enabled = false,
-        -- },
+        discovery = {
+          enabled = false,
+        },
         adapters = {
-          require("rustaceanvim.neotest"),
+          require("neotest-java")({
+            junit_jar = vim.g.nix.junit_jar, -- default: stdpath("data") .. /nvim/neotest-java/junit-platform-console-standalone-[version].jar
+            incremental_build = true,
+          }),
           require("neotest-jest")({
             -- jestCommand = "npx jest --",
-            jest_test_discovery = true,
+            -- jest_test_discovery = true,
             -- isTestFile = function(file_path)
             --   return file_path:match("__tests__/") or file_path:match("%.test%.[jt]sx?$")
             -- end,
           }),
+          require("rustaceanvim.neotest"),
           -- require("neotest-vitest"),
         },
         diagnostic = {
