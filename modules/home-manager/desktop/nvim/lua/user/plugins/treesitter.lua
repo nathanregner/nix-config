@@ -139,6 +139,16 @@ return {
         java = {
           annotation_array = { node = "class_literal" },
           annotation_element = { node = "element_value_pair" },
+          method = {
+            node = "method_declaration",
+            ordinal = "identifier",
+            order_by = function(node1, node2)
+              local bufnr = vim.api.nvim_get_current_buf()
+              ---@param node TSNode
+              local function method_name(node) return vim.treesitter.get_node_text(node:field("name")[1], bufnr) end
+              return method_name(node1) < method_name(node2)
+            end,
+          },
         },
         javascript = {
           -- TODO: merge
