@@ -133,6 +133,23 @@ define_postfix({
   expand = function(match) return sn(nil, fmt("JSON.stringify({}, undefined, 2)", { t(match) })) end,
 })
 
+-- TODO: only in test files
+s("desc", {
+  t("describe('"),
+  i(1),
+  t({ "', () => {", "" }),
+  isn(2, t("//")),
+  t({ "", "});" }),
+})
+
+define_all(s("it", {
+  t("it('"),
+  i(1),
+  t({ "', () => {", "" }),
+  isn(2, t("//")),
+  t({ "", "});" }),
+}))
+
 for lang, lang_snippets in pairs(snippets) do
   ls.add_snippets(lang, lang_snippets, {
     key = lang .. "/custom",
