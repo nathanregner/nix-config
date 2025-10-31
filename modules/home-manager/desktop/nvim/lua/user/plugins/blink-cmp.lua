@@ -105,15 +105,15 @@ return nix_spec({
           end,
         },
 
-        snippets = {
-          score_offset = function(ctx)
-            -- vim.notify("kw: " .. ctx.trigger.initial_kind)
-            -- TODO: trigger_character: only suffix
-            local trigger = ctx.trigger.initial_kind
-            if trigger == "manual" then return -3 end
-            return 0
-          end,
-        },
+        -- snippets = {
+        --   score_offset = function(ctx)
+        --     vim.notify("kw: " .. ctx.trigger.initial_kind)
+        --     -- TODO: trigger_character: only suffix
+        --     local trigger = ctx.trigger.initial_kind
+        --     if trigger == "manual" then return -3 end
+        --     return 1
+        --   end,
+        -- },
       },
     },
 
@@ -123,7 +123,9 @@ return nix_spec({
       },
       sorts = {
         function(a, b)
-          if a.source_id == "snippets" and b.client_name == "emmet_language_server" then return true end
+          if a.source_id == "snippets" and b.source_id == "buffer" then return true end
+          if a.source_id == "buffer" and b.source_id == "snippets" then return false end
+          if a.source_id == "snippets" and b.source_id == "emmet_language_server" then return true end
           if a.client_name == "emmet_language_server" and b.source_id == "snippets" then return false end
           if (a.client_name == nil or b.client_name == nil) or (a.client_name == b.client_name) then return end
           return b.client_name == "emmet_language_server"
