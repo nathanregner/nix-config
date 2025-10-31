@@ -334,6 +334,11 @@
               "x86_64-linux"
             ] outputs.legacyPackages;
           };
+
+        templates = builtins.mapAttrs (name: _: {
+          description = "Rust nightly";
+          path = ./templates + "/${name}";
+        }) (builtins.readDir ./templates);
       };
     };
 }
