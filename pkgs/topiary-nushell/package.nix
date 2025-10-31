@@ -23,7 +23,7 @@ let
       updateScript = [
         (writers.writeNu "update-topiary-nushell" ''
           let position = echo '${drv.meta.position}' | parse --regex '/nix/store/\w+-source/(?<path>.*):\d+' | first
-          nu ${./update.nu} ([($position.path | path dirname) version.lock] | path join)
+          ${./update.nu} ([($position.path | path dirname) version.lock] | path join)
         '')
       ];
 
