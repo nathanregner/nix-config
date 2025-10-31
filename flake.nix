@@ -48,12 +48,8 @@
     neovim-nightly-overlay = {
       url = "github:nix-community/neovim-nightly-overlay";
       inputs = {
-        flake-compat.follows = "flake-compat";
         flake-parts.follows = "flake-parts";
-        git-hooks.follows = "";
-        hercules-ci-effects.follows = "";
         nixpkgs.follows = "nixpkgs-unstable";
-        treefmt-nix.follows = "";
       };
     };
     nix-index-database = {
