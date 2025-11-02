@@ -1268,6 +1268,8 @@ require("lazy").setup({
 
   { "godlygeek/tabular" },
 
+  { "glacambre/firenvim", build = ":call firenvim#install(0)" },
+
   { import = "user.plugins" },
 }, {
   dev = {
