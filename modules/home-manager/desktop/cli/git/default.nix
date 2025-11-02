@@ -58,7 +58,7 @@
         path = "${config.xdg.configHome}/git/local";
       };
       merge = {
-        conflictStyle = "zdiff3";
+        conflictstyle = "zdiff3";
       };
       pager = {
         difftool = true;
