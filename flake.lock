@@ -470,26 +470,6 @@
         "type": "github"
       }
     },
-    "orangepi-nix": {
-      "inputs": {
-        "nixpkgs": [
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "lastModified": 1713060731,
-        "narHash": "sha256-fE/m0HLqEmJXHW8cunLqzY6uVv/OjaBxLJYoyIFmox8=",
-        "owner": "nathanregner",
-        "repo": "orangepi-nix",
-        "rev": "fef8b43a099aa81bcca42bd72e7f6e46f2d8d54a",
-        "type": "github"
-      },
-      "original": {
-        "owner": "nathanregner",
-        "repo": "orangepi-nix",
-        "type": "github"
-      }
-    },
     "pkgs-by-name-for-flake-parts": {
       "locked": {
         "lastModified": 1743779435,
@@ -524,7 +504,6 @@
         "nixos-hardware": "nixos-hardware",
         "nixpkgs": "nixpkgs_2",
         "nixpkgs-unstable": "nixpkgs-unstable",
-        "orangepi-nix": "orangepi-nix",
         "pkgs-by-name-for-flake-parts": "pkgs-by-name-for-flake-parts",
         "sops-nix": "sops-nix",
         "treefmt-nix": "treefmt-nix_2"
