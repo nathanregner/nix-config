@@ -869,7 +869,6 @@ require("lazy").setup({
       -- Adapters
       "marilari88/neotest-vitest",
       "nvim-neotest/neotest-jest",
-      "rouge8/neotest-rust",
     },
     lazy = true,
     keys = {
@@ -951,7 +950,7 @@ require("lazy").setup({
       neotest.setup({
         ---@diagnostic disable-next-line: missing-fields
         discovery = {
-          enabled = false,
+          -- enabled = false,
         },
         adapters = {
           require("rustaceanvim.neotest"),
