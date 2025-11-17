@@ -7,6 +7,7 @@ in
     # TODO: opt-in to individual components options
     ../.
     ./bar/waybar
+    ./clipboard.nix
     ./launcher/tofi.nix
     ./lock/hyprlock.nix
     ./niri
@@ -20,7 +21,6 @@ in
     evince # documents
     loupe # images
     nautilus # files
-    wl-clipboard
   ]);
 
   # auto mount disks

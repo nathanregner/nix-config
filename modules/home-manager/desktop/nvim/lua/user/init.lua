@@ -908,7 +908,6 @@ require("lazy").setup({
       -- Adapters
       "marilari88/neotest-vitest",
       "nvim-neotest/neotest-jest",
-      "rouge8/neotest-rust",
       {
         "rcasia/neotest-java",
         ft = "java",
@@ -1000,7 +999,7 @@ require("lazy").setup({
       neotest.setup({
         ---@diagnostic disable-next-line: missing-fields
         discovery = {
-          enabled = false,
+          -- enabled = false,
         },
         adapters = {
           require("neotest-java")({
@@ -1336,6 +1335,8 @@ require("lazy").setup({
   },
 
   { "godlygeek/tabular" },
+
+  { "glacambre/firenvim", build = ":call firenvim#install(0)" },
 
   { import = "user.plugins" },
 }, {

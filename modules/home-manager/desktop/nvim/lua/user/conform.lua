@@ -55,6 +55,7 @@ require("conform").setup({
     toml = { "taplo" },
     typescript = { "prettierd" },
     typescriptreact = { "prettierd" },
+    typst = { "typstyle" },
     vue = { "prettierd" },
     yaml = { "prettierd" },
     zsh = { "shfmt" },

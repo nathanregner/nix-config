@@ -41,6 +41,9 @@
     ];
     initrd.kernelModules = [ ];
     kernelModules = [ "kvm-amd" ];
+    blacklistedKernelModules = [
+      "dvb_usb_rtl28xxu" # RTL-SDR Blog v4
+    ];
     extraModulePackages = [ ];
   };
   disko.devices = {

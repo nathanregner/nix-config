@@ -3,7 +3,6 @@
     # Nix
     nixpkgs.url = "github:nixos/nixpkgs/nixos-25.05";
     nixpkgs-unstable.url = "github:nixos/nixpkgs/nixpkgs-unstable";
-    nixos-hardware.url = "github:nixos/nixos-hardware";
     home-manager = {
       url = "github:nix-community/home-manager/release-25.05";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -16,9 +15,12 @@
       url = "github:LnL7/nix-darwin/nix-darwin-25.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    flake-compat.url = "github:edolstra/flake-compat";
 
-    # Tools
+    # Misc
+    catppuccin-nix = {
+      url = "github:catppuccin/nix";
+      inputs.nixpkgs.follows = "nixpkgs-unstable";
+    };
     deploy-rs = {
       url = "github:serokell/deploy-rs";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -31,8 +33,8 @@
       url = "github:nix-community/disko";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    flake-compat.url = "github:edolstra/flake-compat";
     flake-parts.url = "github:hercules-ci/flake-parts";
-    pkgs-by-name-for-flake-parts.url = "github:drupol/pkgs-by-name-for-flake-parts";
     hydra-sentinel = {
       url = "github:nathanregner/hydra-sentinel";
       inputs = {
@@ -48,12 +50,8 @@
     neovim-nightly-overlay = {
       url = "github:nix-community/neovim-nightly-overlay";
       inputs = {
-        flake-compat.follows = "flake-compat";
         flake-parts.follows = "flake-parts";
-        git-hooks.follows = "";
-        hercules-ci-effects.follows = "";
         nixpkgs.follows = "nixpkgs-unstable";
-        treefmt-nix.follows = "";
       };
     };
     nix-index-database = {
@@ -64,6 +62,8 @@
       url = "github:nix-community/nixos-generators";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    nixos-hardware.url = "github:nixos/nixos-hardware";
+    pkgs-by-name-for-flake-parts.url = "github:drupol/pkgs-by-name-for-flake-parts";
     sops-nix = {
       url = "github:Mic92/sops-nix";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
@@ -71,26 +71,6 @@
     treefmt-nix = {
       url = "github:numtide/treefmt-nix";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
-    };
-
-    # Desktop
-    catppuccin-nix = {
-      url = "github:catppuccin/nix";
-      inputs.nixpkgs.follows = "nixpkgs-unstable";
-    };
-    # hyprland = {
-    #   url = "github:hyprwm/Hyprland";
-    #   inputs.nixpkgs.follows = "nixpkgs";
-    # };
-    # nixpkgs-wayland = {
-    #   url = "github:nix-community/nixpkgs-wayland";
-    #   inputs.nixpkgs.follows = "nixpkgs";
-    # };
-
-    # 3d printing
-    orangepi-nix = {
-      url = "github:nathanregner/orangepi-nix";
-      inputs.nixpkgs.follows = "nixpkgs";
     };
   };
 
@@ -334,6 +314,11 @@
               "x86_64-linux"
             ] outputs.legacyPackages;
           };
+
+        templates = builtins.mapAttrs (name: _: {
+          description = "Rust nightly";
+          path = ./templates + "/${name}";
+        }) (builtins.readDir ./templates);
       };
     };
 }

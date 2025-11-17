@@ -8,7 +8,6 @@
   programs.eza = {
     enable = true;
     enableZshIntegration = true;
-    git = true;
     icons = "auto";
   };
   catppuccin.eza.enable = true;

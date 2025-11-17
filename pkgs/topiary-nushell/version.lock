@@ -2,16 +2,15 @@
   "src": {
     "owner": "blindFS",
     "repo": "topiary-nushell",
-    "rev": "a922f988062a529c936a4eddc45823396bae0d14",
-    "hash": "sha256-VnDOj2NIz1/gEkfuCFPaVvOlDcWwBXYudEIwATb53/0="
+    "rev": "fd78be393af5a64e56b493f52e4a9ad1482c07f4",
+    "hash": "sha256-5gmLFnbHbQHnE+s1uAhFkUrhEvUWB/hg3/8HSYC9L14="
   },
   "grammar": {
     "src": {
       "owner": "nushell",
       "repo": "tree-sitter-nu",
-      "rev": "0e6c59c46db3c246eaf86ce5b325da1247e971a5",
-      "hash": "sha256-qGKQTdMrxhsMSSY7ghFkc/32O6Fhps9b9oG1wo0m1NA="
+      "rev": "18b7f951e0c511f854685dfcc9f6a34981101dd6",
+      "hash": "sha256-OSazwPrUD7kWz/oVeStnnXEJiDDmI7itiDPmg062Kl8="
     }
   }
 }
-
