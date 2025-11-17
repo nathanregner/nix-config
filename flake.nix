@@ -280,7 +280,7 @@
                   hostname = config.networking.hostName;
                   profiles =
                     let
-                      inherit (deploy-rs.lib.${config.nixpkgs.hostPlatform.system}) activate;
+                      inherit (deploy-rs.lib.${config.nixpkgs.stdenv.hostPlatform.system}) activate;
                     in
                     {
                       system = {

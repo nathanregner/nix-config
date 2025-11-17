@@ -29,7 +29,7 @@ in
       "/var/lib/hydra/machines"
       (pkgs.writeTextFile {
         name = "local-machine";
-        text = "localhost ${pkgs.system} - 10 1 nixos-test,benchmark,big-parallel,kvm - -";
+        text = "localhost ${pkgs.stdenv.hostPlatform.system} - 10 1 nixos-test,benchmark,big-parallel,kvm - -";
       })
     ];
     extraConfig = ''

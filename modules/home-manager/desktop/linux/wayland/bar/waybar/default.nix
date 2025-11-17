@@ -16,7 +16,7 @@
     # [Service]
     # Environment="GTK_DEBUG=interactive"
     style = config.lib.file.mkFlakeSymlink ./style.css;
-    # package = inputs.nixpkgs-wayland.packages.${pkgs.system}.waybar;
+    # package = inputs.nixpkgs-wayland.packages.${pkgs.stdenv.hostPlatform.system}.waybar;
     # TODO: try https://github.com/polybar/polybar instead
     # https://www.reddit.com/r/unixporn/comments/s6s6sv/bspwm_catppuccin_is_a_pretty_cool_theme/#lightbox
     settings.mainBar =

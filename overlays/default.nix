@@ -125,7 +125,7 @@ rec {
 
   unstable-packages = stableFinal: _stablePrev: {
     unstable = import inputs.nixpkgs-unstable {
-      inherit (stableFinal) system;
+      inherit (stableFinal.stdenv.hostPlatform) system;
       config.allowUnfree = true;
       overlays = [
         (_final: _prev: { inherit (stableFinal) local; })
