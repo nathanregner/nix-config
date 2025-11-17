@@ -12,7 +12,7 @@ in
   options.programs.neovim.modules.java = {
     enable = mkOption {
       type = types.bool;
-      default = false;
+      default = true;
     };
 
     finalPackage = mkOption {
