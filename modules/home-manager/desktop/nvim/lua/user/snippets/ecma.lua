@@ -134,19 +134,19 @@ define_postfix({
 })
 
 -- TODO: only in test files
-s("desc", {
+define_all(s("descr", {
   t("describe('"),
   i(1),
   t({ "', () => {", "" }),
-  isn(2, t("//")),
+  i(2, "  //"),
   t({ "", "});" }),
-})
+}))
 
 define_all(s("it", {
   t("it('"),
   i(1),
   t({ "', () => {", "" }),
-  isn(2, t("//")),
+  i(2, "  //"),
   t({ "", "});" }),
 }))
 
