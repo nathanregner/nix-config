@@ -226,14 +226,14 @@ return {
       },
     },
   },
-  {
-    "tronikelis/ts-autotag.nvim",
-    event = "VeryLazy",
-    ft = { "javascriptreact", "typescriptreact", "html", "xml" },
-    opts = {
-      auto_rename = {
-        enabled = true,
-      },
-    },
-  },
+  -- {
+  --   "tronikelis/ts-autotag.nvim",
+  --   event = "VeryLazy",
+  --   ft = { "javascriptreact", "typescriptreact", "html", "xml" },
+  --   opts = {
+  --     auto_rename = {
+  --       enabled = true,
+  --     },
+  --   },
+  -- },
 }
