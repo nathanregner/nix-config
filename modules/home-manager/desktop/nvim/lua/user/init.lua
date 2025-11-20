@@ -999,7 +999,7 @@ require("lazy").setup({
       neotest.setup({
         ---@diagnostic disable-next-line: missing-fields
         discovery = {
-          -- enabled = false,
+          enabled = false,
         },
         adapters = {
           require("neotest-java")({
