@@ -15,6 +15,21 @@ in
       type = types.bool;
       default = true;
     };
+
+    finalPackage = mkOption {
+      type = types.nullOr types.package;
+      readOnly = true;
+      default = (
+        pkgs.unstable.writers.writeNuBin "jdtls" {
+          makeWrapperArgs = [
+            "--prefix"
+            "PATH"
+            ":"
+            "${lib.makeBinPath [ pkgs.unstable.jdt-language-server ]}"
+          ];
+        } ./jdtls.nu
+      );
+    };
   };
 
   config = mkIf cfg.enable {
