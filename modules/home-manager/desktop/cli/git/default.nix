@@ -7,11 +7,9 @@
 {
   programs.git = {
     enable = true;
-    userName = "Nathan Regner";
-    userEmail = "nathanregner@gmail.com";
     lfs.enable = true;
     maintenance.enable = true;
-    extraConfig = {
+    settings = {
       alias = {
         convert-to-worktrees = ''!${lib.getExe pkgs.local.git-convert-to-worktrees}'';
         ddiff = "-c diff.external=difft diff";
@@ -81,6 +79,10 @@
       };
       tag = {
         sort = "version:refname";
+      };
+      user = {
+        name = "Nathan Regner";
+        email = "nathanregner@gmail.com";
       };
     };
     ignores = [
