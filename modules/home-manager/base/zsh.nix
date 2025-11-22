@@ -2,6 +2,7 @@
 {
   programs.zsh = {
     enable = true;
+    enableCompletion = true;
     initContent = ''
       bindkey -M viins 'jk' vi-cmd-mode
 
