@@ -19,7 +19,7 @@
           else
             "${config.home.homeDirectory}/Library/Application Support";
         configFile = "${configDirectory}/lazygit/config.yml";
-        themePkg = inputs.catppuccin-nix.packages.${pkgs.system}.lazygit;
+        themePkg = inputs.catppuccin-nix.packages.${pkgs.stdenv.hostPlatform.system}.lazygit;
       in
       ''
         makeWrapper ${lib.getExe pkgs.unstable.lazygit} $out/bin/lazygit \

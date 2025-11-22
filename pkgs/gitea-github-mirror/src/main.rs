@@ -1,5 +1,3 @@
-#![feature(let_chains)]
-
 use color_eyre::eyre;
 use figment::{providers::Env, Figment};
 use serde::Deserialize;
