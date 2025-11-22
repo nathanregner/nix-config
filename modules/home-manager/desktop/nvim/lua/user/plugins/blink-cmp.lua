@@ -1,8 +1,6 @@
 -- https://cmp.saghen.dev/installation.html-
 
-local bufname_whitelist = vim.regex([[conjure-log-.*]])
-
-local border_chars = { "╭", "─", "╮", "│", "╯", "─", "╰", "│" }
+local bufname_blacklist = vim.regex([[conjure-log-.*]])
 
 -- local log_once = (function()
 --   local logged = {}
@@ -41,6 +39,12 @@ return nix_spec({
 
     snippets = { preset = "luasnip" },
 
+    completion = {
+      trigger = {
+        show_on_blocked_trigger_characters = {},
+      },
+    },
+
     cmdline = {
       completion = { menu = { auto_show = true } },
     },
@@ -75,7 +79,7 @@ return nix_spec({
                   if not vim.api.nvim_buf_is_loaded(bufnr) then return false end
                   local buftype = vim.bo[bufnr].buftype
                   local bufname = vim.api.nvim_buf_get_name(bufnr)
-                  return buftype == "" or bufname_whitelist:match_str(bufname) ~= nil
+                  return buftype == "" or bufname_blacklist:match_str(bufname) ~= nil
                 end)
                 :totable()
             end,
@@ -118,6 +122,7 @@ return nix_spec({
     },
 
     fuzzy = {
+      implementation = "rust",
       prebuilt_binaries = {
         download = false,
       },
@@ -125,8 +130,6 @@ return nix_spec({
         function(a, b)
           if a.source_id == "snippets" and b.client_name == "emmet_language_server" then return true end
           if a.client_name == "emmet_language_server" and b.source_id == "snippets" then return false end
-          if (a.client_name == nil or b.client_name == nil) or (a.client_name == b.client_name) then return end
-          return b.client_name == "emmet_language_server"
         end,
         -- default sorts
         "score",
