@@ -14,8 +14,6 @@
     supportedFilesystems = lib.mkForce [
       "vfat"
       "ext4"
-      "ntfs"
-      "cifs"
     ];
     consoleLogLevel = lib.mkDefault 7;
     initrd = {
