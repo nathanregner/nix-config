@@ -43,7 +43,7 @@
   programs.nano.enable = false;
 
   # basic system utilities
-  environment.systemPackages = with pkgs.unstable; [
+  environment.systemPackages = with pkgs; [
     # text manipulation
     gawk
     gnused
