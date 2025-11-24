@@ -7,7 +7,7 @@
 }:
 {
   imports = [
-    # "${modulesPath}/profiles/minimal.nix"
+    "${modulesPath}/profiles/minimal.nix"
     "${modulesPath}/installer/sd-card/sd-image-aarch64.nix"
     ./sd-image.nix
   ];

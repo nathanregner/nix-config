@@ -906,7 +906,7 @@ require("lazy").setup({
       "nvim-lua/plenary.nvim",
       "nvim-treesitter/nvim-treesitter",
       -- Adapters
-      "marilari88/neotest-vitest",
+      -- "marilari88/neotest-vitest",
       "nvim-neotest/neotest-jest",
       {
         "rcasia/neotest-java",
@@ -999,7 +999,7 @@ require("lazy").setup({
       neotest.setup({
         ---@diagnostic disable-next-line: missing-fields
         discovery = {
-          enabled = false,
+          -- enabled = false,
         },
         adapters = {
           require("neotest-java")({
@@ -1008,7 +1008,7 @@ require("lazy").setup({
           }),
           require("neotest-jest")({
             -- jestCommand = "npx jest --",
-            jest_test_discovery = true,
+            -- jest_test_discovery = true,
             -- isTestFile = function(file_path)
             --   return file_path:match("__tests__/") or file_path:match("%.test%.[jt]sx?$")
             -- end,

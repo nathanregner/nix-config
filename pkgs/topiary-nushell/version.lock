@@ -2,8 +2,8 @@
   "src": {
     "owner": "blindFS",
     "repo": "topiary-nushell",
-    "rev": "fd78be393af5a64e56b493f52e4a9ad1482c07f4",
-    "hash": "sha256-5gmLFnbHbQHnE+s1uAhFkUrhEvUWB/hg3/8HSYC9L14="
+    "rev": "e5c4db10057d2223e00a1f8957987b243350c903",
+    "hash": "sha256-rV0BNLVg+cKJtAprKLPLpfwOvYjCSMjfCKzS/kSUFu0="
   },
   "grammar": {
     "src": {
