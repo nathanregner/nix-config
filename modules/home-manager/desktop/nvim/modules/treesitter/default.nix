@@ -58,21 +58,21 @@ in
 
   programs.ast-grep.customLanguages =
     let
-      parsers = pkgs.unstable.vimPlugins.nvim-treesitter-parsers;
+      parsers = pkgs.unstable.vimPlugins.nvim-treesitter.passthru.builtGrammars;
     in
     {
-      hcl = {
+      terraform = {
         extensions = [
           "hcl"
           "tf"
         ];
-        library = parsers.hcl;
+        library = parsers.terraform;
       };
-      dtd = {
+      xml = {
         extensions = [
           "xml"
         ];
-        library = parsers.dtd;
+        library = parsers.xml;
       };
     };
 }

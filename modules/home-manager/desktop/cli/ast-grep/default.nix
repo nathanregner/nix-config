@@ -57,7 +57,7 @@ in
           name: lang:
           {
             inherit (lang) extensions;
-            libraryPath = "${lang.library}/parser/${name}.so";
+            libraryPath = "${lang.library}/parser";
           }
           // (lib.optionalAttrs (lang.expandoChar != null) {
             inherit (lang) expandoChar;
