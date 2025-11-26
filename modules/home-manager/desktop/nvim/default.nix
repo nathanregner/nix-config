@@ -114,18 +114,15 @@ in
         source = config.lib.file.mkFlakeSymlink ./lazy-lock.json;
         force = true;
       };
+      "nvim/lua/user" = {
+        source = config.lib.file.mkFlakeSymlink ./lua/user;
+        force = true;
+      };
       "nvim/snippets" = {
         source = config.lib.file.mkFlakeSymlink ./snippets;
         force = true;
       };
     }
-    // lib.mapAttrs' (source: _: {
-      name = "nvim/lua/user/${source}";
-      value = {
-        source = config.lib.file.mkFlakeSymlink ./lua/user + "/${source}";
-        force = true;
-      };
-    }) (builtins.readDir ./lua/user)
     // lib.listToAttrs (
       builtins.map (source: {
         name = "nvim/after/ftplugin/${builtins.baseNameOf source}";
