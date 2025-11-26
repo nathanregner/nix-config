@@ -91,8 +91,8 @@ in
         source = config.lib.file.mkFlakeSymlink ./lazy-lock.json;
         force = true;
       };
-      "nvim/lua" = {
-        source = config.lib.file.mkFlakeSymlink ./lua;
+      "nvim/lua/user" = {
+        source = config.lib.file.mkFlakeSymlink ./lua/user;
         force = true;
       };
       "nvim/snippets" = {
