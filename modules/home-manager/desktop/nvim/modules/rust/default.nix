@@ -19,6 +19,7 @@ in
   config = mkIf cfg.enable {
     home.packages = with pkgs.unstable; [
       cargo-autoinherit
+      cargo-generate
       cargo-nextest
       cargo-outdated
     ];
