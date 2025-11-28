@@ -9,10 +9,10 @@ with lib;
 let
   cfg = config.vfio;
   # https://github.com/virtio-win/kvm-guest-drivers-windows
-  win-virtio-iso = pkgs.stdenvNoCC.mkDerivation {
-    name = "win-virtio-iso";
-    inherit (pkgs.win-virtio) version;
-    src = pkgs.win-virtio;
+  virtio-win-iso = pkgs.stdenvNoCC.mkDerivation {
+    name = "virtio-win-iso";
+    inherit (pkgs.virtio-win) version;
+    src = pkgs.virtio-win;
     buildInputs = [ pkgs.cdrtools ];
     installPhase = ''
       mkisofs -o $out $src
@@ -69,6 +69,6 @@ in
     environment.systemPackages = with pkgs; [ virt-manager ];
 
     # mount VFIO drivers in a consistent location
-    systemd.tmpfiles.rules = [ "L+ /var/lib/libvirt/drivers/win-virtio - - - - ${win-virtio-iso}" ];
+    systemd.tmpfiles.rules = [ "L+ /var/lib/libvirt/drivers/virtio-win - - - - ${virtio-win-iso}" ];
   };
 }
