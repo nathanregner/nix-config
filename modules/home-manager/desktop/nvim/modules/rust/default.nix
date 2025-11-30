@@ -22,6 +22,7 @@ in
       cargo-generate
       cargo-nextest
       cargo-outdated
+      cargo-udeps
     ];
 
     # rustc -Z unstable-options --print target-spec-json | jq '.["llvm-target"]' -r
