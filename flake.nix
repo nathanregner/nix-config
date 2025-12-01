@@ -23,7 +23,10 @@
     };
     deploy-rs = {
       url = "github:serokell/deploy-rs";
-      inputs.nixpkgs.follows = "nixpkgs";
+      inputs = {
+        flake-compat.follows = "flake-compat";
+        nixpkgs.follows = "nixpkgs";
+      };
     };
     devshell = {
       url = "github:numtide/devshell";
@@ -45,7 +48,11 @@
     };
     mac-app-util = {
       url = "github:hraban/mac-app-util";
-      inputs.nixpkgs.follows = "nixpkgs-unstable";
+      inputs = {
+        flake-compat.follows = "flake-compat";
+        nixpkgs.follows = "nixpkgs-unstable";
+        treefmt-nix.follows = "";
+      };
     };
     neovim-nightly-overlay = {
       url = "github:nix-community/neovim-nightly-overlay";
