@@ -34,7 +34,7 @@ in
       recommendedTlsSettings = true;
       recommendedBrotliSettings = true;
       recommendedGzipSettings = true;
-      recommendedZstdSettings = true;
+      experimentalZstdSettings = true;
 
       virtualHosts =
         let
