@@ -7,7 +7,10 @@ local on_attach = function(_, bufnr)
 
   local nmap = function(keys, func, desc) map("n", keys, func, desc) end
 
-  nmap("<leader>rn", vim.lsp.buf.rename, "[R]e[n]ame")
+  nmap("<leader>rn", function()
+    local success, ts_autotag = pcall(require, "ts-autotag")
+    if not success or not ts_autotag.rename() then vim.lsp.buf.rename() end
+  end, "[R]e[n]ame")
   map({ "n", "v" }, "<leader>ca", vim.lsp.buf.code_action, "[C]ode [A]ction")
   nmap("<leader>fci", vim.lsp.buf.incoming_calls, "[F]ind [C]allers [I]ncoming")
   nmap("<leader>fca", vim.lsp.buf.outgoing_calls, "[F]ind [C]allers [O]outgoing")
