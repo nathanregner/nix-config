@@ -2,26 +2,31 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 
-    devshell = {
-      url = "github:numtide/devshell";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
     fenix = {
       url = "github:nix-community/fenix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    flake-parts.url = "github:hercules-ci/flake-parts";
+    flake-parts = {
+      url = "github:hercules-ci/flake-parts";
+    };
+    treefmt-nix = {
+      url = "github:numtide/treefmt-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
     inputs@{
-      devshell,
       fenix,
       flake-parts,
+      nixpkgs,
+      treefmt-nix,
       ...
     }:
     flake-parts.lib.mkFlake { inherit inputs; } {
-      imports = [ ];
+      imports = [
+        treefmt-nix.flakeModule
+      ];
       systems = [
         "x86_64-linux"
         "aarch64-linux"
@@ -37,12 +42,23 @@
         }:
         {
           # https://flake.parts/overlays#consuming-an-overlay
-          _module.args.pkgs = import inputs.nixpkgs {
+          _module.args.pkgs = import nixpkgs {
             inherit system;
             overlays = [
-              devshell.overlays.default
               fenix.overlays.default
             ];
+          };
+
+          treefmt = {
+            projectRootFile = "flake.nix";
+            programs = {
+              nixfmt.enable = true;
+              rustfmt = {
+                enable = true;
+                package = pkgs.fenix.complete.rustfmt;
+              };
+              taplo.enable = true;
+            };
           };
 
           packages =
@@ -86,16 +102,9 @@
                 "rustfmt"
               ];
             in
-            pkgs.devshell.mkShell {
-              env = [
-                {
-                  name = "RUST_SRC_PATH";
-                  value = "${toolchain}/lib/rustlib/src/rust/library";
-                }
-              ];
-              packages = [
-                toolchain
-              ];
+            pkgs.mkShell {
+              env.RUST_SRC_PATH = "${toolchain}/lib/rustlib/src/rust/library";
+              packages = [ toolchain ];
             };
         };
 
