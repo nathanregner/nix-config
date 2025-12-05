@@ -600,38 +600,6 @@ require("lazy").setup({
     end,
   },
 
-  { -- TODO comments
-    "folke/todo-comments.nvim",
-    dependencies = { "nvim-lua/plenary.nvim" },
-    keys = function()
-      local todo = require("todo-comments")
-      local ts_repeat_move = require("nvim-treesitter.textobjects.repeatable_move")
-      local jump_next, jump_prev = ts_repeat_move.make_repeatable_move_pair(todo.jump_next, todo.jump_prev)
-      return {
-        { "]t", jump_next, desc = "Next [T]odo comment" },
-        { "[t", jump_prev, desc = "Previous [T]odo comment" },
-      }
-    end,
-    opts = {
-      signs = false,
-      keywords = {
-        TEST = nil,
-      },
-      highlight = {
-        -- TODO
-        -- TODO: asdf
-        -- TODO asdf
-        -- TODO (@someone): asdf
-        pattern = {
-          [[.*<(KEYWORDS)\s*:]],
-          [[.*<(KEYWORDS)\s]],
-          [[.*<(KEYWORDS)\(]],
-          [[.*<(KEYWORDS)$]],
-        },
-      },
-    },
-  },
-
   -- TODO: auto-show output panel on failure
   -- TODO: auto-show clear on run (watch)
   { -- Neotest
