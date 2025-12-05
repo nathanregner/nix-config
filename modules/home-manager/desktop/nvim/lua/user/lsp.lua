@@ -195,26 +195,6 @@ local servers = {
     -- root_dir = util.root_pattern(".terraform", ".terraform.lock.hcl", ".git", ".tflint.hcl"),
   },
   tinymist = {},
-  tsgo = {
-    cmd = { "tsgo", "--lsp", "--stdio" },
-    filetypes = {
-      "javascript",
-      "javascript.jsx",
-      "javascriptreact",
-      "typescript",
-      "typescript.tsx",
-      "typescriptreact",
-    },
-    root_dir = require("lspconfig.util").root_pattern(
-      ".git",
-      "jsconfig.json",
-      "package.json",
-      "tsconfig.base.json",
-      "tsconfig.json"
-    ),
-    settings = {},
-    single_file_support = true,
-  },
   vtsls = {
     capabilities = {
       workspace = {
