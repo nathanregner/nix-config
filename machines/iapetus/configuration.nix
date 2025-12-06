@@ -19,6 +19,7 @@
   networking.networkmanager.enable = true;
   systemd.services.NetworkManager-wait-online.enable = false;
   services.blueman.enable = true;
+  hardware.bluetooth.enable = true;
 
   # Desktop environment
   services.xserver = {
