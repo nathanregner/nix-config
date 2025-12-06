@@ -433,11 +433,11 @@ require("lazy").setup({
     },
   },
 
-  -- {
-  --   "brenoprata10/nvim-highlight-colors",
-  --   opts = {},
-  --   -- init = function() require("nvim-highlight-colors").turnOff() end,
-  -- },
+  {
+    "brenoprata10/nvim-highlight-colors",
+    opts = {},
+    -- init = function() require("nvim-highlight-colors").turnOff() end,
+  },
 
   { -- Theme
     "catppuccin/nvim",
