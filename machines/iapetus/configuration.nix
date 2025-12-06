@@ -85,17 +85,20 @@
     dates = null;
   };
 
-  environment.systemPackages = [
-    config.boot.kernelPackages.perf
-  ]
-  ++ (with pkgs.unstable; [
-    android-file-transfer # aft-mtp-mount ~/mnt
-    nautilus-python
-    networkmanagerapplet
-    libmtp
-    virt-manager
-    xwayland-satellite
-  ]);
+  environment.systemPackages =
+    with pkgs;
+    [
+      perf
+      wireshark
+    ]
+    ++ (with pkgs.unstable; [
+      android-file-transfer # aft-mtp-mount ~/mnt
+      nautilus-python
+      networkmanagerapplet
+      libmtp
+      virt-manager
+      xwayland-satellite
+    ]);
 
   programs.wireshark = {
     enable = true;
