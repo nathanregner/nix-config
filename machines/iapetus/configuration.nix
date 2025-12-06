@@ -97,6 +97,11 @@
     xwayland-satellite
   ]);
 
+  programs.wireshark = {
+    enable = true;
+    usbmon.enable = true;
+  };
+
   # boot.binfmt.emulatedSystems = [ "aarch64-linux" ];
 
   virtualisation.docker = {

@@ -18,6 +18,7 @@ in
       "dialout"
     ]
     ++ ifTheyExist [
+      "wireshark"
       "docker"
       "libvirtd"
       "networkmanager"
