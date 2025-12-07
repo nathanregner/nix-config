@@ -157,10 +157,13 @@
   };
 
   services.udev.extraRules = ''
-    ${builtins.readFile ./probe-rs.rules}
     SUBSYSTEM=="usb", ATTRS{idVendor}=="1337", ATTRS{idProduct}=="1337", MODE="0666", GROUP="dialout"
     SUBSYSTEM=="tty", ATTRS{idVendor}=="1337", ATTRS{idProduct}=="1337", MODE="0666", GROUP="dialout"
   '';
+
+  services.udev.packages = [
+    pkgs.local.probe-rs-udev-rules
+  ];
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions
