@@ -18,6 +18,7 @@ in
       "dialout"
     ]
     ++ ifTheyExist [
+      "bluetooth"
       "docker"
       "libvirtd"
       "networkmanager"
