@@ -98,7 +98,7 @@ in
       };
       idea = {
         toolboxFolder = "intellij-idea-ultimate";
-        darwinAppGlob = "IntelliJ\\ IDEA\\ Ultimate*.app";
+        darwinAppGlob = "IntelliJ\\ IDEA*.app";
       };
       rider = {
         toolboxFolder = "rider";
