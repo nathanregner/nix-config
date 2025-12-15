@@ -74,22 +74,19 @@ in
   config = lib.mkIf cfg.enable {
     home.file.".ideavimrc".source = config.lib.file.mkFlakeSymlink ./ideavimrc;
 
-    home.packages = lib.optionals pkgs.stdenv.isLinux (
-      [
+    home.packages =
+      lib.optionals pkgs.stdenv.isLinux [
         pkgs.unstable.jetbrains-toolbox
       ]
       ++ (lib.mapAttrsToList (
         name: cfg:
-        let
-          launchDetached =
-            name: bin:
-            pkgs.writeShellScriptBin name ''
-              nohup ${bin} "$@" &> /dev/null & disown %%
-            '';
-        in
-        launchDetached name "~/.local/share/JetBrains/Toolbox/apps/${cfg.toolboxFolder}/bin/${name}"
-      ) cfg.tools)
-    );
+        pkgs.writeShellScriptBin name (
+          if pkgs.stdenv.isLinux then
+            ''nohup ~/.local/share/JetBrains/Toolbox/apps/${cfg.toolboxFolder}/bin/${name} "$@" &> /dev/null & disown %%''
+          else
+            ''open -na ~/Applications/${cfg.darwinAppGlob}/Contents/MacOS/${name} --args "$@"''
+        )
+      ) cfg.tools);
 
     programs.jetbrains.tools = {
       datagrip = {
@@ -98,20 +95,13 @@ in
       };
       idea = {
         toolboxFolder = "intellij-idea-ultimate";
-        darwinAppGlob = "IntelliJ\\ IDEA\\ Ultimate*.app";
+        darwinAppGlob = "IntelliJ\\ IDEA*.app";
       };
       rider = {
         toolboxFolder = "rider";
         darwinAppGlob = "Rider*.app";
       };
     };
-
-    # TODO: move to cfg.tools
-    programs.zsh.shellAliases = lib.optionalAttrs pkgs.stdenv.isDarwin (
-      builtins.mapAttrs (
-        name: cfg: "open -na ~/Applications/${cfg.darwinAppGlob}/Contents/MacOS/${name} --args"
-      ) cfg.tools
-    );
 
     xdg.configFile = lib.mkMerge (lib.concatLists (lib.mapAttrsToList linkConfigFiles cfg.tools));
   };
