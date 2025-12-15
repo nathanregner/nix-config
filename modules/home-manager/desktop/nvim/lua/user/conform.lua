@@ -53,7 +53,7 @@ require("conform").setup({
     query = { "topiary_tree_sitter_query" },
     rust = { "rustfmt" },
     sh = { "shfmt" },
-    terraform = { "terraform_fmt" },
+    terraform = { "terraform_fmt", "injected" },
     toml = { "taplo" },
     typescript = { "prettierd" },
     typescriptreact = { "prettierd" },
