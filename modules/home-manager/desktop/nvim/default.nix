@@ -85,6 +85,7 @@ in
             nixd
             terraform-ls
             tflint
+            typescript-go
             vscode-langservers-extracted
             vtsls
             yaml-language-server
@@ -102,8 +103,8 @@ in
     home.packages = with pkgs.unstable; [
       # formatters/linters
       nginx-config-formatter
-      nixfmt-rfc-style
       prettierd
+      nixfmt-rfc-style
       shfmt
       stylua
       taplo
