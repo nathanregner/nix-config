@@ -37,6 +37,11 @@
           key = "Return";
           chars = "\\u001B[13;7u";
         }
+        {
+          mods = "Shift";
+          key = "Return";
+          chars = "\n";
+        }
       ];
       # http://www.leonerd.org.uk/hacks/fixterms/
       selection = {
