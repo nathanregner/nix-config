@@ -29,6 +29,17 @@ let
         ];
     });
 
+    corepack_24 = prev.corepack_24.overrideAttrs (oldAttrs: {
+      nativeBuildInputs = oldAttrs.nativeBuildInputs ++ [
+        prev.installShellFiles
+      ];
+      installPhase = ''
+        ${oldAttrs.installPhase or ""}
+        installShellCompletion --cmd pnpm \
+          --zsh ${./corepack/_pnpm}
+      '';
+    });
+
     # FIXME
     # https://github.com/NixOS/nixpkgs/issues/305779
     # https://github.com/betaflight/betaflight-configurator/issues/3947
