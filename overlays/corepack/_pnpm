@@ -1,0 +1,15 @@
+#compdef pnpm
+
+# Delegate corepack's pnpm shim completion to the real pnpm
+
+if (( ! $+functions[_pnpm_completion] )); then
+  if (( $+commands[pnpm] )); then
+    eval "$(pnpm completion zsh 2>/dev/null)"
+  fi
+fi
+
+if (( $+functions[_pnpm_completion] )); then
+  _pnpm_completion "$@"
+else
+  _files
+fi
