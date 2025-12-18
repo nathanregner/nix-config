@@ -611,7 +611,6 @@ require("lazy").setup({
       "nvim-lua/plenary.nvim",
       "nvim-treesitter/nvim-treesitter",
       -- Adapters
-      "marilari88/neotest-vitest",
       "nvim-neotest/neotest-jest",
     },
     lazy = true,
