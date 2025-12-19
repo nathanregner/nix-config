@@ -104,8 +104,7 @@ require("lazy").setup({
 
   -- https://github.com/sindrets/diffview.nvim#configuration
   {
-    "sindrets/diffview.nvim",
-    dev = true,
+    "nathanregner/diffview.nvim",
     opts = {
       view = {
         merge_tool = {
@@ -129,7 +128,7 @@ require("lazy").setup({
     "NeogitOrg/neogit",
     dependencies = {
       "nvim-lua/plenary.nvim", -- required
-      "sindrets/diffview.nvim", -- optional - Diff integration
+      "nathanregner/diffview.nvim", -- optional - Diff integration
       "nvim-telescope/telescope.nvim",
     },
     keys = { { "<leader>n", "<CMD>Neogit<CR>", desc = "Neogit" } },
