@@ -56,6 +56,8 @@ local function get_git_root(current_dir)
   return git_root
 end
 
+local initial_cwd = vim.fn.getcwd()
+
 vim.g.fugitive_legacy_commands = 0
 
 local leet_arg = "leetcode.nvim"
@@ -545,13 +547,24 @@ require("lazy").setup({
           end
           oil.close()
         end,
-        ["g-"] = function()
-          local oil = require("oil")
-          local cwd = oil.get_current_dir()
-          local git_root = get_git_root(cwd)
-          if git_root == cwd then git_root = get_git_root(vim.fs.dirname(git_root)) end
-          if git_root then oil.open(git_root) end
-        end,
+        ["g-"] = {
+          desc = "Navigate to the git root",
+          callback = function()
+            local oil = require("oil")
+            local cwd = oil.get_current_dir()
+            local git_root = get_git_root(cwd)
+            if git_root == cwd then git_root = get_git_root(vim.fs.dirname(git_root)) end
+            if git_root then oil.open(git_root) end
+          end,
+        },
+        ["g^"] = {
+          desc = "Navigate to the initial cwd (set on startup)",
+          callback = function()
+            local oil = require("oil")
+            vim.notify(initial_cwd)
+            oil.open(initial_cwd)
+          end,
+        },
         ["gd"] = {
           desc = "Toggle file detail view",
           callback = function()
