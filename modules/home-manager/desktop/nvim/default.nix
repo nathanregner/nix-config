@@ -110,7 +110,11 @@ in
       }) (lib.filesystem.listFilesRecursive ./after/ftplugin)
     );
 
-    programs.zsh.shellAliases.vimdiff = "nvim -d";
+    programs.zsh.shellAliases = {
+      v = "nvim";
+      vd = "nvim -d";
+      vimdiff = "nvim -d";
+    };
 
     # https://github.com/jesseduffield/lazygit/wiki/Custom-Commands-Compendium
     programs.lazygit.settings.customCommands = [
