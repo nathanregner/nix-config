@@ -30,19 +30,16 @@
     enable = true;
     # videoDrivers = [ "nvidia" ];
 
+    displayManager.gdm.enable = true;
+    displayManager.gdm.wayland = false;
+    desktopManager.gnome.enable = true;
+
     xkb.layout = "us";
     xkb.variant = "";
   };
 
-  services.displayManager = {
-    gdm.enable = true;
-    gdm.wayland = false;
-
-    autoLogin.enable = true;
-    autoLogin.user = "nregner";
-
-    gnome.enable = true;
-  };
+  services.displayManager.autoLogin.enable = true;
+  services.displayManager.autoLogin.user = "nregner";
 
   # workaround for GNOME autologin: https://github.com/NixOS/nixpkgs/issues/103746#issuecomment-945091229
   systemd.services."getty@tty1".enable = false;
