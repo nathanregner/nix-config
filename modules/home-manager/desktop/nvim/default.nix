@@ -76,7 +76,10 @@ in
             taplo
             ;
 
-          inherit (pkgs.unstable) git;
+          # file browsing
+          inherit (pkgs.unstable)
+            unzip
+            ;
         }
         // lib.optionalAttrs pkgs.stdenv.isLinux {
           inherit (pkgs.unstable)
