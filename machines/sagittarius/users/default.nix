@@ -35,8 +35,20 @@ in
       isNormalUser = true;
       openssh.authorizedKeys.keys = builtins.attrValues self.globals.ssh.userKeys.nregner;
       linger = true;
-      shell = pkgs.unstable.zsh;
     }) cfg;
+
+    users.defaultUserShell = pkgs.zsh;
+
+    programs.zsh.ohMyZsh = {
+      enable = true;
+      plugins = [ "vi-mode" ];
+      theme = "robbyrussell";
+    };
+
+    programs.fzf = {
+      fuzzyCompletion = true;
+      keybindings = true;
+    };
 
     systemd.user.services.nixos-activation.unitConfig.ConditionUser = builtins.map (user: "!${user}") (
       builtins.attrNames cfg
