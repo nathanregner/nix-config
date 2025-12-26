@@ -17,10 +17,7 @@
     };
   };
 
-  local.services.backup.paths.silverbullet = {
-    paths = [ config.services.silverbullet.spaceDir ];
-    restic = {
-      s3 = { };
-    };
+  local.services.backup.jobs.silverbullet = {
+    root = config.services.silverbullet.spaceDir;
   };
 }
