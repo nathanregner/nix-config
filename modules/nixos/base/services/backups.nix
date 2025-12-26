@@ -17,25 +17,61 @@ in
   options.local.services.backup.paths = mkOption {
     default = { };
     type = types.attrsOf (
-      types.submodule {
-        options =
-          (lib.getAttrs [
-            "dynamicFilesFrom"
-            "paths"
-            "timerConfig"
-          ] (options.services.restic.backups.type.getSubOptions [ ]))
-          // {
-            restic = mkOption {
-              type = types.submodule {
-                options = {
-                  s3 = mkOption {
-                    type = types.attrs; # TODO
+      types.submodule (
+        { name, ... }:
+        {
+          options =
+            (lib.getAttrs [
+              "dynamicFilesFrom"
+              "paths"
+              "timerConfig"
+            ] (options.services.restic.backups.type.getSubOptions [ ]))
+            // {
+              restic = mkOption {
+                type = types.submodule {
+                  options = {
+                    s3 =
+
+                      let
+                        s3Defaults = {
+                          repository = "s3:s3.dualstack.us-west-2.amazonaws.com/nregner-restic/${config.networking.hostName}/${name}";
+                          initialize = true;
+                          passwordFile = config.sops.secrets.restic-password.path;
+                          environmentFile = config.sops.secrets.restic-s3-env.path;
+                          pruneOpts = [
+                            "--keep-within 7d"
+                            "--keep-within-daily 1m"
+                            "--keep-within-weekly 6m"
+                            "--keep-within-monthly 1y"
+                          ];
+                        };
+                      in
+                      mkOption {
+                        type = types.submodule {
+                          options = {
+                            enable = mkOption {
+                              type = types.bool;
+                              default = true;
+                            };
+                          }
+                          // builtins.mapAttrs (
+                            name: value:
+                            mkOption {
+                              readOnly = true;
+                              default = value;
+                            }
+                          ) s3Defaults
+                          // builtins.removeAttrs (options.services.restic.backups.type.getSubOptions [ ]) (
+                            [ "enable" ] ++ builtins.attrNames s3Defaults
+                          );
+                        };
+                      };
                   };
                 };
               };
             };
-          };
-      }
+        }
+      )
     );
   };
 
@@ -51,21 +87,6 @@ in
     }
     (lib.mkIf cfg.enable (
       let
-        defaults = {
-          s3 = name: {
-            repository = "s3:s3.dualstack.us-west-2.amazonaws.com/nregner-restic/${config.networking.hostName}/${name}";
-            initialize = true;
-            passwordFile = config.sops.secrets.restic-password.path;
-            environmentFile = config.sops.secrets.restic-s3-env.path;
-            # https://restic.readthedocs.io/en/stable/060_forget.html#removing-snapshots-according-to-a-policy
-            pruneOpts = [
-              "--keep-within 7d"
-              "--keep-within-daily 1m"
-              "--keep-within-weekly 6m"
-              "--keep-within-monthly 1y"
-            ];
-          };
-        };
         resticJobs = trivial.pipe cfg.paths [
           (attrsets.mapAttrsToList (
             name:
@@ -75,7 +96,7 @@ in
             }@opts:
             attrsets.mapAttrs' (type: job: {
               name = "${name}-${type}";
-              value = ((defaults.${type} or (_: { })) name) // job // (builtins.removeAttrs opts [ "restic" ]);
+              value = job // (builtins.removeAttrs opts [ "restic" ]);
             }) restic
           ))
           (lists.foldl (acc: attrs: acc // attrs) { })
