@@ -55,14 +55,18 @@ in
                             };
                           }
                           // builtins.mapAttrs (
-                            name: value:
+                            _name: value:
                             mkOption {
                               readOnly = true;
                               default = value;
                             }
                           ) s3Defaults
                           // builtins.removeAttrs (options.services.restic.backups.type.getSubOptions [ ]) (
-                            [ "enable" ] ++ builtins.attrNames s3Defaults
+                            [
+                              "enable"
+                              "_module"
+                            ]
+                            ++ builtins.attrNames s3Defaults
                           );
                         };
                       };
@@ -96,8 +100,8 @@ in
             }@opts:
             attrsets.mapAttrs' (type: job: {
               name = "${name}-${type}";
-              value = job // (builtins.removeAttrs opts [ "restic" ]);
-            }) restic
+              value = (builtins.removeAttrs job [ "enable" ]) // (builtins.removeAttrs opts [ "restic" ]);
+            }) (attrsets.filterAttrs (_type: job: job.enable) restic)
           ))
           (lists.foldl (acc: attrs: acc // attrs) { })
         ];
