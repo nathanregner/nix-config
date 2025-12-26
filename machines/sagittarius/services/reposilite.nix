@@ -20,20 +20,13 @@
   nginx.subdomain.maven."/".extraConfig = # nginx
     "return 302 http://sagittarius:${toString config.services.reposilite.settings.port}$request_uri;";
 
-  local.services.backup.paths.reposilite = {
-    paths = [ config.services.reposilite.workingDirectory ];
-    restic = {
-      s3 = {
-        extraBackupArgs = [
-          "--skip-if-unchanged"
-        ];
-        exclude = [
-          "*.log"
-          ".local"
-          "logs"
-          "static"
-        ];
-      };
-    };
+  local.services.backup.jobs.reposilite = {
+    root = config.services.reposilite.workingDirectory;
+    exclude = [
+      "*.log"
+      ".local"
+      "logs"
+      "static"
+    ];
   };
 }

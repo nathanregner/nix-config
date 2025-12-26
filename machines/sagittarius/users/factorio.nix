@@ -5,10 +5,8 @@
     allowedUDPPorts = [ 34197 ];
   };
 
-  local.services.backup.paths.factorio = {
-    paths = [ "/home/factorio" ];
-    restic = {
-      s3 = { };
-    };
+  local.services.backup.jobs.factorio = {
+    root = "/home/factorio";
+    timerConfig.OnCalendar = "0/1:00:00";
   };
 }

@@ -67,16 +67,13 @@ in
       ) cfg
     );
 
-    local.services.backup.paths = builtins.mapAttrs (
+    local.services.backup.jobs = builtins.mapAttrs (
       user: cfg':
       let
         inherit (config.users.users.${user}) home;
       in
       {
-        paths = [ "${home}/${cfg'.backupDir}" ];
-        restic = {
-          s3 = { };
-        };
+        root = lib.mkDefault "${home}/${cfg'.backupDir}";
       }
     ) cfg;
   };

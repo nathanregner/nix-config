@@ -22,11 +22,8 @@ in
     "/".proxyPass = "http://127.0.0.1:${toString config.services.mealie.port}/";
   };
 
-  local.services.backup.paths.mealie = {
+  local.services.backup.jobs.mealie = {
     dynamicFilesFrom = "realpath ${dataDir}";
-    restic = {
-      s3 = { };
-    };
   };
 
   assertions = [
