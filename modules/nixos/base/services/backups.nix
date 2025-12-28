@@ -1,4 +1,5 @@
 {
+  self,
   options,
   config,
   lib,
@@ -10,6 +11,7 @@ let
     mapAttrs'
     mapAttrsToList
     mkOption
+    optionalAttrs
     trivial
     types
     ;
@@ -81,6 +83,8 @@ in
 
               initialize = mkReadonly true;
 
+              passwordFile = mkReadonly config.sops.secrets.restic-password.path;
+
               extraBackupArgs = mkReadonly [ "--skip-if-unchanged" ];
 
               pruneOpts = mkDefault [
@@ -93,13 +97,17 @@ in
               targets = mkOption {
                 default = {
                   s3 = { };
+                  server = { };
                 };
                 type = types.submodule {
                   options = {
                     s3 = mkTarget {
                       repository = mkReadonly "s3:s3.dualstack.us-west-2.amazonaws.com/nregner-restic/${config.networking.hostName}/${name}";
-                      passwordFile = mkReadonly config.sops.secrets.restic-password.path;
                       environmentFile = mkReadonly config.sops.secrets.restic-s3-env.path;
+                    };
+                    server = mkTarget {
+                      repository = mkReadonly "rest:http://sagittarius:${toString self.globals.services.restic-server.port}/${config.networking.hostName}/${name}";
+                      environmentFile = mkReadonly config.sops.templates.restic-server-env.path;
                     };
                   };
                 };
@@ -156,18 +164,38 @@ in
           ))
           lib.mergeAttrsList
         ];
+        hasTarget = name: builtins.any (job: job.targets.${name}.enable) (builtins.attrValues cfg.jobs);
       in
       {
-        sops.secrets = lib.mkIf (builtins.any (job: job.targets.s3.enable) (builtins.attrValues cfg.jobs)) {
+        sops.secrets = {
           restic-password = {
             key = "restic_password";
             group = "restic";
             mode = "0440";
           };
+        }
+        // optionalAttrs (hasTarget "s3") {
           restic-s3-env = {
             key = "restic/s3_env";
             group = "restic";
             mode = "0440";
+          };
+        }
+        // optionalAttrs (hasTarget "server") {
+          restic-server-password = {
+            key = "restic/server/password";
+            group = "restic";
+            mode = "0440";
+          };
+        };
+
+        sops.templates = optionalAttrs (hasTarget "server") {
+          restic-server-env = {
+            content = ''
+              RESTIC_REST_USERNAME=${config.networking.hostName}
+              RESTIC_REST_PASSWORD=${config.sops.placeholder.restic-server-password}
+            '';
+            owner = "restic";
           };
         };
 

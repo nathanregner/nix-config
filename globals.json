@@ -4,6 +4,9 @@
     "prometheus": {
       "klipper": { "port": 9002 },
       "node": { "port": 9001 }
+    },
+    "restic-server": {
+      "port": 8002
     }
   }
 }
