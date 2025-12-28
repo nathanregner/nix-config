@@ -1,4 +1,5 @@
 {
+  self,
   options,
   config,
   lib,
@@ -10,6 +11,7 @@ let
     mapAttrs'
     mapAttrsToList
     mkOption
+    optionalAttrs
     trivial
     types
     ;
@@ -18,36 +20,44 @@ let
 
   baseOptions = options.services.restic.backups.type.getSubOptions [ ];
 
-  mkDefault = default: mkOption { inherit default; };
+  mkDefault =
+    default: option:
+    option
+    // lib.traceValSeq {
+      inherit default;
+    };
 
   mkReadonly =
-    default:
-    mkOption {
+    default: option:
+    option
+    // {
       inherit default;
       readOnly = true;
     };
 
-  targetOpts = [
-    "exclude"
-    "pruneOpts"
-    "timerConfig"
-  ];
+  targetOptions = {
+    inherit (baseOptions)
+      exclude
+      pruneOpts
+      timerConfig
+      ;
+  };
+
+  mkOverrides = overrides: builtins.mapAttrs (name: override: override baseOptions.${name}) overrides;
 
   mkTarget =
-    options:
+    base: overrides:
     mkOption {
       type = types.submodule {
-        options = {
-          enable = mkOption {
-            type = types.bool;
-            default = true;
+        options =
+          targetOptions
+          // mkOverrides overrides
+          // {
+            enable = mkOption {
+              type = types.bool;
+              default = true;
+            };
           };
-        }
-        // options
-        // lib.getAttrs (
-          builtins.attrNames (lib.filterAttrs (_name: option: !(option.readOnly or false)) options)
-          ++ targetOpts
-        ) baseOptions;
       };
     };
 
@@ -64,47 +74,55 @@ in
       types.submodule (
         base@{ name, ... }:
         {
-          options =
-            (lib.getAttrs (
-              targetOpts
-              ++ [
-                "dynamicFilesFrom"
-                "paths"
-              ]
-            ) baseOptions)
-            // {
-              root = mkOption {
-                type = types.nullOr types.str;
-                default = null;
-                description = "Root directory for backup command: https://forum.restic.net/t/skip-if-unchanged-usage/8636";
+          options = {
+            inherit (baseOptions) dynamicFilesFrom paths;
+          }
+          // targetOptions
+          // mkOverrides {
+            initialize = mkReadonly true;
+            passwordFile = mkReadonly config.sops.secrets.restic-password.path;
+            extraBackupArgs = mkReadonly [ "--skip-if-unchanged" ];
+            pruneOpts = mkDefault [
+              "--keep-within 7d"
+              "--keep-within-daily 1m"
+              "--keep-within-weekly 6m"
+              "--keep-within-monthly 1y"
+            ];
+          }
+          // {
+            root = mkOption {
+              type = types.nullOr types.str;
+              default = null;
+              description = "Root directory for backup command: https://forum.restic.net/t/skip-if-unchanged-usage/8636";
+            };
+
+            targets = mkOption {
+              default = {
+                s3 = { };
+                server = { };
               };
-
-              initialize = mkReadonly true;
-
-              extraBackupArgs = mkReadonly [ "--skip-if-unchanged" ];
-
-              pruneOpts = mkDefault [
-                "--keep-within 7d"
-                "--keep-within-daily 1m"
-                "--keep-within-weekly 6m"
-                "--keep-within-monthly 1y"
-              ];
-
-              targets = mkOption {
-                default = {
-                  s3 = { };
-                };
-                type = types.submodule {
-                  options = {
-                    s3 = mkTarget {
-                      repository = mkReadonly "s3:s3.dualstack.us-west-2.amazonaws.com/nregner-restic/${config.networking.hostName}/${name}";
-                      passwordFile = mkReadonly config.sops.secrets.restic-password.path;
-                      environmentFile = mkReadonly config.sops.secrets.restic-s3-env.path;
+              type = types.submodule {
+                options = {
+                  s3 = mkTarget base {
+                    repository = mkReadonly "s3:s3.dualstack.us-west-2.amazonaws.com/nregner-restic/${config.networking.hostName}/${name}";
+                    environmentFile = mkReadonly config.sops.secrets.restic-s3-env.path;
+                    timerConfig = mkDefault {
+                      OnCalendar = "daily";
+                      Persistent = true;
+                    };
+                  };
+                  server = mkTarget base {
+                    repository = mkReadonly "rest:http://sagittarius:${toString self.globals.services.restic-server.port}/${config.networking.hostName}/${name}";
+                    environmentFile = mkReadonly config.sops.templates.restic-server-env.path;
+                    timerConfig = mkDefault {
+                      OnCalendar = "0/6:00:00";
+                      Persistent = true;
                     };
                   };
                 };
               };
             };
+          };
 
           config = lib.mkIf (base.config.root != null) {
             paths = lib.mkDefault [ "." ];
@@ -156,18 +174,38 @@ in
           ))
           lib.mergeAttrsList
         ];
+        hasTarget = name: builtins.any (job: job.targets.${name}.enable) (builtins.attrValues cfg.jobs);
       in
       {
-        sops.secrets = lib.mkIf (builtins.any (job: job.targets.s3.enable) (builtins.attrValues cfg.jobs)) {
+        sops.secrets = {
           restic-password = {
             key = "restic_password";
             group = "restic";
             mode = "0440";
           };
+        }
+        // optionalAttrs (hasTarget "s3") {
           restic-s3-env = {
             key = "restic/s3_env";
             group = "restic";
             mode = "0440";
+          };
+        }
+        // optionalAttrs (hasTarget "server") {
+          restic-server-password = {
+            key = "restic/server/password";
+            group = "restic";
+            mode = "0440";
+          };
+        };
+
+        sops.templates = optionalAttrs (hasTarget "server") {
+          restic-server-env = {
+            content = ''
+              RESTIC_REST_USERNAME=${config.networking.hostName}
+              RESTIC_REST_PASSWORD=${config.sops.placeholder.restic-server-password}
+            '';
+            owner = "restic";
           };
         };
 
