@@ -23,20 +23,6 @@
             ];
       }
       {
-        job_name = "klipper";
-        static_configs =
-          builtins.map
-            (node: {
-              targets = [
-                "${node}:${toString self.globals.services.prometheus.klipper.port}"
-              ];
-            })
-            [
-              "sunlu-s8-0"
-              "voron"
-            ];
-      }
-      {
         job_name = "nginx";
         static_configs = [
           { targets = [ "localhost:${toString config.services.prometheus.exporters.nginx.port}" ]; }
