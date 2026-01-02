@@ -6,14 +6,6 @@
 }:
 let
   parserPrefix = "nvim/nvim-treesitter";
-  package = pkgs.unstable.vimPlugins.nvim-treesitter.withAllGrammars.overrideAttrs (old: {
-    # patches = old.patches or [ ] ++ [
-    #   (pkgs.fetchpatch {
-    #     url = "https://github.com/nvim-treesitter/nvim-treesitter/pull/7742/commits/fbcafd3e51200b3788652aef90147caade380750.patch";
-    #     sha256 = "sha256-wOScAN6QqTW18HskDyNLbeg8Zgf5WNLYu39Hef0TQj8=";
-    #   })
-    # ];
-  });
 in
 {
   programs.neovim.lua.globals =
@@ -22,7 +14,7 @@ in
     in
     {
       nvim_treesitter = {
-        dir = "${package}";
+        dir = "${pkgs.unstable.vimPlugins.nvim-treesitter.withAllGrammars}";
         inherit parser_install_dir;
       };
       rtp = [ parser_install_dir ];
