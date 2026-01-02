@@ -10,6 +10,8 @@
     };
     # TODO: this option should not merge
     pruneOpts = lib.mkForce [
+      "--tag"
+      "''"
       "--keep-within 1d"
       "--keep-within-daily 1m"
     ];

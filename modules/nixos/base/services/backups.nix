@@ -83,6 +83,8 @@ in
             passwordFile = mkReadonly config.sops.secrets.restic-password.path;
             extraBackupArgs = mkReadonly [ "--skip-if-unchanged" ];
             pruneOpts = mkDefault [
+              "--tag"
+              "''"
               "--keep-within 7d"
               "--keep-within-daily 1m"
               "--keep-within-weekly 6m"
