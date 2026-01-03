@@ -251,7 +251,7 @@
         ],
         "flake-utils": "flake-utils",
         "nixpkgs": [
-          "nixpkgs-unstable"
+          "nixpkgs"
         ],
         "systems": "systems_3",
         "treefmt-nix": []

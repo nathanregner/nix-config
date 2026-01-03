@@ -50,7 +50,7 @@
       url = "github:hraban/mac-app-util";
       inputs = {
         flake-compat.follows = "flake-compat";
-        nixpkgs.follows = "nixpkgs-unstable";
+        nixpkgs.follows = "nixpkgs";
         treefmt-nix.follows = "";
       };
     };
