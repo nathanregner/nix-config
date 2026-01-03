@@ -75,6 +75,10 @@ let
     # https://github.com/NixOS/nixpkgs/issues/154163#issuecomment-1350599022
     makeModulesClosure = x: prev.makeModulesClosure (x // { allowMissing = true; });
 
+    mainsail = prev.mainsail.override {
+      buildNpmPackage = prev.buildNpmPackage.override { nodejs = prev.nodejs_20; };
+    };
+
     # TODO: upstream https://github.com/Arksine/moonraker/issues/401
     moonraker = prev.moonraker.overrideAttrs (oldAttrs: {
       patches = oldAttrs.patches or [ ] ++ [
