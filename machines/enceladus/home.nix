@@ -9,6 +9,7 @@
     ../../modules/home-manager/darwin
     ../../modules/home-manager/desktop
     ../../modules/home-manager/desktop/jetbrains
+    ./restic.nix
     inputs.mac-app-util.homeManagerModules.default
   ];
 
