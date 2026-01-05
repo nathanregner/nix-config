@@ -10,6 +10,12 @@
   nix.linux-builder = {
     enable = true;
     maxJobs = 8;
+    supportedFeatures = [
+      "benchmark"
+      "big-parallel"
+      "kvm"
+      "nixos-test"
+    ];
 
     # comment out for inital setup (pulls vm image via cache.nixos.org)
     # remove /var/lib/darwin-builder/*.img to force a reset
