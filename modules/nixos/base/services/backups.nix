@@ -161,37 +161,6 @@ in
               name = "${name}-${type}";
               value = {
                 inherit (job) root;
-                completion = (
-                  pkgs.runCommand "restic-${name}-completions" { nativeBuildInputs = [ pkgs.installShellFiles ]; } ''
-                    cat > bash-completion <<EOF
-                    if ! declare -F _restic >/dev/null 2>&1; then
-                      source ${target.package}/share/bash-completion/completions/restic
-                    fi
-                    complete -F _restic restic-${name}
-                    EOF
-
-                    cat > zsh-completion <<EOF
-                    #compdef restic-${name}
-                    if (( ! \$+functions[_restic] )); then
-                      fpath+=(${target.package}/share/zsh/site-functions)
-                      autoload -Uz _restic
-                    fi
-                    _restic "\$@"
-                    EOF
-
-                    cat > fish-completion <<EOF
-                    if not functions -q __fish_restic_no_subcommand
-                      test -f ${target.package}/share/fish/vendor_completions.d/restic.fish && source ${target.package}/share/fish/vendor_completions.d/restic.fish
-                    end
-                    complete -c restic-${name} -w restic
-                    EOF
-
-                    installShellCompletion --cmd restic-${name} \
-                      --bash bash-completion \
-                      --zsh zsh-completion \
-                      --fish fish-completion
-                  ''
-                );
                 resticConfig =
                   removeAttrs target [ "enable" ]
                   // removeAttrs job [
@@ -250,7 +219,38 @@ in
           }
         ) backups;
 
-        environment.systemPackages = lib.mapAttrsToList (_name: job: job.completion) backups;
+        environment.systemPackages = lib.mapAttrsToList (
+          name: backup:
+          pkgs.runCommand "restic-${name}-completions" { nativeBuildInputs = [ pkgs.installShellFiles ]; } ''
+            cat > bash-completion <<EOF
+            if ! declare -F _restic >/dev/null 2>&1; then
+              source ${backup.package}/share/bash-completion/completions/restic
+            fi
+            complete -F _restic restic-${name}
+            EOF
+
+            cat > zsh-completion <<EOF
+            #compdef restic-${name}
+            if (( ! \$+functions[_restic] )); then
+              fpath+=(${backup.package}/share/zsh/site-functions)
+              autoload -Uz _restic
+            fi
+            _restic "\$@"
+            EOF
+
+            cat > fish-completion <<EOF
+            if not functions -q __fish_restic_no_subcommand
+              test -f ${backup.package}/share/fish/vendor_completions.d/restic.fish && source ${backup.package}/share/fish/vendor_completions.d/restic.fish
+            end
+            complete -c restic-${name} -w restic
+            EOF
+
+            installShellCompletion --cmd restic-${name} \
+              --bash bash-completion \
+              --zsh zsh-completion \
+              --fish fish-completion
+          ''
+        ) config.services.restic.backups;
       }
     ))
   ];
