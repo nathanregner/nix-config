@@ -3,16 +3,12 @@
   options,
   config,
   lib,
+  pkgs,
   ...
 }:
 let
   inherit (lib)
-    filterAttrs
-    mapAttrs'
-    mapAttrsToList
     mkOption
-    optionalAttrs
-    trivial
     types
     ;
 
@@ -23,7 +19,7 @@ let
   mkDefault =
     default: option:
     option
-    // lib.traceValSeq {
+    // {
       inherit default;
     };
 
@@ -150,32 +146,31 @@ in
           );
         message = ''
           local.services.backup.jobs.${name}: exactly one of root, paths, or dynamicFilesFrom should be set:
-              root = ${builtins.toString job.root}
+              root = ${toString job.root}
               paths = [ ${lib.concatStringsSep ", " job.paths} ]
-              dynamicFilesFrom = ${builtins.toString job.dynamicFilesFrom}
+              dynamicFilesFrom = ${toString job.dynamicFilesFrom}
         '';
       }) cfg.jobs;
     }
     (lib.mkIf cfg.enable (
       let
-        backups = trivial.pipe cfg.jobs [
-          (mapAttrsToList (
+        backups = lib.mergeAttrsList (
+          lib.mapAttrsToList (
             name: job:
-            mapAttrs' (type: target: {
+            lib.mapAttrs' (type: target: {
               name = "${name}-${type}";
               value = {
                 inherit (job) root;
                 resticConfig =
-                  builtins.removeAttrs target [ "enable" ]
-                  // builtins.removeAttrs job [
+                  removeAttrs target [ "enable" ]
+                  // removeAttrs job [
                     "root"
                     "targets"
                   ];
               };
-            }) (filterAttrs (_: target: target.enable) job.targets)
-          ))
-          lib.mergeAttrsList
-        ];
+            }) (lib.filterAttrs (_: target: target.enable) job.targets)
+          ) cfg.jobs
+        );
         hasTarget = name: builtins.any (job: job.targets.${name}.enable) (builtins.attrValues cfg.jobs);
       in
       {
@@ -186,14 +181,14 @@ in
             mode = "0440";
           };
         }
-        // optionalAttrs (hasTarget "s3") {
+        // lib.optionalAttrs (hasTarget "s3") {
           restic-s3-env = {
             key = "restic/s3_env";
             group = "restic";
             mode = "0440";
           };
         }
-        // optionalAttrs (hasTarget "server") {
+        // lib.optionalAttrs (hasTarget "server") {
           restic-server-password = {
             key = "restic/server/password";
             group = "restic";
@@ -201,13 +196,14 @@ in
           };
         };
 
-        sops.templates = optionalAttrs (hasTarget "server") {
+        sops.templates = lib.optionalAttrs (hasTarget "server") {
           restic-server-env = {
             content = ''
               RESTIC_REST_USERNAME=${config.networking.hostName}
               RESTIC_REST_PASSWORD=${config.sops.placeholder.restic-server-password}
             '';
-            owner = "restic";
+            group = "restic";
+            mode = "0440";
           };
         };
 
@@ -222,6 +218,39 @@ in
             serviceConfig.WorkingDirectory = lib.mkIf (job.root != null) job.root;
           }
         ) backups;
+
+        environment.systemPackages = lib.mapAttrsToList (
+          name: backup:
+          pkgs.runCommand "restic-${name}-completions" { nativeBuildInputs = [ pkgs.installShellFiles ]; } ''
+            cat > bash-completion <<EOF
+            if ! declare -F _restic >/dev/null 2>&1; then
+              source ${backup.package}/share/bash-completion/completions/restic
+            fi
+            complete -F _restic restic-${name}
+            EOF
+
+            cat > zsh-completion <<EOF
+            #compdef restic-${name}
+            if (( ! \$+functions[_restic] )); then
+              fpath+=(${backup.package}/share/zsh/site-functions)
+              autoload -Uz _restic
+            fi
+            _restic "\$@"
+            EOF
+
+            cat > fish-completion <<EOF
+            if not functions -q __fish_restic_no_subcommand
+              test -f ${backup.package}/share/fish/vendor_completions.d/restic.fish && source ${backup.package}/share/fish/vendor_completions.d/restic.fish
+            end
+            complete -c restic-${name} -w restic
+            EOF
+
+            installShellCompletion --cmd restic-${name} \
+              --bash bash-completion \
+              --zsh zsh-completion \
+              --fish fish-completion
+          ''
+        ) config.services.restic.backups;
       }
     ))
   ];
