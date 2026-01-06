@@ -32,90 +32,91 @@ return {
     lazy = false,
     ---@type TSTextObjects.UserConfig
     opts = {
-      lsp_interop = {
-        enable = true,
-        peek_definition_code = {
-          ["<leader>kf"] = "@function.outer",
-          ["<leader>dt"] = "@class.outer",
-        },
-      },
-
       move = {
-        enable = true,
         set_jumps = true, -- whether to set jumps in the jumplist
-        goto_next_start = {
-          ["]a"] = "@parameter.outer",
-          ["]f"] = "@function.outer",
-          ["]]"] = "@class.outer",
-          ["]t"] = "@tag.outer",
-          -- ["]z"] = { query = "@fold", query_group = "folds", desc = "Next fold" },
-        },
-        goto_next_end = {
-          ["]A"] = "@parameter.outer",
-          ["]F"] = "@function.outer",
-          ["]T"] = "@tag.outer",
-          ["]["] = "@class.outer",
-        },
-        goto_previous_start = {
-          ["[a"] = "@parameter.outer",
-          ["[f"] = "@function.outer",
-          ["[t"] = "@tag.outer",
-          ["[["] = "@class.outer",
-          -- ["[z"] = { query = "@fold", query_group = "folds", desc = "Previous fold" },
-        },
-        goto_previous_end = {
-          ["[A"] = "@parameter.outer",
-          ["[F"] = "@function.outer",
-          ["[T"] = "@tag.outer",
-          ["[]"] = "@class.outer",
-        },
       },
 
       select = {
-        enable = true,
         lookahead = true, -- Automatically jump forward to textobj, similar to targets.vim
-        keymaps = {
-          ["aa"] = "@parameter.outer",
-          ["ia"] = "@parameter.inner",
-          ["af"] = "@function.outer",
-          ["if"] = "@function.inner",
-          ["aC"] = "@class.outer",
-          ["iC"] = "@class.inner",
-          ["ac"] = "@comment.outer",
-          ["ic"] = "@comment.inner",
-          ["al"] = "@loop.outer",
-          ["il"] = "@loop.inner",
-          ["at"] = "@tag.outer",
-          ["it"] = "@tag.inner",
-          ["aP"] = "@pair.outer",
-          ["iP"] = "@pair.inner",
-          ["ae"] = "@element.inner",
-          ["aE"] = "@element.outer",
-        },
-      },
-
-      swap = {
-        enable = true,
-        swap_next = {
-          ["<leader>a"] = "@parameter.inner",
-        },
-        swap_previous = {
-          ["<leader>A"] = "@parameter.inner",
-        },
       },
     },
-    config = function()
+    init = function()
+      -- Disable entire built-in ftplugin mappings to avoid conflicts.
+      -- See https://github.com/neovim/neovim/tree/master/runtime/ftplugin for built-in ftplugins.
+      vim.g.no_plugin_maps = true
+    end,
+    config = function(a, opts)
+      require("nvim-treesitter-textobjects").setup(opts)
       local ts_repeat_move = require("nvim-treesitter-textobjects.repeatable_move")
 
       -- vim way: ; goes to the direction you were moving.
       vim.keymap.set({ "n", "x", "o" }, ";", ts_repeat_move.repeat_last_move)
       vim.keymap.set({ "n", "x", "o" }, ",", ts_repeat_move.repeat_last_move_opposite)
 
-      -- Optionally, make builtin f, F, t, T also repeatable with ; and ,
+      -- make builtin f, F, t, T also repeatable with ; and ,
       vim.keymap.set({ "n", "x", "o" }, "f", ts_repeat_move.builtin_f_expr, { expr = true })
       vim.keymap.set({ "n", "x", "o" }, "F", ts_repeat_move.builtin_F_expr, { expr = true })
       vim.keymap.set({ "n", "x", "o" }, "t", ts_repeat_move.builtin_t_expr, { expr = true })
       vim.keymap.set({ "n", "x", "o" }, "T", ts_repeat_move.builtin_T_expr, { expr = true })
+
+      -- select
+      for k, v in pairs({
+        ["aa"] = "@parameter.outer",
+        ["ia"] = "@parameter.inner",
+        ["af"] = "@function.outer",
+        ["if"] = "@function.inner",
+        ["aC"] = "@class.outer",
+        ["iC"] = "@class.inner",
+        ["ac"] = "@comment.outer",
+        ["ic"] = "@comment.inner",
+        ["al"] = "@loop.outer",
+        ["il"] = "@loop.inner",
+        ["at"] = "@tag.outer",
+        ["it"] = "@tag.inner",
+        ["aP"] = "@pair.outer",
+        ["iP"] = "@pair.inner",
+        ["ae"] = "@element.inner",
+        ["aE"] = "@element.outer",
+      }) do
+        vim.keymap.set(
+          { "x", "o" },
+          k,
+          function() require("nvim-treesitter-textobjects.select").select_textobject(v, "textobjects") end
+        )
+      end
+
+      -- swap
+      local swap = require("nvim-treesitter-textobjects.swap")
+      vim.keymap.set("n", "<leader>a", function() swap.swap_next("@parameter.inner") end)
+      vim.keymap.set("n", "<leader>A", function() swap.swap_previous("@parameter.inner") end)
+
+      -- move
+      for k, v in pairs({
+        a = "@parameter.outer",
+        f = "@function.outer",
+        t = "@tag.outer",
+      }) do
+        vim.keymap.set(
+          { "n", "x", "o" },
+          "]" .. k,
+          function() require("nvim-treesitter-textobjects.move").goto_next_start(v, "textobjects") end
+        )
+        vim.keymap.set(
+          { "n", "x", "o" },
+          "]" .. string.upper(k),
+          function() require("nvim-treesitter-textobjects.move").goto_next_end(v, "textobjects") end
+        )
+        vim.keymap.set(
+          { "n", "x", "o" },
+          "[" .. k,
+          function() require("nvim-treesitter-textobjects.move").goto_previous_start(v, "textobjects") end
+        )
+        vim.keymap.set(
+          { "n", "x", "o" },
+          "[" .. string.upper(k),
+          function() require("nvim-treesitter-textobjects.move").goto_previous_end(v, "textobjects") end
+        )
+      end
 
       -- Quickfix keymaps
       local next_quickfix, prev_quickfix = make_repeatable_move_pair(vim.cmd.cnext, vim.cmd.cprev)
