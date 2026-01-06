@@ -24,21 +24,25 @@ return {
         },
       },
     },
+    config = function()
+      vim.api.nvim_create_autocmd("FileType", {
+        callback = function(details) require("user.treesitter_incremental_selection").attach(details.buf) end,
+      })
+
+      vim.api.nvim_create_autocmd("BufDelete", {
+        pattern = "<buffer>",
+        callback = function(details) require("user.treesitter_incremental_selection").detach(details.buf) end,
+      })
+    end,
   }),
   {
     "nvim-treesitter/nvim-treesitter-textobjects",
     dependencies = { "nvim-treesitter/nvim-treesitter" },
     branch = "main",
-    lazy = false,
     ---@type TSTextObjects.UserConfig
     opts = {
-      move = {
-        set_jumps = true, -- whether to set jumps in the jumplist
-      },
-
-      select = {
-        lookahead = true, -- Automatically jump forward to textobj, similar to targets.vim
-      },
+      move = { set_jumps = true },
+      select = { lookahead = true },
     },
     init = function()
       -- Disable entire built-in ftplugin mappings to avoid conflicts.
@@ -46,7 +50,7 @@ return {
       vim.g.no_plugin_maps = true
     end,
     config = function(a, opts)
-      require("nvim-treesitter-textobjects").setup(opts)
+      -- require("nvim-treesitter-textobjects").setup(opts)
       local ts_repeat_move = require("nvim-treesitter-textobjects.repeatable_move")
 
       -- vim way: ; goes to the direction you were moving.
@@ -91,31 +95,17 @@ return {
       vim.keymap.set("n", "<leader>A", function() swap.swap_previous("@parameter.inner") end)
 
       -- move
+      local move = require("nvim-treesitter-textobjects.move")
       for k, v in pairs({
         a = "@parameter.outer",
         f = "@function.outer",
         t = "@tag.outer",
       }) do
-        vim.keymap.set(
-          { "n", "x", "o" },
-          "]" .. k,
-          function() require("nvim-treesitter-textobjects.move").goto_next_start(v, "textobjects") end
-        )
-        vim.keymap.set(
-          { "n", "x", "o" },
-          "]" .. string.upper(k),
-          function() require("nvim-treesitter-textobjects.move").goto_next_end(v, "textobjects") end
-        )
-        vim.keymap.set(
-          { "n", "x", "o" },
-          "[" .. k,
-          function() require("nvim-treesitter-textobjects.move").goto_previous_start(v, "textobjects") end
-        )
-        vim.keymap.set(
-          { "n", "x", "o" },
-          "[" .. string.upper(k),
-          function() require("nvim-treesitter-textobjects.move").goto_previous_end(v, "textobjects") end
-        )
+        local modes = { "n", "x", "o" }
+        vim.keymap.set(modes, "]" .. k, function() move.goto_next_start(v, "textobjects") end)
+        vim.keymap.set(modes, "[" .. k, function() move.goto_previous_start(v, "textobjects") end)
+        vim.keymap.set(modes, "]" .. string.upper(k), function() move.goto_next_end(v, "textobjects") end)
+        vim.keymap.set(modes, "[" .. string.upper(k), function() move.goto_previous_end(v, "textobjects") end)
       end
 
       -- Quickfix keymaps
@@ -158,13 +148,16 @@ return {
   {
     "nvim-treesitter/nvim-treesitter-context",
     dependencies = { "nvim-treesitter/nvim-treesitter" },
-    keys = {
-      {
-        "[C",
-        function() require("treesitter-context").go_to_context(vim.v.count1) end,
-        silent = true,
-      },
-    },
+    event = "VeryLazy",
+    keys = function()
+      return {
+        {
+          "[C",
+          function() require("treesitter-context").go_to_context(vim.v.count1) end,
+          silent = true,
+        },
+      }
+    end,
     opts = {
       max_lines = 10,
       multiline_threshold = 1,
@@ -175,10 +168,10 @@ return {
     -- "mtrajano/tssorter.nvim",
     "nathanregner/tssorter.nvim",
     keys = function()
-      -- return {
-      --   { "<leader>st", function() require("tssorter").sort({ range = "paragraph" }) end, desc = "[S]ort [t]ree" },
-      --   { "<leader>sT", require("tssorter").sort, desc = "[S]ort full [t]ree" },
-      -- }
+      return {
+        { "<leader>st", function() require("tssorter").sort({ range = "paragraph" }) end, desc = "[S]ort [t]ree" },
+        { "<leader>sT", require("tssorter").sort, desc = "[S]ort full [t]ree" },
+      }
     end,
     opts = {
       sortables = {
