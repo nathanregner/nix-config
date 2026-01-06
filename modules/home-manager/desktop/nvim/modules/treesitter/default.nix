@@ -13,7 +13,7 @@ in
       parser_install_dir = "${config.xdg.dataHome}/${parserPrefix}";
     in
     {
-      nvim_treesitter = {
+      nvim-treesitter = {
         dir = "${pkgs.unstable.vimPlugins.nvim-treesitter.withAllGrammars}";
         inherit parser_install_dir;
       };
