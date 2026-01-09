@@ -21,7 +21,7 @@
       <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "settings.build.tools.auto.reload": "ALL",
-    "settings.editor.selected.configurable": "build.tools"
+    "settings.editor.selected.configurable": "com.poratu.idea.plugins.tomcat.setting.TomcatServersConfigurable"
   }
 }]]></component>
       <component name="RunManager">
@@ -53,6 +53,12 @@
             <option name="Make" enabled="true" />
           </method>
         </configuration>
+      </component>
+      <component name="WindowStateProjectService">
+        <state x="395" y="-931" key="SettingsEditor" timestamp="1767974722506">
+          <screen x="-74" y="-1050" width="1920" height="1050" />
+        </state>
+        <state x="395" y="-931" key="SettingsEditor/0.33.1728.989/1846.-1050.1920.1050/-74.-1050.1920.1050" timestamp="1767974722506" />
       </component>
     </defaultProject>
   </component>

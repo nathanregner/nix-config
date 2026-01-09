@@ -1,4 +1,3 @@
-{ ... }:
 {
   programs.claude-code = {
     enable = true;
@@ -128,16 +127,17 @@
       fi
     '';
 
-    # Register hooks to use the notify script
-    settings.hooks = {
-      UserPromptSubmit = {
-        command = "notify";
-        enabled = true;
-      };
-      PermissionRequest = {
-        command = "notify";
-        enabled = true;
-      };
-    };
+    settings.hooks.Notification = [
+      {
+        matcher = "";
+        hooks = [
+          {
+            type = "command";
+            command = "notify";
+          }
+        ];
+      }
+    ];
+
   };
 }
