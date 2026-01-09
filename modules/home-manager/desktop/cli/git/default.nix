@@ -85,9 +85,11 @@
       };
     };
     ignores = [
+      ".devenv"
       ".direnv"
-      "Session.vim"
+      ".local"
       ".neoconf.json"
+      "Session.vim"
     ]
     ++ lib.optionals pkgs.stdenv.isDarwin [
       ".DS_Store"
