@@ -3,6 +3,7 @@
   imports = [
     ./hammerspoon.nix
     ./scroll-reverser.nix
+    ./claude-notify.nix
   ];
 
   # https://github.com/nix-darwin/nix-darwin/issues/1307

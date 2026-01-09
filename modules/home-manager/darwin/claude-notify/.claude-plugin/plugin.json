@@ -1,0 +1,5 @@
+{
+  "name": "claude-notify",
+  "version": "1.0.0",
+  "description": "Sends macOS notifications when Claude needs input and terminal is unfocused"
+}

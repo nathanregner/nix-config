@@ -1,0 +1,9 @@
+{
+  "hooks": [
+    {
+      "name": "UserPromptSubmit",
+      "command": "./check-focus.sh",
+      "enabled": true
+    }
+  ]
+}
