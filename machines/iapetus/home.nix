@@ -32,7 +32,6 @@
     awscli2
     gh
     nix-fast-build
-    nushell
     rclone
     xdot
   ];
