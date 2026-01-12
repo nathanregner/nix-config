@@ -113,7 +113,7 @@ return {
     config = function(_, opts)
       require("nvim-treesitter.configs").setup(opts)
       require("treesitter-context").setup({
-        max_lines = 10,
+        max_lines = 5,
         multiline_threshold = 1,
         -- mode = "topline",
       })
