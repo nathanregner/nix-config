@@ -5,7 +5,7 @@
 }:
 let
   parserPrefix = "nvim/nvim-treesitter";
-  package = pkgs.unstable.vimPlugins.nvim-treesitter.withAllGrammars.overrideAttrs (old: {
+  package = pkgs.vimPlugins.nvim-treesitter.withAllGrammars.overrideAttrs (old: {
     patches = old.patches or [ ] ++ [
       (pkgs.fetchpatch {
         url = "https://github.com/nvim-treesitter/nvim-treesitter/pull/7742/commits/fbcafd3e51200b3788652aef90147caade380750.patch";
@@ -58,7 +58,7 @@ in
 
   programs.ast-grep.customLanguages =
     let
-      parsers = pkgs.unstable.vimPlugins.nvim-treesitter.passthru.builtGrammars;
+      parsers = pkgs.vimPlugins.nvim-treesitter.passthru.builtGrammars;
     in
     {
       terraform = {
