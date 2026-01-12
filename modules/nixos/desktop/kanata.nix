@@ -12,10 +12,14 @@
         # scheme
         ''
           (defsrc
-            caps)
+            caps
+            mlft mrgt mmid)
 
           (deflayermap (default-layer)
-            caps (tap-hold-press 0 250 esc lctl))
+            caps (tap-hold-press 0 250 esc lctl)
+            mlft mlft
+            mrgt mrgt
+            mmid mmid)
         '';
     };
   };
