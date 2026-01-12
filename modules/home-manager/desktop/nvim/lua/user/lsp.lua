@@ -1,3 +1,5 @@
+local util = require("lspconfig.util")
+
 local on_attach = function(_, bufnr)
   local map = function(mode, keys, func, desc)
     if desc then desc = "LSP: " .. desc end
@@ -250,20 +252,23 @@ local capabilities = vim.lsp.protocol.make_client_capabilities()
 capabilities = vim.tbl_deep_extend("force", capabilities, require("blink.cmp").get_lsp_capabilities({}, false))
 
 for server_name, server_config in pairs(servers) do
-  if server_config.capabilities then
-    capabilities = vim.tbl_deep_extend("force", capabilities, server_config.capabilities)
+  local custom_capabilities = server_config.capabilities
+  if custom_capabilities then
+    server_config.capabilities = vim.tbl_deep_extend("force", capabilities, custom_capabilities)
+  else
+    server_config.capabilities = capabilities
   end
-  vim.lsp.config(server_name, {
-    cmd = server_config.cmd,
-    capabilities = capabilities,
-    on_attach = function(...)
+
+  local custom_on_attach = server_config.on_attach
+  if custom_on_attach then
+    server_config.on_attach = function(...)
       on_attach(...)
-      if server_config.on_attach then server_config.on_attach(...) end
-    end,
-    settings = server_config.settings,
-    filetypes = server_config.filetypes,
-    init_options = server_config.init_options,
-    root_dir = server_config.root_dir,
-  })
-  vim.lsp.enable(server_name)
+      custom_on_attach(...)
+    end
+  else
+    server_config.on_attach = on_attach
+  end
+
+  vim.lsp.config(server_name, server_config)
+  vim.lsp.enable(server_name, true)
 end
