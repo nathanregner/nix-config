@@ -4,8 +4,9 @@ return {
   {
     -- Highlight, edit, and navigate code
     "nvim-treesitter/nvim-treesitter",
-    dir = vim.g.nix.nvim_treesitter.dir,
-    pin = true,
+    branch = "master", -- TODO: deprecated; update to main
+    -- dir = vim.g.nix.nvim_treesitter.dir,
+    -- pin = true,
     dependencies = {
       "nvim-treesitter/nvim-treesitter-context",
       "nvim-treesitter/nvim-treesitter-textobjects",
