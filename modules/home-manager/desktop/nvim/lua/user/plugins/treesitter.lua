@@ -4,9 +4,9 @@ return {
   {
     -- Highlight, edit, and navigate code
     "nvim-treesitter/nvim-treesitter",
-    dir = vim.g.nix.nvim_treesitter.dir,
-    pin = true,
-    -- FIXME: load after?
+    branch = "master", -- TODO: deprecated; update to main
+    -- dir = vim.g.nix.nvim_treesitter.dir,
+    -- pin = true,
     dependencies = {
       "nvim-treesitter/nvim-treesitter-textobjects",
     },
@@ -104,6 +104,11 @@ return {
     },
     config = function(_, opts)
       require("nvim-treesitter.configs").setup(opts)
+      require("treesitter-context").setup({
+        max_lines = 5,
+        multiline_threshold = 1,
+        -- mode = "topline",
+      })
 
       local ts_repeat_move = require("nvim-treesitter.textobjects.repeatable_move")
 

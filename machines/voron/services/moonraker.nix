@@ -24,11 +24,8 @@
     };
   };
 
-  local.services.backup.paths.moonraker = {
-    paths = [ config.services.moonraker.stateDir ];
-    restic = {
-      s3 = { };
-    };
+  local.services.backup.jobs.moonraker = {
+    root = config.services.moonraker.stateDir;
   };
 
   # required for allowSystemControl

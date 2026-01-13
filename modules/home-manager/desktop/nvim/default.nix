@@ -20,6 +20,7 @@ in
           options = {
             rtp = mkOption {
               type = types.listOf types.str;
+              default = [ ];
             };
           };
         };
@@ -90,7 +91,13 @@ in
             vtsls
             yaml-language-server
             ;
+
           inherit (pkgs.unstable) git;
+
+          # file browsing
+          inherit (pkgs.unstable)
+            unzip
+            ;
         }
         // lib.optionalAttrs pkgs.stdenv.isLinux {
           inherit (pkgs.unstable)
@@ -134,7 +141,11 @@ in
       }) (lib.filesystem.listFilesRecursive ./after/ftplugin)
     );
 
-    programs.zsh.shellAliases.vimdiff = "nvim -d";
+    programs.zsh.shellAliases = {
+      v = "nvim";
+      vd = "nvim -d";
+      vimdiff = "nvim -d";
+    };
 
     # https://github.com/jesseduffield/lazygit/wiki/Custom-Commands-Compendium
     programs.lazygit.settings.customCommands = [

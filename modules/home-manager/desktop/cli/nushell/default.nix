@@ -10,6 +10,9 @@
       edit_mode = "vi";
       show_banner = false;
     };
+    plugins = with pkgs.nushellPlugins; [
+      formats
+    ];
   };
 
   catppuccin.nushell.enable = true;

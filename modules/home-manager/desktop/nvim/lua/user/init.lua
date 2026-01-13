@@ -56,6 +56,8 @@ local function get_git_root(current_dir)
   return git_root
 end
 
+local initial_cwd = vim.fn.getcwd()
+
 vim.g.fugitive_legacy_commands = 0
 
 local leet_arg = "leetcode.nvim"
@@ -122,18 +124,6 @@ require("lazy").setup({
   {
     "mfussenegger/nvim-jdtls",
     ft = { "java" },
-  },
-
-  {
-    "NeogitOrg/neogit",
-    dependencies = {
-      "nvim-lua/plenary.nvim", -- required
-      "nathanregner/diffview.nvim", -- optional - Diff integration
-      "nvim-telescope/telescope.nvim",
-    },
-    keys = { { "<leader>n", "<CMD>Neogit<CR>", desc = "Neogit" } },
-    lazy = true,
-    config = true,
   },
 
   -- Detect tabstop and shiftwidth automatically
@@ -553,13 +543,24 @@ require("lazy").setup({
           end
           oil.close()
         end,
-        ["g-"] = function()
-          local oil = require("oil")
-          local cwd = oil.get_current_dir()
-          local git_root = get_git_root(cwd)
-          if git_root == cwd then git_root = get_git_root(vim.fs.dirname(git_root)) end
-          if git_root then oil.open(git_root) end
-        end,
+        ["g-"] = {
+          desc = "Navigate to the git root",
+          callback = function()
+            local oil = require("oil")
+            local cwd = oil.get_current_dir()
+            local git_root = get_git_root(cwd)
+            if git_root == cwd then git_root = get_git_root(vim.fs.dirname(git_root)) end
+            if git_root then oil.open(git_root) end
+          end,
+        },
+        ["g^"] = {
+          desc = "Navigate to the initial cwd (set on startup)",
+          callback = function()
+            local oil = require("oil")
+            vim.notify(initial_cwd)
+            oil.open(initial_cwd)
+          end,
+        },
         ["gd"] = {
           desc = "Toggle file detail view",
           callback = function()
@@ -588,6 +589,9 @@ require("lazy").setup({
       { "JoosepAlviste/nvim-ts-context-commentstring", opts = { enable_autocmd = false } },
     },
     config = function()
+      local ft = require("Comment.ft")
+      ft.ld = { "/* %s */", "/* %s */" }
+
       ---@diagnostic disable-next-line: missing-fields
       require("Comment").setup({
         pre_hook = require("ts_context_commentstring.integrations.comment_nvim").create_pre_hook(),
@@ -1182,6 +1186,7 @@ vim.filetype.add({
     log = "log",
     conf = "conf",
     env = "sh",
+    x = "ld",
   },
   -- Detect and apply filetypes based on the entire filename
   filename = {

@@ -32,14 +32,10 @@
     # apps
     rectangle
 
-    # tools
+    # cli
     awscli2
     gh
     nushell
-    sops
-
-    # nix
-    nixos-rebuild
   ];
 
   programs.tmux-sessionizer = {
