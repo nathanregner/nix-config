@@ -8,11 +8,12 @@ return {
     -- dir = vim.g.nix.nvim_treesitter.dir,
     -- pin = true,
     dependencies = {
-      "nvim-treesitter/nvim-treesitter-textobjects",
+      { "nvim-treesitter/nvim-treesitter-textobjects", branch = "master" },
+      { "nvim-treesitter/nvim-treesitter-context", branch = "master" },
     },
     lazy = false,
     opts = {
-      parser_install_dir = vim.g.nix.nvim_treesitter.parser_install_dir,
+      -- parser_install_dir = vim.g.nix.nvim_treesitter.parser_install_dir,
       auto_install = true,
       highlight = { enable = true },
       indent = { enable = true },

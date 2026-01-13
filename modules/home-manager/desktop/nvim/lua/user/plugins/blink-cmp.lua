@@ -12,6 +12,8 @@ local bufname_blacklist = vim.regex([[conjure-log-.*]])
 --   end
 -- end)()
 
+-- TODO: lazy load snippets based on file type
+
 ---@module "lazy"
 ---@type LazySpec
 return nix_spec({
