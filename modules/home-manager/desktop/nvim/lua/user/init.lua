@@ -432,6 +432,7 @@ require("lazy").setup({
   { -- Theme
     "catppuccin/nvim",
     name = "catppuccin",
+    version = "1.10.0", -- TODO: remove after https://github.com/catppuccin/nvim/discussions/903?
     priority = 1000,
     opts = {
       flavour = "mocha",
