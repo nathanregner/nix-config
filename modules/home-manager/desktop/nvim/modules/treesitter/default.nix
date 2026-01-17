@@ -1,13 +1,37 @@
 {
-  pkgs,
   config,
+  pkgs,
+  lib,
   ...
 }:
+let
+  parserPrefix = "nvim/nvim-treesitter";
+in
 {
+  programs.neovim.lua.globals =
+    let
+      parser_install_dir = "${config.xdg.dataHome}/${parserPrefix}";
+    in
+    {
+      nvim-treesitter = {
+        dir = "${pkgs.unstable.vimPlugins.nvim-treesitter.withAllGrammars}";
+        inherit parser_install_dir;
+      };
+      rtp = [ parser_install_dir ];
+    };
+
   xdg.configFile."nvim/after/queries" = {
     source = config.lib.file.mkFlakeSymlink ./queries;
     force = true;
   };
+
+  xdg.dataFile = lib.mapAttrs' (name: grammar: {
+    name = "${parserPrefix}/parser/${name}.so";
+    value = {
+      source = "${grammar}/parser";
+      force = true;
+    };
+  }) pkgs.unstable.vimPlugins.nvim-treesitter.passthru.builtGrammars;
 
   programs.topiary.languages.tree_sitter_query = {
     extensions = [ "scm" ];

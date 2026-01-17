@@ -79,24 +79,23 @@ function nix_spec(spec)
   return spec
 end
 
+function make_repeatable_move_pair(forward, backward)
+  local ts_repeat_move = require("nvim-treesitter-textobjects.repeatable_move")
+  local move_fn = ts_repeat_move.make_repeatable_move(function(opts)
+    if opts.forward then
+      forward()
+    else
+      backward()
+    end
+  end)
+  return function() move_fn({ forward = true }) end, function() move_fn({ forward = false }) end
+end
+
 -- https://github.com/folke/lazy.nvim#-plugin-spec
 require("lazy").setup({
   -- Git
   "tpope/vim-fugitive",
   "tpope/vim-rhubarb",
-
-  -- replacement for ":w !sudo tee % > /dev/null" trick
-  "lambdalisue/vim-suda",
-
-  { -- Local (project-specific) config
-    "klen/nvim-config-local",
-    config = function()
-      require("config-local").setup({
-        config_files = { ".nvim.lua", ".nvimrc", ".exrc" },
-        hashfile = vim.fn.stdpath("data") .. "/nvim-config-local",
-      })
-    end,
-  },
 
   -- {
   --   "akinsho/git-conflict.nvim",
@@ -358,6 +357,7 @@ require("lazy").setup({
 
   { -- gitsigns
     "lewis6991/gitsigns.nvim",
+    dependencies = { "nvim-treesitter/nvim-treesitter-textobjects" },
     opts = {
       on_attach = function(bufnr)
         local gs = require("gitsigns")
@@ -395,7 +395,7 @@ require("lazy").setup({
         map("n", "<leader>hD", function() gs.diffthis("~") end, { desc = "[H]unk [D]iff last commit" })
         map("n", "<leader>htd", gs.toggle_deleted, { desc = "[H]unk [T]oggle [D]eleted" })
 
-        local ts_repeat_move = require("nvim-treesitter.textobjects.repeatable_move")
+        local ts_repeat_move = require("nvim-treesitter-textobjects.repeatable_move")
 
         local next_hunk = function()
           if vim.wo.diff then
@@ -415,7 +415,7 @@ require("lazy").setup({
           end
         end
 
-        local next_hunk_repeat, prev_hunk_repeat = ts_repeat_move.make_repeatable_move_pair(next_hunk, prev_hunk)
+        local next_hunk_repeat, prev_hunk_repeat = make_repeatable_move_pair(next_hunk, prev_hunk)
 
         map({ "n", "v" }, "]c", next_hunk_repeat, { desc = "Jump to next hunk" })
         map({ "n", "v" }, "[c", prev_hunk_repeat, { desc = "Jump to previous hunk" })
@@ -432,6 +432,7 @@ require("lazy").setup({
   { -- Theme
     "catppuccin/nvim",
     name = "catppuccin",
+    version = "1.10.0", -- TODO: remove after https://github.com/catppuccin/nvim/discussions/903?
     priority = 1000,
     opts = {
       flavour = "mocha",
@@ -613,6 +614,7 @@ require("lazy").setup({
       "nvim-neotest/nvim-nio",
       "nvim-lua/plenary.nvim",
       "nvim-treesitter/nvim-treesitter",
+      "nvim-treesitter/nvim-treesitter-textobjects",
       -- Adapters
       "nvim-neotest/neotest-jest",
     },
@@ -721,8 +723,7 @@ require("lazy").setup({
       })
     end,
     init = function()
-      local ts_repeat_move = require("nvim-treesitter.textobjects.repeatable_move")
-      local next, prev = ts_repeat_move.make_repeatable_move_pair(
+      local next, prev = make_repeatable_move_pair(
         function() require("neotest").jump.next({ status = "failed" }) end,
         function() require("neotest").jump.prev({ status = "failed" }) end
       )
@@ -733,6 +734,7 @@ require("lazy").setup({
 
   { -- trouble.nvim
     "folke/trouble.nvim",
+    dependencies = { "nvim-treesitter/nvim-treesitter-textobjects" },
     opts = {
       keys = {
         -- -- TODO: doesn't work quite right
@@ -754,8 +756,7 @@ require("lazy").setup({
     init = function()
       ---@type any
       local trouble = require("trouble")
-      local ts_repeat_move = require("nvim-treesitter.textobjects.repeatable_move")
-      local next, prev = ts_repeat_move.make_repeatable_move_pair(
+      local next, prev = make_repeatable_move_pair(
         function() trouble.next({ jump = true }) end,
         function() trouble.prev({ jump = true }) end
       )
@@ -1088,36 +1089,6 @@ vim.keymap.set("n", "<Esc>", "<cmd>nohls<cr>", { silent = true, noremap = true }
 
 -- Diagnostic keymaps
 
--- https://github.com/neovim/neovim/discussions/25588#discussioncomment-8700283
-local function pos_equal(p1, p2)
-  local r1, c1 = unpack(p1)
-  local r2, c2 = unpack(p2)
-  return r1 == r2 and c1 == c2
-end
-
-local function goto_error_diagnostic(f)
-  return function()
-    local pos_before = vim.api.nvim_win_get_cursor(0)
-    f({ severity = vim.diagnostic.severity.ERROR, wrap = true })
-    local pos_after = vim.api.nvim_win_get_cursor(0)
-    if pos_equal(pos_before, pos_after) then f({ wrap = true }) end
-  end
-end
-
-local ts_repeat_move = require("nvim-treesitter.textobjects.repeatable_move")
-local next_diag_error, prev_diag_error = ts_repeat_move.make_repeatable_move_pair(
-  goto_error_diagnostic(vim.diagnostic.goto_next),
-  goto_error_diagnostic(vim.diagnostic.goto_prev)
-)
-vim.keymap.set("n", "]e", next_diag_error, { desc = "Go to next diagnostic" })
-vim.keymap.set("n", "[e", prev_diag_error, { desc = "Go to previous error diagnostic" })
-local next_diag, prev_diag =
-  ts_repeat_move.make_repeatable_move_pair(vim.diagnostic.goto_next, vim.diagnostic.goto_prev)
-vim.keymap.set("n", "]d", next_diag, { desc = "Go to next diagnostic" })
-vim.keymap.set("n", "[d", prev_diag, { desc = "Go to previous diagnostic" })
-vim.keymap.set("n", "<leader>e", vim.diagnostic.open_float, { desc = "Open floating diagnostic message" })
-vim.keymap.set("n", "<leader>d", vim.diagnostic.setloclist, { desc = "Open diagnostics list" })
-
 vim.keymap.set("n", "<leader>sv", function()
   -- source: https://github.com/creativenull
   for name, _ in pairs(package.loaded) do
@@ -1126,14 +1097,6 @@ vim.keymap.set("n", "<leader>sv", function()
   dofile(vim.env.MYVIMRC)
   vim.notify("Config reloaded", vim.log.levels.INFO)
 end, { desc = "[S]ource [V]imrc" })
-
--- Quickfix keymaps
-local next_quickfix, prev_quickfix = ts_repeat_move.make_repeatable_move_pair(vim.cmd.cnext, vim.cmd.cprev)
-vim.keymap.set("n", "]q", next_quickfix, { desc = "Go to next quickfix item" })
-vim.keymap.set("n", "[q", prev_quickfix, { desc = "Go to previous quickfix item" })
-local last_quickfix, first_quickfix = ts_repeat_move.make_repeatable_move_pair(vim.cmd.clast, vim.cmd.cfirst)
-vim.keymap.set("n", "]Q", last_quickfix, { desc = "Go to last quickfix item" })
-vim.keymap.set("n", "[Q", first_quickfix, { desc = "Go to first quickfix item" })
 
 if vim.fn.has("mac") == 1 then
   vim.g.open_cmd = "open"
