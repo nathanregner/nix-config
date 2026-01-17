@@ -10,7 +10,7 @@
   nixpkgs = import ../../../nixpkgs.nix { inherit inputs outputs; };
 
   nix = {
-    # FIXME: nix 2.33 build broken on darwin
+    # FIXME: nix 2.32 build broken on darwin
     package =
       if pkgs.stdenv.hostPlatform.isDarwin then pkgs.unstable.nix else pkgs.unstable.nixVersions.latest;
     distributedBuilds = true;
