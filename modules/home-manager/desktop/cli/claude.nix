@@ -3,7 +3,7 @@
     enable = true;
 
     settings = {
-      model = "sonnet";
+      model = "us.anthropic.claude-opus-4-5-20251101-v1:0";
       permissions = {
         defaultMode = "acceptEdits";
 
