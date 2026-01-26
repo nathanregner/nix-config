@@ -3,8 +3,8 @@
 return {
   {
     -- Highlight, edit, and navigate code
-    "nvim-treesitter/nvim-treesitter",
-    branch = "master", -- TODO: deprecated; update to main
+    "nathanregner/nvim-treesitter",
+    branch = "make-range-exclusive", -- TODO: deprecated; update to main
     -- dir = vim.g.nix.nvim_treesitter.dir,
     -- pin = true,
     dependencies = {

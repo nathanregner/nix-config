@@ -93,28 +93,28 @@ local servers = {
   },
   -- https://github.com/olrtg/emmet-language-server
   -- https://code.visualstudio.com/docs/editor/emmet#_emmet-configuration
-  emmet_language_server = {
-    filetypes = {
-      "css",
-      "html",
-      "javascript",
-      "javascriptreact",
-      "less",
-      "pug",
-      "sass",
-      "scss",
-      "typescriptreact",
-      "xml",
-    },
-    init_options = {
-      showSuggestionsAsSnippets = true,
-      showExpandedAbbreviation = "always",
-      includeLanguages = {
-        javascript = "javascriptreact",
-        -- typescript = "typescriptreact",
-      },
-    },
-  },
+  -- emmet_language_server = {
+  --   filetypes = {
+  --     "css",
+  --     "html",
+  --     "javascript",
+  --     "javascriptreact",
+  --     "less",
+  --     "pug",
+  --     "sass",
+  --     "scss",
+  --     "typescriptreact",
+  --     "xml",
+  --   },
+  --   init_options = {
+  --     showSuggestionsAsSnippets = true,
+  --     showExpandedAbbreviation = "always",
+  --     includeLanguages = {
+  --       javascript = "javascriptreact",
+  --       -- typescript = "typescriptreact",
+  --     },
+  --   },
+  -- },
   eslint = {},
   gopls = {},
   graphql = {
@@ -228,6 +228,12 @@ local servers = {
       },
       vtsls = {
         enableMoveToFileCodeAction = true,
+        experimental = {
+          completion = {
+            enableServerSideFuzzyMatch = true,
+            entriesLimit = 1000,
+          },
+        },
       },
     },
   },
