@@ -1,7 +1,7 @@
 ---@module "lazy"
 ---@type LazySpec
 return {
-  nix_spec({
+  {
     -- Highlight, edit, and navigate code
     "nvim-treesitter/nvim-treesitter",
     lazy = false,
@@ -34,7 +34,7 @@ return {
         callback = function(details) require("user.treesitter_incremental_selection").detach(details.buf) end,
       })
     end,
-  }),
+  },
   {
     "nvim-treesitter/nvim-treesitter-textobjects",
     dependencies = { "nvim-treesitter/nvim-treesitter" },

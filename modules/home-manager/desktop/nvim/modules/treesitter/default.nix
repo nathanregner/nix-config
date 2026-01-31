@@ -20,6 +20,15 @@ in
       rtp = [ parser_install_dir ];
     };
 
+  # :checkhealth nvim-treesitter
+  home.packages = with pkgs.unstable; [
+    curl
+    gnumake
+    gnutar
+    stdenv.cc
+    tree-sitter-latest
+  ];
+
   xdg.configFile."nvim/after/queries" = {
     source = config.lib.file.mkFlakeSymlink ./queries;
     force = true;

@@ -70,7 +70,7 @@ in
           # formatters/linters
           inherit (pkgs.unstable)
             nginx-config-formatter
-            nixfmt-rfc-style
+            nixfmt
             prettierd
             shfmt
             stylua
