@@ -34,7 +34,7 @@ in
       package = inputs.neovim-nightly-overlay.packages.${pkgs.stdenv.hostPlatform.system}.default;
       defaultEditor = true;
       extraConfig = builtins.readFile ./init.vim;
-      extraLuaConfig = ''
+      initLua = ''
         vim.g.nix = vim.fn.json_decode('${builtins.toJSON cfg.lua.globals}')
         require('user')
       '';
