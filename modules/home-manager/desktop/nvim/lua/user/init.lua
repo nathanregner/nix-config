@@ -432,22 +432,21 @@ require("lazy").setup({
   { -- Theme
     "catppuccin/nvim",
     name = "catppuccin",
-    version = "1.10.0", -- TODO: remove after https://github.com/catppuccin/nvim/discussions/903?
     priority = 1000,
-    opts = {
-      flavour = "mocha",
-      styles = {
-        conditionals = {}, -- disable italics
-      },
-      highlight_overrides = {
-        all = function(mocha)
-          return {
-            BlinkCmpKindText = { fg = mocha.subtext0 },
-          }
-        end,
-      },
-    },
-    init = function() vim.cmd.colorscheme("catppuccin") end,
+    init = function(opts)
+      require("catppuccin").setup({
+        flavour = "mocha",
+        no_italic = true,
+        highlight_overrides = {
+          all = function(mocha)
+            return {
+              BlinkCmpKindText = { fg = mocha.subtext0 },
+            }
+          end,
+        },
+      })
+      vim.cmd.colorscheme("catppuccin")
+    end,
   },
 
   -- https://github.com/stevearc/dressing.nvim
