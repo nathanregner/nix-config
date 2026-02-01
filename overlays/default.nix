@@ -24,14 +24,6 @@ rec {
       overlays = [
         (_final: _prev: { inherit (stableFinal) local; })
         modifications
-        (final: _: {
-          tree-sitter-latest =
-            (import (stableFinal.applyPatches {
-              name = "nixpkgs-unstable";
-              src = inputs.nixpkgs-unstable;
-              patches = [ ./nixpkgs-482787.patch ];
-            }) { inherit (stableFinal.stdenv.hostPlatform) system; }).tree-sitter;
-        })
       ];
     };
   };
