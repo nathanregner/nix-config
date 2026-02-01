@@ -31,18 +31,11 @@
 
       services.gnome-keyring.enable = true;
 
-      # programs.fuzzel.enable = true;
-      # catppuccin.fuzzel.enable = true;
       catppuccin.rofi.enable = true;
       programs.rofi = {
         enable = true;
         package = pkgs.unstable.rofi;
         terminal = lib.getExe config.programs.alacritty.package;
       };
-
-      services.swww.enable = true;
-      systemd.user.services.swww.Service.ExecStartPost = ''
-        ${lib.getExe' config.services.swww.package "swww"} img ${../../../assets/planet-rise.png}
-      '';
     };
 }
