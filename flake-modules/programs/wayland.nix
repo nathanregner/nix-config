@@ -9,9 +9,11 @@
   flake.modules.homeManager.wayland = {
     imports = with inputs.self.modules.homeManager; [
       hyprlock
+      mako # notifications
       niri
-      swww
-      tofi
+      swww # wallpaper
+      tofi # launcher
+      waybar
     ];
   };
 }

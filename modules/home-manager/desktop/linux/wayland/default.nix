@@ -6,11 +6,7 @@ in
   imports = [
     # TODO: opt-in to individual components options
     ../.
-    ./bar/waybar
     ./clipboard.nix
-    ./launcher/tofi.nix
-    ./lock/hyprlock.nix
-    ./notification/mako.nix
   ]
   ++ (with inputs.self.modules.homeManager; [
     wayland
