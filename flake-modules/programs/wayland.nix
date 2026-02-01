@@ -14,6 +14,7 @@
       swww # wallpaper
       tofi # launcher
       waybar
+      wl-clipboard-sync
     ];
   };
 }
