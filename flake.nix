@@ -104,6 +104,8 @@
         "aarch64-darwin"
       ];
       imports = [
+        inputs.flake-parts.flakeModules.modules
+        inputs.home-manager-unstable.flakeModules.home-manager
         inputs.pkgs-by-name-for-flake-parts.flakeModule
         inputs.treefmt-nix.flakeModule
       ]

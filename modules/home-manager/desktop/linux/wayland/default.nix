@@ -13,7 +13,7 @@ in
     ./notification/mako.nix
   ]
   ++ (with inputs.self.modules.homeManager; [
-    niri
+    wayland
   ]);
 
   home.packages = [

@@ -12,7 +12,7 @@
     ./zsa.nix
   ]
   ++ (with inputs.self.modules.nixos; [
-    niri
+    wayland
   ]);
 
   sops.defaultSopsFile = ./secrets.yaml;
