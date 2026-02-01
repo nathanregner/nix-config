@@ -6,7 +6,6 @@ in
   imports = [
     # TODO: opt-in to individual components options
     ../.
-    ./clipboard.nix
   ]
   ++ (with inputs.self.modules.homeManager; [
     wayland
