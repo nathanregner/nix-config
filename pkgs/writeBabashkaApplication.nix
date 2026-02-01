@@ -1,3 +1,4 @@
+# TODO: use pkgs.writers instead
 # https://github.com/Sohalt/write-babashka-application/blob/main/flake.nix
 {
   babashka,
