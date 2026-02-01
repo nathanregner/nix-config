@@ -35,7 +35,7 @@ in
     );
 
     # :checkhealth nvim-treesitter
-    home.packages = lib.optionals (cfg.grammar == "git") (
+    home.packages = lib.optionals (cfg.grammarSource == "git") (
       with pkgs.unstable;
       [
         curl
@@ -53,13 +53,26 @@ in
 
     xdg.dataFile = lib.optionalAttrs (cfg.grammarSource == "nix") (
       lib.listToAttrs (
-        map (name: grammar: {
-          name = "${parserPrefix}/parser/${name}.so";
-          value = {
-            source = "${grammar}/parser";
-            force = true;
-          };
-        }) package.passthru.dependencies
+        builtins.filter (grammar: grammar ? name) (
+          map (
+            dependency:
+            let
+              match = builtins.match "nvim-treesitter-grammar-(.*)" (dependency.pname or "");
+            in
+            lib.optionalAttrs (match != null) (
+              let
+                language = builtins.elemAt match 0;
+              in
+              {
+                name = "${parserPrefix}/parser/${language}.so";
+                value = {
+                  source = "${dependency}/parser/${language}.so";
+                  force = true;
+                };
+              }
+            )
+          ) package.passthru.dependencies
+        )
       )
     );
 
