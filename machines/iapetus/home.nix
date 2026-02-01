@@ -10,10 +10,6 @@
     flakePath = "/home/nregner/nix-config/local";
   };
 
-  local.niri = {
-    enable = true;
-  };
-
   programs.insync = {
     enable = true;
     extensions.nautilus.enable = true;
