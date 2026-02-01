@@ -1,5 +1,5 @@
 {
-  config,
+  inputs,
   pkgs,
   lib,
   ...
@@ -10,7 +10,10 @@
     ./hardware-configuration.nix
     ./windows-vm
     ./zsa.nix
-  ];
+  ]
+  ++ (with inputs.self.modules.nixos; [
+    niri
+  ]);
 
   sops.defaultSopsFile = ./secrets.yaml;
 
@@ -28,12 +31,6 @@
 
     xkb.layout = "us";
     xkb.variant = "";
-  };
-
-  # TODO: Launch directly, just use home-manager
-  programs.niri = {
-    enable = true;
-    package = pkgs.unstable.niri;
   };
 
   services.displayManager = {
