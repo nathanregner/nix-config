@@ -8,23 +8,10 @@
 
   flake.modules.homeManager.wayland = {
     imports = with inputs.self.modules.homeManager; [
+      hyprlock
       niri
       swww
+      tofi
     ];
-  };
-}
-
-{ inputs, ... }:
-{
-  flake.modules.nixos.filename = {
-    imports = with inputs.self.modules.nixos; [  ];
-  };
-
-  flake.modules.darwin.filename = {
-    imports = with inputs.self.modules.darwin; [  ];
-  };
-
-  flake.modules.homeManager.filename = {
-    imports = with inputs.self.modules.homeManager; [  ];
   };
 }
