@@ -15,6 +15,7 @@
       url = "github:LnL7/nix-darwin/nix-darwin-25.11";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    import-tree.url = "github:vic/import-tree";
 
     # Misc
     catppuccin-nix = {
@@ -105,7 +106,8 @@
       imports = [
         inputs.pkgs-by-name-for-flake-parts.flakeModule
         inputs.treefmt-nix.flakeModule
-      ];
+      ]
+      ++ (inputs.import-tree ./flake-modules).imports;
 
       perSystem =
         {
