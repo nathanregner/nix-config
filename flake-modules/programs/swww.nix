@@ -4,7 +4,7 @@
     {
       services.swww.enable = true;
       systemd.user.services.swww.Service.ExecStartPost = ''
-        ${lib.getExe' config.services.swww.package "swww"} img ${../../../assets/planet-rise.png}
+        ${lib.getExe' config.services.swww.package "swww"} img ${../../assets/planet-rise.png}
       '';
     };
 }
