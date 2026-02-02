@@ -28,7 +28,9 @@ in
       {
         nvim-treesitter = {
           dir = "${package}";
-          inherit parser_install_dir;
+          opts = {
+            inherit parser_install_dir;
+          };
         };
         rtp = [ parser_install_dir ];
       }

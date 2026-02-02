@@ -76,6 +76,7 @@ function nix_spec(spec)
 
   spec.dir = nix.dir
   spec.pin = true
+  spec.opts = vim.tbl_deep_extend("error", nix.opts or {}, spec.opts or {})
   return spec
 end
 
