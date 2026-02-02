@@ -28,8 +28,6 @@
 
     xkb.layout = "us";
     xkb.variant = "";
-
-    displayManager.gdm.enable = true;
   };
 
   # TODO: Launch directly, just use home-manager
@@ -44,6 +42,7 @@
       user = "nregner";
     };
     defaultSession = "niri";
+    gdm.enable = true;
   };
 
   security.pam.services.hyprlock = { };
@@ -74,7 +73,7 @@
     motherboard = "amd";
   };
 
-  services.logind.powerKey = "suspend";
+  services.logind.settings.Login.HandlePowerKey = "suspend";
 
   local.services.hydra-builder.enable = true;
 
@@ -85,17 +84,15 @@
     dates = null;
   };
 
-  environment.systemPackages = [
-    config.boot.kernelPackages.perf
-  ]
-  ++ (with pkgs.unstable; [
+  environment.systemPackages = with pkgs.unstable; [
     android-file-transfer # aft-mtp-mount ~/mnt
+    libmtp
     nautilus-python
     networkmanagerapplet
-    libmtp
     virt-manager
     xwayland-satellite
-  ]);
+    perf
+  ];
 
   # boot.binfmt.emulatedSystems = [ "aarch64-linux" ];
 

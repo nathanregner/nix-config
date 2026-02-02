@@ -1,4 +1,4 @@
-{ config, lib, ... }:
+{ pkgs, lib, ... }:
 {
   imports = [
     ../../modules/nixos/desktop
@@ -28,14 +28,13 @@
   # desktop environment
   services.xserver = {
     enable = true;
-    # videoDrivers = [ "nvidia" ];
-
-    displayManager.gdm.enable = true;
-    displayManager.gdm.wayland = false;
-    desktopManager.gnome.enable = true;
-
     xkb.layout = "us";
     xkb.variant = "";
+  };
+
+  services.displayManager = {
+    gdm.enable = true;
+    gdm.wayland = false;
   };
 
   services.displayManager.autoLogin.enable = true;
@@ -65,7 +64,7 @@
     motherboard = "intel";
   };
 
-  environment.systemPackages = [ config.boot.kernelPackages.perf ];
+  environment.systemPackages = [ pkgs.perf ];
 
   boot.binfmt.emulatedSystems = [ "aarch64-linux" ];
 

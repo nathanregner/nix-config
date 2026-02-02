@@ -34,8 +34,8 @@ in
       package = inputs.neovim-nightly-overlay.packages.${pkgs.stdenv.hostPlatform.system}.default;
       defaultEditor = true;
       extraConfig = builtins.readFile ./init.vim;
-      extraLuaConfig = ''
-        vim.g.nix = ${lib.generators.toLua { } cfg.lua.globals}
+      initLua = ''
+        vim.g.nix = vim.fn.json_decode('${builtins.toJSON cfg.lua.globals}')
         require('user')
       '';
 
@@ -92,7 +92,15 @@ in
             yaml-language-server
             ;
 
-          inherit (pkgs.unstable) git;
+          # formatters/linters
+          inherit (pkgs.unstable)
+            nginx-config-formatter
+            nixfmt
+            prettierd
+            shfmt
+            stylua
+            taplo
+            ;
 
           # file browsing
           inherit (pkgs.unstable)
@@ -106,16 +114,6 @@ in
         }
       );
     };
-
-    home.packages = with pkgs.unstable; [
-      # formatters/linters
-      nginx-config-formatter
-      prettierd
-      nixfmt-rfc-style
-      shfmt
-      stylua
-      taplo
-    ];
 
     xdg.configFile = {
       "nvim/lazy-lock.json" = {
