@@ -1,0 +1,81 @@
+From f1bb9dc6c1ee438ca5f5503db1340e476dfa99fd Mon Sep 17 00:00:00 2001
+From: shadmansaleh <13149513+shadmansaleh@users.noreply.github.com>
+Date: Mon, 2 Feb 2026 13:33:55 +0600
+Subject: [PATCH] fix(prompt): ensure prompt-mark call gets reseted properly
+
+problem: currently when empty string is set as prompt the prompt-mark
+colum doesn't update
+
+solution: ensure the colum is reset to 0 when starting prompt buffer and
+before creating a new prompt after prompt-callback
+---
+ src/nvim/eval.c                               |  1 +
+ src/nvim/optionstr.c                          |  2 +-
+ test/functional/legacy/prompt_buffer_spec.lua | 31 +++++++++++++++++++
+ 3 files changed, 33 insertions(+), 1 deletion(-)
+
+diff --git a/src/nvim/eval.c b/src/nvim/eval.c
+index a11035a93147b8..2578ed99ca3231 100644
+--- a/src/nvim/eval.c
++++ b/src/nvim/eval.c
+@@ -6668,6 +6668,7 @@ void prompt_invoke_callback(void)
+   curwin->w_cursor.lnum = lnum + 1;
+   curwin->w_cursor.col = 0;
+   curbuf->b_prompt_start.mark.lnum = lnum + 1;
++  curbuf->b_prompt_start.mark.col = 0;
+ 
+   if (curbuf->b_prompt_callback.type == kCallbackNone) {
+     xfree(user_input);
+diff --git a/src/nvim/optionstr.c b/src/nvim/optionstr.c
+index ac4990e1b6415e..198ec8e848d5c3 100644
+--- a/src/nvim/optionstr.c
++++ b/src/nvim/optionstr.c
+@@ -711,7 +711,7 @@ const char *did_set_buftype(optset_T *args)
+     // Set default value for 'comments'
+     set_option_direct(kOptComments, STATIC_CSTR_AS_OPTVAL(""), OPT_LOCAL, SID_NONE);
+     // set the prompt start position to lastline.
+-    pos_T next_prompt = { .lnum = buf->b_ml.ml_line_count, .col = 1, .coladd = 0 };
++    pos_T next_prompt = { .lnum = buf->b_ml.ml_line_count, .col = 0, .coladd = 0 };
+     RESET_FMARK(&buf->b_prompt_start, next_prompt, 0, ((fmarkv_T)INIT_FMARKV));
+   }
+   if (win->w_status_height || global_stl_height()) {
+diff --git a/test/functional/legacy/prompt_buffer_spec.lua b/test/functional/legacy/prompt_buffer_spec.lua
+index 8174ded8032595..853d0e0e5d5af5 100644
+--- a/test/functional/legacy/prompt_buffer_spec.lua
++++ b/test/functional/legacy/prompt_buffer_spec.lua
+@@ -762,4 +762,35 @@ describe('prompt buffer', function()
+       {5:-- INSERT --}             |
+     ]])
+   end)
++
++  it('works correctly with empty string as prompt', function()
++    api.nvim_set_option_value('buftype', 'prompt', { buf = 0 })
++    exec_lua(function()
++      local buf = vim.api.nvim_get_current_buf()
++      vim.fn.prompt_setprompt(buf, '')
++    end)
++
++    source('startinsert')
++
++    -- mark correctly set
++    eq({ 1, 0 }, api.nvim_buf_get_mark(0, ':'))
++
++    feed('asdf')
++    screen:expect([[
++      asdf^                     |
++      {1:~                        }|*8
++      {5:-- INSERT --}             |
++    ]])
++
++    -- can clear all of it
++    feed('<backspace><backspace><backspace><backspace>')
++    screen:expect([[
++      ^                         |
++      {1:~                        }|*8
++      {5:-- INSERT --}             |
++    ]])
++    feed('<cr>')
++
++    eq({ 2, 0 }, api.nvim_buf_get_mark(0, ':'))
++  end)
+ end)

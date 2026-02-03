@@ -11,8 +11,7 @@
 
   nix = {
     # FIXME: nix 2.33 build broken on darwin
-    package =
-      if pkgs.stdenv.hostPlatform.isDarwin then pkgs.unstable.nix else pkgs.unstable.nixVersions.latest;
+    package = if pkgs.stdenv.hostPlatform.isDarwin then pkgs.nix else pkgs.unstable.nixVersions.latest;
     distributedBuilds = true;
     optimise.automatic = true;
 

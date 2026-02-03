@@ -31,7 +31,11 @@ in
   config = {
     programs.neovim = {
       enable = true;
-      package = inputs.neovim-nightly-overlay.packages.${pkgs.stdenv.hostPlatform.system}.default;
+      package = inputs.neovim-nightly-overlay.packages.${pkgs.stdenv.hostPlatform.system}.default.overrideAttrs (old: {
+        patches = old.patches or [] ++ [
+          ./37669.patch
+        ];
+      });
       defaultEditor = true;
       extraConfig = builtins.readFile ./init.vim;
       initLua = ''
