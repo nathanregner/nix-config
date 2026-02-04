@@ -13,6 +13,8 @@
       docker_context.only_with_files = false;
       package.disabled = true;
       git_status.disabled = true;
+      python.disabled = true;
+      node.disabled = true;
 
       # FIXME: IFD
       # catppuccin.starship.enable = false;
