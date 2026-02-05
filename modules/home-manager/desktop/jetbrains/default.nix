@@ -18,29 +18,6 @@ let
       name = lib.removePrefix "./" (toString (lib.path.removePrefix root file));
       path = file;
     }) (lib.filesystem.listFilesRecursive root);
-
-  linkConfigFiles =
-    appName:
-    { plugins, ... }:
-    let
-      commonConfig = listFilesRecursive ./config/common;
-      appConfig = listFilesRecursive (./config + "/${appName}");
-    in
-    (builtins.map (
-      { name, path }:
-      {
-        "JetBrains/${appName}/config/${name}" = {
-          source = config.lib.file.mkFlakeSymlink path;
-          force = true;
-        };
-      }
-    ) (commonConfig ++ appConfig))
-    ++ builtins.map (plugin: {
-      "JetBrains/${appName}/config/plugins/${plugin.name}.jar" = {
-        source = "${plugin}";
-        force = true;
-      };
-    }) plugins;
 in
 {
   options.programs.jetbrains = {
@@ -51,6 +28,21 @@ in
 
     tools = mkOption {
       default = {
+        datagrip = {
+          toolboxFolder = "datagrip";
+          darwinAppGlob = "IntelliJ\\ IDEA\\ Ultimate*.app";
+          plugins = [ ];
+        };
+        idea = {
+          toolboxFolder = "intellij-idea-ultimate";
+          darwinAppGlob = "DataGrip\\*.app";
+          plugins = [ ];
+        };
+        rider = {
+          toolboxFolder = "rider";
+          darwinAppGlob = "Rider*.app";
+          plugins = [ ];
+        };
       };
       type = types.attrsOf (
         types.submodule {
@@ -71,48 +63,51 @@ in
     };
   };
 
-  config = lib.mkIf cfg.enable {
-    home.file.".ideavimrc".source = config.lib.file.mkFlakeSymlink ./ideavimrc;
-
-    home.packages = lib.optionals pkgs.stdenv.isLinux (
+  config = lib.mkIf cfg.enable (
+    lib.mkMerge (
       [
-        pkgs.unstable.jetbrains-toolbox
+        {
+          home.file.".ideavimrc".source = config.lib.file.mkFlakeSymlink ./ideavimrc;
+
+          home.packages = lib.optionals pkgs.stdenv.isLinux [
+            pkgs.unstable.jetbrains-toolbox
+          ];
+        }
       ]
-      ++ (lib.mapAttrsToList (
-        name: cfg:
-        let
-          launchDetached =
-            name: bin:
-            pkgs.writeShellScriptBin name ''
-              nohup ${bin} "$@" &> /dev/null & disown %%
-            '';
-        in
-        launchDetached name "~/.local/share/JetBrains/Toolbox/apps/${cfg.toolboxFolder}/bin/${name}"
-      ) cfg.tools)
-    );
+      ++ lib.mapAttrsToList (toolName: toolCfg: {
+        home.packages = [
+          (pkgs.writeShellScriptBin toolName (
+            if pkgs.stdenv.isDarwin then
+              "open -na ~/Applications/${toolCfg.darwinAppGlob}/Contents/MacOS/${toolName} --args"
+            else
+              ''nohup ~/.local/share/JetBrains/Toolbox/apps/${toolCfg.toolboxFolder}/bin/${toolName} "$@" &> /dev/null & disown %%''
+          ))
+        ];
 
-    programs.jetbrains.tools = {
-      datagrip = {
-        toolboxFolder = "datagrip";
-        darwinAppGlob = "IntelliJ\\ IDEA\\ Ultimate*.app";
-      };
-      idea = {
-        toolboxFolder = "intellij-idea-ultimate";
-        darwinAppGlob = "DataGrip\\*.app";
-      };
-      rider = {
-        toolboxFolder = "rider";
-        darwinAppGlob = "Rider*.app";
-      };
-    };
-
-    # TODO: move to cfg.tools
-    programs.zsh.shellAliases = lib.optionalAttrs pkgs.stdenv.isDarwin (
-      builtins.mapAttrs (
-        name: cfg: "open -na ~/Applications/${cfg.darwinAppGlob}/Contents/MacOS/${name} --args"
-      ) cfg.tools
-    );
-
-    xdg.configFile = lib.mkMerge (lib.concatLists (lib.mapAttrsToList linkConfigFiles cfg.tools));
-  };
+        xdg.configFile = (
+          let
+            commonConfig = listFilesRecursive ./config/common;
+            appConfig = listFilesRecursive (./config + "/${toolName}");
+            prefix = "JetBrains/${toolName}/config";
+          in
+          lib.listToAttrs (
+            map (file: {
+              name = "${prefix}/${file.name}";
+              value = {
+                source = config.lib.file.mkFlakeSymlink file.path;
+                force = true;
+              };
+            }) (commonConfig ++ appConfig)
+            ++ map (plugin: {
+              name = "${prefix}/plugins/${plugin.name}.jar";
+              value = {
+                source = "${plugin}";
+                force = true;
+              };
+            }) toolCfg.plugins
+          )
+        );
+      }) tools
+    )
+  );
 }
