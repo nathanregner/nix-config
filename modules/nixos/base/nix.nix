@@ -22,6 +22,7 @@
       experimental-features = [
         "nix-command"
         "flakes"
+        "pipe-operators"
       ];
       # https://github.com/NixOS/nix/issues/9087
       inherit (pkgs.local) flake-registry;
