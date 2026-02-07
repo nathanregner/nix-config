@@ -55,7 +55,7 @@ fn diff(profile_path: &Path, build: &Build) -> io::Result<()> {
     exec(&mut command)
 }
 
-fn activate(profile: Profile, build: &Build, args: &[String]) -> io::Result<()> {
+fn activate(profile: Profile, build: &Build, args: &[String]) -> Result<()> {
     let tempdir = TempDir::new("activate")?;
 
     let activate_rs = build.out_path().join("activate-rs");
@@ -75,7 +75,7 @@ fn activate(profile: Profile, build: &Build, args: &[String]) -> io::Result<()> 
 
     match profile {
         Profile::Home { .. } => {
-            command.args(["--profile-user", &whoami::username()]);
+            command.args(["--profile-user", &whoami::username()?]);
             command.args(["--profile-name", "home-manager"]);
         }
         Profile::System { .. } => {
