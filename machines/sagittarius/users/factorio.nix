@@ -8,7 +8,7 @@
 
   local.services.backup.jobs.factorio = {
     root = "/home/factorio";
-    timerConfig.OnCalendar = {
+    timerConfig = {
       OnCalendar = lib.mkForce "hourly";
       Persistent = true;
     };
