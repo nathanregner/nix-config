@@ -7,7 +7,7 @@
 let
   cfg = config.programs.neovim.treesitter;
   package = pkgs.unstable.vimPlugins.nvim-treesitter.withAllGrammars;
-  parserPrefix = "nvim/nvim-treesitter";
+  parserPrefix = "nvim/site";
 in
 {
   options.programs.neovim.treesitter = {
@@ -23,16 +23,16 @@ in
   config = {
     programs.neovim.lua.globals = lib.optionalAttrs (cfg.grammarSource == "nix") (
       let
-        parser_install_dir = "${config.xdg.dataHome}/${parserPrefix}";
+        install_dir = "${config.xdg.dataHome}/${parserPrefix}";
       in
       {
         nvim-treesitter = {
           dir = "${package}";
           opts = {
-            inherit parser_install_dir;
+            inherit install_dir;
           };
         };
-        rtp = [ parser_install_dir ];
+        rtp = [ install_dir ];
       }
     );
 
@@ -44,7 +44,7 @@ in
         gnumake
         gnutar
         stdenv.cc
-        tree-sitter-latest
+        tree-sitter
       ]
     );
 

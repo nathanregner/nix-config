@@ -436,6 +436,9 @@ require("lazy").setup({
     priority = 1000,
     init = function(opts)
       require("catppuccin").setup({
+        integrations = {
+          treesitter = true,
+        },
         flavour = "mocha",
         no_italic = true,
         highlight_overrides = {
@@ -1020,6 +1023,9 @@ require("lazy").setup({
 }, {
   dev = {
     path = "~/dev/github",
+  },
+  change_detection = {
+    enabled = false,
   },
   performance = {
     rtp = { paths = vim.g.nix.rtp },
