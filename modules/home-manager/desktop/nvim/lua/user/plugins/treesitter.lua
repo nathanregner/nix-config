@@ -4,6 +4,7 @@ local function large_file(buf)
   if ok and stats and stats.size > max_filesize then return true end
   return false
 end
+
 ---@module "lazy"
 ---@type LazySpec
 return {
@@ -22,14 +23,15 @@ return {
       vim.api.nvim_create_autocmd("FileType", {
         group = group,
         callback = function(args)
-          local type = args.match
           if not large_file(args.buf) then
-            if require("nvim-treesitter.parsers")[type] then
-              -- FIXME: nil_ls setting highlights? why doesn't treesitter work?
-              if type ~= "nix" then vim.treesitter.start(args.buf) end
+            local lang = vim.treesitter.language.get_lang(args.match)
+            if lang then
               require("user.treesitter_incremental_selection").attach(args.buf)
-            else
-              vim.bo[args.buf].syntax = "on"
+              if vim.treesitter.query.get(lang, "highlights") then
+                vim.treesitter.start(args.buf)
+              else
+                vim.bo[args.buf].syntax = "on"
+              end
             end
           end
         end,
