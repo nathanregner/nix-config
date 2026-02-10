@@ -1,3 +1,9 @@
+local function large_file(buf)
+  local max_filesize = 100 * 1024 -- 100 KB
+  local ok, stats = pcall(vim.loop.fs_stat, vim.api.nvim_buf_get_name(buf))
+  if ok and stats and stats.size > max_filesize then return true end
+  return false
+end
 ---@module "lazy"
 ---@type LazySpec
 return {
@@ -6,32 +12,33 @@ return {
     "nvim-treesitter/nvim-treesitter",
     lazy = false,
     opts = {
-      parser_install_dir = vim.g.nix["nvim-treesitter"].parser_install_dir,
       auto_install = true,
       highlight = { enable = true },
       indent = { enable = true },
-      disable = function(_, buf)
-        local max_filesize = 100 * 1024 -- 100 KB
-        local ok, stats = pcall(vim.loop.fs_stat, vim.api.nvim_buf_get_name(buf))
-        if ok and stats and stats.size > max_filesize then return true end
-        if #vim.api.nvim_buf_get_lines(0, 0, 1, false)[1] > 1000 then return true end
-      end,
-      incremental_selection = {
-        enable = true,
-        keymaps = {
-          node_incremental = "v",
-          node_decremental = "V",
-        },
-      },
     },
     config = function()
+      local group = vim.api.nvim_create_augroup("treesitter-enable", { clear = true })
+
       vim.api.nvim_create_autocmd("FileType", {
-        callback = function(details) require("user.treesitter_incremental_selection").attach(details.buf) end,
+        group = group,
+        callback = function(args)
+          local type = args.match
+          if not large_file(args.buf) then
+            if require("nvim-treesitter.parsers")[type] then
+              -- FIXME: nil_ls setting highlights? why doesn't treesitter work?
+              if type ~= "nix" then vim.treesitter.start(args.buf) end
+              require("user.treesitter_incremental_selection").attach(args.buf)
+            else
+              vim.bo[args.buf].syntax = "on"
+            end
+          end
+        end,
       })
 
       vim.api.nvim_create_autocmd("BufDelete", {
         pattern = "<buffer>",
-        callback = function(details) require("user.treesitter_incremental_selection").detach(details.buf) end,
+        group = group,
+        callback = function(args) pcall(require("user.treesitter_incremental_selection").detach, args.buf) end,
       })
     end,
   }),
