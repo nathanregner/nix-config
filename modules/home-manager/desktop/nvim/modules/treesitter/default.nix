@@ -32,7 +32,9 @@ in
             inherit install_dir;
           };
         };
-        rtp = [ install_dir ];
+        rtp = [
+          "${package}/runtime"
+        ];
       }
     );
 
