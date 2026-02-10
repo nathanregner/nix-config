@@ -16,7 +16,7 @@ let
     src = fetchFromGitHub src;
 
     installPhase = ''
-      cp $src/languages/nu.scm $out
+      cp $src/queries/nu.scm $out
     '';
 
     passthru = {

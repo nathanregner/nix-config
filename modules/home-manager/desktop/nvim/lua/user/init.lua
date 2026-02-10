@@ -1036,6 +1036,9 @@ require("lazy").setup({
   dev = {
     path = "~/dev/github",
   },
+  change_detection = {
+    enabled = false,
+  },
   performance = {
     rtp = { paths = vim.g.nix.rtp },
   },

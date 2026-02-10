@@ -1,3 +1,4 @@
+{ lib, ... }:
 {
   local.users.factorio = { };
 
@@ -7,6 +8,15 @@
 
   local.services.backup.jobs.factorio = {
     root = "/home/factorio";
-    timerConfig.OnCalendar = "0/1:00:00";
+    timerConfig = {
+      OnCalendar = lib.mkForce "hourly";
+      Persistent = true;
+    };
+    pruneOpts = lib.mkForce [
+      "--tag"
+      "''"
+      "--keep-within 1d"
+      "--keep-within-daily 7d"
+    ];
   };
 }

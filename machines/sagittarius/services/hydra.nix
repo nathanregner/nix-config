@@ -16,7 +16,18 @@ let
   prometheusAddress = "127.0.0.1:9198";
 in
 {
-  imports = [ inputs.hydra-sentinel.nixosModules.server ];
+  imports = [
+    # inputs.hydra.nixosModules.hydra
+    inputs.hydra-sentinel.nixosModules.server
+    inputs.hydra-queue-runner.nixosModules.queue-runner
+  ];
+
+  assertions = [
+    {
+      assertion = config.services.hydra.package.version == "0-unstable-2026-01-23";
+      message = "${config.services.hydra.package.version} == \"0-unstable-2026-01-23\"";
+    }
+  ];
 
   services.hydra = {
     enable = true;
@@ -51,6 +62,10 @@ in
     '';
   };
 
+  services.queue-runner-dev = {
+    enable = true;
+  };
+
   services.prometheus.exporters.postgres.enable = true;
 
   services.postgresql.identMap = ''
@@ -58,7 +73,7 @@ in
   '';
 
   local.services.backup.jobs.hydra = {
-    dynamicFilesFrom = ''${pkgs.writers.writeNu "pg_dump-hydra"
+    dynamicFilesFrom = "${pkgs.writers.writeNu "pg_dump-hydra"
       {
         makeWrapperArgs = [
           "--prefix"
@@ -73,7 +88,7 @@ in
         pg_dump -d hydra -Z zstd -Fd -f $tmp
         $tmp
       ''
-    }'';
+    }";
   };
 
   services.prometheus.scrapeConfigs = [

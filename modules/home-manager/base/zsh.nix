@@ -7,7 +7,6 @@
 {
   programs.zsh = {
     enable = true;
-    enableCompletion = true;
     dotDir = config.home.homeDirectory;
     initContent = ''
       bindkey -M viins 'jk' vi-cmd-mode
