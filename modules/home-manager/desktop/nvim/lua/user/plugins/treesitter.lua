@@ -32,6 +32,8 @@ return {
               else
                 vim.bo[args.buf].syntax = "on"
               end
+            else
+              vim.bo[args.buf].syntax = "on"
             end
           end
         end,
