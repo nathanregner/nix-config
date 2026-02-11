@@ -6,40 +6,36 @@
 }:
 let
   cfg = config.programs.neovim.treesitter;
-  package = pkgs.unstable.vimPlugins.nvim-treesitter.withAllGrammars;
   parserPrefix = "nvim/site";
 in
 {
   options.programs.neovim.treesitter = {
-    grammarSource = lib.mkOption {
-      type = lib.types.enum [
-        "nix"
-        "git"
-      ];
-      default = "nix";
+    package = lib.mkOption {
+      type = lib.types.nullOr lib.types.package;
+      default = pkgs.unstable.vimPlugins.nvim-treesitter.withAllGrammars;
     };
   };
 
   config = {
-    programs.neovim.lua.globals = lib.optionalAttrs (cfg.grammarSource == "nix") (
+    programs.neovim.lua.globals = lib.optionalAttrs (cfg.package != null) (
       let
         install_dir = "${config.xdg.dataHome}/${parserPrefix}";
       in
       {
         nvim-treesitter = {
-          dir = "${package}";
+          dir = "${cfg.package}";
           opts = {
             inherit install_dir;
           };
         };
         rtp = [
-          "${package}/runtime"
+          "${cfg.package}/runtime"
         ];
       }
     );
 
     # :checkhealth nvim-treesitter
-    home.packages = lib.optionals (cfg.grammarSource == "git") (
+    home.packages = lib.optionals (cfg.package == null) (
       with pkgs.unstable;
       [
         curl
@@ -55,7 +51,7 @@ in
       force = true;
     };
 
-    xdg.dataFile = lib.optionalAttrs (cfg.grammarSource == "nix") (
+    xdg.dataFile = lib.optionalAttrs (cfg.package != null) (
       lib.listToAttrs (
         builtins.filter (grammar: grammar ? name) (
           map (
@@ -75,7 +71,7 @@ in
                 };
               }
             )
-          ) package.passthru.dependencies
+          ) cfg.package.passthru.dependencies
         )
       )
     );
