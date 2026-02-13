@@ -64,4 +64,8 @@
   services.oauth2-proxy = {
     nginx.virtualHosts."grafana.nregner.net" = { };
   };
+
+  local.services.backup.jobs.grafana = {
+    dynamicFilesFrom = "realpath ${config.services.grafana.dataDir}";
+  };
 }
