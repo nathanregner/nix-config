@@ -36,7 +36,7 @@ let
     '';
 
     passthru = {
-      updateScript = cargo-update-script pkg { };
+      updateScript = cargo-update-script pkg { breaking = false; };
       devShell = mkRustShell {
         inherit pkg rustPlatform;
       };
