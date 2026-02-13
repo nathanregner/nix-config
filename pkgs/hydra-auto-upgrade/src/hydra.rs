@@ -1,7 +1,7 @@
 use serde::Deserialize;
 use std::path::{Path, PathBuf};
 
-use crate::{Profile, Result, cli::Args};
+use crate::{cli::Args, Profile, Result};
 
 pub fn get_latest_build(
     Args {
@@ -16,7 +16,7 @@ pub fn get_latest_build(
     let job = match job {
         Some(job) => job.to_string(),
         None => {
-            let hostname = whoami::hostname()?;
+            let hostname = whoami::fallible::hostname()?;
             let profile = match profile {
                 Profile::Home => "home",
                 Profile::System => "system",
