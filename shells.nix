@@ -33,7 +33,7 @@
       with pkgs.unstable;
       [
         pkgs.local.generate-sops-keys
-        inputs'.home-manager.packages.home-manager
+        inputs'.home-manager-unstable.packages.home-manager
       ]
       ++ pkgs.lib.optionals pkgs.stdenv.isDarwin [ inputs'.nix-darwin.packages.darwin-rebuild ];
   };
