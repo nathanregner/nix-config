@@ -1,4 +1,5 @@
 {
+  inputs,
   config,
   pkgs,
   lib,
@@ -7,7 +8,11 @@
 {
   programs.firefox = {
     enable = true;
-    package = if pkgs.stdenv.isDarwin then null else pkgs.unstable.firefox-devedition;
+    package =
+      if pkgs.stdenv.isLinux then
+        inputs.nixpkgs.legacyPackages.${pkgs.stdenv.hostPlatform.system}.firefox-devedition
+      else
+        null;
     # name must start with "dev-edition-"? https://github.com/nix-community/home-manager/issues/4703
     profiles.default = {
       id = 1;
