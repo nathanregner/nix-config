@@ -40,6 +40,9 @@
           name = "Prometheus";
           type = "prometheus";
           url = "http://${config.services.prometheus.listenAddress}:${toString config.services.prometheus.port}";
+          jsonData.timeInterval =
+            let interval = config.services.prometheus.globalConfig.scrape_interval;
+            in if interval == null then "1m" else interval;
         }
       ];
     };
