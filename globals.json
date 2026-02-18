@@ -2,7 +2,8 @@
   "services": {
     "hydra": { "port": 3001 },
     "prometheus": {
-      "node": { "port": 9001 }
+      "node": { "port": 9001 },
+      "pushgateway": { "port": 9091 }
     },
     "restic-server": {
       "port": 8002

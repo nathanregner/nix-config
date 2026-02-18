@@ -180,6 +180,56 @@ in
           ) cfg.jobs
         );
         hasTarget = name: builtins.any (job: job.targets.${name}.enable) (builtins.attrValues cfg.jobs);
+        pushgatewayUrl = "http://sagittarius:${toString self.globals.services.prometheus.pushgateway.port}";
+        metricsScripts = lib.mapAttrs (
+          name: _job:
+          let
+            # Find the restic wrapper created by the nixos restic module
+            resticWrapper = lib.findFirst
+              (pkg: pkg.name == "restic-${name}")
+              (throw "restic-${name} wrapper not found in environment.systemPackages")
+              config.environment.systemPackages;
+          in
+          pkgs.writeShellApplication {
+            name = "restic-backups-${name}-metrics";
+            runtimeInputs = [
+              resticWrapper
+              pkgs.jq
+              pkgs.coreutils
+              pkgs.curl
+            ];
+            text = ''
+              if [ "$SERVICE_RESULT" = "success" ]; then
+                success=1
+              else
+                success=0
+              fi
+              timestamp=$(date +%s)
+
+              stats_start=$(date +%s%3N)
+              stats=$(restic-${name} stats --json 2>/dev/null) && stats_ok=1 || stats_ok=0
+              stats_end=$(date +%s%3N)
+              scrape_ms=$(( stats_end - stats_start ))
+              scrape_duration=$(printf '%d.%03d' $(( scrape_ms / 1000 )) $(( scrape_ms % 1000 )))
+
+              {
+                cat <<METRICS
+              # HELP restic_backup_success 1 if the last backup succeeded, 0 otherwise
+              restic_backup_success $success
+              # HELP restic_backup_last_run_timestamp_seconds Unix timestamp of the last backup run
+              restic_backup_last_run_timestamp_seconds $timestamp
+              # HELP restic_scrape_duration_seconds Time taken to gather repository stats
+              restic_scrape_duration_seconds $scrape_duration
+              METRICS
+                if [ "$stats_ok" = "1" ]; then
+                  jq -r 'to_entries[] | "restic_\(.key) \(.value)"' <<< "$stats"
+                fi
+              } | curl --silent --show-error --data-binary @- \
+                "${pushgatewayUrl}/metrics/job/restic_backup/instance/${config.networking.hostName}/${name}" \
+                || true
+            '';
+          }
+        ) backups;
       in
       {
         sops.secrets = {
@@ -223,7 +273,12 @@ in
         systemd.services = lib.mapAttrs' (
           name: job:
           lib.nameValuePair "restic-backups-${name}" {
-            serviceConfig.WorkingDirectory = lib.mkIf (job.root != null) job.root;
+            serviceConfig = {
+              WorkingDirectory = lib.mkIf (job.root != null) job.root;
+            };
+            postStop = lib.mkAfter ''
+              ${metricsScripts.${name}}/bin/restic-backups-${name}-metrics
+            '';
           }
         ) backups;
 
@@ -260,7 +315,8 @@ in
                 --zsh zsh-completion \
                 --fish fish-completion
             ''
-          ) config.services.restic.backups;
+          ) config.services.restic.backups
+          ++ lib.attrValues metricsScripts;
       }
     ))
   ];
