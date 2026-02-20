@@ -186,17 +186,9 @@ in
         pushgatewayUrl = "http://sagittarius:${toString self.globals.services.prometheus.pushgateway.port}";
         metricsScripts = lib.mapAttrs (
           name: _job:
-          let
-            # Find the restic wrapper created by the nixos restic module
-            resticWrapper =
-              lib.findFirst (pkg: pkg.name == "restic-${name}")
-                (throw "restic-${name} wrapper not found in environment.systemPackages")
-                config.environment.systemPackages;
-          in
           pkgs.writeShellApplication {
             name = "restic-backups-${name}-metrics";
             runtimeInputs = [
-              resticWrapper
               pkgs.jq
               pkgs.coreutils
               pkgs.curl
@@ -210,7 +202,7 @@ in
               timestamp=$(date +%s)
 
               stats_start=$(date +%s%3N)
-              stats=$(restic-${name} stats --json 2>/dev/null) && stats_ok=1 || stats_ok=0
+              stats=$(/run/current-system/sw/bin/restic-${name} stats --json 2>/dev/null) && stats_ok=1 || stats_ok=0
               stats_end=$(date +%s%3N)
               scrape_ms=$(( stats_end - stats_start ))
               scrape_duration=$(printf '%d.%03d' $(( scrape_ms / 1000 )) $(( scrape_ms % 1000 )))
