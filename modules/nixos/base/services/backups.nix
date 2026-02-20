@@ -107,6 +107,7 @@ in
                     environmentFile = mkReadonly config.sops.secrets.restic-s3-env.path;
                     timerConfig = mkDefault {
                       OnCalendar = "daily";
+                      RandomizedDelaySec = "10m";
                       Persistent = true;
                     };
                   };
@@ -115,6 +116,7 @@ in
                     environmentFile = mkReadonly config.sops.templates.restic-server-env.path;
                     timerConfig = mkDefault {
                       OnCalendar = "0/6:00:00";
+                      RandomizedDelaySec = "10m";
                       Persistent = true;
                     };
                   };
@@ -122,6 +124,7 @@ in
                     repository = mkReadonly "rclone:google_drive:restic/${config.networking.hostName}/${name}";
                     timerConfig = mkDefault {
                       OnCalendar = "daily";
+                      RandomizedDelaySec = "10m";
                       Persistent = true;
                     };
                   };
@@ -185,10 +188,10 @@ in
           name: _job:
           let
             # Find the restic wrapper created by the nixos restic module
-            resticWrapper = lib.findFirst
-              (pkg: pkg.name == "restic-${name}")
-              (throw "restic-${name} wrapper not found in environment.systemPackages")
-              config.environment.systemPackages;
+            resticWrapper =
+              lib.findFirst (pkg: pkg.name == "restic-${name}")
+                (throw "restic-${name} wrapper not found in environment.systemPackages")
+                config.environment.systemPackages;
           in
           pkgs.writeShellApplication {
             name = "restic-backups-${name}-metrics";
