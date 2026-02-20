@@ -13,13 +13,18 @@
           "Bash(cargo doc:*)"
           "Bash(cargo info:*)"
           "Bash(cargo tree:*)"
-          "Bash(cat :*)"
-          "Bash(echo :*)"
+          "Bash(cat:*)"
+          "Bash(echo:*)"
           "Bash(git cp:*)"
           "Bash(git diff:*)"
           "Bash(git mv:*)"
+          "Bash(grep:*)"
+          "Bash(ls:*)"
+          "Bash(tree:*)"
           "Read(/nix/store/**)"
           "Read(~/.cargo/registry/**)"
+          "WebFetch"
+          "WebSearch"
         ];
         ask = [
         ];
