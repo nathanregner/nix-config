@@ -43,6 +43,11 @@ resource "tailscale_acl" "acl" {
           action = "accept"
           src    = ["tag:server"]
           dst    = ["sagittarius:${local.globals.services.hydra.port}"]
+        },
+        {
+          action = "accept"
+          src    = ["tag:server"]
+          dst    = ["sagittarius:${local.globals.services.restic-server.port}"]
         }
       ],
       [
