@@ -54,6 +54,13 @@
         treefmt-nix.follows = "treefmt-nix";
       };
     };
+    llm-agents = {
+      url = "github:numtide/llm-agents.nix";
+      inputs = {
+        nixpkgs.follows = "nixpkgs-unstable";
+        treefmt-nix.follows = "treefmt-nix";
+      };
+    };
     mac-app-util = {
       url = "github:hraban/mac-app-util";
       inputs = {

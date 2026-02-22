@@ -1,7 +1,16 @@
-{ config, lib, ... }:
 {
+  inputs,
+  config,
+  pkgs,
+  lib,
+  ...
+}:
+{
+  nixpkgs.overlays = [ inputs.llm-agents.overlays.default ];
+
   programs.claude-code = {
     enable = true;
+    package = pkgs.llm-agents.claude-code;
 
     settings = {
       model = "sonnet";
@@ -54,4 +63,6 @@
       fi
     '';
   };
+
+  home.packages = [ pkgs.llm-agents.claudebox ];
 }
