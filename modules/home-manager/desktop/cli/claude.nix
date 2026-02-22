@@ -1,3 +1,4 @@
+{ config, lib, ... }:
 {
   programs.claude-code = {
     enable = true;
@@ -43,4 +44,14 @@
   programs.git.ignores = [
     "settings.local.json"
   ];
+
+  programs.zsh = {
+    enable = true;
+    initContent = lib.optionalString config.programs.direnv.enable /* zsh */ ''
+      if [[ ! -z "$CLAUDECODE" ]]; then
+        eval "$(direnv hook zsh)"
+        eval "$(DIRENV_LOG_FORMAT= direnv export zsh)"  # Need to trigger "hook" manually
+      fi
+    '';
+  };
 }
