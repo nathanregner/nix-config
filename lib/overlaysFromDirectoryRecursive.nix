@@ -11,15 +11,12 @@ let
         let
           defaultNix = path + "/default.nix";
         in
-        if builtins.pathExists defaultNix then
-          { ${name} = import defaultNix; }
-        else
-          { ${lib.removeSuffix ".nix" (lib.traceVal name)} = processDir path; }
+        if builtins.pathExists defaultNix then { ${name} = import defaultNix; } else processDir path
       else if type == "regular" && lib.hasSuffix ".nix" name && name != "default.nix" then
-        { ${lib.removeSuffix ".nix" (lib.traceVal name)} = import path; }
+        { ${lib.removeSuffix ".nix" name} = import path; }
       else
         { }
-    ) (builtins.readDir (lib.traceVal dir));
+    ) (builtins.readDir dir);
 in
 final: prev:
 lib.mapAttrs (

@@ -13,7 +13,6 @@
 
   overlays = [
     inputs.devshell.overlays.default
-    inputs.llm-agents.overlays.default
     outputs.overlays.additions
     outputs.overlays.modifications
     outputs.overlays.unstable-packages

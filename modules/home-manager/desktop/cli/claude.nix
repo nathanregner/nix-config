@@ -1,10 +1,13 @@
 {
+  inputs,
   config,
   pkgs,
   lib,
   ...
 }:
 {
+  nixpkgs.overlays = [ inputs.llm-agents.overlays.default ];
+
   programs.claude-code = {
     enable = true;
     package = pkgs.llm-agents.claude-code;
