@@ -3,29 +3,22 @@
 
 ---@type rustaceanvim.Opts
 vim.g.rustaceanvim = {
-  dap = {},
-  server = {
-    default_settings = {
-      -- https://rust-analyzer.github.io/manual.html#configuration
-      ["rust-analyzer"] = {
-        cargo = {
-          allFeatures = true,
-        },
-        check = {
-          command = "clippy",
-        },
-        completion = {
-          autoimport = { enable = true },
-        },
-        files = {
-          excludeDirs = { ".direnv", ".git" },
-        },
+  settings = {
+    -- https://rust-analyzer.github.io/manual.html#configuration
+    ["rust-analyzer"] = {
+      cargo = {
+        allFeatures = true,
+      },
+      check = {
+        command = "clippy",
+      },
+      completion = {
+        autoimport = { enable = true },
+      },
+      files = {
+        excludeDirs = { ".direnv", ".git" },
       },
     },
-  },
-  tools = {
-    -- enable_nextest = true, -- FIXME: buggy out of order test output on reset
-    enable_nextest = false,
   },
 }
 
