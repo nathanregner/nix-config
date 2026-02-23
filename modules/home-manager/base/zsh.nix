@@ -38,21 +38,20 @@
     };
     shellAliases =
       let
-        nixRebuild = if pkgs.stdenv.isDarwin then "darwin-rebuild" else "nixos-rebuild";
+        sys = if pkgs.stdenv.isDarwin then "darwin" else "os";
       in
       rec {
+        nrb = "nh ${sys} build .";
+        nrr = "nh ${sys} repl .";
+        snrb = "sudo nh ${sys} boot .";
+        snrs = "sudo nh ${sys} switch .";
+        snrt = "sudo nh ${sys} test .";
+
+        hmb = "nh home build .";
+        hmr = "nh home repl .";
+        hms = "nh home switch .";
+
         cdiff = "diff --new-line-format='+%L' --old-line-format='-%L' --unchanged-line-format=' %L'"; # diff with full context
-
-        nr = "${nixRebuild} --flake .";
-        nrb = "${nr} build";
-        snr = "sudo ${nr}";
-        snrb = "${snr} boot";
-        snrs = "${snr} switch";
-        snrt = "${snr} test";
-
-        hm = "HOME_MANAGER_BACKUP_OVERWRITE=true home-manager -b backup --flake .";
-        hmb = "${hm} build";
-        hms = "${hm} switch";
 
         lg = "lazygit";
 

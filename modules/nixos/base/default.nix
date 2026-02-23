@@ -15,7 +15,10 @@
     ./tailscale.nix
     ./users.nix
     ./zswap.nix
-  ];
+  ]
+  ++ (with inputs.self.modules.nixos; [
+    nh
+  ]);
 
   time.timeZone = "America/Boise";
   i18n.defaultLocale = "en_US.UTF-8";
@@ -24,12 +27,6 @@
   catppuccin = {
     flavor = "mocha";
     accent = "blue";
-  };
-
-  nix.gc = {
-    automatic = true;
-    options = "--delete-older-than 7d";
-    dates = "weekly";
   };
 
   system.configurationRevision = self.rev or self.dirtyRev or null;
