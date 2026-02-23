@@ -7,6 +7,7 @@
         enabled = true;
         header_name = "X-WEBAUTH-EMAIL";
         header_property = "email";
+        headers = "Role:X-WEBAUTH-ROLE";
         auto_sign_up = true;
         whitelist = "127.0.0.0/8";
         sync_ttl = 15;
@@ -20,7 +21,7 @@
       users = {
         allow_sign_up = false;
         auto_assign_org = true;
-        auto_assign_org_role = "Editor";
+        auto_assign_org_role = "Viewer";
       };
     };
 
@@ -39,6 +40,9 @@
           name = "Prometheus";
           type = "prometheus";
           url = "http://${config.services.prometheus.listenAddress}:${toString config.services.prometheus.port}";
+          jsonData.timeInterval =
+            let interval = config.services.prometheus.globalConfig.scrape_interval;
+            in if interval == null then "1m" else interval;
         }
       ];
     };
@@ -50,6 +54,13 @@
     user = "grafana";
   };
 
+  services.nginx.appendHttpConfig = ''
+    map $email $grafana_role {
+      "nathanregner@gmail.com" "Admin";
+      default                  "Viewer";
+    }
+  '';
+
   nginx.subdomain.grafana = {
     "/" = {
       proxyPass = "http://127.0.0.1:${toString config.services.grafana.settings.server.http_port}";
@@ -57,6 +68,7 @@
       extraConfig = # nginx
         ''
           proxy_set_header X-WEBAUTH-EMAIL $email;
+          proxy_set_header X-WEBAUTH-ROLE  $grafana_role;
         '';
     };
   };

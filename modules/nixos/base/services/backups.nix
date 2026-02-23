@@ -107,6 +107,7 @@ in
                     environmentFile = mkReadonly config.sops.secrets.restic-s3-env.path;
                     timerConfig = mkDefault {
                       OnCalendar = "daily";
+                      RandomizedDelaySec = "10m";
                       Persistent = true;
                     };
                   };
@@ -115,6 +116,15 @@ in
                     environmentFile = mkReadonly config.sops.templates.restic-server-env.path;
                     timerConfig = mkDefault {
                       OnCalendar = "0/6:00:00";
+                      RandomizedDelaySec = "10m";
+                      Persistent = true;
+                    };
+                  };
+                  google-drive = mkTarget base {
+                    repository = mkReadonly "rclone:google_drive:restic/${config.networking.hostName}/${name}";
+                    timerConfig = mkDefault {
+                      OnCalendar = "daily";
+                      RandomizedDelaySec = "10m";
                       Persistent = true;
                     };
                   };

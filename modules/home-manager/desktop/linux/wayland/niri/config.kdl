@@ -625,3 +625,11 @@ layer-rule {
         color "#00000064"
     }
 }
+
+// https://github.com/niri-wm/niri/wiki/Configuration:-Debug-Options#deactivate-unfocused-windows
+debug {
+    // Discord: fix notifications not sending if window isn't focused by the keyboard
+    deactivate-unfocused-windows
+    // Discord: fix tray icons not activating application
+    honor-xdg-activation-with-invalid-serial
+}

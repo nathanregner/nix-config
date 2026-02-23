@@ -190,6 +190,26 @@ local servers = {
       },
     },
   },
+  rust_analyzer = {
+    settings = {
+      -- https://rust-analyzer.github.io/manual.html#configuration
+      ["rust-analyzer"] = {
+        cargo = {
+          allFeatures = true,
+        },
+        check = {
+          command = "clippy",
+        },
+        completion = {
+          autoimport = { enable = true },
+        },
+        files = {
+          excludeDirs = { ".direnv", ".git" },
+        },
+      },
+    },
+  },
+
   terraformls = {
     -- root_dir = util.root_pattern(".terraform", ".terraform.lock.hcl", ".git"),
   },
