@@ -99,5 +99,10 @@
   home.packages = with pkgs.unstable; [
     difftastic
     git-filter-repo
+    pkgs.local.git-switch-worktrees
   ];
+
+  programs.zsh.initContent = lib.mkAfter ''
+    source ${pkgs.local.git-switch-worktrees.passthru.shellIntegration}
+  '';
 }

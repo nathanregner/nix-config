@@ -6,9 +6,9 @@ hs.loadSpoon("ControlEscape"):start()
 ---@type hs.screen[]
 local screens = hs.screen.allScreens()
 for _, screen in ipairs(screens) do
-  print(screen:id(), screen:name())
-  local spaces = hs.spaces.spacesForScreen(screen)
-  print(spaces)
+	print(screen:id(), screen:name())
+	local spaces = hs.spaces.spacesForScreen(screen)
+	print(spaces)
 end
 
 -- for i, x in ipairs(hs.application.runningApplications()) do
