@@ -735,7 +735,6 @@ require("lazy").setup({
     end,
   },
 
-
   {
     "chrishrb/gx.nvim",
     dependencies = { "nvim-lua/plenary.nvim" },
@@ -1096,14 +1095,13 @@ vim.filetype.add({
   },
   -- Detect and apply filetypes based on the entire filename
   filename = {
-    [".env"] = "sh",
-    ["env"] = "sh",
+    [".env"] = "dotenv",
     ["tsconfig.json"] = "jsonc",
   },
   -- Detect and apply filetypes based on certain patterns of the filenames
   pattern = {
     -- INFO: Match filenames like - ".env.example", ".env.local" and so on
-    ["%.env%.[%w_.-]+"] = "sh",
+    ["%.env%.[%w_.-]+"] = "dotenv",
   },
 })
 
