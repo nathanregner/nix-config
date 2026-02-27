@@ -47,6 +47,14 @@
           "Read(**/secrets/**)"
         ];
       };
+
+      fileSuggestion = {
+        type = "command";
+        command = pkgs.writeShellScript "claude-fzf" ''
+          QUERY=$(jq -r '.query // ""')
+          ${config.programs.fzf.defaultCommand} "''${CLAUDE_PROJECT_DIR:-.}" | fzf --filter "$QUERY"
+        '';
+      };
     };
   };
 
