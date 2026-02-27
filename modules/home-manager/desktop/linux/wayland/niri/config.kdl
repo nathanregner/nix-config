@@ -354,7 +354,6 @@ binds {
     // You can also move the mouse into the top-left hot corner,
     // or do a four-finger swipe up on a touchpad.
     Mod+O repeat=false { toggle-overview; }
-    Mod+Tab repeat=false { toggle-overview; }
 
     Mod+Q { close-window; }
 
