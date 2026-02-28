@@ -36,6 +36,7 @@ in
     notificationSender = "hydra@nregner.net";
     useSubstitutes = true;
     inherit (self.globals.services.hydra) port;
+    dbi = "dbi:Pg:dbname=hydra;host=${config.services.pgbouncer.settings.pgbouncer.unix_socket_dir};user=hydra;";
     buildMachinesFiles = [
       "/var/lib/hydra/machines"
       (pkgs.writeTextFile {
@@ -62,6 +63,13 @@ in
     '';
   };
 
+  services.pgbouncer.settings.databases.hydra = "host=/run/postgresql user=hydra";
+
+  systemd.services.hydra-init = {
+    requires = [ "pgbouncer.service" ];
+    after = [ "pgbouncer.service" ];
+  };
+
   services.queue-runner-dev = {
     enable = true;
   };
@@ -70,6 +78,14 @@ in
 
   services.postgresql.identMap = ''
     hydra-users nregner hydra
+    hydra hydra hydra
+    hydra hydra-queue-runner hydra
+    hydra hydra-www hydra
+    hydra root hydra
+  '';
+
+  services.postgresql.authentication = ''
+    local all hydra peer map=hydra
   '';
 
   local.services.backup.jobs.hydra = {

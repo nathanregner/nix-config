@@ -7,6 +7,7 @@
     ./hydra.nix
     ./mealie.nix
     ./nginx.nix
+    ./postgresql.nix
     ./prometheus.nix
     ./qbittorrent.nix
     ./reposilite.nix
