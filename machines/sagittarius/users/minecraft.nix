@@ -2,8 +2,16 @@
 {
   local.users.minecraft = { };
 
-  # TODO: cleanup
-  services.restic.backups.minecraft-s3 = {
+  networking.firewall = {
+    allowedTCPPorts = [ 25565 ];
+    allowedUDPPorts = [ 25565 ];
+  };
+
+  nginx.subdomain.minecraft."/" = {
+    proxyPass = "http://127.0.0.1:65000/";
+  };
+
+  local.services.backup.jobs.minecraft = {
     timerConfig = {
       OnCalendar = lib.mkForce "hourly";
       Persistent = true;
@@ -17,12 +25,4 @@
     ];
   };
 
-  networking.firewall = {
-    allowedTCPPorts = [ 25565 ];
-    allowedUDPPorts = [ 25565 ];
-  };
-
-  nginx.subdomain.minecraft."/" = {
-    proxyPass = "http://127.0.0.1:65000/";
-  };
 }

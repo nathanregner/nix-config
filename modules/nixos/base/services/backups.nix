@@ -96,21 +96,11 @@ in
 
             targets = mkOption {
               default = {
-                s3 = { };
                 server = { };
                 google-drive = { };
               };
               type = types.submodule {
                 options = {
-                  s3 = mkTarget base {
-                    repository = mkReadonly "s3:s3.dualstack.us-west-2.amazonaws.com/nregner-restic/${config.networking.hostName}/${name}";
-                    environmentFile = mkReadonly config.sops.secrets.restic-s3-env.path;
-                    timerConfig = mkDefault {
-                      OnCalendar = "daily";
-                      RandomizedDelaySec = "10m";
-                      Persistent = true;
-                    };
-                  };
                   server = mkTarget base {
                     repository = mkReadonly "rest:http://sagittarius:${toString self.globals.services.restic-server.port}/${config.networking.hostName}/${name}";
                     environmentFile = mkReadonly config.sops.templates.restic-server-env.path;
@@ -187,14 +177,7 @@ in
       {
         sops.secrets = {
           restic-password = {
-            key = "restic_password";
-            group = "restic";
-            mode = "0440";
-          };
-        }
-        // lib.optionalAttrs (hasTarget "s3") {
-          restic-s3-env = {
-            key = "restic/s3_env";
+            key = "restic/password";
             group = "restic";
             mode = "0440";
           };
