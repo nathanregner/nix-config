@@ -14,6 +14,8 @@
         auth_type = "hba";
         ignore_startup_parameters = "extra_float_digits";
         pool_mode = "transaction";
+        # auth_hba_file = config.services.postgresql.settings.hba_file;
+        # auth_ident_file = config.services.postgresql.settings.ident_file;
       };
     };
   };
