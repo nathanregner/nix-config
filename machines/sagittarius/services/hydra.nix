@@ -36,7 +36,7 @@ in
     notificationSender = "hydra@nregner.net";
     useSubstitutes = true;
     inherit (self.globals.services.hydra) port;
-    dbi = "dbi:Pg:dbname=hydra;host=${config.services.pgbouncer.settings.pgbouncer.unix_socket_dir};user=hydra;";
+    dbi = "dbi:Pg:dbname=hydra;host=${config.services.pgbouncer.settings.pgbouncer.unix_socket_dir};port=${toString config.services.pgbouncer.settings.pgbouncer.listen_port};user=hydra;";
     buildMachinesFiles = [
       "/var/lib/hydra/machines"
       (pkgs.writeTextFile {

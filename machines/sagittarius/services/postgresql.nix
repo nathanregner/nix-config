@@ -11,6 +11,8 @@
       pgbouncer = {
         unix_socket_dir = "/run/pgbouncer";
         listen_port = 6432;
+        auth_type = "hba";
+        ignore_startup_parameters = "extra_float_digits";
         pool_mode = "transaction";
       };
     };
