@@ -46,14 +46,6 @@
         treefmt-nix.follows = "treefmt-nix";
       };
     };
-    hydra-queue-runner = {
-      url = "github:helsinki-systems/hydra-queue-runner";
-      inputs = {
-        nixpkgs.follows = "nixpkgs";
-        nixpkgs-unstable.follows = "nixpkgs-unstable";
-        treefmt-nix.follows = "treefmt-nix";
-      };
-    };
     mac-app-util = {
       url = "github:hraban/mac-app-util";
       inputs = {
