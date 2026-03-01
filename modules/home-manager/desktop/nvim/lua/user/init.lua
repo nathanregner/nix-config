@@ -231,6 +231,9 @@ require("lazy").setup({
         jsonls = {
           configured_servers_only = false,
         },
+        lspconfig = {
+          enabled = false,
+        },
       },
     },
     config = function(opts)
@@ -266,6 +269,7 @@ require("lazy").setup({
     dependencies = {
       "artemave/workspace-diagnostics.nvim",
       "folke/neoconf.nvim",
+      "mrjones2014/codesettings.nvim",
       "yioneko/nvim-vtsls",
     },
     config = function() require("user.lsp") end,
@@ -717,7 +721,6 @@ require("lazy").setup({
           -- enabled = false,
         },
         adapters = {
-          require("rustaceanvim.neotest"),
           require("neotest-jest")({
             -- jestCommand = "npx jest --",
             jest_test_discovery = true,

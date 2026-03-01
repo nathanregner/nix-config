@@ -188,13 +188,10 @@ local servers = {
       },
     },
   },
-  rust_analyzer = {
+  rust_analyzer = require("codesettings").with_local_settings("rust-analyzer", {
     settings = {
       -- https://rust-analyzer.github.io/manual.html#configuration
       ["rust-analyzer"] = {
-        cargo = {
-          allFeatures = true,
-        },
         check = {
           command = "clippy",
         },
@@ -206,8 +203,7 @@ local servers = {
         },
       },
     },
-  },
-
+  }),
   terraformls = {
     -- root_dir = util.root_pattern(".terraform", ".terraform.lock.hcl", ".git"),
   },
@@ -265,6 +261,15 @@ local servers = {
     },
   },
 }
+
+vim.lsp.config("*", {
+  before_init = function(_, config)
+    -- vim.notify("before_init")
+    -- vim.notify(config.name)
+    local codesettings = require("codesettings")
+    codesettings.with_local_settings(config.name, config)
+  end,
+})
 
 local capabilities = vim.lsp.protocol.make_client_capabilities()
 capabilities = vim.tbl_deep_extend("force", capabilities, require("blink.cmp").get_lsp_capabilities({}, false))
