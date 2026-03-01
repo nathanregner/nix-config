@@ -1,15 +1,24 @@
-{ config, lib, ... }:
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
 {
   programs.claude-code = {
     enable = true;
+    package = pkgs.local.claude-code;
 
     settings = {
-      model = "sonnet";
+      model = "claude-opus-4-5";
+      availableModels = [
+        "claude-sonnet-4-5"
+        "claude-opus-4-5"
+        "haiku"
+      ];
       permissions = {
         defaultMode = "acceptEdits";
-
         allow = [
-          "Bash(cargo b:*)"
           "Bash(cargo clean:*)"
           "Bash(cargo doc:*)"
           "Bash(cargo info:*)"
@@ -26,6 +35,7 @@
           "Read(~/.cargo/registry/**)"
           "WebFetch"
           "WebSearch"
+          "mcp__ide__getDiagnostics"
         ];
         ask = [
         ];
@@ -42,7 +52,7 @@
   };
 
   programs.git.ignores = [
-    "settings.local.json"
+    ".claude"
   ];
 
   programs.zsh = {
