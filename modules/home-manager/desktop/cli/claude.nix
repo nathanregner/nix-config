@@ -42,6 +42,49 @@
           "Read(**/secrets/**)"
         ];
       };
+
+      hooks = {
+        Notification = [
+          {
+            hooks = [
+              {
+                command = "tmux-claude-status-hook Notification";
+                type = "command";
+              }
+            ];
+          }
+        ];
+        PreToolUse = [
+          {
+            hooks = [
+              {
+                command = "tmux-claude-status-hook PreToolUse";
+                type = "command";
+              }
+            ];
+          }
+        ];
+        Stop = [
+          {
+            hooks = [
+              {
+                command = "tmux-claude-status-hook Stop";
+                type = "command";
+              }
+            ];
+          }
+        ];
+        UserPromptSubmit = [
+          {
+            hooks = [
+              {
+                command = "tmux-claude-status-hook UserPromptSubmit";
+                type = "command";
+              }
+            ];
+          }
+        ];
+      };
     };
   };
 
@@ -58,4 +101,20 @@
       fi
     '';
   };
+
+  programs.tmux = {
+    extraConfig = /* tmux */ ''
+      set -g @claude-status-key "a"
+      set -g @claude-next-done-key "c-n"
+      set -g @claude-wait-key "w"
+    '';
+
+    plugins = [
+      pkgs.local.tmux-claude-status
+    ];
+  };
+
+  home.packages = [
+    pkgs.local.tmux-claude-status
+  ];
 }

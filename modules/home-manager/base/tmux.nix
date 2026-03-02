@@ -4,7 +4,7 @@
 
   programs.tmux = {
     enable = true;
-    extraConfig = ''
+    extraConfig = /* tmux */ ''
       unbind r
       bind-key r source-file ${config.xdg.configHome}/tmux/tmux.conf \; display-message "tmux.conf reloaded"
 
