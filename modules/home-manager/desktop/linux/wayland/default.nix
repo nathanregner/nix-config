@@ -1,4 +1,4 @@
-{ inputs, pkgs, ... }:
+{ pkgs, ... }:
 let
   import-env = pkgs.writeShellScriptBin "import-env" (builtins.readFile ./import-env.sh);
 in
@@ -10,11 +10,9 @@ in
     ./clipboard.nix
     ./launcher/tofi.nix
     ./lock/hyprlock.nix
+    ./niri
     ./notification/mako.nix
-  ]
-  ++ (with inputs.self.modules.homeManager; [
-    niri
-  ]);
+  ];
 
   home.packages = [
     import-env

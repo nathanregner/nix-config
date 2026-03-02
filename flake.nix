@@ -15,7 +15,6 @@
       url = "github:LnL7/nix-darwin/nix-darwin-25.11";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    import-tree.url = "github:vic/import-tree";
 
     # Misc
     catppuccin-nix = {
@@ -44,14 +43,6 @@
       inputs = {
         flake-parts.follows = "flake-parts";
         nixpkgs.follows = "nixpkgs-unstable";
-        treefmt-nix.follows = "treefmt-nix";
-      };
-    };
-    hydra-queue-runner = {
-      url = "github:helsinki-systems/hydra-queue-runner";
-      inputs = {
-        nixpkgs.follows = "nixpkgs";
-        nixpkgs-unstable.follows = "nixpkgs-unstable";
         treefmt-nix.follows = "treefmt-nix";
       };
     };
@@ -114,8 +105,7 @@
       imports = [
         inputs.pkgs-by-name-for-flake-parts.flakeModule
         inputs.treefmt-nix.flakeModule
-      ]
-      ++ (inputs.import-tree ./flake-modules).imports;
+      ];
 
       perSystem =
         {

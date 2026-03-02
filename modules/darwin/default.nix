@@ -12,10 +12,7 @@
     ./nix.nix
     ./preferences.nix
     ./sops.nix
-  ]
-  ++ (with inputs.self.modules.homeManager; [
-    nh
-  ]);
+  ];
 
   # Create /etc/zshrc that loads the nix-darwin environment.
   programs.zsh.enable = true;

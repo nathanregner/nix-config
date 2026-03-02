@@ -14,7 +14,7 @@ jobs:
       - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
         with:
           token: ${{ secrets.GH_TOKEN_FOR_UPDATES }}
-          ref: next
+          ref: staging
       - id: attrs
         run: |
           echo "attrs=`nix eval .\#update-pkgs.passthru.attrs --json`" >> "$GITHUB_OUTPUT"
