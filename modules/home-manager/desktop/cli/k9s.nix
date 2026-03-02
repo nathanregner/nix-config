@@ -4,6 +4,15 @@
   programs.k9s = {
     enable = true;
     package = pkgs.unstable.k9s;
+
+    views = {
+      "v1/pods" = {
+        columns = [ { Version = ".metadata.labels\\.tags\\.datadoghq\\.com/version"; } ];
+      };
+      "v1/deployments" = {
+        columns = [ { Version = ".metadata.labels\\.tags\\.datadoghq\\.com/version"; } ];
+      };
+    };
   };
 
   xdg.enable = true;
