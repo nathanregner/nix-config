@@ -74,5 +74,8 @@
     extraPackages = with pkgs.unstable; [
       nix-update
     ];
+    extraEnvironment = {
+      inherit (config.environment.sessionVariables) NIX_PATH;
+    };
   };
 }
