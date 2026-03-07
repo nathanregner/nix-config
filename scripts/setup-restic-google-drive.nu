@@ -1,7 +1,12 @@
 #!/usr/bin/env nix-shell
 #!nix-shell -i nu -p nushell sops rclone
 
-def main [host: string] {
+# setup a rclone google drive target for restic backups remotely
+def main [
+  destination: string # [user@]host, root@host if user not provided (restic runs as root by default)
+] {
+  let destination = if ($destination | str contains "@") { $destination } else { $"root@($destination)" }
+
   let creds = (
     sops -d $"(git rev-parse --show-toplevel)/secrets.yaml"
     | from yaml
@@ -18,7 +23,7 @@ def main [host: string] {
 
   let token = (
     rclone authorize "drive"
-    --drive-scope "drive.file"
+    --drive-scope "drive.appfolder"
     $client_id
     $client_secret
     | complete
@@ -33,29 +38,30 @@ def main [host: string] {
 
   print "\nToken acquired successfully"
 
-  print $"Configuring rclone on ($host)..."
+  print $"Configuring rclone for ($destination)..."
 
   (
     $"[google_drive]
     type = drive
     client_id = ($client_id)
     client_secret = ($client_secret)
-    scope = drive.file
+    scope = drive.appfolder
+    root_folder_id = appDataFolder
     token = ($token)
     team_drive ="
-    | ssh $host "sudo mkdir -p /root/.config/rclone && sudo tee /root/.config/rclone/rclone.conf > /dev/null"
+    | ssh $destination "bash -c 'mkdir -p ~/.config/rclone && tee ~/.config/rclone/rclone.conf > /dev/null'"
   )
 
   print "\nTesting connection..."
   let test_result = (
-    ssh $host "sudo rclone lsd google_drive: 2>&1"
+    ssh $destination "rclone lsd google_drive: 2>&1"
     | complete
   )
 
   if $test_result.exit_code == 0 {
     print "✓ Connection successful"
     print $"\nSetup complete! Start backup with:"
-    print $"  ssh ($host) sudo systemctl start restic-backups-nixos-google-drive.service"
+    print $"  ssh ($destination) systemctl start restic-backups-nixos-google-drive.service"
   } else {
     print "✗ Connection test failed"
     print $test_result.stdout
