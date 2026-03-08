@@ -29,33 +29,6 @@ vim.api.nvim_create_autocmd({ "FileChangedShellPost" }, {
   end,
 })
 
-local function get_buffer_cwd()
-  -- Use the current buffer's path as the starting point for the git search
-  local current_file = vim.api.nvim_buf_get_name(0)
-  current_file = string.gsub(current_file, "^oil://", "")
-  local cwd = vim.fn.getcwd()
-  -- If the buffer is not associated with a file, return nil
-  if current_file == "" then
-    current_dir = cwd
-  else
-    -- Extract the directory from the current file's path
-    current_dir = vim.fn.fnamemodify(current_file, ":h")
-  end
-  return current_dir
-end
-
-local function get_git_root(current_dir)
-  if current_dir == nil then current_dir = get_buffer_cwd() end
-
-  -- Find the Git root directory from the current file's path
-  local git_root = vim.fn.systemlist("git -C " .. vim.fn.escape(current_dir, " ") .. " rev-parse --show-toplevel")[1]
-  if vim.v.shell_error ~= 0 then
-    print("Not a git repository. Searching on current working directory")
-    return nil
-  end
-  return git_root
-end
-
 local initial_cwd = vim.fn.getcwd()
 
 vim.g.fugitive_legacy_commands = 0
@@ -105,8 +78,31 @@ require("lazy").setup({
   -- },
 
   -- https://github.com/sindrets/diffview.nvim#configuration
+  -- TODO: C-d/C-u at top/bottom of diff moves to next file
+  -- TODO: :q on a buffer closes tab
   {
     "nathanregner/diffview.nvim",
+    lazy = false,
+    keys = function()
+      local git = require("user.git")
+      return {
+        { "<leader>dd", "<cmd>DiffviewOpen<cr>", desc = "Diffview Open" },
+        {
+          "<leader>dm",
+          function()
+            vim.cmd({
+              cmd = "DiffviewOpen",
+              args = {
+                --- could use main..., but that won't diff with the working tree
+                git.merge_base(git.default_branch()),
+              },
+            })
+          end,
+          desc = "Diffview Open ma{in,aster}",
+        },
+        { "<leader>du", "<cmd>DiffviewOpen @{u}<cr>", desc = "Diffview Open upstream" },
+      }
+    end,
     opts = {
       view = {
         merge_tool = {
@@ -556,7 +552,7 @@ require("lazy").setup({
           callback = function()
             local oil = require("oil")
             local cwd = oil.get_current_dir()
-            local git_root = get_git_root(cwd)
+            local git_root = require("user.git").root(cwd)
             if git_root == cwd then git_root = get_git_root(vim.fs.dirname(git_root)) end
             if git_root then oil.open(git_root) end
           end,

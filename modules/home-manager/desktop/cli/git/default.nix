@@ -13,6 +13,9 @@
       alias = {
         convert-to-worktrees = "!${lib.getExe pkgs.local.git-convert-to-worktrees}";
         ddiff = "-c diff.external=difft diff";
+        default-branch = "!${pkgs.writers.writeBash "git-default-branch" ''
+          [ -f $(git rev-parse --git-common-dir)/refs/remotes/origin/main ] && echo -n main || echo -n master
+        ''}";
         # https://github.com/orgs/community/discussions/9632#discussioncomment-4702442
         diff-refactor = ''
           -c color.diff.oldMoved='white dim'
