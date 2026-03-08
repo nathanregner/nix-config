@@ -104,4 +104,14 @@
     git-filter-repo
     local.git-prune-fork
   ];
+  programs.zsh.shellAliases = {
+    g- = ''cd "$(git rev-parse --show-toplevel)"'';
+    gco = "git checkout";
+    grc = "git rebase --continue";
+    gra = "git rebase abort";
+    gs = "git status";
+    gsw = "git switch";
+
+    # gfu = "git switch";
+  };
 }
