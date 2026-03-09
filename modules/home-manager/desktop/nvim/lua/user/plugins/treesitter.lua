@@ -1,10 +1,3 @@
-local function large_file(buf)
-  local max_filesize = 100 * 1024 -- 100 KB
-  local ok, stats = pcall(vim.loop.fs_stat, vim.api.nvim_buf_get_name(buf))
-  if ok and stats and stats.size > max_filesize then return true end
-  return false
-end
-
 ---@module "lazy"
 ---@type LazySpec
 return {
@@ -23,7 +16,7 @@ return {
       vim.api.nvim_create_autocmd("FileType", {
         group = group,
         callback = function(args)
-          if not large_file(args.buf) then
+          if not vim.b[args.buf].bigfile then
             local lang = vim.treesitter.language.get_lang(args.match)
             if lang then
               require("user.treesitter_incremental_selection").attach(args.buf)

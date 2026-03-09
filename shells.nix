@@ -1,8 +1,11 @@
 {
   inputs',
-  pkgs,
   config,
+  pkgs,
 }:
+let
+  inherit (pkgs) lib;
+in
 {
   default = pkgs.devshell.mkShell {
     packagesFrom = [
@@ -10,9 +13,24 @@
     ];
     packages = with pkgs.unstable; [
       inputs'.deploy-rs.packages.default
-      local.generate-sops-keys
       sops
       # tenv
+    ];
+    env = [
+      {
+        name = "SOPS_AGE_KEY_CMD";
+        value = pkgs.writers.writeBash "sops-age-key" {
+          makeWrapperArgs = [
+            "--prefix"
+            "PATH"
+            ":"
+            "${lib.makeBinPath [
+              pkgs.ssh-to-age
+              pkgs.age
+            ]}"
+          ];
+        } "ssh-to-age -private-key -i ~/.ssh/id_ed25519";
+      }
     ];
   };
 
@@ -29,12 +47,9 @@
         value = "experimental-features = nix-command flakes";
       }
     ];
-    packages =
-      with pkgs.unstable;
-      [
-        pkgs.local.generate-sops-keys
-        inputs'.home-manager-unstable.packages.home-manager
-      ]
-      ++ pkgs.lib.optionals pkgs.stdenv.isDarwin [ inputs'.nix-darwin.packages.darwin-rebuild ];
+    packages = [
+      inputs'.home-manager-unstable.packages.home-manager
+    ]
+    ++ lib.optionals pkgs.stdenv.isDarwin [ inputs'.nix-darwin.packages.darwin-rebuild ];
   };
 }

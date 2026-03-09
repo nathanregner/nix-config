@@ -1,7 +1,12 @@
 name: Run nix-update
 
 on:
-  workflow_dispatch: # allow manual trigger
+  workflow_dispatch:
+    inputs:
+      packages:
+        description: "Comma-separated list of packages to update"
+        required: false
+        type: string
   schedule:
     - cron: "0 16 * * 6" # min hour day-of-month month day-of-week
 
@@ -16,8 +21,15 @@ jobs:
           token: ${{ secrets.GH_TOKEN_FOR_UPDATES }}
           ref: staging
       - id: attrs
+        env:
+          PACKAGES: ${{ inputs.packages }}
         run: |
-          echo "attrs=`nix eval .\#update-pkgs.passthru.attrs --json`" >> "$GITHUB_OUTPUT"
+          if [[ -n "$PACKAGES" ]]; then
+            attrs=$(nix run nixpkgs#jq -- -Rc 'split(",")' <<<$PACKAGES)
+          else
+            attrs=$(nix eval .\#update-pkgs.passthru.attrs --json)
+          fi
+          echo "attrs=$attrs" >> "$GITHUB_OUTPUT"
   nix-update:
     runs-on: [self-hosted]
     needs: nix-update-matrix
@@ -29,10 +41,12 @@ jobs:
       - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
         with:
           token: ${{ secrets.GH_TOKEN_FOR_UPDATES }}
-          ref: next
+          ref: staging
       - name: Run update script
         run: |
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git config user.name "github-actions[bot]"
           nix run .\#update-pkgs -- ${{ matrix.attr }}
+          git add -A
+          git commit -m "build: update ${{ matrix.attr }}" || echo "no changes"
           git push

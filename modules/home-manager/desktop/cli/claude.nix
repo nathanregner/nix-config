@@ -30,6 +30,7 @@
           "Read(~/.cargo/registry/**)"
           "WebFetch"
           "WebSearch"
+          "mcp__ide__getDiagnostics"
         ];
         ask = [
         ];

@@ -1,11 +1,3 @@
--- return {
---   "greggh/claude-code.nvim",
---   dependencies = {
---     "nvim-lua/plenary.nvim",
---   },
---   opts = {},
--- }
-
 return {
   "coder/claudecode.nvim",
   dependencies = { "folke/snacks.nvim" },
