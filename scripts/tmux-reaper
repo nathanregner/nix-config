@@ -1,0 +1,68 @@
+#!/usr/bin/env nu
+
+use std repeat
+
+def ps-tree [ppid: int] {
+  let by_ppid = ps -l | group-by ppid
+
+  def build-tree [proc: record depth: int] {
+    let children = $by_ppid | get -o ($proc.pid | into string) | each { build-tree $in ($depth + 1) } | default []
+    $proc | merge {children: $children depth: $depth}
+  }
+
+  $by_ppid | get -o ($ppid | into string) | default [] | each { build-tree $in 0 }
+}
+
+def display-tree [expand: int] {
+  let proc = $in
+  let depth = $proc.depth
+  let indent = "│ " | repeat $depth | str join
+  let prefix = if $depth > 0 { $"($indent)└ " } else { "" }
+  let row = $proc | merge {command: ($"(ansi grey)($prefix)(ansi reset)($proc.command)" | str substring 0..100 | str trim)}
+
+  if $expand <= 0 {
+    let descendant_count = $proc.children | length
+    if $descendant_count > 0 {
+      let ellipsis_indent = if $depth > 0 { 1..$depth | each { "│ " } | str join } else { "" }
+      [$row {pid: null command: $"(ansi grey)│ ($prefix)... \(pass -d to expand\)(ansi reset)" cwd: null start_time: null}]
+    } else {
+      [$row]
+    }
+  } else {
+    let children = $proc.children | each { display-tree ($expand - 1) } | flatten
+    [$row ...$children]
+  }
+}
+
+def main [
+  --dry-run (-n)
+  --depth (-d): int = 3 # how far to expand the process tree preview
+] {
+  let tmux_pid = tmux display-message -p '#{pid}' | str trim | into int
+  let tmux_children = ps-tree $tmux_pid # list children first to avoid race
+  let pane_pids = tmux list-panes -a -F '#{pane_pid}' | lines | each { into int }
+  let orphans = $tmux_children | where { $in.pid not-in $pane_pids }
+
+  if ($orphans | is-empty) {
+    print "No orphaned processes found"
+    return
+  }
+
+  let orphan_tree = $orphans | each { display-tree $depth } | flatten
+
+  print "Orphaned process trees:"
+  print ($orphan_tree | select pid command cwd start_time | table)
+
+  if $dry_run {
+    print "\nDry run - not killing processes"
+    return
+  }
+
+  let confirm = input "Kill these processes? [y/N] "
+  if $confirm == "y" or $confirm == "Y" {
+    $orphans | each {|orphan| kill -9 $orphan.pid }
+    print "Done"
+  } else {
+    print "Aborted"
+  }
+}
