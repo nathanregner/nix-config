@@ -102,6 +102,7 @@ require("lazy").setup({
   -- TODO: :q on a buffer closes tab
   {
     "nathanregner/diffview.nvim",
+    lazy = false,
     keys = function()
       local git = require("user.git")
       return {
