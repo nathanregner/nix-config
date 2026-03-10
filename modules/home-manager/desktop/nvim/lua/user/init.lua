@@ -29,26 +29,6 @@ vim.api.nvim_create_autocmd({ "FileChangedShellPost" }, {
   end,
 })
 
-local function get_buffer_cwd()
-  -- Use the current buffer's path as the starting point for the git search
-  local current_file = vim.api.nvim_buf_get_name(0)
-  current_file = string.gsub(current_file, "^oil://", "")
-  local cwd = vim.fn.getcwd()
-  -- If the buffer is not associated with a file, return nil
-  if current_file == "" then
-    current_dir = cwd
-  else
-    -- Extract the directory from the current file's path
-    current_dir = vim.fn.fnamemodify(current_file, ":h")
-  end
-  return current_dir
-end
-
-local function get_git_default_branch(current_dir)
-  if current_dir == nil then current_dir = get_buffer_cwd() end
-  return vim.fn.systemlist("git -C " .. vim.fn.escape(current_dir, " ") .. " default-branch")[1]
-end
-
 local initial_cwd = vim.fn.getcwd()
 
 vim.g.fugitive_legacy_commands = 0

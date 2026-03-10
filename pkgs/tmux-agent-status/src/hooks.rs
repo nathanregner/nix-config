@@ -1,0 +1,115 @@
+use crate::state::{AgentStatus, StatusFile};
+use anyhow::{Context, Result, bail};
+use serde::{Deserialize, Serialize};
+use std::io::Read;
+use tmux_interface::{DisplayMessage, RefreshClient, Tmux};
+
+/// https://code.claude.com/docs/en/hooks
+#[derive(Deserialize, Debug)]
+#[serde(tag = "hook_event_name")]
+enum HookInput {
+    UserPromptSubmit,
+    PreToolUse,
+    Stop,
+    Notification { notification_type: NotificationType },
+}
+
+/// https://code.claude.com/docs/en/hooks#notification
+#[derive(Deserialize, Debug)]
+#[serde(rename_all = "snake_case")]
+enum NotificationType {
+    IdlePrompt,
+    PermissionPrompt,
+    ElicitationDialog,
+    #[serde(untagged)]
+    Unknown(String),
+}
+
+#[derive(Serialize, Debug)]
+struct HookOutput {
+    #[serde(rename = "systemMessage")]
+    system_message: String,
+}
+
+pub fn run(stdin: impl Read) {
+    if let Err(err) = handle_inner(stdin) {
+        tracing::error!("{err:#}");
+        let output = HookOutput {
+            system_message: format!("tmux-agent-status hook error: {err:#}"),
+        };
+        println!("{}", serde_json::to_string(&output).unwrap());
+    }
+}
+
+fn handle_inner(mut stdin: impl Read) -> Result<()> {
+    let session = match get_current_tmux_session()? {
+        Some(s) => s,
+        None => return Ok(()), // Not in tmux
+    };
+
+    let mut json = String::new();
+    stdin
+        .read_to_string(&mut json)
+        .context("failed to read stdin")?;
+    let event = serde_json::from_str::<HookInput>(&json)
+        .with_context(|| format!("failed to parse {json}"))?;
+
+    let status = match event {
+        HookInput::UserPromptSubmit | HookInput::PreToolUse => Some(AgentStatus::Working),
+        HookInput::Stop => Some(AgentStatus::Idle),
+        HookInput::Notification { notification_type } => match notification_type {
+            NotificationType::IdlePrompt => Some(AgentStatus::Idle),
+            NotificationType::PermissionPrompt | NotificationType::ElicitationDialog => {
+                Some(AgentStatus::Waiting)
+            }
+            NotificationType::Unknown(ty) => {
+                tracing::warn!("Ignoring unknown notification_type: {}", ty);
+                None
+            }
+        },
+    };
+
+    if let Some(status) = status {
+        let mut status_file = StatusFile::load()?;
+        let should_notify = status == AgentStatus::Waiting;
+
+        // Use parent PID (Claude Code's PID) rather than our own
+        let pid = std::os::unix::process::parent_id();
+        status_file.set_agent(&session, pid, status);
+        status_file.save()?;
+
+        // Refresh tmux status bar immediately
+        if let Err(err) = Tmux::new()
+            .command(RefreshClient::new().status_line())
+            .output()
+        {
+            tracing::warn!("failed to refresh tmux status bar: {err:#}");
+        }
+
+        if should_notify {
+            print!("\x07"); //  terminal bell
+        }
+    }
+
+    Ok(())
+}
+
+fn get_current_tmux_session() -> Result<Option<String>> {
+    let cmd = DisplayMessage::new().message("#{session_name}").print();
+    let output = Tmux::new()
+        .command(cmd)
+        .output()
+        .context("failed to run tmux display-message")?;
+
+    if !output.success() {
+        // Not in tmux session
+        return Ok(None);
+    }
+
+    let session = String::from_utf8_lossy(&output.stdout()).trim().to_string();
+    if session.is_empty() {
+        bail!("tmux display-message returned empty session name");
+    }
+
+    Ok(Some(session))
+}

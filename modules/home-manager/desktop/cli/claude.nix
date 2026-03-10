@@ -10,6 +10,39 @@
     package = pkgs.local.claude-code;
 
     settings = {
+      hooks =
+        let
+          tmux-hook = {
+            type = "command";
+            command = "tmux-agent-status hook";
+          };
+        in
+        {
+          Notification = [
+            {
+              matcher = "";
+              hooks = [ tmux-hook ];
+            }
+          ];
+          PreToolUse = [
+            {
+              matcher = "";
+              hooks = [ tmux-hook ];
+            }
+          ];
+          Stop = [
+            {
+              matcher = "";
+              hooks = [ tmux-hook ];
+            }
+          ];
+          UserPromptSubmit = [
+            {
+              matcher = "";
+              hooks = [ tmux-hook ];
+            }
+          ];
+        };
       model = "claude-opus-4-5";
       permissions = {
         defaultMode = "acceptEdits";
@@ -41,49 +74,6 @@
           "Read(**/.env*)"
           "Read(**/.ssh/**)"
           "Read(**/secrets/**)"
-        ];
-      };
-
-      hooks = {
-        Notification = [
-          {
-            hooks = [
-              {
-                command = "tmux-claude-status-hook Notification";
-                type = "command";
-              }
-            ];
-          }
-        ];
-        PreToolUse = [
-          {
-            hooks = [
-              {
-                command = "tmux-claude-status-hook PreToolUse";
-                type = "command";
-              }
-            ];
-          }
-        ];
-        Stop = [
-          {
-            hooks = [
-              {
-                command = "tmux-claude-status-hook Stop";
-                type = "command";
-              }
-            ];
-          }
-        ];
-        UserPromptSubmit = [
-          {
-            hooks = [
-              {
-                command = "tmux-claude-status-hook UserPromptSubmit";
-                type = "command";
-              }
-            ];
-          }
         ];
       };
     };
