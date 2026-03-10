@@ -16,5 +16,7 @@
 
   programs.zsh.initContent = builtins.readFile ./tmux.sh;
 
-  home.packages = with pkgs.unstable; [ tmux-sessionizer ];
+  home.packages = with pkgs.unstable; [
+    tmux-sessionizer
+  ];
 }

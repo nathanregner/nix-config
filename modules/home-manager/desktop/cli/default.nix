@@ -1,6 +1,7 @@
 { pkgs, ... }:
 {
   imports = [
+    ./amux.nix
     ./ast-grep
     ./bat.nix
     ./claude.nix
