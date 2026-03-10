@@ -51,7 +51,7 @@ require("conform").setup({
       "ruff_organize_imports",
     },
     query = { "topiary_tree_sitter_query" },
-    rust = { "rustfmt" },
+    rust = { "rustfmt", "injected" },
     sh = { "shfmt" },
     terraform = { "terraform_fmt", "injected" },
     toml = { "taplo" },
