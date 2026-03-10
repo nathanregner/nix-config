@@ -58,7 +58,7 @@ in
   '';
 
   local.services.backup.jobs.hydra = {
-    dynamicFilesFrom = ''${pkgs.writers.writeNu "pg_dump-hydra"
+    dynamicFilesFrom = "${pkgs.writers.writeNu "pg_dump-hydra"
       {
         makeWrapperArgs = [
           "--prefix"
@@ -73,7 +73,7 @@ in
         pg_dump -d hydra -Z zstd -Fd -f $tmp
         $tmp
       ''
-    }'';
+    }";
   };
 
   services.prometheus.scrapeConfigs = [

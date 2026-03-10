@@ -97,6 +97,8 @@
       inherit (nixpkgs) lib;
     in
     flake-parts.lib.mkFlake { inherit inputs; } {
+      # nix eval .#debug.<...>
+      # debug = true;
       systems = [
         "aarch64-linux"
         "x86_64-linux"

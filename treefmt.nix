@@ -1,4 +1,7 @@
 { pkgs }:
+let
+  inherit (pkgs) lib;
+in
 {
   projectRootFile = "flake.nix";
 
@@ -13,6 +16,7 @@
         "**/secrets.yaml"
       ];
     };
+    rustfmt.enable = true;
     shfmt.enable = true;
     statix.enable = true;
     stylua.enable = true;
@@ -37,5 +41,6 @@
         "*.edn"
       ];
     };
+    rustfmt.options = [ "+nightly" ];
   };
 }
