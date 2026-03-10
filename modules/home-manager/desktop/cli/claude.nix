@@ -10,6 +10,45 @@
     package = pkgs.local.claude-code;
 
     settings = {
+      hooks =
+        let
+          tmux-hook = {
+            type = "command";
+            command = "amux hook";
+          };
+        in
+        {
+          Notification = [
+            {
+              matcher = "";
+              hooks = [ tmux-hook ];
+            }
+          ];
+          PreToolUse = [
+            {
+              matcher = "";
+              hooks = [ tmux-hook ];
+            }
+          ];
+          PostToolUse = [
+            {
+              matcher = "";
+              hooks = [ tmux-hook ];
+            }
+          ];
+          Stop = [
+            {
+              matcher = "";
+              hooks = [ tmux-hook ];
+            }
+          ];
+          UserPromptSubmit = [
+            {
+              matcher = "";
+              hooks = [ tmux-hook ];
+            }
+          ];
+        };
       model = "claude-opus-4-5";
       availableModels = [
         "claude-sonnet-4-5"
