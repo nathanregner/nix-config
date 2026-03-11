@@ -14,7 +14,7 @@
         let
           tmux-hook = {
             type = "command";
-            command = "tmux-agent-status hook";
+            command = "amux hook";
           };
         in
         {
@@ -25,6 +25,12 @@
             }
           ];
           PreToolUse = [
+            {
+              matcher = "";
+              hooks = [ tmux-hook ];
+            }
+          ];
+          PostToolUse = [
             {
               matcher = "";
               hooks = [ tmux-hook ];
@@ -92,20 +98,4 @@
       fi
     '';
   };
-
-  programs.tmux = {
-    extraConfig = /* tmux */ ''
-      set -g @claude-status-key "a"
-      set -g @claude-next-done-key "c-n"
-      set -g @claude-wait-key "w"
-    '';
-
-    plugins = [
-      pkgs.local.tmux-claude-status
-    ];
-  };
-
-  home.packages = [
-    pkgs.local.tmux-claude-status
-  ];
 }

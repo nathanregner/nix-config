@@ -43,27 +43,19 @@ function M.create_buffer_cache()
   ---@param type_name string
   ---@param bufnr integer
   ---@return any
-  function cache.get(type_name, bufnr)
-    return items[bufnr][type_name]
-  end
+  function cache.get(type_name, bufnr) return items[bufnr][type_name] end
 
   ---@param type_name string
   ---@param bufnr integer
   ---@return boolean
-  function cache.has(type_name, bufnr)
-    return cache.get(type_name, bufnr) ~= nil
-  end
+  function cache.has(type_name, bufnr) return cache.get(type_name, bufnr) ~= nil end
 
   ---@param type_name string
   ---@param bufnr integer
-  function cache.remove(type_name, bufnr)
-    items[bufnr][type_name] = nil
-  end
+  function cache.remove(type_name, bufnr) items[bufnr][type_name] = nil end
 
   ---@param bufnr integer
-  function cache.clear_buffer(bufnr)
-    items[bufnr] = nil
-  end
+  function cache.clear_buffer(bufnr) items[bufnr] = nil end
 
   return cache
 end
