@@ -781,6 +781,11 @@ require("lazy").setup({
             end
           end,
         },
+        nix_fetch_github = {
+          name = "nix_fetch_github",
+          filetype = { "nix" },
+          handle = function(_, _, _) return require("user.gx.nix_fetch").handle() end,
+        },
         rust = {
           name = "rust",
           filename = "Cargo.toml",
