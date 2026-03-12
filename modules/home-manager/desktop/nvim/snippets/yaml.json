@@ -13,8 +13,12 @@
       "  sphere-prod: sphere"
     ]
   },
+  "logging_level": {
+    "body": ["- name: LOGGING_LEVEL_WEB", "  value: DEBUG"],
+    "prefix": "logging_level"
+  },
   "ecr-image-nregner": {
-    "body": "image: 557126177626.dkr.ecr.us-west-2.amazonaws.com/nregner",
-    "prefix": "ecr-image-nregner"
+    "prefix": "ecr-image-nregner",
+    "body": "image: 557126177626.dkr.ecr.us-west-2.amazonaws.com/nregner"
   }
 }
