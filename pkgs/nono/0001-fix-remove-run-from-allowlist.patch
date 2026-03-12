@@ -1,0 +1,34 @@
+From cd4ed3e4b157ea01b1b985d7b870dd90e0722bcd Mon Sep 17 00:00:00 2001
+From: Nathan Regner <nathanregner@gmail.com>
+Date: Wed, 11 Mar 2026 23:07:06 -0600
+Subject: [PATCH] fix; remove /run from allowlist
+
+---
+ crates/nono-cli/data/policy.json | 4 ----
+ 1 file changed, 4 deletions(-)
+
+diff --git a/crates/nono-cli/data/policy.json b/crates/nono-cli/data/policy.json
+index d833d8e..3a5f0ed 100644
+--- a/crates/nono-cli/data/policy.json
++++ b/crates/nono-cli/data/policy.json
+@@ -216,8 +216,6 @@
+           "/Applications",
+           "/cores",
+           "/opt",
+-          "/Volumes",
+-          "/run",
+           "/nix"
+         ]
+       },
+@@ -270,8 +268,6 @@
+           "/dev/pts",
+           "/proc",
+           "/sys",
+-          "/run",
+-          "/var/run",
+           "/tmp",
+           "/nix"
+         ]
+-- 
+2.53.0
+

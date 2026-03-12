@@ -3,7 +3,7 @@
   imports = [
     ./ast-grep
     ./bat.nix
-    ./claude.nix
+    ./claude
     ./direnv
     ./eza.nix
     ./git

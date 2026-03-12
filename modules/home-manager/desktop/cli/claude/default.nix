@@ -103,4 +103,18 @@
       fi
     '';
   };
+
+  home.packages = [
+    pkgs.local.nono
+    (pkgs.writeShellApplication {
+      name = "claude-nono";
+      runtimeInputs = [ ];
+      text = ''
+        nono run --allow-cwd --profile claude
+      '';
+    })
+  ];
+
+  xdg.configFile."nono/profiles/claude.json".source =
+    config.lib.file.mkFlakeSymlink ./nono.profile.json;
 }

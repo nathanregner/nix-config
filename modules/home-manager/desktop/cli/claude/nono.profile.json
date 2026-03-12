@@ -1,0 +1,13 @@
+{
+  "meta": { "name": "claude" },
+  "extends": "claude-code",
+  "workdir": { "access": "readwrite" },
+  "filesystem": {
+    "allow": ["$HOME/.cache/amux"],
+    "read": [],
+    "write": [],
+    "allow_file": [],
+    "read_file": [],
+    "write_file": []
+  }
+}

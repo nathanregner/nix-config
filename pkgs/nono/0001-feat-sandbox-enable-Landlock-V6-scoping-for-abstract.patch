@@ -1,0 +1,87 @@
+From 6ab8e30be1759508ad57492580d2ab5627521115 Mon Sep 17 00:00:00 2001
+From: Nathan Regner <nathanregner@gmail.com>
+Date: Wed, 11 Mar 2026 23:07:06 -0600
+Subject: [PATCH] feat(sandbox): enable Landlock V6 scoping for abstract Unix
+ sockets
+
+Add `.scope(Scope::from_all(target_abi))` to the ruleset builder in
+`apply_with_abi()` to enable process scoping on Landlock V6+ kernels.
+
+This blocks:
+- Abstract Unix socket connections to sockets created outside the
+  sandbox (e.g., D-Bus abstract sockets)
+- Signals to processes outside the Landlock domain
+
+Known limitation:
+Filesystem-based Unix sockets (like tmux's /run/user/$UID/tmux-*/default)
+are NOT blocked. Landlock currently lacks LANDLOCK_SCOPE_PATHNAME_UNIX_SOCKET
+to restrict connect() on pathname-based sockets. A kernel patch series is
+in progress: https://lwn.net/Articles/1052264/
+
+Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>
+---
+ .envrc                           |  1 +
+ crates/nono-cli/data/policy.json |  6 ++----
+ crates/nono/src/sandbox/linux.rs | 14 ++++++++++++++
+ 3 files changed, 17 insertions(+), 4 deletions(-)
+ create mode 100644 .envrc
+
+diff --git a/.envrc b/.envrc
+new file mode 100644
+index 0000000..3d75fcf
+--- /dev/null
++++ b/.envrc
+@@ -0,0 +1 @@
++use flake ~/nix-config/local#nono.passthru.devShell
+diff --git a/crates/nono-cli/data/policy.json b/crates/nono-cli/data/policy.json
+index 3851930..82d0ae8 100644
+--- a/crates/nono-cli/data/policy.json
++++ b/crates/nono-cli/data/policy.json
+@@ -216,8 +216,7 @@
+           "/Applications",
+           "/cores",
+           "/opt",
+-          "/Volumes",
+-          "/run",
++          "/run/current-system/sw/bin",
+           "/nix"
+         ]
+       },
+@@ -270,8 +269,7 @@
+           "/dev/pts",
+           "/proc",
+           "/sys",
+-          "/run",
+-          "/var/run",
++          "/run/current-system/sw/bin",
+           "/tmp",
+           "/nix"
+         ]
+diff --git a/crates/nono/src/sandbox/linux.rs b/crates/nono/src/sandbox/linux.rs
+index 7d43c5a..1d56dfc 100644
+--- a/crates/nono/src/sandbox/linux.rs
++++ b/crates/nono/src/sandbox/linux.rs
+@@ -349,6 +349,20 @@ pub fn apply_with_abi(caps: &CapabilitySet, abi: &DetectedAbi) -> Result<()> {
+         ruleset_builder
+     };
+ 
++    // Enable process scoping (abstract Unix sockets, ptrace) on V6+
++    // Use HardRequirement so that if scoping is available, it must be enforced
++    let scopes = Scope::from_all(target_abi);
++    let ruleset_builder = if !scopes.is_empty() {
++        debug!("Handling process scopes: {:?}", scopes);
++        ruleset_builder
++            .set_compatibility(CompatLevel::HardRequirement)
++            .scope(scopes)
++            .map_err(|e| NonoError::SandboxInit(format!("Failed to scope: {}", e)))?
++            .set_compatibility(CompatLevel::BestEffort)
++    } else {
++        ruleset_builder
++    };
++
+     let mut ruleset = ruleset_builder
+         .create()
+         .map_err(|e| NonoError::SandboxInit(format!("Failed to create ruleset: {}", e)))?;
+-- 
+2.53.0
+

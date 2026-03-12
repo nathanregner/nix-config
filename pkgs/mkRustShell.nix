@@ -5,7 +5,12 @@
   rust-analyzer,
   rustfmt,
 }:
-{ pkg, rustPlatform, ... }@args:
+{
+  pkg,
+  rustPlatform,
+  packages ? [ ],
+  ...
+}@args:
 mkShell (
   {
     RUST_SRC_PATH = "${rustPlatform.rustLibSrc}";
@@ -17,10 +22,12 @@ mkShell (
         clippy
         rust-analyzer
         rustfmt
-      ];
+      ]
+      ++ packages;
   }
-  // (builtins.removeAttrs args [
+  // (removeAttrs args [
     "pkg"
     "rustPlatform"
+    "packages"
   ])
 )
