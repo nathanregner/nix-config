@@ -103,13 +103,30 @@ require("lazy").setup({
         { "<leader>du", "<cmd>DiffviewOpen @{u}<cr>", desc = "Diffview Open upstream" },
       }
     end,
-    opts = {
-      view = {
-        merge_tool = {
-          layout = "diff3_mixed",
+    opts = function()
+      local actions = require("diffview.actions")
+
+      local next_change, prev_change =
+        make_repeatable_move_pair(actions.smart_next_change(), actions.smart_prev_change())
+
+      local function focus_diff()
+        local view = require("diffview.lib").get_current_view()
+        if view and view.cur_layout then view.cur_layout:get_main_win():focus() end
+      end
+
+      return {
+        keymaps = {
+          view = {
+            { "n", "]c", next_change, { desc = "Next change or next file" } },
+            { "n", "[c", prev_change, { desc = "Prev change or prev file" } },
+          },
+          file_panel = {
+            { "n", "]c", focus_diff, { desc = "Focus diff view" } },
+            { "n", "[c", focus_diff, { desc = "Focus diff view" } },
+          },
         },
-      },
-    },
+      }
+    end,
   },
 
   {
@@ -1106,6 +1123,9 @@ vim.api.nvim_create_autocmd("TextYankPost", {
   group = highlight_group,
   pattern = "*",
 })
+
+-- Allow devshells to override makeprg via MAKEPRG env var
+if vim.env.MAKEPRG then vim.o.makeprg = vim.env.MAKEPRG end
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
