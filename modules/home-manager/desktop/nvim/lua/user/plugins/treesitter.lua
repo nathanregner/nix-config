@@ -19,7 +19,6 @@ return {
           if not vim.b[args.buf].bigfile then
             local lang = vim.treesitter.language.get_lang(args.match)
             if lang then
-              require("user.treesitter_incremental_selection").attach(args.buf)
               if vim.treesitter.query.get(lang, "highlights") then
                 vim.treesitter.start(args.buf)
               else
@@ -30,12 +29,6 @@ return {
             end
           end
         end,
-      })
-
-      vim.api.nvim_create_autocmd("BufDelete", {
-        pattern = "<buffer>",
-        group = group,
-        callback = function(args) pcall(require("user.treesitter_incremental_selection").detach, args.buf) end,
       })
     end,
   }),
