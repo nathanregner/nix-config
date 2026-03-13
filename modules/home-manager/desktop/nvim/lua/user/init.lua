@@ -105,15 +105,31 @@ require("lazy").setup({
     end,
     opts = function()
       local actions = require("diffview.actions")
-      local next_change, prev_change = make_repeatable_move_pair(
-        actions.smart_next_change(),
-        actions.smart_prev_change()
-      )
+
+      local goto_top = function() vim.cmd("normal! gg") end
+      local goto_bottom = function() vim.cmd("normal! G") end
+
+      local next_change, prev_change =
+        make_repeatable_move_pair(actions.smart_next_change(goto_top), actions.smart_prev_change(goto_bottom))
+
+      local function focus_diff()
+        local view = require("diffview.lib").get_current_view()
+        if view and view.cur_layout then view.cur_layout:get_main_win():focus() end
+      end
+
       return {
         keymaps = {
           view = {
             { "n", "]c", next_change, { desc = "Next change or next file" } },
             { "n", "[c", prev_change, { desc = "Prev change or prev file" } },
+            -- { "n", "G", actions.smart_goto_end(goto_bottom), { desc = "Go to end or next file" } },
+            -- { "n", "gg", actions.smart_goto_start(goto_top), { desc = "Go to start or prev file" } },
+            -- { "n", "<C-d>", actions.smart_scroll_down(0.5, goto_bottom), { desc = "Scroll down or next file" } },
+            -- { "n", "<C-u>", actions.smart_scroll_up(0.5, goto_top), { desc = "Scroll up or prev file" } },
+          },
+          file_panel = {
+            { "n", "]c", focus_diff, { desc = "Focus diff view" } },
+            { "n", "[c", focus_diff, { desc = "Focus diff view" } },
           },
         },
         view = {
@@ -1131,9 +1147,7 @@ vim.api.nvim_create_autocmd("TextYankPost", {
 })
 
 -- Allow devshells to override makeprg via MAKEPRG env var
-if vim.env.MAKEPRG then
-  vim.o.makeprg = vim.env.MAKEPRG
-end
+if vim.env.MAKEPRG then vim.o.makeprg = vim.env.MAKEPRG end
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et

@@ -1,18 +1,71 @@
-From 22392f8fbdd81e327b8fd20582f41fee38f8c07b Mon Sep 17 00:00:00 2001
+From bc325b1e4c1be83ee0080fbd1f565e810a0aa8d6 Mon Sep 17 00:00:00 2001
 From: Nathan Regner <nathan.regner@clickbank.com>
 Date: Fri, 13 Mar 2026 08:19:05 -0600
 Subject: [PATCH] fixup! feat: smart scroll
 
 ---
- lua/diffview/actions.lua | 32 ++++++++++++++++++++++++++++++++
- lua/diffview/config.lua  |  2 ++
- 2 files changed, 34 insertions(+)
+ lua/diffview/actions.lua                      | 68 +++++++++++++++++--
+ lua/diffview/config.lua                       |  2 +
+ lua/diffview/scene/views/diff/listeners.lua   |  6 +-
+ .../scene/views/file_history/listeners.lua    |  6 +-
+ 4 files changed, 72 insertions(+), 10 deletions(-)
 
 diff --git a/lua/diffview/actions.lua b/lua/diffview/actions.lua
-index 2709744..9d5076f 100644
+index 2709744..68cfb89 100644
 --- a/lua/diffview/actions.lua
 +++ b/lua/diffview/actions.lua
-@@ -395,6 +395,38 @@ function M.smart_goto_start()
+@@ -341,7 +341,11 @@ function M.smart_scroll_down(distance)
+ 
+     local total_lines = api.nvim_buf_line_count(api.nvim_win_get_buf(target))
+     if vim.fn.line("w$", target) >= total_lines then
+-      require("diffview").emit("select_next_entry")
++      require("diffview").emit("select_next_entry", function()
++        vim.schedule(function()
++          api.nvim_win_call(get_target_win(), function() vim.cmd([[exe "norm! gg"]]) end)
++        end)
++      end)
+     else
+       api.nvim_win_call(target, function() vim.cmd(scroll_cmd) end)
+     end
+@@ -359,7 +363,11 @@ function M.smart_scroll_up(distance)
+     if not target then return end
+ 
+     if vim.fn.line("w0", target) <= 1 then
+-      require("diffview").emit("select_prev_entry")
++      require("diffview").emit("select_prev_entry", function()
++        vim.schedule(function()
++          api.nvim_win_call(get_target_win(), function() vim.cmd([[exe "norm! G"]]) end)
++        end)
++      end)
+     else
+       api.nvim_win_call(target, function() vim.cmd(scroll_cmd) end)
+     end
+@@ -374,7 +382,11 @@ function M.smart_goto_end()
+ 
+     local total_lines = api.nvim_buf_line_count(api.nvim_win_get_buf(target))
+     if api.nvim_win_get_cursor(target)[1] >= total_lines then
+-      require("diffview").emit("select_next_entry")
++      require("diffview").emit("select_next_entry", function()
++        vim.schedule(function()
++          api.nvim_win_call(get_target_win(), function() vim.cmd([[exe "norm! gg"]]) end)
++        end)
++      end)
+     else
+       api.nvim_win_call(target, function() vim.cmd([[exe "norm! G"]]) end)
+     end
+@@ -388,13 +400,57 @@ function M.smart_goto_start()
+     if not target then return end
+ 
+     if api.nvim_win_get_cursor(target)[1] <= 1 then
+-      require("diffview").emit("select_prev_entry")
++      require("diffview").emit("select_prev_entry", function()
++        vim.schedule(function()
++          api.nvim_win_call(get_target_win(), function() vim.cmd([[exe "norm! G"]]) end)
++        end)
++      end)
+     else
+       api.nvim_win_call(target, function() vim.cmd([[exe "norm! gg"]]) end)
+     end
    end
  end
  
@@ -27,7 +80,11 @@ index 2709744..9d5076f 100644
 +    local new_pos = api.nvim_win_get_cursor(target)
 +
 +    if cur_pos[1] == new_pos[1] and cur_pos[2] == new_pos[2] then
-+      require("diffview").emit("select_next_entry")
++      require("diffview").emit("select_next_entry", function()
++        vim.schedule(function()
++          api.nvim_win_call(get_target_win(), function() vim.cmd([[silent! exe "norm! gg]c"]]) end)
++        end)
++      end)
 +    end
 +  end
 +end
@@ -43,7 +100,11 @@ index 2709744..9d5076f 100644
 +    local new_pos = api.nvim_win_get_cursor(target)
 +
 +    if cur_pos[1] == new_pos[1] and cur_pos[2] == new_pos[2] then
-+      require("diffview").emit("select_prev_entry")
++      require("diffview").emit("select_prev_entry", function()
++        vim.schedule(function()
++          api.nvim_win_call(get_target_win(), function() vim.cmd([[silent! exe "norm! G[c"]]) end)
++        end)
++      end)
 +    end
 +  end
 +end
@@ -51,6 +112,21 @@ index 2709744..9d5076f 100644
  ---@param kind "ours"|"theirs"|"base"|"local"
  local function diff_copy_target(kind)
    local view = lib.get_current_view() --[[@as DiffView|FileHistoryView ]]
+@@ -720,12 +776,12 @@ local action_names = {
+   "refresh_files",
+   "restore_entry",
+   "select_entry",
+-  "select_next_entry",
+-  "select_prev_entry",
+   "select_first_entry",
+   "select_last_entry",
+   "select_next_commit",
++  "select_next_entry",
+   "select_prev_commit",
++  "select_prev_entry",
+   "stage_all",
+   "toggle_files",
+   "toggle_flatten_dirs",
 diff --git a/lua/diffview/config.lua b/lua/diffview/config.lua
 index 4f14ea2..de38d16 100644
 --- a/lua/diffview/config.lua
@@ -64,6 +140,46 @@ index 4f14ea2..de38d16 100644
        unpack(actions.compat.fold_cmds),
      },
      diff1 = {
+diff --git a/lua/diffview/scene/views/diff/listeners.lua b/lua/diffview/scene/views/diff/listeners.lua
+index 504c458..aef2ef9 100644
+--- a/lua/diffview/scene/views/diff/listeners.lua
++++ b/lua/diffview/scene/views/diff/listeners.lua
+@@ -77,11 +77,13 @@ return function(view)
+         view:set_file(files[#files], false, true)
+       end
+     end,
+-    select_next_entry = function()
++    select_next_entry = function(_, on_entry_change)
+       view:next_file(true)
++      if on_entry_change then on_entry_change() end
+     end,
+-    select_prev_entry = function()
++    select_prev_entry = function(_, on_entry_change)
+       view:prev_file(true)
++      if on_entry_change then on_entry_change() end
+     end,
+     next_entry = function()
+       view.panel:highlight_next_file()
+diff --git a/lua/diffview/scene/views/file_history/listeners.lua b/lua/diffview/scene/views/file_history/listeners.lua
+index c10a4ff..10fba0c 100644
+--- a/lua/diffview/scene/views/file_history/listeners.lua
++++ b/lua/diffview/scene/views/file_history/listeners.lua
+@@ -53,11 +53,13 @@ return function(view)
+         new_view:open()
+       end
+     end,
+-    select_next_entry = function()
++    select_next_entry = function(_, on_entry_change)
+       view:next_item()
++      if on_entry_change then on_entry_change() end
+     end,
+-    select_prev_entry = function()
++    select_prev_entry = function(_, on_entry_change)
+       view:prev_item()
++      if on_entry_change then on_entry_change() end
+     end,
+     select_first_entry = function()
+       local entry = view.panel.entries[1]
 -- 
 2.53.0
 
