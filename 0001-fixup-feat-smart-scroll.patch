@@ -1,0 +1,69 @@
+From 22392f8fbdd81e327b8fd20582f41fee38f8c07b Mon Sep 17 00:00:00 2001
+From: Nathan Regner <nathan.regner@clickbank.com>
+Date: Fri, 13 Mar 2026 08:19:05 -0600
+Subject: [PATCH] fixup! feat: smart scroll
+
+---
+ lua/diffview/actions.lua | 32 ++++++++++++++++++++++++++++++++
+ lua/diffview/config.lua  |  2 ++
+ 2 files changed, 34 insertions(+)
+
+diff --git a/lua/diffview/actions.lua b/lua/diffview/actions.lua
+index 2709744..9d5076f 100644
+--- a/lua/diffview/actions.lua
++++ b/lua/diffview/actions.lua
+@@ -395,6 +395,38 @@ function M.smart_goto_start()
+   end
+ end
+ 
++---@return function
++function M.smart_next_change()
++  return function()
++    local target = get_target_win()
++    if not target then return end
++
++    local cur_pos = api.nvim_win_get_cursor(target)
++    api.nvim_win_call(target, function() vim.cmd([[silent! exe "norm! ]c"]]) end)
++    local new_pos = api.nvim_win_get_cursor(target)
++
++    if cur_pos[1] == new_pos[1] and cur_pos[2] == new_pos[2] then
++      require("diffview").emit("select_next_entry")
++    end
++  end
++end
++
++---@return function
++function M.smart_prev_change()
++  return function()
++    local target = get_target_win()
++    if not target then return end
++
++    local cur_pos = api.nvim_win_get_cursor(target)
++    api.nvim_win_call(target, function() vim.cmd([[silent! exe "norm! [c"]]) end)
++    local new_pos = api.nvim_win_get_cursor(target)
++
++    if cur_pos[1] == new_pos[1] and cur_pos[2] == new_pos[2] then
++      require("diffview").emit("select_prev_entry")
++    end
++  end
++end
++
+ ---@param kind "ours"|"theirs"|"base"|"local"
+ local function diff_copy_target(kind)
+   local view = lib.get_current_view() --[[@as DiffView|FileHistoryView ]]
+diff --git a/lua/diffview/config.lua b/lua/diffview/config.lua
+index 4f14ea2..de38d16 100644
+--- a/lua/diffview/config.lua
++++ b/lua/diffview/config.lua
+@@ -148,6 +148,8 @@ M.defaults = {
+       { "n", "<C-u>",       actions.smart_scroll_up(0.5),           { desc = "Scroll up or prev file at top" } },
+       { "n", "G",           actions.smart_goto_end(),               { desc = "Go to end or next file" } },
+       { "n", "gg",          actions.smart_goto_start(),             { desc = "Go to start or prev file" } },
++      { "n", "]c",          actions.smart_next_change(),            { desc = "Next change or next file" } },
++      { "n", "[c",          actions.smart_prev_change(),            { desc = "Prev change or prev file" } },
+       unpack(actions.compat.fold_cmds),
+     },
+     diff1 = {
+-- 
+2.53.0
+

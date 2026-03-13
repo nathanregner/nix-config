@@ -103,13 +103,26 @@ require("lazy").setup({
         { "<leader>du", "<cmd>DiffviewOpen @{u}<cr>", desc = "Diffview Open upstream" },
       }
     end,
-    opts = {
-      view = {
-        merge_tool = {
-          layout = "diff3_mixed",
+    opts = function()
+      local actions = require("diffview.actions")
+      local next_change, prev_change = make_repeatable_move_pair(
+        actions.smart_next_change(),
+        actions.smart_prev_change()
+      )
+      return {
+        keymaps = {
+          view = {
+            { "n", "]c", next_change, { desc = "Next change or next file" } },
+            { "n", "[c", prev_change, { desc = "Prev change or prev file" } },
+          },
         },
-      },
-    },
+        view = {
+          merge_tool = {
+            layout = "diff3_mixed",
+          },
+        },
+      }
+    end,
   },
 
   {

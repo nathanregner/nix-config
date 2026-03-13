@@ -1,19 +1,6 @@
 {
-  "aws-sso": {
-    "body": [
-      "<dependency>",
-      "  <groupId>software.amazon.awssdk</groupId>",
-      "  <artifactId>sts</artifactId>",
-      "</dependency>",
-      "<dependency>",
-      "  <groupId>software.amazon.awssdk</groupId>",
-      "  <artifactId>sso</artifactId>",
-      "  <optional>true</optional>",
-      "</dependency>"
-    ],
-    "prefix": "aws-sso"
-  },
   "maven-enforcer-plugin": {
+    "prefix": "maven-enforcer-plugin",
     "body": [
       "<plugin>",
       "   <groupId>org.apache.maven.plugins</groupId>",
@@ -42,10 +29,38 @@
       "     </execution>",
       "   </executions>",
       " </plugin>"
-    ],
-    "prefix": "maven-enforcer-plugin"
+    ]
+  },
+  "aws-sso": {
+    "prefix": "aws-sso",
+    "body": [
+      "<dependency>",
+      "  <groupId>software.amazon.awssdk</groupId>",
+      "  <artifactId>sts</artifactId>",
+      "</dependency>",
+      "<dependency>",
+      "  <groupId>software.amazon.awssdk</groupId>",
+      "  <artifactId>sso</artifactId>",
+      "  <optional>true</optional>",
+      "</dependency>"
+    ]
+  },
+  "spring-boot-devtools": {
+    "prefix": "spring-boot-devtools",
+    "body": [
+      "<dependency>",
+      "    <groupId>org.springframework.boot</groupId>",
+      "    <artifactId>spring-boot-devtools</artifactId>",
+      "    <optional>true</optional>",
+      "</dependency>"
+    ]
+  },
+  "ignore_optional_problems": {
+    "prefix": "ignore_optional_problems",
+    "body": "<attribute name=\"ignore_optional_problems\" value=\"true\"/>"
   },
   "maven-profile-netty-resolver-dns-native-macos-aarch64": {
+    "prefix": "netty-resolver-dns-native-macos-aarch64",
     "body": [
       "<profile>",
       "    <id>maven-profile-netty-resolver-dns-native-macos-aarch64</id>",
@@ -63,14 +78,10 @@
       "        </dependency>",
       "    </dependencies>",
       "</profile>"
-    ],
-    "prefix": "netty-resolver-dns-native-macos-aarch64"
-  },
-  "ignore_optional_problems": {
-    "prefix": "ignore_optional_problems",
-    "body": "<attribute name=\"ignore_optional_problems\" value=\"true\"/>"
+    ]
   },
   "maven-plugin-spring-javaformat": {
+    "prefix": "maven-plugin-spring-javaformat",
     "body": [
       "<plugin>",
       "  <groupId>io.spring.javaformat</groupId>",
@@ -86,7 +97,6 @@
       "    </execution>",
       "  </executions>",
       "</plugin>"
-    ],
-    "prefix": "maven-plugin-spring-javaformat"
+    ]
   }
 }
