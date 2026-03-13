@@ -7,6 +7,7 @@ mod hooks;
 mod list;
 mod state;
 mod status_line;
+mod theme;
 
 fn main() {
     tracing_subscriber::fmt()

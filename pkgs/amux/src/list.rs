@@ -1,8 +1,10 @@
-use crate::state::{AgentStatus, PaneId, StatusFile};
+use crate::state::{Agent, PaneId, StatusFile};
+use crate::theme::ansi_rgb;
 use anyhow::{Context, Result, bail};
 use std::collections::HashMap;
 use std::io::Write;
 use std::process::{Command, Stdio};
+use std::time::SystemTime;
 use tmux_interface::{ListPanes, SwitchClient, Tmux};
 
 struct PaneInfo {
@@ -55,11 +57,22 @@ fn switch_to_pane(id: &PaneId) -> Result<()> {
     Ok(())
 }
 
-fn status_icon(status: AgentStatus) -> &'static str {
-    match status {
-        AgentStatus::Waiting => "\x1b[31m󱚟\x1b[0m", // red
-        AgentStatus::Working => "\x1b[33m󱜙\x1b[0m", // yellow
-        AgentStatus::Idle => "\x1b[32m󱚡\x1b[0m",    // green
+fn format_age(agent: &Agent) -> String {
+    let Some(last_update) = agent.last_update else {
+        return "-".to_string();
+    };
+    let Ok(elapsed) = SystemTime::now().duration_since(last_update) else {
+        return "-".to_string();
+    };
+    let secs = elapsed.as_secs();
+    if secs < 60 {
+        format!("{secs}s")
+    } else if secs < 3600 {
+        format!("{}m", secs / 60)
+    } else if secs < 86400 {
+        format!("{}h", secs / 3600)
+    } else {
+        format!("{}d", secs / 86400)
     }
 }
 
@@ -82,26 +95,41 @@ pub fn output() -> Result<()> {
         return Ok(());
     }
 
-    let fzf_lines: Vec<String> = panes
+    let mut fzf_entries: Vec<_> = panes
         .iter()
         .filter_map(|(id, pane)| {
             let agent = agents.get(id)?;
-            let status = agent.status;
-            let icon = status_icon(status);
+            Some((id, pane, agent))
+        })
+        .collect();
+
+    // Sort by status (waiting, idle, working), then by last_update (most recent first)
+    fzf_entries.sort_by(|(_, _, a), (_, _, b)| {
+        a.status
+            .cmp(&b.status)
+            .then_with(|| b.last_update.cmp(&a.last_update))
+    });
+
+    let fzf_lines: Vec<String> = fzf_entries
+        .iter()
+        .map(|(id, pane, agent)| {
+            let icon = ansi_rgb(agent.status.color(), agent.status.icon());
+            let age = format_age(agent);
             let attached = if pane.session_attached {
                 "(attached)"
             } else {
                 ""
             };
 
-            // Format: <pane_id> <icon> <description> <attached>
-            Some(format!(
-                "{} {} {:<30} {}",
+            // Format: <pane_id> <icon> <age> <description> <attached>
+            format!(
+                "{:<5} {} {:>4} {:<30} {}",
                 id.as_str(),
                 icon,
+                age,
                 pane.description,
                 attached
-            ))
+            )
         })
         .collect();
 
@@ -110,6 +138,7 @@ pub fn output() -> Result<()> {
             "--ansi",
             "--no-sort",
             "--reverse",
+            "--cycle",
             "--preview=tmux capture-pane -e -p -t {1} 2>/dev/null || echo 'No preview'",
             "--preview-window=right:50%:nowrap",
             "--bind=j:down,k:up",

@@ -1,3 +1,4 @@
+use crate::theme;
 use anyhow::{Context, Result};
 use etcetera::BaseStrategy;
 use nix::fcntl::{Flock, FlockArg};
@@ -7,6 +8,16 @@ use std::fs::{self, File, OpenOptions};
 use std::io::{Read, Seek, Write};
 use std::os::fd::{AsFd, OwnedFd};
 use std::path::PathBuf;
+
+/// Get cache directory, preferring XDG_CACHE_HOME if set (even on macOS)
+fn cache_dir() -> Result<PathBuf> {
+    if let Some(dir) = std::env::var_os("XDG_CACHE_HOME") {
+        Ok(PathBuf::from(dir))
+    } else {
+        let base = etcetera::choose_base_strategy().context("failed to determine base directories")?;
+        Ok(base.cache_dir())
+    }
+}
 
 #[derive(Serialize, Deserialize, Hash, PartialEq, Eq, PartialOrd, Ord, Clone, Debug)]
 #[serde(transparent)]
@@ -22,21 +33,41 @@ impl PaneId {
     }
 }
 
-#[derive(Serialize, Deserialize, Hash, Eq, PartialEq, Copy, Clone, Debug)]
+#[derive(Serialize, Deserialize, Hash, Eq, PartialEq, PartialOrd, Ord, Copy, Clone, Debug)]
 #[serde(rename_all = "snake_case")]
 pub enum AgentStatus {
-    /// Actively running
-    Working,
     /// Waiting for user permissions
     Waiting,
     /// Stopped
     Idle,
+    /// Actively running
+    Working,
+}
+
+impl AgentStatus {
+    pub fn color(self) -> u32 {
+        match self {
+            Self::Waiting => theme::RED,
+            Self::Idle => theme::FG,
+            Self::Working => theme::BLACK_4,
+        }
+    }
+
+    pub fn icon(self) -> &'static str {
+        match self {
+            Self::Waiting => "󱚟",
+            Self::Idle => "󱚡",
+            Self::Working => "󱜙",
+        }
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Agent {
     pub pid: u32,
     pub status: AgentStatus,
+    #[serde(default, with = "humantime_serde")]
+    pub last_update: Option<std::time::SystemTime>,
 }
 
 #[derive(Debug, Default, Serialize, Deserialize)]
@@ -64,14 +95,18 @@ pub struct StatusFile<Mode> {
 impl StatusFile<ReadMode> {
     /// Load status file without acquiring a lock (read-only mode).
     pub fn load() -> Result<Self> {
-        let base_dirs =
-            etcetera::choose_base_strategy().context("failed to determine base directories")?;
-        Self::load_with(&base_dirs)
+        let path = cache_dir()?.join("amux/status.json");
+        Self::load_from_path(&path)
     }
 
     /// Load status file with custom base directories (for testing).
+    #[cfg(test)]
     pub fn load_with(base_dirs: &dyn BaseStrategy) -> Result<Self> {
         let path = status_file_path(base_dirs);
+        Self::load_from_path(&path)
+    }
+
+    fn load_from_path(path: &PathBuf) -> Result<Self> {
         let data = match fs::read_to_string(&path) {
             Ok(content) if content.is_empty() => StatusFileData::default(),
             Ok(content) => match serde_json::from_str(&content) {
@@ -127,26 +162,24 @@ impl StatusFile<ReadMode> {
 
     /// Upgrade to write mode by acquiring an exclusive lock.
     pub fn upgrade(&self) -> Result<StatusFile<WriteMode>> {
-        let base_dirs =
-            etcetera::choose_base_strategy().context("failed to determine base directories")?;
-        self.upgrade_with(base_dirs)
-    }
-
-    fn upgrade_with(&self, base_dirs: impl BaseStrategy) -> Result<StatusFile<WriteMode>> {
-        StatusFile::<WriteMode>::load_for_write_with(base_dirs)
+        StatusFile::<WriteMode>::load_for_write()
     }
 }
 
 impl StatusFile<WriteMode> {
     /// Load status file with an exclusive lock (write mode).
     pub fn load_for_write() -> Result<Self> {
-        let base_dirs =
-            etcetera::choose_base_strategy().context("failed to determine base directories")?;
-        Self::load_for_write_with(base_dirs)
+        let path = cache_dir()?.join("amux/status.json");
+        Self::load_for_write_from_path(path)
     }
 
-    fn load_for_write_with(base_dirs: impl BaseStrategy) -> Result<Self> {
+    #[cfg(test)]
+    pub(crate) fn load_for_write_with(base_dirs: impl BaseStrategy) -> Result<Self> {
         let path = status_file_path(&base_dirs);
+        Self::load_for_write_from_path(path)
+    }
+
+    fn load_for_write_from_path(path: PathBuf) -> Result<Self> {
         ensure_status_dir(&path)?;
 
         let file = OpenOptions::new()
@@ -184,7 +217,14 @@ impl StatusFile<WriteMode> {
 
     /// Set or update an agent's status.
     pub fn set_agent(&mut self, pane_id: PaneId, pid: u32, status: AgentStatus) {
-        self.data.agents.insert(pane_id, Agent { pid, status });
+        self.data.agents.insert(
+            pane_id,
+            Agent {
+                pid,
+                status,
+                last_update: Some(std::time::SystemTime::now()),
+            },
+        );
     }
 
     /// Remove agents by their keys.
@@ -209,6 +249,7 @@ impl StatusFile<WriteMode> {
     }
 }
 
+#[cfg(test)]
 fn status_file_path(base_dirs: &dyn BaseStrategy) -> PathBuf {
     base_dirs.cache_dir().join("amux/status.json")
 }

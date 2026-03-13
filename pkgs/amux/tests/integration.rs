@@ -1,5 +1,4 @@
 use assert_cmd::cargo::*;
-use predicates::prelude::*;
 use std::{
     sync::atomic::{AtomicU32, Ordering},
     time::Duration,
@@ -79,13 +78,17 @@ impl TestEnv {
         Tmux::new().file("/dev/null").socket_path(&self.socket_path)
     }
 
-    pub fn status_line(&self) -> assert_cmd::assert::Assert {
+    pub fn status_line(&self) -> String {
         let mut cmd = cargo_bin_cmd!();
         cmd.env("XDG_CACHE_HOME", &self.cache_dir)
             .args(["status-line"]);
-        cmd.assert()
+        let output = cmd
+            .assert()
             .append_context("pane content", self.capture_pane())
             .success()
+            .get_output()
+            .clone();
+        String::from_utf8_lossy(&output.stdout).to_string()
     }
 
     /// Run hook command inside the tmux session's shell.
@@ -173,7 +176,7 @@ fn retry<T, E>(max_attempts: u32, mut f: impl FnMut() -> Result<T, E>) -> Result
 fn test_status_line_empty() {
     let env = TestEnv::new("empty");
 
-    env.status_line().stdout(predicate::str::is_empty());
+    insta::assert_snapshot!(env.status_line(), @"");
 }
 
 #[test]
@@ -185,8 +188,7 @@ fn test_hook_creates_working_status() {
         r#"{ "hook_event_name": "UserPromptSubmit" }"#,
     );
 
-    env.status_line()
-        .stdout(predicate::str::contains("working"));
+    insta::assert_snapshot!(env.status_line(), @"#[fg=#585b70,bold]󱜙 1#[default]");
 }
 
 #[test]
@@ -203,7 +205,7 @@ fn test_hook_stop_sets_done() {
         r#"{ "hook_event_name": "Stop" }"#,
     );
 
-    env.status_line().stdout(predicate::str::contains("idle"));
+    insta::assert_snapshot!(env.status_line(), @"#[fg=#cdd6f4,bold]󱚡 1#[default]");
 }
 
 #[test]
@@ -215,7 +217,7 @@ fn test_notification_idle_prompt_sets_done() {
         r#"{ "hook_event_name": "Notification", "notification_type": "idle_prompt" }"#,
     );
 
-    env.status_line().stdout(predicate::str::contains("idle"));
+    insta::assert_snapshot!(env.status_line(), @"#[fg=#cdd6f4,bold]󱚡 1#[default]");
 }
 
 #[test]
@@ -227,6 +229,5 @@ fn test_notification_permission_prompt_sets_waiting() {
         r#"{ "hook_event_name": "Notification", "notification_type": "permission_prompt" }"#,
     );
 
-    env.status_line()
-        .stdout(predicate::str::contains("waiting"));
+    insta::assert_snapshot!(env.status_line(), @"#[fg=#f38ba8,bold]󱚟 1#[default]");
 }
