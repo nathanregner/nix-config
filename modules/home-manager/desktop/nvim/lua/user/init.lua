@@ -1117,5 +1117,10 @@ vim.api.nvim_create_autocmd("TextYankPost", {
   pattern = "*",
 })
 
+-- Allow devshells to override makeprg via MAKEPRG env var
+if vim.env.MAKEPRG then
+  vim.o.makeprg = vim.env.MAKEPRG
+end
+
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
