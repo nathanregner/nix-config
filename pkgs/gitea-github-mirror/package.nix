@@ -79,8 +79,7 @@ let
     cargoLock = {
       lockFile = ./Cargo.lock;
       outputHashes = {
-        "progenitor-0.9.1" = "sha256-s8ebaxdCYft2FHwB41hnBrKr1t5OU8g4duc+y/3YkeI=";
-        "typify-0.3.0" = "sha256-6seAL8DfQmCgQyFR9IAbzuL8ZJXWd56Kkxcr/Y2yE3A=";
+        "progenitor-0.13.0" = "sha256-n9K6gY17DRpyNh9UkIrwCiqG/mHWWrdOPvxqhdK/kgU=";
       };
     };
 
@@ -97,7 +96,7 @@ let
       };
     };
 
-    meta.platforms = [ "x86_64-linux" ];
+    meta.hydra.platforms = [ "x86_64-linux" ];
   };
 in
 pkg

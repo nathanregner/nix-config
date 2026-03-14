@@ -3,7 +3,7 @@ if lib.isDerivation value then
   let
     isBroken = value.meta.broken or false;
     platforms =
-      value.meta.platforms or [
+      value.meta.hydra.platforms or value.meta.platforms or [
         "aarch64-darwin"
         "x86_64-linux"
       ];
