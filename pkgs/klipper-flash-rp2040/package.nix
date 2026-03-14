@@ -11,7 +11,7 @@ let
     (klipper-firmware.override {
       mcu = "rp2040";
       firmwareConfig = ./rp2040_config;
-      wxGTK32 = emptyFile;
+      wxwidgets_3_2 = emptyFile;
       stdenv = gccStdenv;
     }).overrideAttrs
       {
