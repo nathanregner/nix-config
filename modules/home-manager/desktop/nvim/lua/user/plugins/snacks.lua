@@ -24,7 +24,32 @@ return {
       --   enabled = true,
       --   timeout = 3000,
       -- },
-      picker = { enabled = true },
+      picker = {
+        enabled = true,
+        sources = {
+          command_history = {
+            layout = {
+              preset = "ivy",
+              hidden = { "preview" },
+              layout = { position = "bottom" },
+            },
+            -- matcher = {
+            --   history_bonus = true, -- fzf's scheme=history: recent items score higher
+            -- },
+            sort = {
+              fields = { "idx" },
+            },
+            win = {
+              input = {
+                keys = {
+                  ["<c-y>"] = { "confirm", mode = { "n", "i" } },
+                },
+              },
+            },
+          },
+        },
+      },
+
       quickfile = { enabled = true },
       -- scope = { enabled = true },
       -- scroll = { enabled = false },
