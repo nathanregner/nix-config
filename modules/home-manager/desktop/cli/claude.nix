@@ -44,6 +44,10 @@ in
           "claude-opus-4-5"
           "haiku"
         ];
+        statusLine = {
+          type = "command";
+          command = "${config.home.homeDirectory}/.claude/statusline";
+        };
         permissions = {
           defaultMode = "acceptEdits";
           allow = [
@@ -78,6 +82,8 @@ in
         };
       };
     };
+
+    home.file.".claude/statusline".source = config.lib.file.mkFlakeSymlink ./claude-statusline.nu;
 
     programs.git.ignores = [
       ".claude"
