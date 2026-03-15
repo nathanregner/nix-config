@@ -8,6 +8,8 @@ local enabled = function(bufnr, before)
   -- global disabled?
   if not settings.enabled then return false end
 
+  if vim.g.format_on_save == false then return false end
+
   -- filetype disabled?
   local ft = vim.bo[bufnr].filetype
   if settings.filetypes[ft] == false then return false end
@@ -107,16 +109,22 @@ require("conform").setup({
 -- TODO: writeback to config
 
 vim.api.nvim_create_user_command("FormatDisable", function(args)
-  ---@diagnostic disable-next-line: inject-field
-  vim.b.format_on_save = false
+  if args.bang then
+    vim.g.format_on_save = false
+  else
+    vim.b.format_on_save = false
+  end
 end, {
   desc = "Disable autoformat-on-save",
   bang = true,
 })
 
 vim.api.nvim_create_user_command("FormatEnable", function(args)
-  ---@diagnostic disable-next-line: inject-field
-  vim.b.format_on_save = true
+  if args.bang then
+    vim.g.format_on_save = true
+  else
+    vim.b.format_on_save = true
+  end
 end, {
   desc = "Re-enable autoformat-on-save",
 })
