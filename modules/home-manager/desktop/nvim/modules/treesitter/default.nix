@@ -5,37 +5,55 @@
   ...
 }:
 let
+  inherit (lib) mkOption types;
   cfg = config.programs.neovim.treesitter;
   parserPrefix = "nvim/site";
 in
 {
   options.programs.neovim.treesitter = {
-    package = lib.mkOption {
-      type = lib.types.nullOr lib.types.package;
-      default = pkgs.unstable.vimPlugins.nvim-treesitter.withAllGrammars;
+    package = mkOption {
+      type = types.nullOr types.package;
+      default = pkgs.unstable.vimPlugins.nvim-treesitter;
+    };
+
+    finalPackage = mkOption {
+      default =
+        if cfg.package != null then
+          if cfg.grammars == [ ] then
+            cfg.package.withAllGrammars
+          else
+            cfg.package.withPlugins (
+              plugins: (map (name: plugins.${name} or throw "Invalid grammar ${name}") cfg.grammars)
+            )
+        else
+          null;
+      readOnly = true;
+    };
+
+    grammars = mkOption {
+      type = types.listOf types.str;
+      default = lib.splitString "\n" (builtins.readFile ./grammars.txt);
     };
   };
 
   config = {
-    programs.neovim.lua.globals = lib.optionalAttrs (cfg.package != null) (
+    programs.neovim.lua.globals = lib.optionalAttrs (cfg.finalPackage != null) (
       let
         install_dir = "${config.xdg.dataHome}/${parserPrefix}";
       in
       {
         nvim-treesitter = {
-          dir = "${cfg.package}";
-          opts = {
-            inherit install_dir;
-          };
+          dir = "${cfg.finalPackage}";
+          opts = { inherit install_dir; };
         };
         rtp = [
-          "${cfg.package}/runtime"
+          "${cfg.finalPackage}/runtime"
         ];
       }
     );
 
     # :checkhealth nvim-treesitter
-    home.packages = lib.optionals (cfg.package == null) (
+    home.packages = lib.optionals (cfg.finalPackage == null || cfg.grammars != [ ]) (
       with pkgs.unstable;
       [
         curl
@@ -51,7 +69,7 @@ in
       force = true;
     };
 
-    xdg.dataFile = lib.optionalAttrs (cfg.package != null) (
+    xdg.dataFile = lib.optionalAttrs (cfg.finalPackage != null) (
       lib.listToAttrs (
         builtins.filter (grammar: grammar ? name) (
           map (
@@ -71,7 +89,7 @@ in
                 };
               }
             )
-          ) cfg.package.passthru.dependencies
+          ) cfg.finalPackage.passthru.dependencies
         )
       )
     );
