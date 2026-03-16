@@ -47,6 +47,33 @@ return {
               },
             },
           },
+          grep = {
+            case_sensitive = false,
+            toggles = {
+              case_sensitive = "s",
+            },
+            finder = function(opts, ctx)
+              if opts.case_sensitive then
+                opts.args = vim.list_extend({ unpack(opts.args or {}) }, { "--case-sensitive" })
+              else
+                opts.args = vim.tbl_filter(function(arg) return arg ~= "--case-sensitive" end, opts.args or {})
+              end
+              return require("snacks.picker.source.grep").grep(opts, ctx)
+            end,
+            actions = {
+              toggle_live_case_sens = function(picker) -- [[Override]]
+                picker.opts.case_sensitive = not picker.opts.case_sens
+                picker:find()
+              end,
+            },
+            win = {
+              input = {
+                keys = {
+                  ["<M-s>"] = { "toggle_live_case_sens", mode = { "i", "n" } },
+                },
+              },
+            },
+          },
         },
       },
 
