@@ -1,13 +1,21 @@
 #!/usr/bin/env -S nu --stdin
 # Claude Code status line script
 
+def model-name [] {
+  # us.anthropic.claude-opus-4-5-20251101-v1:0
+  parse --regex 'claude-(?<name>\w+)-(?<major>\d)-(?<minor>\d)'
+  | each { $"($in.name | str title-case) ($in.major).($in.minor)" }
+  | first
+  | default $in
+}
+
 def main [] {
   let input = $in | from json
 
   # Terminal width minus Claude Code's UI padding and emoji width buffer
   let term_width = (term size).columns - 6
 
-  let model = $input | get -o model.display_name | default "unknown"
+  let model = $input | get -o model.display_name | model-name | default "unknown"
   let cost = $input | get -o cost.total_cost_usd | default 0
   let pct = $input | get -o context_window.used_percentage | default 0 | math round | into int
   let duration_ms = $input | get -o cost.total_duration_ms | default 0
