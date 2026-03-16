@@ -2,8 +2,8 @@
 # Claude Code status line script
 
 def model-name [] {
-  # us.anthropic.claude-opus-4-5-20251101-v1:0
-  parse --regex 'claude-(?<name>\w+)-(?<major>\d)-(?<minor>\d)'
+  $in
+  | parse --regex 'claude-(?<name>\w+)-(?<major>\d)-(?<minor>\d)'
   | each { $"($in.name | str title-case) ($in.major).($in.minor)" }
   | first
   | default $in
@@ -40,15 +40,5 @@ def main [] {
   # Cost format
   let cost_fmt = $"$($cost | into string -d 2)"
 
-  # Build left and right parts
-  let left = $"[($model)]($branch) ($bar_color)($bar)(ansi reset) ($pct)%"
-  let right = $"($cost_fmt) | ⏱️($mins)m ($secs)s"
-
-  # Calculate padding (subtract visible chars, not ANSI codes)
-  let left_visible = $"[($model)]($branch) ($bar) ($pct)%"
-  let padding = $term_width - ($left_visible | str stats).unicode-width - ($right | str stats).unicode-width
-  let pad_str = if $padding > 0 { "" | fill -c " " -w $padding } else { " " }
-
-  # Output
-  print -n $"($left)($pad_str)($right)"
+  print -n $"[($model)]($branch) ($bar_color)($bar)(ansi reset) ($pct)% | ($cost_fmt) | ⏱️($mins)m ($secs)s"
 }
