@@ -7,14 +7,15 @@ use std::collections::{BTreeMap, HashMap};
 use std::fs::{self, File, OpenOptions};
 use std::io::{Read, Seek, Write};
 use std::os::fd::{AsFd, OwnedFd};
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 /// Get cache directory, preferring XDG_CACHE_HOME if set (even on macOS)
 fn cache_dir() -> Result<PathBuf> {
     if let Some(dir) = std::env::var_os("XDG_CACHE_HOME") {
         Ok(PathBuf::from(dir))
     } else {
-        let base = etcetera::choose_base_strategy().context("failed to determine base directories")?;
+        let base =
+            etcetera::choose_base_strategy().context("failed to determine base directories")?;
         Ok(base.cache_dir())
     }
 }
@@ -55,9 +56,9 @@ impl AgentStatus {
 
     pub fn icon(self) -> &'static str {
         match self {
-            Self::Waiting => "󱚟",
-            Self::Idle => "󱚡",
-            Self::Working => "󱜙",
+            Self::Waiting => "󰀦",
+            Self::Idle => "󰒲",
+            Self::Working => "",
         }
     }
 }
@@ -106,8 +107,8 @@ impl StatusFile<ReadMode> {
         Self::load_from_path(&path)
     }
 
-    fn load_from_path(path: &PathBuf) -> Result<Self> {
-        let data = match fs::read_to_string(&path) {
+    fn load_from_path(path: &Path) -> Result<Self> {
+        let data = match fs::read_to_string(path) {
             Ok(content) if content.is_empty() => StatusFileData::default(),
             Ok(content) => match serde_json::from_str(&content) {
                 Ok(data) => data,
@@ -254,13 +255,12 @@ fn status_file_path(base_dirs: &dyn BaseStrategy) -> PathBuf {
     base_dirs.cache_dir().join("amux/status.json")
 }
 
-fn ensure_status_dir(path: &PathBuf) -> Result<()> {
-    if let Some(parent) = path.parent() {
-        if !parent.exists() {
-            fs::create_dir_all(parent).with_context(|| {
-                format!("failed to create status directory: {}", parent.display())
-            })?;
-        }
+fn ensure_status_dir(path: &Path) -> Result<()> {
+    if let Some(parent) = path.parent()
+        && !parent.exists()
+    {
+        fs::create_dir_all(parent)
+            .with_context(|| format!("failed to create status directory: {}", parent.display()))?;
     }
     Ok(())
 }

@@ -103,12 +103,7 @@ pub fn output() -> Result<()> {
         })
         .collect();
 
-    // Sort by status (waiting, idle, working), then by last_update (most recent first)
-    fzf_entries.sort_by(|(_, _, a), (_, _, b)| {
-        a.status
-            .cmp(&b.status)
-            .then_with(|| b.last_update.cmp(&a.last_update))
-    });
+    fzf_entries.sort_by_key(|(_, _, agent)| (agent.status, agent.last_update));
 
     let fzf_lines: Vec<String> = fzf_entries
         .iter()

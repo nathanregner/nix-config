@@ -1,5 +1,6 @@
 {
   lib,
+  cargo-insta,
   cargo-update-script,
   installShellFiles,
   mkRustShell,
@@ -45,6 +46,7 @@ let
       updateScript = cargo-update-script pkg { breaking = false; };
       devShell = mkRustShell {
         inherit pkg rustPlatform;
+        packages = [ cargo-insta ];
       };
     };
   };

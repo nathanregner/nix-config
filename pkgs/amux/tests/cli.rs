@@ -188,7 +188,7 @@ fn test_hook_creates_working_status() {
         r#"{ "hook_event_name": "UserPromptSubmit" }"#,
     );
 
-    insta::assert_snapshot!(env.status_line(), @"#[fg=#585b70,bold]󱜙 1#[default]");
+    insta::assert_snapshot!(env.status_line(), @"#[fg=#585b70,bold] 1#[default]");
 }
 
 #[test]
@@ -205,7 +205,7 @@ fn test_hook_stop_sets_done() {
         r#"{ "hook_event_name": "Stop" }"#,
     );
 
-    insta::assert_snapshot!(env.status_line(), @"#[fg=#cdd6f4,bold]󱚡 1#[default]");
+    insta::assert_snapshot!(env.status_line(), @"#[fg=#cdd6f4,bold]󰒲 1#[default]");
 }
 
 #[test]
@@ -217,7 +217,7 @@ fn test_notification_idle_prompt_sets_done() {
         r#"{ "hook_event_name": "Notification", "notification_type": "idle_prompt" }"#,
     );
 
-    insta::assert_snapshot!(env.status_line(), @"#[fg=#cdd6f4,bold]󱚡 1#[default]");
+    insta::assert_snapshot!(env.status_line(), @"#[fg=#cdd6f4,bold]󰒲 1#[default]");
 }
 
 #[test]
@@ -229,5 +229,5 @@ fn test_notification_permission_prompt_sets_waiting() {
         r#"{ "hook_event_name": "Notification", "notification_type": "permission_prompt" }"#,
     );
 
-    insta::assert_snapshot!(env.status_line(), @"#[fg=#f38ba8,bold]󱚟 1#[default]");
+    insta::assert_snapshot!(env.status_line(), @"#[fg=#f38ba8,bold]󰀦 1#[default]");
 }

@@ -29,7 +29,7 @@ pub fn output(test: bool) -> Result<()> {
         return Ok(());
     }
 
-    let mut f = String::with_capacity(256);
+    let mut status_line = String::with_capacity(256);
 
     let mut push = |status: AgentStatus| {
         let count = *statuses.get(&status).unwrap_or(&0);
@@ -37,7 +37,7 @@ pub fn output(test: bool) -> Result<()> {
             return Ok(());
         }
         write!(
-            f,
+            status_line,
             "#[fg={},bold]{} {}#[default]  ",
             hex_rgb(status.color()),
             status.icon(),
@@ -48,7 +48,7 @@ pub fn output(test: bool) -> Result<()> {
     push(AgentStatus::Waiting)?;
     push(AgentStatus::Idle)?;
     push(AgentStatus::Working)?;
-    println!("{}", f);
+    println!("{}", status_line);
 
     Ok(())
 }

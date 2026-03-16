@@ -9,10 +9,10 @@ use tmux_interface::{RefreshClient, Tmux};
 #[serde(tag = "hook_event_name")]
 enum HookInput {
     UserPromptSubmit,
-    PreToolUse,
     PostToolUse,
-    Stop,
+    PostToolUseFailure,
     Notification { notification_type: NotificationType },
+    Stop,
 }
 
 /// https://code.claude.com/docs/en/hooks#notification
@@ -56,42 +56,39 @@ fn handle_inner(mut stdin: impl Read) -> Result<()> {
         .with_context(|| format!("failed to parse {json}"))?;
 
     let status = match event {
-        HookInput::UserPromptSubmit | HookInput::PreToolUse | HookInput::PostToolUse => {
-            Some(AgentStatus::Working)
-        }
-        HookInput::Stop => Some(AgentStatus::Idle),
+        HookInput::UserPromptSubmit => AgentStatus::Working,
+        HookInput::PostToolUse | HookInput::PostToolUseFailure => AgentStatus::Working,
         HookInput::Notification { notification_type } => match notification_type {
-            NotificationType::IdlePrompt => Some(AgentStatus::Idle),
+            NotificationType::IdlePrompt => AgentStatus::Idle,
             NotificationType::PermissionPrompt | NotificationType::ElicitationDialog => {
-                Some(AgentStatus::Waiting)
+                AgentStatus::Waiting
             }
             NotificationType::Unknown(ty) => {
                 tracing::warn!("Ignoring unknown notification_type: {}", ty);
-                None
+                return Ok(());
             }
         },
+        HookInput::Stop => AgentStatus::Idle,
     };
 
-    if let Some(status) = status {
-        let mut status_file = StatusFile::load_for_write()?;
-        let should_notify = status == AgentStatus::Waiting;
+    let mut status_file = StatusFile::load_for_write()?;
+    let should_notify = status == AgentStatus::Waiting;
 
-        // Use parent PID (Claude Code's PID) rather than our own
-        let pid = std::os::unix::process::parent_id();
-        status_file.set_agent(pane_id, pid, status);
-        status_file.save()?;
+    // Use parent PID (Claude Code's PID) rather than our own
+    let pid = std::os::unix::process::parent_id();
+    status_file.set_agent(pane_id, pid, status);
+    status_file.save()?;
 
-        // Refresh tmux status bar immediately
-        if let Err(err) = Tmux::new()
-            .command(RefreshClient::new().status_line())
-            .output()
-        {
-            tracing::warn!("failed to refresh tmux status bar: {err:#}");
-        }
+    // Refresh tmux status bar immediately
+    if let Err(err) = Tmux::new()
+        .command(RefreshClient::new().status_line())
+        .output()
+    {
+        tracing::warn!("failed to refresh tmux status bar: {err:#}");
+    }
 
-        if should_notify {
-            print!("\x07"); //  terminal bell
-        }
+    if should_notify {
+        print!("\x07"); //  terminal bell
     }
 
     Ok(())

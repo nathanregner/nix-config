@@ -18,6 +18,5 @@
 
   home.packages = with pkgs.unstable; [
     tmux-sessionizer
-    pkgs.local.amux
   ];
 }
