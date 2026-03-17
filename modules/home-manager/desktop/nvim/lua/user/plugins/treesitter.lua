@@ -1,3 +1,4 @@
+function enable_tree_sitter() end
 ---@module "lazy"
 ---@type LazySpec
 return {
@@ -16,17 +17,30 @@ return {
       vim.api.nvim_create_autocmd("FileType", {
         group = group,
         callback = function(args)
-          if not vim.b[args.buf].bigfile then
-            local lang = vim.treesitter.language.get_lang(args.match)
-            if lang then
-              if vim.treesitter.query.get(lang, "highlights") then
-                vim.treesitter.start(args.buf)
-              else
-                vim.bo[args.buf].syntax = "on"
-              end
+          -- skip big files as detected by snacks.nvim
+          if vim.b[args.buf].bigfile then return end
+
+          local lang = vim.treesitter.language.get_lang(args.match)
+          if not lang then return end
+
+          -- check if grammar is available in nvim-treesitter
+          local parsers = require("nvim-treesitter.parsers")
+          if not parsers[lang] then return end
+
+          local enable_highlights = function()
+            if vim.treesitter.query.get(lang, "highlights") then
+              vim.treesitter.start(args.buf)
             else
               vim.bo[args.buf].syntax = "on"
             end
+          end
+
+          -- auto-install
+          if not vim.treesitter.get_parser(args.buf, lang) then
+            -- vim.print("Installing grammar " .. lang)
+            require("nvim-treesitter.install").install(lang):await(enable_highlights)
+          else
+            enable_highlights()
           end
         end,
       })
