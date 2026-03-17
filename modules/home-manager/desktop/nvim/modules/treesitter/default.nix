@@ -22,9 +22,7 @@ in
           if cfg.grammars == [ ] then
             cfg.package.withAllGrammars
           else
-            cfg.package.withPlugins (
-              plugins: (map (name: plugins.${name} or throw "Invalid grammar ${name}") cfg.grammars)
-            )
+            cfg.package.withPlugins (plugins: (map (name: plugins.${name}) cfg.grammars))
         else
           null;
       readOnly = true;
@@ -32,7 +30,9 @@ in
 
     grammars = mkOption {
       type = types.listOf types.str;
-      default = lib.splitString "\n" (builtins.readFile ./grammars.txt);
+      default = builtins.filter (line: line != "") (
+        lib.splitString "\n" (builtins.readFile ./grammars.txt)
+      );
     };
   };
 
