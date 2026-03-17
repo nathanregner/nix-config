@@ -80,6 +80,9 @@ require("conform").setup({
       command = "spring-javaformat",
       args = { "$FILENAME" },
       stdin = true,
+      condition = function(_, ctx)
+        return vim.fs.find(".springjavaformatconfig", { path = ctx.dirname, upward = true })[1] ~= nil
+      end,
     },
     taplo = {
       command = "taplo",
