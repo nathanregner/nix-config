@@ -1,0 +1,18 @@
+{
+  "filesystem": {
+    "denyRead": ["/run", "/"],
+    "allowRead": [
+      "/nix/store",
+      "/nix/store/0550j0i8bmzxbcnzrg1g51zigj7y12ih-bash-interactive-5.3p9/bin/bash",
+      "~/.nix-profile/",
+      ".",
+      "/run/current-system/sw/bin"
+    ],
+    "allowWrite": ["."],
+    "denyWrite": []
+  },
+  "network": {
+    "allowedDomains": [],
+    "deniedDomains": []
+  }
+}

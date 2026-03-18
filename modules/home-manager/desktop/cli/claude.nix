@@ -106,5 +106,11 @@ in
         fi
       '';
     };
+
+    home.packages = [
+      pkgs.local.sandbox-runtime
+    ];
+
+    home.file.".srt-settings.json".source = config.lib.file.mkFlakeSymlink ./srt-settings.json;
   };
 }
