@@ -1,3 +1,7 @@
+#!/usr/bin/env nu
+
+use std log
+
 def parse-porcelain [] {
   str trim
   | split row --regex '\n\n'
@@ -5,19 +9,20 @@ def parse-porcelain [] {
     $row
     | lines
     | each {|line| split row --number 2 " " }
-    | reduce --fold {} {|entry acc| $acc | insert $entry.0 $entry.1 }
+    | reduce --fold {} {|entry acc| $acc | insert $entry.0 ($entry | get -o 1) }
   }
 }
 
 def setup-bare-repo [src: path] {
   cd $src
   let config = git config list --local
-  | lines
-  | where {|it| $it =~ '^(remote|branch)\.' }
-  | each {|entry| $entry | split row --number 2 "=" }
+    | lines
+    | where {|it| $it =~ '^(remote|branch)\.' }
+    | each {|entry| $entry | split row --number 2 "=" }
 
   let temp = mktemp -d $"(basename $src)-bare.XXXXXXXXXX" | path join ".git"
-  git clone --bare --quiet $src $temp
+  log info $"Cloning bare repo into ($temp)..."
+  git clone --bare $src $temp
   cd $temp
   git remote remove origin
   $config | each {|entry| git config set ...$entry }
@@ -25,8 +30,8 @@ def setup-bare-repo [src: path] {
   $temp
 }
 
-def copy-worktree [$bare: path $worktree: record] {
-  cd $bare
+def copy-worktree [$worktree: record] {
+  log info $"Copying worktree ($worktree)"
   let branch = $worktree.branch | str replace 'refs/heads/' ''
   let dest = $"../($branch)"
 
@@ -44,17 +49,20 @@ def copy-worktree [$bare: path $worktree: record] {
 }
 
 def main [] {
-  if (git --git-dir (git rev-parse --git-dir) rev-parse --is-bare-repository) == "true" {
-    print -e "Nothing to do: already a bare repository"
+  if (git -C (git rev-parse --git-dir) rev-parse --is-bare-repository) == "true" {
+    log info "Nothing to do: already a bare repository"
     return
   }
 
   let src = (git rev-parse --show-toplevel)
   cd $src
-  let worktrees = git worktree list --porcelain | parse-porcelain
+  let worktrees = git worktree list --porcelain
+    | parse-porcelain
+    | where { ($in | get -o branch) != null }
 
   let bare = setup-bare-repo $src
-  $worktrees | each {|worktree| copy-worktree $bare $worktree }
+  cd $bare
+  $worktrees | each {|worktree| copy-worktree $worktree }
 
   trash -v $src
   cd # reset pwd
