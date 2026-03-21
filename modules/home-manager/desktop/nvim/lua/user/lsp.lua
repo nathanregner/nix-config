@@ -194,6 +194,9 @@ local servers = {
       ["rust-analyzer"] = {
         cargo = {
           allFeatures = true,
+          -- https://github.com/rust-lang/rust-analyzer/issues/10684
+          -- fixes build scripts constantly re-running
+          targetDir = "target/rust-analyzer",
         },
         check = {
           command = "clippy",
