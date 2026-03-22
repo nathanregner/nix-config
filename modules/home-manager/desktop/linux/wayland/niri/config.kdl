@@ -596,7 +596,6 @@ binds {
 
     // Mod+Space repeat=false { spawn "niri-select-window"; }
 
-    Alt+Tab repeat=false { spawn "rofi" "-show" "window" "-show-icons"; }
     Mod+Space repeat=false { spawn "rofi" "-show" "window" "-show-icons"; }
 
     // Alt+Tab repeat=false { spawn "niriswitcherctl" "show" "--window"; }
