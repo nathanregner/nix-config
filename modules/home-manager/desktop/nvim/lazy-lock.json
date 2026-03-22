@@ -7,7 +7,7 @@
   "claudecode.nvim": { "branch": "main", "commit": "432121f0f5b9bda041030d1e9e83b7ba3a93dd8f" },
   "conform.nvim": { "branch": "master", "commit": "e969e302bced7ffb9a0a0323629f31feb0ca35a6" },
   "conjure": { "branch": "main", "commit": "42048ce74a7d86dd85091d7d8cebb78d25761da3" },
-  "diffview.nvim": { "branch": "main", "commit": "f64d6d1d5fb74970ecebb0779b072681b92e2bca" },
+  "diffview.nvim": { "branch": "main", "commit": "582f907481a9e4b61fa859912fc9c0814ba9c728" },
   "dressing.nvim": { "branch": "master", "commit": "2d7c2db2507fa3c4956142ee607431ddb2828639" },
   "firenvim": { "branch": "master", "commit": "a18ef908ac06b52ad9333b70e3e630b0a56ecb3d" },
   "friendly-snippets": { "branch": "main", "commit": "6cd7280adead7f586db6fccbd15d2cac7e2188b9" },
