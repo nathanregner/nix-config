@@ -1,4 +1,4 @@
-local logged_grammars = {}
+local logged_grammars = vim.g.nix["nvim-treesitter"].grammars or {}
 
 -- Monkeypatch vim.treesitter.get_parser to log all grammar loads
 local original_get_parser = vim.treesitter.get_parser

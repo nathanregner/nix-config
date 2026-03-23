@@ -6,13 +6,14 @@
     # https://starship.rs/config
     settings = {
       aws.disabled = true;
+      docker_context.only_with_files = false;
+      gcloud.disabled = true;
+      git_status.disabled = true;
       nix_shell = {
         symbol = "❄️";
         heuristic = true;
       };
-      docker_context.only_with_files = false;
       package.disabled = true;
-      git_status.disabled = true;
 
       java.disabled = true;
       nodejs.disabled = true;

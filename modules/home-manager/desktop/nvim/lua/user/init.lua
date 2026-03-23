@@ -83,7 +83,7 @@ require("lazy").setup({
   -- TODO: C-d/C-u at top/bottom of diff moves to next file
   -- TODO: :q on a buffer closes tab
   {
-    "nathanregner/diffview.nvim",
+    "git@github.com:nathanregner/diffview.nvim",
     lazy = false,
     keys = function()
       local git = require("user.git")

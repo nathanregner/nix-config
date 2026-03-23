@@ -45,6 +45,7 @@ in
         nvim-treesitter = {
           dir = "${cfg.finalPackage}";
           opts = { inherit install_dir; };
+          grammars = lib.genAttrs cfg.grammars (_: true);
         };
         rtp = [
           "${cfg.finalPackage}/runtime"
@@ -61,6 +62,15 @@ in
         gnutar
         stdenv.cc
         tree-sitter
+        (
+          let
+            grammars = config.lib.file.mkFlakeSymlink ./grammars.txt;
+          in
+          writers.writeBashBin "nvim-treesitter-update-grammars" ''
+            echo "$(shopt -s nullglob; cat ~/.local/state/nvim/treesitter-grammars-* ${grammars} | sort -u)" >${grammars}
+            rm -f ~/.local/state/nvim/treesitter-grammars-*
+          ''
+        )
       ]
     );
 
@@ -71,7 +81,16 @@ in
 
     xdg.dataFile = lib.optionalAttrs (cfg.finalPackage != null) (
       lib.listToAttrs (
-        builtins.filter (grammar: grammar ? name) (
+        [
+          {
+            name = "nvim/lazy/nvim-treesitter";
+            value = {
+              source = cfg.finalPackage;
+              force = true;
+            };
+          }
+        ]
+        ++ (builtins.filter (grammar: grammar ? name) (
           map (
             dependency:
             let
@@ -90,7 +109,7 @@ in
               }
             )
           ) cfg.finalPackage.passthru.dependencies
-        )
+        ))
       )
     );
 
