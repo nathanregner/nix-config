@@ -1,6 +1,12 @@
 {
+  "actuator-exposure": {
+    "body": [
+      "- name: MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE",
+      "  value: health,prometheus,loggers,metrics,threaddump"
+    ],
+    "prefix": "actuator-exposure"
+  },
   "spring-profile-groups": {
-    "prefix": "spring-profile-groups",
     "body": [
       "group:",
       "  local: clickbank",
@@ -11,14 +17,15 @@
       "  sphere-dev: sphere",
       "  sphere-staging: sphere",
       "  sphere-prod: sphere"
-    ]
+    ],
+    "prefix": "spring-profile-groups"
+  },
+  "ecr-image-nregner": {
+    "body": "image: 557126177626.dkr.ecr.us-west-2.amazonaws.com/nregner",
+    "prefix": "ecr-image-nregner"
   },
   "logging_level": {
     "body": ["- name: LOGGING_LEVEL_WEB", "  value: DEBUG"],
     "prefix": "logging_level"
-  },
-  "ecr-image-nregner": {
-    "prefix": "ecr-image-nregner",
-    "body": "image: 557126177626.dkr.ecr.us-west-2.amazonaws.com/nregner"
   }
 }
