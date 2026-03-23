@@ -217,6 +217,10 @@ return {
           keys = { node = "pair" },
           shorthand = { node = "shorthand_property_identifier" },
         },
+        nu = {
+          map = { node = "record_entry" },
+          list = { node = "val_entry" },
+        },
         nix = {
           -- TODO: inherit(a) b c d;
           -- attr = { node = { "attr" } },
