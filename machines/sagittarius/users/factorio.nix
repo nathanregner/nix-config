@@ -6,6 +6,10 @@
     allowedUDPPorts = [ 34197 ];
   };
 
+  nginx.subdomain.factorio."/" = {
+    proxyPass = "http://127.0.0.1:65001/";
+  };
+
   local.services.backup.jobs.factorio = {
     root = "/home/factorio";
     timerConfig = {
