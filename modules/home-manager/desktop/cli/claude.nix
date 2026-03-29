@@ -25,6 +25,14 @@ in
       enable = true;
       package = pkgs.local.claude-code;
 
+      mcpServers = {
+        github = {
+          type = "stdio";
+          command = lib.getExe pkgs.github-mcp-server;
+          args = [ "stdio" ];
+        };
+      };
+
       settings = {
         hooks = lib.mapAttrs (
           _: hooks:
