@@ -36,6 +36,14 @@
       url = "github:nix-community/disko";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    disko-zfs = {
+      url = "github:numtide/disko-zfs";
+      inputs = {
+        flake-parts.follows = "flake-parts";
+        nixpkgs.follows = "nixpkgs";
+        disko.follows = "disko";
+      };
+    };
     flake-compat.url = "github:edolstra/flake-compat";
     flake-parts.url = "github:hercules-ci/flake-parts";
     hydra-sentinel = {
@@ -239,16 +247,21 @@
                 inherit self inputs outputs;
               };
               modules = [
-                "${nixpkgs}/nixos/modules/installer/cd-dvd/installation-cd-graphical-gnome.nix"
+                "${nixpkgs}/nixos/modules/installer/cd-dvd/installation-cd-minimal.nix"
                 ./modules/nixos/base/nix.nix
-                ./modules/nixos/base/kanata.nix
+                ./modules/nixos/desktop/kanata.nix
                 {
                   environment.etc."nixos/flake".source = self.outPath;
                   environment.systemPackages = [
                     # copy system closure so we don't have to download/rebuild on the host
-                    config.system.build.toplevel
+                    # config.system.build.toplevel
+                    (pkgs.symlinkJoin {
+                      name = "flake-inputs";
+                      paths = map (input: "${input}") (builtins.attrValues inputs);
+                    })
                     (pkgs.runCommand "install-scripts" { } ''
                       mkdir -p $out/bin
+                      cp ${config.system.build.diskoScript} $out/bin/disko
                       cp ${config.system.build.formatScript} $out/bin/disko-format
                       cp ${config.system.build.mountScript} $out/bin/disko-mount
                       cp ${pkgs.writeShellScript "install" ''
