@@ -239,9 +239,9 @@
                 inherit self inputs outputs;
               };
               modules = [
-                "${nixpkgs}/nixos/modules/installer/cd-dvd/installation-cd-graphical-gnome.nix"
+                "${nixpkgs}/nixos/modules/installer/cd-dvd/installation-cd-minimal.nix"
                 ./modules/nixos/base/nix.nix
-                ./modules/nixos/base/kanata.nix
+                ./modules/nixos/desktop/kanata.nix
                 {
                   environment.etc."nixos/flake".source = self.outPath;
                   environment.systemPackages = [
