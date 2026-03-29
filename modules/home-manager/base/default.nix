@@ -23,8 +23,9 @@
     };
 
     home.packages = with pkgs.unstable; [
-      nix-tree
       nix-du
+      nix-sweep
+      nix-tree
       pik
     ];
 
