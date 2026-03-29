@@ -17,6 +17,10 @@
     };
 
     # Misc
+    agent-sandbox = {
+      url = "github:nathanregner/agent-sandbox.nix";
+      inputs.nixpkgs.follows = "nixpkgs-unstable";
+    };
     catppuccin-nix = {
       url = "github:catppuccin/nix/release-25.11";
       inputs.nixpkgs.follows = "nixpkgs-unstable";

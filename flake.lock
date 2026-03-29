@@ -1,5 +1,25 @@
 {
   "nodes": {
+    "agent-sandbox": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs-unstable"
+        ]
+      },
+      "locked": {
+        "lastModified": 1774711568,
+        "narHash": "sha256-t4nzKd3XpMbcJs2FNyFdA5vfDG2m7uTFBr/itqpw6DE=",
+        "owner": "nathanregner",
+        "repo": "agent-sandbox.nix",
+        "rev": "f925aecc8d9237798d5565f1c268db585e96f445",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nathanregner",
+        "repo": "agent-sandbox.nix",
+        "type": "github"
+      }
+    },
     "catppuccin-nix": {
       "inputs": {
         "nixpkgs": [
@@ -515,6 +535,7 @@
     },
     "root": {
       "inputs": {
+        "agent-sandbox": "agent-sandbox",
         "catppuccin-nix": "catppuccin-nix",
         "deploy-rs": "deploy-rs",
         "devshell": "devshell",
