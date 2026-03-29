@@ -36,6 +36,14 @@
       url = "github:nix-community/disko";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    disko-zfs = {
+      url = "github:numtide/disko-zfs";
+      inputs = {
+        flake-parts.follows = "flake-parts";
+        nixpkgs.follows = "nixpkgs";
+        disko.follows = "disko";
+      };
+    };
     flake-compat.url = "github:edolstra/flake-compat";
     flake-parts.url = "github:hercules-ci/flake-parts";
     hydra-sentinel = {
@@ -179,6 +187,16 @@
               ./machines/voron/configuration.nix
             ];
             system = "aarch64-linux";
+          };
+
+          # QEMU test VM with ZFS
+          qemu-test = lib.nixosSystem {
+            specialArgs = {
+              inherit self inputs outputs;
+            };
+            modules = [
+              ./machines/qemu-test/configuration.nix
+            ];
           };
         }
         // (import ./machines/print-farm {
