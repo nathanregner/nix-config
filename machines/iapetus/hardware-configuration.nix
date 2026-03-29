@@ -9,6 +9,7 @@
   imports = [
     "${modulesPath}/installer/scan/not-detected.nix"
     inputs.disko.nixosModules.disko
+    inputs.disko-zfs.nixosModules.default
     inputs.nixos-hardware.nixosModules.common-cpu-amd
     inputs.nixos-hardware.nixosModules.common-pc-ssd
   ];
@@ -29,6 +30,7 @@
       "exfat"
       "ext4"
       "btrfs"
+      "zfs"
       "ntfs"
     ];
     initrd.availableKernelModules = [
@@ -46,74 +48,100 @@
     ];
     extraModulePackages = [ ];
   };
+
   disko.devices = {
     disk.main = {
       type = "disk";
       device = "/dev/disk/by-uuid/432fbe74-ed01-4696-aecb-59028c69531b";
       content = {
         type = "gpt";
-        partitions.ESP = {
-          label = "NIXOS-BOOT";
-          type = "EF00";
-          size = "1G";
-          priority = 1;
-          # bootable = true;
-          content = {
-            type = "filesystem";
-            format = "vfat";
-            mountpoint = "/boot";
+        partitions = {
+          ESP = {
+            label = "NIXOS-BOOT";
+            type = "EF00";
+            size = "2G";
+            priority = 1;
+            # bootable = true;
+            content = {
+              type = "filesystem";
+              format = "vfat";
+              mountpoint = "/boot";
+            };
           };
-        };
-        partitions.root = {
-          label = "NIXOS-ROOT";
-          size = "100%";
-          priority = 2;
-          content = {
-            type = "btrfs";
-            extraArgs = [ "-f" ]; # Override existing partition
-            subvolumes = {
-              "root" = {
-                mountpoint = "/";
-                mountOptions = [
-                  "noatime"
-                ];
-              };
-              "home" = {
-                mountpoint = "/home";
-                mountOptions = [
-                  "noatime"
-                ];
-              };
-              "home-snapshots" = {
-                mountpoint = "/home/.snapshots";
-                mountOptions = [
-                  "noatime"
-                ];
-              };
-              "nix" = {
-                mountpoint = "/nix";
-                mountOptions = [
-                  "noatime"
-                ];
-              };
-              "@var" = { };
-              "var-lib" = {
-                mountpoint = "/var/lib";
-                mountOptions = [
-                  "noatime"
-                ];
-              };
-              "var-log" = {
-                mountpoint = "/var/log";
-                mountOptions = [
-                  "noatime"
-                ];
-              };
+          zfs = {
+            label = "NIXOS-ROOT";
+            end = "-32G";
+            priority = 2;
+            content = {
+              type = "zfs";
+              pool = "zroot";
+            };
+          };
+          swap = {
+            size = "100%";
+            content = {
+              type = "swap";
             };
           };
         };
       };
     };
+
+    zpool.zroot = {
+      type = "zpool";
+
+      options = {
+        ashift = "12"; # force 4096 (some old SSDs lie for compatibility reasons)
+        autotrim = "on";
+      };
+
+      # man zfsprops
+      rootFsOptions = {
+        xattr = "sa";
+        dnodesize = "auto"; # consider setting dnodesize to auto if the dataset uses the xattr=sa
+        acltype = "posixacl";
+        compression = "zstd";
+        atime = "off";
+        mountpoint = "none";
+        "com.sun:auto-snapshot" = "false";
+      };
+
+      # data = generic storage
+      # local = never replicated
+      datasets = {
+        "local" = {
+          type = "zfs_fs";
+          options = {
+            mountpoint = "none";
+            canmount = "off";
+          };
+        };
+
+        "data" = {
+          type = "zfs_fs";
+          options = {
+            mountpoint = "none";
+            canmount = "off";
+          };
+        };
+
+        "data/root" = {
+          type = "zfs_fs";
+          mountpoint = "/";
+        };
+
+        "data/home" = {
+          type = "zfs_fs";
+          mountpoint = "/home";
+        };
+
+        "local/nix" = {
+          type = "zfs_fs";
+          mountpoint = "/nix";
+        };
+      };
+    };
+
     nodev = {
       "/tmp" = {
         fsType = "tmpfs";
@@ -126,7 +154,6 @@
 
   # https://github.com/nix-community/disko/issues/192
   fileSystems."/boot".neededForBoot = true;
-  fileSystems."/var/log".neededForBoot = true;
 
   swapDevices = [ ];
   zramSwap.enable = true;
@@ -153,6 +180,23 @@
       else
         config.boot.kernelPackages.nvidiaPackages.beta;
   };
+
+  # enable disko-zfs for declarative dataset management
+  disko.zfs = {
+    enable = true;
+    settings = {
+      logLevel = "info";
+      # Datasets managed by disko-zfs (auto-populated from disko.devices.zpool)
+      # Additional datasets can be declared here:
+      # datasets = {
+      #   "zroot/safe/persist/postgresql" = {
+      #     properties.recordsize = "8K";
+      #   };
+      # };
+    };
+  };
+
+  networking.hostId = "86e1ce56";
 
   # Fix issues with suspend/resume on wayland
   boot.kernelParams = [ "nvidia.NVreg_PreserveVideoMemoryAllocations=1" ];

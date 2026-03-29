@@ -2,7 +2,7 @@
 # sudo cat /etc/ssh/ssh_host_ed25519_key | nix-shell -p ssh-to-age age --run "ssh-to-age -private-key | age-keygen -y"
 keys:
   - &host_enceladus age19hzwnm5dfl6m9vv2sq9z9r0ykn8djvjqaauuruyhf4q4vuxpev2sx4rcsd
-  - &host_iapetus age1pfp278lmacxxj9xj9zez9pgh3yuh64vp0syh6cx6xapvx0c9yfhssl8ed5
+  - &host_iapetus age1rl8hhks47u8d70fg9u820adumj0u7kpfj66eu7nkrl6f3xfa0c3ska8amf
   - &host_print_farm age16zk73cejuepyskjeq0625ecf727y3nmmw32qq0ta97q9e4uj2sqstq6240
   - &host_sagittarius age1yfflu4pxlt32sy4xaa04m5gs7kyrccyj9y5hh0qvndmxtrxrtpns7mf682
   - &host_server age1g2mgt0s80nc5yzkjnwmn6qwf8udnapx92vhwussjpa9d4et5v5zskgap5y
@@ -18,6 +18,7 @@ creation_rules:
   - path_regex: modules/nixos/server/.*/secrets.yaml
     key_groups:
       - age:
+          - *user_nregner_enceladus
           - *host_enceladus
           - *host_iapetus
           - *host_print_farm
