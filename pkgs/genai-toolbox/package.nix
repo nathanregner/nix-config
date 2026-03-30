@@ -7,16 +7,16 @@
 
 buildGoModule (finalAttrs: {
   pname = "genai-toolbox";
-  version = "0.30.0";
+  version = "0.31.0";
 
   src = fetchFromGitHub {
     owner = "googleapis";
     repo = "genai-toolbox";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-J3o4pAfZ6YARWzJzJocN/9BMEBCW9jfaEVzSwHWfT3s=";
+    hash = "sha256-hD5HumHx+juSkJCA6pRYzForAqZKvNRFpnhmeylgHZ4=";
   };
 
-  vendorHash = "sha256-vQklQYnA2tNFwXaU91wafbES/J8SAOn9P2ZN6No1oi0=";
+  vendorHash = "sha256-ByCaEsv+SdzbqAdwWmzfUDKwJ76iyojG0qlp3SWo01M=";
 
   subPackages = [ "." ];
 
