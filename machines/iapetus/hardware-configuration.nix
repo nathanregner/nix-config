@@ -46,6 +46,7 @@
     ];
     extraModulePackages = [ ];
   };
+
   disko.devices = {
     disk.main = {
       type = "disk";
@@ -64,61 +65,78 @@
             mountpoint = "/boot";
           };
         };
-        partitions.root = {
+        partitions.zfs = {
           label = "NIXOS-ROOT";
           size = "100%";
           priority = 2;
           content = {
-            type = "btrfs";
-            extraArgs = [ "-f" ]; # Override existing partition
-            subvolumes = {
-              "root" = {
-                mountpoint = "/";
-                mountOptions = [
-                  "noatime"
-                ];
-              };
-              "home" = {
-                mountpoint = "/home";
-                mountOptions = [
-                  "noatime"
-                ];
-              };
-              "home-snapshots" = {
-                mountpoint = "/home/.snapshots";
-                mountOptions = [
-                  "noatime"
-                ];
-              };
-              "nix" = {
-                mountpoint = "/nix";
-                mountOptions = [
-                  "noatime"
-                ];
-              };
-              "@var" = { };
-              "var-lib" = {
-                mountpoint = "/var/lib";
-                mountOptions = [
-                  "noatime"
-                ];
-              };
-              "var-log" = {
-                mountpoint = "/var/log";
-                mountOptions = [
-                  "noatime"
-                ];
-              };
-            };
+            type = "zfs";
+            pool = "zroot";
           };
         };
       };
     };
+
+    zpool.zroot = {
+      type = "zpool";
+
+      options = {
+        ashift = "12"; # force 4096 (some old SSDs lie for compatibility reasons)
+        autotrim = "on";
+      };
+
+      # man zfsprops
+      rootFsOptions = {
+        xattr = "sa";
+        dnodesize = "auto"; # consider setting dnodesize to auto if the dataset uses the xattr=sa
+        acltype = "posixacl";
+        compression = "zstd";
+        atime = "off";
+        mountpoint = "none";
+        "com.sun:auto-snapshot" = "false";
+      };
+
+      # data = generic storage
+      # local = never replicated
+      datasets = {
+        "local" = {
+          type = "zfs_fs";
+          options = {
+            mountpoint = "none";
+            canmount = "off";
+          };
+        };
+
+        "data" = {
+          type = "zfs_fs";
+          options = {
+            mountpoint = "none";
+            canmount = "off";
+          };
+        };
+
+        "data/root" = {
+          type = "zfs_fs";
+          mountpoint = "/";
+        };
+
+        "data/home" = {
+          type = "zfs_fs";
+          mountpoint = "/home";
+        };
+
+        "local/nix" = {
+          type = "zfs_fs";
+          mountpoint = "/nix";
+        };
+      };
+    };
+
     nodev = {
       "/tmp" = {
         fsType = "tmpfs";
         mountOptions = [
-          "size=16G"
+          "size=8G"
         ];
       };
     };
