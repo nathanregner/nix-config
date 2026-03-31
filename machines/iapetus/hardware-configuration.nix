@@ -52,7 +52,7 @@
   disko.devices = {
     disk.main = {
       type = "disk";
-      device = lib.mkDefault "/dev/disk/by-uuid/432fbe74-ed01-4696-aecb-59028c69531b";
+      device = "/dev/disk/by-id/ata-Samsung_SSD_990_PRO_1TB_S7LANL0L213889F";
       content = {
         type = "gpt";
         partitions.ESP = {

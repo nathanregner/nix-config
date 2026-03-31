@@ -272,9 +272,9 @@
                       cp ${pkgs.writeShellScript "install" ''
                         sudo nixos-install --root /mnt --flake ${self.outPath}#${name}
                       ''} $out/bin/nixos-install-flake
-                      cp ${pkgs.writeShellScript "disko-install" ''
-                        sudo disko-install --root /mnt --flake ${self.outPath}#${name}
-                      ''}
+                      cp ${pkgs.writeShellScript "disko-install-flake" ''
+                        sudo --root /mnt --flake ${self.outPath}#${name} "$@"
+                      ''} $out/bin/disko-install-flake
                     '')
                   ];
                   isoImage.squashfsCompression = "zstd -Xcompression-level 1";
