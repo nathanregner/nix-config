@@ -188,6 +188,8 @@
     };
   };
 
+  networking.hostId = "86e1ce56";
+
   # Fix issues with suspend/resume on wayland
   boot.kernelParams = [ "nvidia.NVreg_PreserveVideoMemoryAllocations=1" ];
 
