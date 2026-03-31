@@ -29,6 +29,7 @@
       "exfat"
       "ext4"
       "btrfs"
+      "zfs"
       "ntfs"
     ];
     initrd.availableKernelModules = [
@@ -144,7 +145,6 @@
 
   # https://github.com/nix-community/disko/issues/192
   fileSystems."/boot".neededForBoot = true;
-  fileSystems."/var/log".neededForBoot = true;
 
   swapDevices = [ ];
   zramSwap.enable = true;
