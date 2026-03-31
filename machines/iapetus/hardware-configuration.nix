@@ -9,6 +9,7 @@
   imports = [
     "${modulesPath}/installer/scan/not-detected.nix"
     inputs.disko.nixosModules.disko
+    inputs.disko-zfs.nixosModules.default
     inputs.nixos-hardware.nixosModules.common-cpu-amd
     inputs.nixos-hardware.nixosModules.common-pc-ssd
   ];
@@ -51,7 +52,7 @@
   disko.devices = {
     disk.main = {
       type = "disk";
-      device = "/dev/disk/by-uuid/432fbe74-ed01-4696-aecb-59028c69531b";
+      device = lib.mkDefault "/dev/disk/by-uuid/432fbe74-ed01-4696-aecb-59028c69531b";
       content = {
         type = "gpt";
         partitions.ESP = {
@@ -170,6 +171,21 @@
         config.boot.kernelPackages.nvidiaPackages.stable
       else
         config.boot.kernelPackages.nvidiaPackages.beta;
+  };
+
+  # enable disko-zfs for declarative dataset management
+  disko.zfs = {
+    enable = true;
+    settings = {
+      logLevel = "info";
+      # Datasets managed by disko-zfs (auto-populated from disko.devices.zpool)
+      # Additional datasets can be declared here:
+      # datasets = {
+      #   "zroot/safe/persist/postgresql" = {
+      #     properties.recordsize = "8K";
+      #   };
+      # };
+    };
   };
 
   # Fix issues with suspend/resume on wayland

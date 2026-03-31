@@ -101,7 +101,7 @@
     };
   };
 
-  # Enable disko-zfs for declarative dataset management
+  # enable disko-zfs for declarative dataset management
   disko.zfs = {
     enable = true;
     settings = {
