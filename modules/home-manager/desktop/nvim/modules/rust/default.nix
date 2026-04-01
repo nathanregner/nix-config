@@ -38,5 +38,9 @@ in
     programs.zsh.initContent = ''
       export PATH="$PATH:$HOME/.cargo/bin"
     '';
+
+    programs.zsh.shellAliases = {
+      cargo = "alias cargo='cargo --target-dir /tmp/cargo/build/$(dirname $(cargo locate-project --message-format plain))'";
+    };
   };
 }
