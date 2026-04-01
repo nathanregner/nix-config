@@ -38,5 +38,14 @@ in
     programs.zsh.initContent = ''
       export PATH="$PATH:$HOME/.cargo/bin"
     '';
+
+    programs.zsh.shellAliases = {
+      cargo = ''
+        CARGO_TARGET_DIR="/tmp/cargo/build/$(dirname "$(/usr/bin/env cargo locate-project --message-format plain)")" /usr/bin/env cargo
+      '';
+      # rust-analyzer = ''
+      #   CARGO_TARGET_DIR="/tmp/cargo/build/$(dirname "$(/usr/bin/env cargo locate-project --message-format plain)")" /usr/bin/env rust-analyzer
+      # '';
+    };
   };
 }
