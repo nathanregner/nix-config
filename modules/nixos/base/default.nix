@@ -14,6 +14,7 @@
     ./sops.nix
     ./tailscale.nix
     ./users.nix
+    ./zswap.nix
   ];
 
   time.timeZone = "America/Boise";

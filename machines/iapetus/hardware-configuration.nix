@@ -47,6 +47,7 @@
       "dvb_usb_rtl28xxu" # RTL-SDR Blog v4
     ];
     extraModulePackages = [ ];
+    zswap.enable = config.swapDevices != [ ];
   };
 
   disko.devices = {
@@ -154,9 +155,6 @@
 
   # https://github.com/nix-community/disko/issues/192
   fileSystems."/boot".neededForBoot = true;
-
-  swapDevices = [ ];
-  zramSwap.enable = true;
 
   hardware.nvidia = {
     # Modesetting is needed for most wayland compositors
