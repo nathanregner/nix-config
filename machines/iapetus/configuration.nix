@@ -123,7 +123,6 @@
 
   services.earlyoom = {
     enable = true;
-    freeMemThreshold = 1; # no swap, let it get pretty full...
   };
 
   programs.steam = {
