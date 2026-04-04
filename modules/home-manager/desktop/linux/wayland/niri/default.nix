@@ -22,11 +22,6 @@
         };
       };
 
-      home.packages = [
-        # cfg.package
-        # (pkgs.writers.writeNuBin "niri-select-window" ./select-window.nu)
-      ];
-
       services.gnome-keyring.enable = true;
 
       # programs.fuzzel.enable = true;
