@@ -5,56 +5,37 @@
   ...
 }:
 let
-  inherit (lib) mkOption types;
   cfg = config.programs.neovim.treesitter;
   parserPrefix = "nvim/site";
 in
 {
   options.programs.neovim.treesitter = {
-    package = mkOption {
-      type = types.nullOr types.package;
-      default = pkgs.unstable.vimPlugins.nvim-treesitter;
-    };
-
-    finalPackage = mkOption {
-      default =
-        if cfg.package != null then
-          if cfg.grammars == [ ] then
-            cfg.package.withAllGrammars
-          else
-            cfg.package.withPlugins (plugins: (map (name: plugins.${name}) cfg.grammars))
-        else
-          null;
-      readOnly = true;
-    };
-
-    grammars = mkOption {
-      type = types.listOf types.str;
-      default = builtins.filter (line: line != "") (
-        lib.splitString "\n" (builtins.readFile ./grammars.txt)
-      );
+    package = lib.mkOption {
+      type = lib.types.nullOr lib.types.package;
+      default = pkgs.unstable.vimPlugins.nvim-treesitter.withAllGrammars;
     };
   };
 
   config = {
-    programs.neovim.lua.globals = lib.optionalAttrs (cfg.finalPackage != null) (
+    programs.neovim.lua.globals = lib.optionalAttrs (cfg.package != null) (
       let
         install_dir = "${config.xdg.dataHome}/${parserPrefix}";
       in
       {
         nvim-treesitter = {
-          dir = "${cfg.finalPackage}";
-          opts = { inherit install_dir; };
-          grammars = lib.genAttrs cfg.grammars (_: true);
+          dir = "${cfg.package}";
+          opts = {
+            inherit install_dir;
+          };
         };
         rtp = [
-          "${cfg.finalPackage}/runtime"
+          "${cfg.package}/runtime"
         ];
       }
     );
 
     # :checkhealth nvim-treesitter
-    home.packages = lib.optionals (cfg.finalPackage == null || cfg.grammars != [ ]) (
+    home.packages = lib.optionals (cfg.package == null) (
       with pkgs.unstable;
       [
         curl
@@ -62,15 +43,6 @@ in
         gnutar
         stdenv.cc
         tree-sitter
-        (
-          let
-            grammars = config.lib.file.mkFlakeSymlink ./grammars.txt;
-          in
-          writers.writeBashBin "nvim-treesitter-update-grammars" ''
-            echo "$(shopt -s nullglob; cat ~/.local/state/nvim/treesitter-grammars-* ${grammars} | sort -u)" >${grammars}
-            rm -f ~/.local/state/nvim/treesitter-grammars-*
-          ''
-        )
       ]
     );
 
@@ -79,18 +51,9 @@ in
       force = true;
     };
 
-    xdg.dataFile = lib.optionalAttrs (cfg.finalPackage != null) (
+    xdg.dataFile = lib.optionalAttrs (cfg.package != null) (
       lib.listToAttrs (
-        [
-          {
-            name = "nvim/lazy/nvim-treesitter";
-            value = {
-              source = cfg.finalPackage;
-              force = true;
-            };
-          }
-        ]
-        ++ (builtins.filter (grammar: grammar ? name) (
+        builtins.filter (grammar: grammar ? name) (
           map (
             dependency:
             let
@@ -108,8 +71,8 @@ in
                 };
               }
             )
-          ) cfg.finalPackage.passthru.dependencies
-        ))
+          ) cfg.package.passthru.dependencies
+        )
       )
     );
 
