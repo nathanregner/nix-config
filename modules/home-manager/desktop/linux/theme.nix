@@ -2,6 +2,7 @@
 {
   gtk = {
     enable = true;
+    gtk4 = { inherit (config.gtk) theme; };
     theme = {
       name = "Colloid-Dark-Compact-Catppuccin";
       package = pkgs.unstable.colloid-gtk-theme.override {
