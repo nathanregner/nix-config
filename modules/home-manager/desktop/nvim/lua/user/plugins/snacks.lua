@@ -14,7 +14,7 @@ return {
 
     ---@type snacks.Config
     return {
-      bigfile = { enabled = true },
+      bigfile = { enabled = false },
       -- dashboard = { enabled = true },
       -- debug = { enabled = true },
       git = { enabled = false },

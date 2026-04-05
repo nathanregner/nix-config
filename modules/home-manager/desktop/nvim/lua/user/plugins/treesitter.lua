@@ -12,11 +12,12 @@ return {
     },
     config = function()
       local group = vim.api.nvim_create_augroup("treesitter-enable", { clear = true })
+      local bigfile = require("user.bigfile")
 
       vim.api.nvim_create_autocmd("FileType", {
         group = group,
         callback = function(args)
-          if not vim.b[args.buf].bigfile then
+          if not bigfile.is_big(args.buf) then
             local lang = vim.treesitter.language.get_lang(args.match)
             if lang then
               if vim.treesitter.query.get(lang, "highlights") then
