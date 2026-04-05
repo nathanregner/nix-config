@@ -4,6 +4,7 @@
     ./amux.nix
     ./ast-grep
     ./bat.nix
+    ./btop.nix
     ./claude.nix
     ./direnv
     ./eza.nix
