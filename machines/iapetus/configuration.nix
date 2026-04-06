@@ -92,6 +92,9 @@
     virt-manager
     xwayland-satellite
     perf
+    (pkgs.writeShellScriptBin "sanoid" ''
+      ${config.systemd.services.sanoid.serviceConfig.ExecStart} "$@"
+    '')
   ];
 
   # boot.binfmt.emulatedSystems = [ "aarch64-linux" ];
@@ -120,7 +123,6 @@
 
   services.earlyoom = {
     enable = true;
-    freeMemThreshold = 1; # no swap, let it get pretty full...
   };
 
   programs.steam = {
@@ -129,19 +131,16 @@
     dedicatedServer.openFirewall = true; # Open ports in the firewall for Source Dedicated Server
   };
 
-  services.snapper = {
-    snapshotInterval = "*:0/15";
-    persistentTimer = true;
-    # snapper -c home <...>
-    # https://wiki.archlinux.org/title/Snapper
-    # https://doc.opensuse.org/documentation/leap/reference/html/book-reference/cha-snapper.html#sec-snapper-clean-up-timeline
-    configs.home = {
-      SUBVOLUME = "/home";
-      ALLOW_USERS = [ "nregner" ];
-      TIMELINE_CLEANUP = true;
-      TIMELINE_CREATE = true;
-      TIMELINE_MIN_AGE = 24 * 60 * 60;
-      TIMELINE_LIMIT_DAILY = 7;
+  services.sanoid = {
+    enable = true;
+    interval = "*:0/15";
+    datasets."zroot/data/home" = {
+      autoprune = true;
+      autosnap = true;
+      hourly = 4 * 24;
+      daily = 30;
+      weekly = 4;
+      monthly = 3;
     };
   };
 

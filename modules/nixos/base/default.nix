@@ -14,6 +14,7 @@
     ./sops.nix
     ./tailscale.nix
     ./users.nix
+    ./zswap.nix
   ];
 
   time.timeZone = "America/Boise";
@@ -32,6 +33,9 @@
   };
 
   system.configurationRevision = self.rev or self.dirtyRev or null;
+
+  # https://github.com/NixOS/nixpkgs/issues/83694
+  boot.kernel.sysctl."kernel.sysrq" = "1";
 
   boot.tmp.cleanOnBoot = true;
 
