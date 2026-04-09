@@ -1,6 +1,7 @@
 use crate::state::{Agent, PaneId, StatusFile};
 use crate::theme::ansi_rgb;
 use anyhow::{Context, Result, bail};
+use etcetera::BaseStrategy;
 use std::collections::HashMap;
 use std::io::Write;
 use std::process::{Command, Stdio};
@@ -76,8 +77,8 @@ fn format_age(agent: &Agent) -> String {
     }
 }
 
-pub fn output() -> Result<()> {
-    let status = StatusFile::load()?;
+pub fn output(base_dirs: &dyn BaseStrategy) -> Result<()> {
+    let status = StatusFile::load(base_dirs)?;
     let dead_agents = status.find_dead_agents();
 
     let agents = status.agents();

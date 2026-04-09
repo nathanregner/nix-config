@@ -1,8 +1,10 @@
 use crate::state::{AgentStatus, PaneId, StatusFile};
 use anyhow::{Context, Result};
+use etcetera::BaseStrategy;
 use serde::{Deserialize, Serialize};
 use std::io::Read;
 use tmux_interface::{RefreshClient, Tmux};
+use tracing::error_span;
 
 /// https://code.claude.com/docs/en/hooks
 #[derive(Deserialize, Debug)]
@@ -33,8 +35,22 @@ struct HookOutput {
     system_message: String,
 }
 
-pub fn run(stdin: impl Read) {
-    if let Err(err) = handle_inner(stdin) {
+pub fn run(base_dirs: &dyn BaseStrategy, stdin: impl Read) {
+    let pane_id = match std::env::var("TMUX_PANE") {
+        Ok(id) => PaneId::new(id),
+        Err(err) => {
+            tracing::warn!("Failed to read TMUX_PANE: {err}, exiting");
+            return;
+        }
+    };
+
+    // Use parent PID (Claude Code's PID) rather than our own
+    let parent_pid = std::os::unix::process::parent_id();
+
+    let span = error_span!("hook", pane_id = pane_id.as_str(), parent_pid);
+    let _span = span.enter();
+
+    if let Err(err) = handle_inner(base_dirs, stdin, pane_id, parent_pid) {
         tracing::error!("{err:#}");
         let output = HookOutput {
             system_message: format!("amux hook error: {err:#}"),
@@ -43,18 +59,18 @@ pub fn run(stdin: impl Read) {
     }
 }
 
-fn handle_inner(mut stdin: impl Read) -> Result<()> {
-    let pane_id = match get_current_tmux_pane() {
-        Some(s) => s,
-        None => return Ok(()), // Not in tmux
-    };
-
+fn handle_inner(
+    base_dirs: &dyn BaseStrategy,
+    mut stdin: impl Read,
+    pane_id: PaneId,
+    parent_pid: u32,
+) -> Result<()> {
     let mut json = String::new();
     stdin
         .read_to_string(&mut json)
         .context("failed to read stdin")?;
     let event = serde_json::from_str::<HookInput>(&json)
-        .with_context(|| format!("failed to parse {json}"))?;
+        .with_context(|| format!("failed to parse input: {json}"))?;
 
     let status = match event {
         HookInput::UserPromptSubmit | HookInput::PreToolUse | HookInput::PostToolUseFailure => {
@@ -80,12 +96,10 @@ fn handle_inner(mut stdin: impl Read) -> Result<()> {
         HookInput::Stop => AgentStatus::Idle,
     };
 
-    let mut status_file = StatusFile::load_for_write()?;
+    let mut status_file = StatusFile::load_for_write(base_dirs)?;
     let should_notify = status == AgentStatus::Waiting;
 
-    // Use parent PID (Claude Code's PID) rather than our own
-    let pid = std::os::unix::process::parent_id();
-    status_file.set_agent(pane_id, pid, status);
+    status_file.set_agent(pane_id, parent_pid, status);
     status_file.save()?;
 
     // Refresh tmux status bar immediately
@@ -93,7 +107,7 @@ fn handle_inner(mut stdin: impl Read) -> Result<()> {
         .command(RefreshClient::new().status_line())
         .output()
     {
-        tracing::warn!("failed to refresh tmux status bar: {err:#}");
+        tracing::warn!("Failed to refresh tmux status bar: {err:#}");
     }
 
     if should_notify {
@@ -101,14 +115,4 @@ fn handle_inner(mut stdin: impl Read) -> Result<()> {
     }
 
     Ok(())
-}
-
-fn get_current_tmux_pane() -> Option<PaneId> {
-    match std::env::var("TMUX_PANE") {
-        Ok(pane) => Some(PaneId::new(pane)),
-        Err(_) => {
-            tracing::warn!("TMUX_PANE not set - not running in tmux?");
-            None
-        }
-    }
 }
