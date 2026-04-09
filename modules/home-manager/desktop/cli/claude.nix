@@ -97,6 +97,8 @@ in
       ".claude"
     ];
 
+    programs.tmux-sessionizer.excluded_dirs = [ ".claude" ];
+
     programs.zsh = {
       enable = true;
       initContent = lib.optionalString config.programs.direnv.enable /* zsh */ ''
