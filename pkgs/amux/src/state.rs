@@ -20,6 +20,17 @@ fn cache_dir() -> Result<PathBuf> {
     }
 }
 
+/// Get state directory, preferring XDG_STATE_HOME if set (even on macOS)
+pub fn state_dir() -> Result<PathBuf> {
+    if let Some(dir) = std::env::var_os("XDG_STATE_HOME") {
+        Ok(PathBuf::from(dir))
+    } else {
+        let base =
+            etcetera::choose_base_strategy().context("failed to determine base directories")?;
+        Ok(base.state_dir().unwrap_or_else(|| base.data_dir()))
+    }
+}
+
 #[derive(Serialize, Deserialize, Hash, PartialEq, Eq, PartialOrd, Ord, Clone, Debug)]
 #[serde(transparent)]
 pub struct PaneId(String);
