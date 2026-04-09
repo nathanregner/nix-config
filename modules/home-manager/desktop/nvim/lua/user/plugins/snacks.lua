@@ -26,6 +26,7 @@ return {
       -- },
       picker = {
         enabled = true,
+        main = { current = true },
         sources = {
           command_history = {
             layout = {
