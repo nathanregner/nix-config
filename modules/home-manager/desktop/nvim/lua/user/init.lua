@@ -247,7 +247,6 @@ require("lazy").setup({
         "chrisgrieser/nvim-scissors",
         opts = {
           snippetDir = vim.fn.stdpath("config") .. "/snippets",
-          jsonFormatter = { "prettierd", "dummy.json" },
         },
       },
     },
