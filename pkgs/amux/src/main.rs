@@ -62,31 +62,13 @@ fn init_logging() {
 
 fn create_log_file() -> Result<File, Box<dyn std::error::Error>> {
     let state_dir = state::state_dir()?;
-    let log_dir = state_dir.join("amux/logs");
+    let log_dir = state_dir.join("amux");
     fs::create_dir_all(&log_dir)?;
-
-    let session = std::env::var("TMUX").ok().and_then(|tmux| {
-        tmux.split(',').next().and_then(|socket_path| {
-            std::path::Path::new(socket_path)
-                .file_name()
-                .and_then(|n| n.to_str())
-                .map(|s| s.to_string())
-        })
-    });
-    let pane = std::env::var("TMUX_PANE").ok();
-    let pid = std::process::id();
-
-    let filename = match (session, pane) {
-        (Some(session), Some(pane)) => format!("{session}_{pane}_{pid}.log"),
-        (Some(session), None) => format!("{session}_{pid}.log"),
-        (None, Some(pane)) => format!("{pane}_{pid}.log"),
-        (None, None) => format!("{pid}.log"),
-    };
 
     let log_file = OpenOptions::new()
         .create(true)
         .append(true)
-        .open(log_dir.join(filename))?;
+        .open(log_dir.join("amux.log"))?;
 
     Ok(log_file)
 }
