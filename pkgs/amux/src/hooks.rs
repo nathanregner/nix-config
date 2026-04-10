@@ -9,7 +9,8 @@ use tmux_interface::{RefreshClient, Tmux};
 #[serde(tag = "hook_event_name")]
 enum HookInput {
     UserPromptSubmit,
-    PostToolUse,
+    PreToolUse,
+    PostToolUse { tool_name: String },
     PostToolUseFailure,
     Notification { notification_type: NotificationType },
     Stop,
@@ -56,8 +57,16 @@ fn handle_inner(mut stdin: impl Read) -> Result<()> {
         .with_context(|| format!("failed to parse {json}"))?;
 
     let status = match event {
-        HookInput::UserPromptSubmit => AgentStatus::Working,
-        HookInput::PostToolUse | HookInput::PostToolUseFailure => AgentStatus::Working,
+        HookInput::UserPromptSubmit | HookInput::PreToolUse | HookInput::PostToolUseFailure => {
+            AgentStatus::Working
+        }
+        HookInput::PostToolUse { tool_name } => {
+            if tool_name == "AskUserQuestion" {
+                AgentStatus::Waiting
+            } else {
+                AgentStatus::Working
+            }
+        }
         HookInput::Notification { notification_type } => match notification_type {
             NotificationType::IdlePrompt => AgentStatus::Idle,
             NotificationType::PermissionPrompt | NotificationType::ElicitationDialog => {

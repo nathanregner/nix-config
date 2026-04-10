@@ -25,11 +25,7 @@ impl TestEnv {
         let socket_path = socket_temp.path().join("tmux.sock");
         let socket_path = socket_path.to_string_lossy().to_string();
 
-        let session_name = format!(
-            "amux-test-{}-{}",
-            test_name,
-            std::process::id()
-        );
+        let session_name = format!("amux-test-{}-{}", test_name, std::process::id());
 
         // Start tmux server in foreground mode (no daemon) so we can kill it on drop
         // Note: -D flag cannot be combined with a command, so we start the server first
@@ -230,4 +226,28 @@ fn test_notification_permission_prompt_sets_waiting() {
     );
 
     insta::assert_snapshot!(env.status_line(), @"#[fg=#f38ba8,bold]󰀦 1#[default]");
+}
+
+#[test]
+fn test_post_tool_use_ask_user_question_sets_waiting() {
+    let env = TestEnv::new("ask_user");
+
+    env.run_hook(
+        // json
+        r#"{ "hook_event_name": "PostToolUse", "tool_name": "AskUserQuestion" }"#,
+    );
+
+    insta::assert_snapshot!(env.status_line(), @"#[fg=#f38ba8,bold]󰀦 1#[default]");
+}
+
+#[test]
+fn test_post_tool_use_other_sets_working() {
+    let env = TestEnv::new("other_tool");
+
+    env.run_hook(
+        // json
+        r#"{ "hook_event_name": "PostToolUse", "tool_name": "Bash" }"#,
+    );
+
+    insta::assert_snapshot!(env.status_line(), @"#[fg=#585b70,bold] 1#[default]");
 }
