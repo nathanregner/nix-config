@@ -17,10 +17,12 @@ mkShell (
         clippy
         rust-analyzer
         rustfmt
-      ];
+      ]
+      ++ (args.packages or [ ]);
   }
-  // (builtins.removeAttrs args [
+  // (removeAttrs args [
     "pkg"
     "rustPlatform"
+    "packages"
   ])
 )
