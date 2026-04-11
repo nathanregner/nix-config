@@ -3,20 +3,25 @@
 
 ---@type rustaceanvim.Opts
 vim.g.rustaceanvim = {
-  settings = {
-    -- https://rust-analyzer.github.io/manual.html#configuration
-    ["rust-analyzer"] = {
-      cargo = {
-        allFeatures = true,
-      },
-      check = {
-        command = "clippy",
-      },
-      completion = {
-        autoimport = { enable = true },
-      },
-      files = {
-        excludeDirs = { ".direnv", ".git" },
+  server = {
+    default_settings = {
+      -- https://rust-analyzer.github.io/manual.html#configuration
+      ["rust-analyzer"] = {
+        cargo = {
+          allFeatures = true,
+          -- https://github.com/rust-lang/rust-analyzer/issues/10684
+          -- fixes build scripts constantly re-running
+          targetDir = "target/rust-analyzer",
+        },
+        check = {
+          command = "clippy",
+        },
+        completion = {
+          autoimport = { enable = true },
+        },
+        files = {
+          excludeDirs = { ".direnv", ".git" },
+        },
       },
     },
   },
@@ -26,6 +31,5 @@ vim.g.rustaceanvim = {
 ---@type LazySpec
 return {
   "mrcjkb/rustaceanvim",
-  version = "^6",
   lazy = false, -- This plugin is already lazy
 }
