@@ -35,7 +35,6 @@
     # cli
     awscli2
     gh
-    nushell
   ];
 
   programs.tmux-sessionizer = {
