@@ -34,7 +34,9 @@ in
       package = pkgs.unstable.neovim-unwrapped;
       defaultEditor = true;
       extraConfig = builtins.readFile ./init.vim;
-      initLua = ''
+      withPython3 = false;
+      withRuby = false;
+      initLua = /* lua */ ''
         vim.g.nix = vim.fn.json_decode('${builtins.toJSON cfg.lua.globals}')
         require('user')
       '';
