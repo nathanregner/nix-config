@@ -34,8 +34,10 @@
 
   system.configurationRevision = self.rev or self.dirtyRev or null;
 
-  # https://github.com/NixOS/nixpkgs/issues/83694
-  boot.kernel.sysctl."kernel.sysrq" = "1";
+  boot.kernel.sysctl = {
+    "kernel.sysrq" = "1"; # https://github.com/NixOS/nixpkgs/issues/83694
+    "vm.swappiness" = 10;
+  };
 
   boot.tmp.cleanOnBoot = true;
 
