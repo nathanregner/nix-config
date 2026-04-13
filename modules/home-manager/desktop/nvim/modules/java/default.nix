@@ -70,5 +70,10 @@ in
       source = ./add-versions-plugin.init.gradle.kts;
       force = true;
     };
+
+    home.file.".m2/mvnd.properties" = {
+      source = ./mvnd.properties;
+      force = true;
+    };
   };
 }
