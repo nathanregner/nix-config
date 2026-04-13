@@ -1,10 +1,11 @@
 use crate::state::{AgentStatus, StatusFile};
 use crate::theme::hex_rgb;
 use anyhow::Result;
+use etcetera::BaseStrategy;
 use std::collections::HashMap;
 use std::fmt::Write;
 
-pub fn output(test: bool) -> Result<()> {
+pub fn output(base_dirs: &dyn BaseStrategy, test: bool) -> Result<()> {
     let statuses = if test {
         HashMap::from([
             (AgentStatus::Waiting, 1),
@@ -12,7 +13,7 @@ pub fn output(test: bool) -> Result<()> {
             (AgentStatus::Idle, 1),
         ])
     } else {
-        let read_status = StatusFile::load()?;
+        let read_status = StatusFile::load(base_dirs)?;
         let dead_agents = read_status.find_dead_agents();
         let statuses = read_status.count_by_status();
 

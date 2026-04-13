@@ -22,11 +22,6 @@
         };
       };
 
-      home.packages = [
-        # cfg.package
-        # (pkgs.writers.writeNuBin "niri-select-window" ./select-window.nu)
-      ];
-
       services.gnome-keyring.enable = true;
 
       # programs.fuzzel.enable = true;
@@ -38,9 +33,9 @@
         terminal = lib.getExe config.programs.alacritty.package;
       };
 
-      services.swww.enable = true;
-      systemd.user.services.swww.Service.ExecStartPost = ''
-        ${lib.getExe' config.services.swww.package "swww"} img ${../../../../../../assets/planet-rise.png}
+      services.awww.enable = true;
+      systemd.user.services.awww.Service.ExecStartPost = ''
+        ${lib.getExe' config.services.awww.package "awww"} img ${../../../../../../assets/planet-rise.png}
       '';
     };
 }

@@ -5,7 +5,7 @@
     hostKeys = {
       enceladus = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIByCYpEo+AjtM2kWxxr5C9Mp3tm1PyVDVD8BGesKTi85";
       enceladus-linux-vm = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJBWcxb/Blaqt1auOtE+F8QUWrUotiC5qBJ+UuEWdVCb";
-      iapetus = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOhre0L0AW87qYkI5Os8U2+DS5yvAOnjpEY+Lmn5f0l7";
+      iapetus = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIF89Q9q+P/V77LCgxZG9DTtLJTb4g+vdyn42PyzTFvM/";
       sagittarius = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIQOaeRY07hRIPpeFYRWoQOzP+toxZjveC5jVHF+vpIj";
       voron = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKPtYcccv53Oae+tUde3hSsqlnyq33LZN/jr/vb6HNRf";
     };

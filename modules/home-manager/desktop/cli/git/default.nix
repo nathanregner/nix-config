@@ -9,6 +9,7 @@
     enable = true;
     lfs.enable = true;
     maintenance.enable = true;
+    signing.format = "ssh";
     settings = {
       alias = {
         convert-to-worktrees = "!${lib.getExe pkgs.local.git-convert-to-worktrees}";

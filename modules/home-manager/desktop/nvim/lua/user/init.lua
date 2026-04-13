@@ -67,6 +67,9 @@ function make_repeatable_move_pair(forward, backward)
   return function() move_fn({ forward = true }) end, function() move_fn({ forward = false }) end
 end
 
+local bigfile = require("user.bigfile")
+bigfile.setup()
+
 -- https://github.com/folke/lazy.nvim#-plugin-spec
 require("lazy").setup({
   -- Git
@@ -254,7 +257,6 @@ require("lazy").setup({
         "chrisgrieser/nvim-scissors",
         opts = {
           snippetDir = vim.fn.stdpath("config") .. "/snippets",
-          jsonFormatter = { "prettierd", "dummy.json" },
         },
       },
     },

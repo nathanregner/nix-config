@@ -8,7 +8,6 @@
     <entry key="ide.experimental.ui" value="true" source="SYSTEM" />
     <entry key="vcs.log.index.enable" value="true" source="SYSTEM" />
     <entry key="jvm.dfa.analysis.ui.security.analysis.window.was.shown" value="true" source="SYSTEM" />
-    <entry key="maven.packagesearch.enabled" value="false" source="MANAGER" />
     <entry key="switched.from.classic.to.islands" value="false" source="SYSTEM" />
   </component>
   <component name="StatusBar">

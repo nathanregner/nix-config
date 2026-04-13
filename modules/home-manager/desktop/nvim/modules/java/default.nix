@@ -44,7 +44,7 @@ in
           hash = "sha256-tC6qU9E1dtF9tfuLKAcipq6eNtr5X0JivG6W1Msgcl8=";
         };
         jdtls = {
-          lombok = "${pkgs.lombok}/share/java/lombok.jar";
+          lombok = "${pkgs.local.lombok}/share/java/lombok.jar";
           settings = {
           };
         };

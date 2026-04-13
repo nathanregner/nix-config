@@ -190,28 +190,28 @@ local servers = {
       },
     },
   },
-  rust_analyzer = {
-    settings = {
-      -- https://rust-analyzer.github.io/manual.html#configuration
-      ["rust-analyzer"] = {
-        cargo = {
-          allFeatures = true,
-          -- https://github.com/rust-lang/rust-analyzer/issues/10684
-          -- fixes build scripts constantly re-running
-          targetDir = "target/rust-analyzer",
-        },
-        check = {
-          command = "clippy",
-        },
-        completion = {
-          autoimport = { enable = true },
-        },
-        files = {
-          excludeDirs = { ".direnv", ".git" },
-        },
-      },
-    },
-  },
+  -- rust_analyzer = {
+  --   settings = {
+  --     -- https://rust-analyzer.github.io/manual.html#configuration
+  --     ["rust-analyzer"] = {
+  --       cargo = {
+  --         allFeatures = true,
+  --         -- https://github.com/rust-lang/rust-analyzer/issues/10684
+  --         -- fixes build scripts constantly re-running
+  --         targetDir = "target/rust-analyzer",
+  --       },
+  --       check = {
+  --         command = "clippy",
+  --       },
+  --       completion = {
+  --         autoimport = { enable = true },
+  --       },
+  --       files = {
+  --         excludeDirs = { ".direnv", ".git" },
+  --       },
+  --     },
+  --   },
+  -- },
 
   terraformls = {
     -- root_dir = util.root_pattern(".terraform", ".terraform.lock.hcl", ".git"),

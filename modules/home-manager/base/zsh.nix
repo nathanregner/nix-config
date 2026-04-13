@@ -20,6 +20,11 @@
         chmod +w {shell.nix,.envrc}
       }
 
+      catwhich() {
+        cat "$(which "$1")"
+      }
+      compdef catwhich=which
+
       # https://github.com/NixOS/nixpkgs/issues/275770
       complete -C aws_completer aws
     ''
