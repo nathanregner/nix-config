@@ -9,17 +9,6 @@ use std::io::{Read, Seek, Write};
 use std::os::fd::{AsFd, OwnedFd};
 use std::path::{Path, PathBuf};
 
-/// Get cache directory, preferring XDG_CACHE_HOME if set (even on macOS)
-fn cache_dir() -> Result<PathBuf> {
-    if let Some(dir) = std::env::var_os("XDG_CACHE_HOME") {
-        Ok(PathBuf::from(dir))
-    } else {
-        let base =
-            etcetera::choose_base_strategy().context("failed to determine base directories")?;
-        Ok(base.cache_dir())
-    }
-}
-
 #[derive(Serialize, Deserialize, Hash, PartialEq, Eq, PartialOrd, Ord, Clone, Debug)]
 #[serde(transparent)]
 pub struct PaneId(String);
@@ -88,26 +77,22 @@ pub struct WriteMode {
 ///
 /// - `StatusFile<ReadMode>` - no lock, allows inspection and dead agent detection
 /// - `StatusFile<WriteMode>` - holds filesystem lock, allows mutation and save
-pub struct StatusFile<Mode> {
+pub struct StatusFile<'b, Mode> {
     data: StatusFileData,
+    base_dirs: &'b dyn BaseStrategy,
     mode: Mode,
 }
 
-impl StatusFile<ReadMode> {
+impl<T> StatusFile<'_, T> {
+    fn status_file_path(base_dirs: &dyn BaseStrategy) -> PathBuf {
+        base_dirs.cache_dir().join("amux/status.json")
+    }
+}
+
+impl<'b> StatusFile<'b, ReadMode> {
     /// Load status file without acquiring a lock (read-only mode).
-    pub fn load() -> Result<Self> {
-        let path = cache_dir()?.join("amux/status.json");
-        Self::load_from_path(&path)
-    }
-
-    /// Load status file with custom base directories (for testing).
-    #[cfg(test)]
-    pub fn load_with(base_dirs: &dyn BaseStrategy) -> Result<Self> {
-        let path = status_file_path(base_dirs);
-        Self::load_from_path(&path)
-    }
-
-    fn load_from_path(path: &Path) -> Result<Self> {
+    pub fn load(base_dirs: &'b dyn BaseStrategy) -> Result<Self> {
+        let path = Self::status_file_path(base_dirs);
         let data = match fs::read_to_string(path) {
             Ok(content) if content.is_empty() => StatusFileData::default(),
             Ok(content) => match serde_json::from_str(&content) {
@@ -126,6 +111,7 @@ impl StatusFile<ReadMode> {
 
         Ok(Self {
             data,
+            base_dirs,
             mode: ReadMode,
         })
     }
@@ -162,25 +148,15 @@ impl StatusFile<ReadMode> {
     }
 
     /// Upgrade to write mode by acquiring an exclusive lock.
-    pub fn upgrade(&self) -> Result<StatusFile<WriteMode>> {
-        StatusFile::<WriteMode>::load_for_write()
+    pub fn upgrade(&self) -> Result<StatusFile<'b, WriteMode>> {
+        StatusFile::<WriteMode>::load_for_write(self.base_dirs)
     }
 }
 
-impl StatusFile<WriteMode> {
+impl<'b> StatusFile<'b, WriteMode> {
     /// Load status file with an exclusive lock (write mode).
-    pub fn load_for_write() -> Result<Self> {
-        let path = cache_dir()?.join("amux/status.json");
-        Self::load_for_write_from_path(path)
-    }
-
-    #[cfg(test)]
-    pub(crate) fn load_for_write_with(base_dirs: impl BaseStrategy) -> Result<Self> {
-        let path = status_file_path(&base_dirs);
-        Self::load_for_write_from_path(path)
-    }
-
-    fn load_for_write_from_path(path: PathBuf) -> Result<Self> {
+    pub fn load_for_write(base_dirs: &'b dyn BaseStrategy) -> Result<Self> {
+        let path = Self::status_file_path(base_dirs);
         ensure_status_dir(&path)?;
 
         let file = OpenOptions::new()
@@ -213,6 +189,7 @@ impl StatusFile<WriteMode> {
         Ok(Self {
             data,
             mode: WriteMode { flock },
+            base_dirs,
         })
     }
 
@@ -248,11 +225,6 @@ impl StatusFile<WriteMode> {
 
         Ok(())
     }
-}
-
-#[cfg(test)]
-fn status_file_path(base_dirs: &dyn BaseStrategy) -> PathBuf {
-    base_dirs.cache_dir().join("amux/status.json")
 }
 
 fn ensure_status_dir(path: &Path) -> Result<()> {
@@ -313,11 +285,11 @@ mod tests {
     fn test_read_mode_handles_truncated_file() {
         let dir = tempfile::tempdir().unwrap();
         let base_dirs = TestDirs::new(dir.path());
-        let path = status_file_path(&base_dirs);
+        let path = StatusFile::<()>::status_file_path(&base_dirs);
         fs::create_dir_all(path.parent().unwrap()).unwrap();
         fs::write(&path, r#"{"agents": {"#).unwrap();
 
-        let status = StatusFile::load_with(&base_dirs).unwrap();
+        let status = StatusFile::load(&base_dirs).unwrap();
         assert!(status.data.agents.is_empty());
     }
 
@@ -326,7 +298,7 @@ mod tests {
         let dir = tempfile::tempdir().unwrap();
         let base_dirs = TestDirs::new(dir.path());
 
-        let status = StatusFile::load_with(&base_dirs).unwrap();
+        let status = StatusFile::load(&base_dirs).unwrap();
         assert!(status.data.agents.is_empty());
     }
 
@@ -334,11 +306,11 @@ mod tests {
     fn test_write_mode_handles_truncated_file() {
         let dir = tempfile::tempdir().unwrap();
         let base_dirs = TestDirs::new(dir.path());
-        let path = status_file_path(&base_dirs);
+        let path = StatusFile::<()>::status_file_path(&base_dirs);
         fs::create_dir_all(path.parent().unwrap()).unwrap();
         fs::write(&path, r#"{"agents": {"#).unwrap();
 
-        let status = StatusFile::load_for_write_with(base_dirs).unwrap();
+        let status = StatusFile::load_for_write(&base_dirs).unwrap();
         assert!(status.data.agents.is_empty());
     }
 }
