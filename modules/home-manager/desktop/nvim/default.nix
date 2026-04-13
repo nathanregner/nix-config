@@ -31,7 +31,7 @@ in
   config = {
     programs.neovim = {
       enable = true;
-      package = inputs.neovim-nightly-overlay.packages.${pkgs.stdenv.hostPlatform.system}.default;
+      package = pkgs.unstable.neovim-unwrapped;
       defaultEditor = true;
       extraConfig = builtins.readFile ./init.vim;
       initLua = ''
@@ -105,8 +105,8 @@ in
       };
     }
     // lib.listToAttrs (
-      builtins.map (source: {
-        name = "nvim/after/ftplugin/${builtins.baseNameOf source}";
+      map (source: {
+        name = "nvim/after/ftplugin/${baseNameOf source}";
         value = {
           source = config.lib.file.mkFlakeSymlink source;
           force = true;
