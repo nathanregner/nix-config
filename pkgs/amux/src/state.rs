@@ -3,7 +3,7 @@ use anyhow::{Context, Result};
 use etcetera::BaseStrategy;
 use nix::fcntl::{Flock, FlockArg};
 use serde::{Deserialize, Serialize};
-use std::collections::{BTreeMap, HashMap};
+use std::collections::{BTreeMap, BTreeSet, HashMap};
 use std::fs::{self, File, OpenOptions};
 use std::io::{Read, Seek, Write};
 use std::os::fd::{AsFd, OwnedFd};
@@ -55,9 +55,62 @@ impl AgentStatus {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Agent {
     pub pid: u32,
-    pub status: AgentStatus,
+    status: AgentStatus,
     #[serde(default, with = "humantime_serde")]
-    pub last_update: Option<std::time::SystemTime>,
+    last_update: Option<std::time::SystemTime>,
+    #[serde(default, skip_serializing_if = "BTreeSet::is_empty")]
+    waiting_agents: BTreeSet<String>,
+}
+
+impl Agent {
+    fn new(pid: u32) -> Self {
+        Self {
+            pid,
+            status: AgentStatus::Idle,
+            last_update: None,
+            waiting_agents: BTreeSet::new(),
+        }
+    }
+
+    fn touch(&mut self) {
+        self.last_update = Some(std::time::SystemTime::now());
+    }
+
+    pub fn status(&self) -> AgentStatus {
+        if self.waiting_agents.is_empty() {
+            self.status
+        } else {
+            AgentStatus::Waiting
+        }
+    }
+
+    pub fn last_update(&self) -> Option<std::time::SystemTime> {
+        self.last_update
+    }
+
+    pub fn is_waiting(&self) -> bool {
+        !self.waiting_agents.is_empty()
+    }
+
+    pub fn set_status(&mut self, status: AgentStatus) {
+        self.status = status;
+        self.touch();
+    }
+
+    pub fn add_waiting(&mut self, agent_id: String) {
+        self.waiting_agents.insert(agent_id);
+        self.touch();
+    }
+
+    pub fn remove_waiting(&mut self, agent_id: &str) {
+        self.waiting_agents.remove(agent_id);
+        self.touch();
+    }
+
+    pub fn clear_waiting(&mut self) {
+        self.waiting_agents.clear();
+        self.touch();
+    }
 }
 
 #[derive(Debug, Default, Serialize, Deserialize)]
@@ -126,7 +179,7 @@ impl<'b> StatusFile<'b, ReadMode> {
             .agents
             .values()
             .fold(HashMap::new(), |mut acc, agent| {
-                *acc.entry(agent.status).or_default() += 1;
+                *acc.entry(agent.status()).or_default() += 1;
                 acc
             })
     }
@@ -193,16 +246,12 @@ impl<'b> StatusFile<'b, WriteMode> {
         })
     }
 
-    /// Set or update an agent's status.
-    pub fn set_agent(&mut self, pane_id: PaneId, pid: u32, status: AgentStatus) {
-        self.data.agents.insert(
-            pane_id,
-            Agent {
-                pid,
-                status,
-                last_update: Some(std::time::SystemTime::now()),
-            },
-        );
+    /// Get or create an agent for the given pane.
+    pub fn get_or_create_agent(&mut self, pane_id: PaneId, pid: u32) -> &mut Agent {
+        self.data
+            .agents
+            .entry(pane_id)
+            .or_insert_with(|| Agent::new(pid))
     }
 
     /// Remove agents by their keys.

@@ -15,15 +15,9 @@ return {
     ---@type snacks.Config
     return {
       bigfile = { enabled = false },
-      -- dashboard = { enabled = true },
-      -- debug = { enabled = true },
       git = { enabled = false },
       indent = { enabled = false },
       input = { enabled = false },
-      -- notifier = {
-      --   enabled = true,
-      --   timeout = 3000,
-      -- },
       picker = {
         enabled = true,
         main = { current = true },
@@ -77,16 +71,13 @@ return {
           },
         },
       },
-
       quickfile = { enabled = true },
-      -- scope = { enabled = true },
-      -- scroll = { enabled = false },
-      -- statuscolumn = { enabled = true },
       styles = {
         notification = {
           -- wo = { wrap = true } -- Wrap notifications
         },
       },
+      terminal = { enabled = false },
       win = {
         input = {
           keys = {

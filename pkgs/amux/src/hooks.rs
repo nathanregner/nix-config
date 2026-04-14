@@ -8,8 +8,17 @@ use tracing::error_span;
 
 /// https://code.claude.com/docs/en/hooks
 #[derive(Deserialize, Debug)]
+struct HookPayload {
+    #[serde(flatten)]
+    event: HookEvent,
+    agent_id: Option<String>,
+}
+
+const ROOT_AGENT_ID: &str = "__root__";
+
+#[derive(Deserialize, Debug)]
 #[serde(tag = "hook_event_name")]
-enum HookInput {
+enum HookEvent {
     UserPromptSubmit,
     PreToolUse,
     PostToolUse { tool_name: String },
@@ -69,37 +78,54 @@ fn handle_inner(
     stdin
         .read_to_string(&mut json)
         .context("failed to read stdin")?;
-    let event = serde_json::from_str::<HookInput>(&json)
+    let payload = serde_json::from_str::<HookPayload>(&json)
         .with_context(|| format!("failed to parse input: {json}"))?;
 
-    let status = match event {
-        HookInput::UserPromptSubmit | HookInput::PreToolUse | HookInput::PostToolUseFailure => {
-            AgentStatus::Working
+    let mut status_file = StatusFile::load_for_write(base_dirs)?;
+    let agent = status_file.get_or_create_agent(pane_id, parent_pid);
+    let agent_id = payload
+        .agent_id
+        .unwrap_or_else(|| ROOT_AGENT_ID.to_owned());
+
+    match payload.event {
+        HookEvent::PreToolUse | HookEvent::PostToolUseFailure => {
+            if agent.is_waiting() {
+                return Ok(());
+            }
+            agent.set_status(AgentStatus::Working);
         }
-        HookInput::PostToolUse { tool_name } => {
+        HookEvent::UserPromptSubmit => {
+            agent.remove_waiting(&agent_id);
+            agent.set_status(AgentStatus::Working);
+        }
+        HookEvent::PostToolUse { tool_name } => {
             if tool_name == "AskUserQuestion" {
-                AgentStatus::Waiting
+                agent.add_waiting(agent_id);
             } else {
-                AgentStatus::Working
+                agent.remove_waiting(&agent_id);
+                agent.set_status(AgentStatus::Working);
             }
         }
-        HookInput::Notification { notification_type } => match notification_type {
-            NotificationType::IdlePrompt => AgentStatus::Idle,
+        HookEvent::Notification { notification_type } => match notification_type {
+            NotificationType::IdlePrompt => {
+                agent.clear_waiting();
+                agent.set_status(AgentStatus::Idle);
+            }
             NotificationType::PermissionPrompt | NotificationType::ElicitationDialog => {
-                AgentStatus::Waiting
+                agent.add_waiting(agent_id);
             }
             NotificationType::Unknown(ty) => {
                 tracing::warn!("Ignoring unknown notification_type: {}", ty);
                 return Ok(());
             }
         },
-        HookInput::Stop => AgentStatus::Idle,
+        HookEvent::Stop => {
+            agent.clear_waiting();
+            agent.set_status(AgentStatus::Idle);
+        }
     };
 
-    let mut status_file = StatusFile::load_for_write(base_dirs)?;
-    let should_notify = status == AgentStatus::Waiting;
-
-    status_file.set_agent(pane_id, parent_pid, status);
+    let should_notify = agent.status() == AgentStatus::Waiting;
     status_file.save()?;
 
     // Refresh tmux status bar immediately
