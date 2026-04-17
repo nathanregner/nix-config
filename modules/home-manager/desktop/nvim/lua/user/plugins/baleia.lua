@@ -12,11 +12,11 @@ return {
     vim.g.baleia = require("baleia").setup({})
 
     vim.api.nvim_create_user_command(
-      "BaleiaColorize",
+      "ColorizeAnsi",
       function() vim.g.baleia.once(vim.api.nvim_get_current_buf()) end,
       { bang = true }
     )
 
-    vim.api.nvim_create_user_command("BaleiaLogs", vim.cmd.messages, { bang = true })
+    vim.api.nvim_create_user_command("ColorizeAnsiLogs", vim.cmd.messages, { bang = true })
   end,
 }
