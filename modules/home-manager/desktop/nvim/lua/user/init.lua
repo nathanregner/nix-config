@@ -836,6 +836,7 @@ require("lazy").setup({
     },
   },
 
+  -- TODO: replace with snacks.toggle
   { -- toggle.nvim
     "gregorias/toggle.nvim",
     -- version = "2.0",
