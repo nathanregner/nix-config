@@ -31,10 +31,12 @@ in
   config = {
     programs.neovim = {
       enable = true;
-      package = inputs.neovim-nightly-overlay.packages.${pkgs.stdenv.hostPlatform.system}.default;
+      package = pkgs.unstable.neovim-unwrapped;
       defaultEditor = true;
       extraConfig = builtins.readFile ./init.vim;
-      initLua = ''
+      withPython3 = false;
+      withRuby = false;
+      initLua = /* lua */ ''
         vim.g.nix = vim.fn.json_decode('${builtins.toJSON cfg.lua.globals}')
         require('user')
       '';
@@ -130,8 +132,8 @@ in
       };
     }
     // lib.listToAttrs (
-      builtins.map (source: {
-        name = "nvim/after/ftplugin/${builtins.baseNameOf source}";
+      map (source: {
+        name = "nvim/after/ftplugin/${baseNameOf source}";
         value = {
           source = config.lib.file.mkFlakeSymlink source;
           force = true;

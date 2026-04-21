@@ -23,7 +23,7 @@ in
   config = {
     programs.claude-code = {
       enable = true;
-      package = pkgs.local.claude-code;
+      package = pkgs.unstable.claude-code;
 
       mcpServers = {
         github = {
