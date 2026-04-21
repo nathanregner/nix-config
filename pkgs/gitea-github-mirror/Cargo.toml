@@ -7,7 +7,7 @@ chrono = "0.4.38"
 clients = { path = "clients" }
 color-eyre = "0.6.3"
 figment = "0.10.19"
-gix-config = "0.54.0"
+gix-config = "0.53.0"
 http = "1"
 prettyplease = "0.2.22"
 progenitor = { git = "https://github.com/nathanregner/progenitor" }
