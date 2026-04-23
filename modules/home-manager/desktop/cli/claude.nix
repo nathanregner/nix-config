@@ -31,6 +31,10 @@ in
           command = lib.getExe pkgs.github-mcp-server;
           args = [ "stdio" ];
         };
+
+        playwright = {
+          command = lib.getExe pkgs.playwright-mcp;
+        };
       };
 
       settings = {
