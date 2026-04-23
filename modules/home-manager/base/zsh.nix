@@ -55,7 +55,7 @@
         hmb = "${hm} build";
         hms = "${hm} switch";
 
-        "g-" = ''cd "$(git rev-parse --show-toplevel)"'';
+        "g-" = ''root="$(git rev-parse --show-toplevel)"; if [ "$PWD" = "$root" ]; then parent="$(git -C .. rev-parse --show-toplevel 2>/dev/null)" && cd "$parent"; else cd "$root"; fi'';
         "lg" = "lazygit";
 
         # https://www.reddit.com/r/NixOS/comments/8m1n3d/comment/dzkfwhl/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button

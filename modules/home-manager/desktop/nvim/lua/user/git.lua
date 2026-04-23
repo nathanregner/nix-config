@@ -17,10 +17,12 @@ end
 
 ---@param args string
 ---@param cwd? string
----@return string
+---@return string?
 local function git(args, cwd)
   cwd = cwd or get_buffer_cwd()
-  return vim.fn.systemlist("git -C " .. vim.fn.escape(cwd, " ") .. " " .. args)[1]
+  local result = vim.fn.systemlist("git -C " .. vim.fn.escape(cwd, " ") .. " " .. args .. " 2>/dev/null")[1]
+  if vim.v.shell_error ~= 0 then return nil end
+  return result
 end
 
 ---@param cwd? string

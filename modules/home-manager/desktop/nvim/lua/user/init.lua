@@ -578,10 +578,15 @@ require("lazy").setup({
           desc = "Navigate to the git root",
           callback = function()
             local oil = require("oil")
-            local cwd = oil.get_current_dir()
-            local git_root = require("user.git").root(cwd)
-            if git_root == cwd then git_root = get_git_root(vim.fs.dirname(git_root)) end
-            if git_root then oil.open(git_root) end
+            local git = require("user.git")
+            local cwd = oil.get_current_dir():gsub("/$", "")
+            local git_root = git.root(cwd)
+            if git_root == cwd then
+              local parent_root = git.root(vim.fs.dirname(git_root))
+              if parent_root and parent_root ~= git_root then oil.open(parent_root) end
+            elseif git_root then
+              oil.open(git_root)
+            end
           end,
         },
         ["g^"] = {
