@@ -59,7 +59,7 @@ fn switch_to_pane(id: &PaneId) -> Result<()> {
 }
 
 fn format_age(agent: &Agent) -> String {
-    let Some(last_update) = agent.last_update() else {
+    let Some(last_update) = agent.last_update else {
         return "-".to_string();
     };
     let Ok(elapsed) = SystemTime::now().duration_since(last_update) else {
@@ -104,12 +104,12 @@ pub fn output(base_dirs: &dyn BaseStrategy) -> Result<()> {
         })
         .collect();
 
-    fzf_entries.sort_by_key(|(_, _, agent)| (agent.status(), agent.last_update()));
+    fzf_entries.sort_by_key(|(_, _, agent)| (agent.status, agent.last_update));
 
     let fzf_lines: Vec<String> = fzf_entries
         .iter()
         .map(|(id, pane, agent)| {
-            let icon = ansi_rgb(agent.status().color(), agent.status().icon());
+            let icon = ansi_rgb(agent.status.color(), agent.status.icon());
             let age = format_age(agent);
             let attached = if pane.session_attached {
                 "(attached)"
