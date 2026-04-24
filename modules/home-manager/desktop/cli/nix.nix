@@ -14,7 +14,7 @@
   home.packages = with pkgs; [
     (pkgs.writers.writeNuBin "nix-add-gc-roots" ./nix-add-gc-roots.nu)
     deploy-rs
-    nix-diff
+    dix
     nix-du
     nix-output-monitor
     nix-prefetch
