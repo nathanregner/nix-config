@@ -6,6 +6,7 @@
     ./bat.nix
     ./btop.nix
     ./claude.nix
+    ./claude-sandbox.nix
     ./direnv
     ./eza.nix
     ./git
