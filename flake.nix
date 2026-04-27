@@ -1,5 +1,7 @@
 {
   inputs = {
+    self.submodules = true;
+
     # Nix
     nixpkgs.url = "github:nixos/nixpkgs/release-25.11";
     nixpkgs-unstable.url = "github:nixos/nixpkgs/nixpkgs-unstable";
@@ -17,7 +19,7 @@
     };
 
     agent-sandbox = {
-      url = "github:nathanregner/agent-sandbox.nix";
+      url = "./agent-sandbox.nix";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
 

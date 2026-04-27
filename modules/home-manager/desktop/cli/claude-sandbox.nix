@@ -6,7 +6,12 @@
   ...
 }:
 let
-  inherit (lib) mkOption mkEnableOption mkIf types;
+  inherit (lib)
+    mkOption
+    mkEnableOption
+    mkIf
+    types
+    ;
   cfg = config.programs.claude-code.sandbox;
 
   mkProfileEnvVars =
@@ -21,9 +26,11 @@ let
       "AWS_${envName}_REGION" = "$AWS_${envName}_REGION";
     };
 
-  profileEnvVars = lib.foldl' (acc: profile: acc // mkProfileEnvVars profile) { } cfg.awsProfiles;
+  allAwsProfiles = cfg.awsProfiles ++ cfg.awsExtraProfiles;
 
-  defaultAwsEnvVars = lib.optionalAttrs (cfg.awsProfiles != [ ]) {
+  profileEnvVars = lib.foldl' (acc: profile: acc // mkProfileEnvVars profile) { } allAwsProfiles;
+
+  defaultAwsEnvVars = lib.optionalAttrs (allAwsProfiles != [ ]) {
     AWS_ACCESS_KEY_ID = "$AWS_ACCESS_KEY_ID";
     AWS_SECRET_ACCESS_KEY = "$AWS_SECRET_ACCESS_KEY";
     AWS_SESSION_TOKEN = "$AWS_SESSION_TOKEN";
@@ -31,32 +38,35 @@ let
     AWS_DEFAULT_REGION = "$AWS_DEFAULT_REGION";
   };
 
-  allStateDirs =
-    [
-      "$HOME/.claude"
-      "$HOME/.cache"
-    ]
-    ++ cfg.stateDirs
-    ++ config.programs.claude-code.settings.permissions.additionalDirectories;
+  allStateDirs = [
+    "$HOME/.claude"
+    "$HOME/.cache"
+  ]
+  ++ cfg.stateDirs
+  ++ config.programs.claude-code.settings.permissions.additionalDirectories;
 
   allStateFiles = [
     "$HOME/.claude.json"
     "$HOME/.claude.json.lock"
-  ] ++ cfg.stateFiles;
+  ]
+  ++ cfg.stateFiles;
 
   allRoStateDirs = [
     "$HOME/.local/state/nix/profiles"
     "$HOME/.nix-profile"
-  ] ++ cfg.roStateDirs;
+  ]
+  ++ cfg.roStateDirs;
 
-  allExtraEnv =
-    {
-      PATH = "$HOME/.nix-profile/bin";
-      CLAUDE_CODE_OAUTH_TOKEN = "$CLAUDE_CODE_OAUTH_TOKEN";
-    }
-    // cfg.extraEnv
-    // profileEnvVars
-    // defaultAwsEnvVars;
+  allExtraEnv = {
+    PATH = "$HOME/.nix-profile/bin";
+    CLAUDE_CODE_OAUTH_TOKEN = "$CLAUDE_CODE_OAUTH_TOKEN";
+  }
+  // lib.optionalAttrs (cfg.eksClusters != [ ]) {
+    KUBECONFIG = "$HOME/.claude/kube/config";
+  }
+  // cfg.extraEnv
+  // profileEnvVars
+  // defaultAwsEnvVars;
 
   mkSandbox = inputs.agent-sandbox.lib.${pkgs.stdenv.hostPlatform.system}.mkSandbox;
 
@@ -71,29 +81,32 @@ let
     extraEnv = allExtraEnv;
   };
 
-  profilesJson = builtins.toJSON cfg.awsProfiles;
+  configJson = builtins.toJSON {
+    awsProfiles = cfg.awsProfiles;
+    awsExtraProfiles = cfg.awsExtraProfiles;
+    eksClusters = cfg.eksClusters;
+    sandboxedBash = lib.getExe sandboxedBash;
+  };
 
-  sandboxScript = pkgs.writers.writeNuBin "sandbox-inner"
-    {
-      makeWrapperArgs = [
-        "--prefix"
-        "PATH"
-        ":"
-        "${lib.makeBinPath cfg.wrapperScriptExtraPackages}"
-      ];
-    }
-    cfg.wrapperScript;
+  sandboxScript = pkgs.writers.writeNuBin "sandbox-inner" {
+    makeWrapperArgs = [
+      "--prefix"
+      "PATH"
+      ":"
+      "${lib.makeBinPath cfg.wrapperScriptExtraPackages}"
+    ];
+  } cfg.wrapperScript;
 
   package =
     if cfg.wrapperScript != null then
-      pkgs.writers.writeBashBin "sandbox" ''
-        exec ${lib.getExe sandboxScript} --profiles '${profilesJson}' --sandboxed-bash '${lib.getExe sandboxedBash}' "$@"
+      pkgs.writers.writeBashBin "sb" ''
+        exec ${lib.getExe sandboxScript} --config '${configJson}' "$@"
       ''
     else
       sandboxedBash;
 
-  claudePackage = pkgs.writers.writeBashBin "sandbox-claude" ''
-    exec ${lib.getExe cfg.package} -c '${lib.getExe config.programs.claude-code.package} --dangerously-skip-permissions "$@"' bash "$@"
+  claudePackage = pkgs.writers.writeBashBin "sb-claude" ''
+    exec ${lib.getExe cfg.package} "$@" -c '${lib.getExe config.programs.claude-code.package} --dangerously-skip-permissions "$@"' bash
   '';
 in
 {
@@ -133,6 +146,32 @@ in
     awsProfiles = mkOption {
       type = types.listOf types.str;
       default = [ ];
+    };
+
+    awsExtraProfiles = mkOption {
+      type = types.listOf types.str;
+      default = [ ];
+    };
+
+    eksClusters = mkOption {
+      type = types.listOf (types.submodule {
+        options = {
+          profile = mkOption { type = types.str; };
+          cluster = mkOption { type = types.str; };
+          alias = mkOption { type = types.str; };
+          region = mkOption {
+            type = types.str;
+            default = "us-west-2";
+          };
+        };
+      });
+      default = [ ];
+    };
+
+    computedExtraEnv = mkOption {
+      type = types.attrsOf types.str;
+      readOnly = true;
+      default = allExtraEnv;
     };
 
     wrapperScript = mkOption {

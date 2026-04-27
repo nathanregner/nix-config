@@ -1,0 +1,3 @@
+[submodule "agent-sandbox.nix"]
+	path = agent-sandbox.nix
+	url = git@github.com:nathanregner/agent-sandbox.nix.git
