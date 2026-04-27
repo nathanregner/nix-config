@@ -150,6 +150,12 @@ define_all(s("it", {
   t({ "", "});" }),
 }))
 
+define_all(s("sleep", {
+  t("await new Promise((resolve) => setTimeout(resolve, "),
+  i(1, "5000"),
+  t("));"),
+}))
+
 for lang, lang_snippets in pairs(snippets) do
   ls.add_snippets(lang, lang_snippets, {
     key = lang .. "/custom",
