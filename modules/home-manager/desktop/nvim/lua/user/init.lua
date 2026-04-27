@@ -34,6 +34,7 @@ local initial_cwd = vim.fn.getcwd()
 vim.g.fugitive_legacy_commands = 0
 
 require("user.treesitter")
+require("user.shada").setup()
 
 local leet_arg = "leetcode.nvim"
 
