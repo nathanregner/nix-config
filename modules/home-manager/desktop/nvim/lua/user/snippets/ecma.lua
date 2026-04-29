@@ -1,0 +1,162 @@
+local ls = require("luasnip")
+local s = ls.snippet
+local sn = ls.snippet_node
+local isn = ls.indent_snippet_node
+local t = ls.text_node
+local i = ls.insert_node
+local f = ls.function_node
+local c = ls.choice_node
+local d = ls.dynamic_node
+local r = ls.restore_node
+local ai = require("luasnip.nodes.absolute_indexer")
+local events = require("luasnip.util.events")
+local extras = require("luasnip.extras")
+local l = extras.lambda
+local rep = extras.rep
+local p = extras.partial
+local m = extras.match
+local n = extras.nonempty
+local dl = extras.dynamic_lambda
+local fmt = require("luasnip.extras.fmt").fmt
+local fmta = require("luasnip.extras.fmt").fmta
+local conds = require("luasnip.extras.expand_conditions")
+local postfix = require("luasnip.extras.postfix").postfix
+local types = require("luasnip.util.types")
+local parse = require("luasnip.util.parser").parse_snippet
+local ms = ls.multi_snippet
+local k = require("luasnip.nodes.key_indexer").new_key
+
+local treesitter_postfix = require("luasnip.extras.treesitter_postfix").treesitter_postfix
+
+local expression = [[
+  [
+    (expression)
+  ] @prefix
+]]
+
+-- require("luasnip.session.snippet_collection").clear_snippets("javascript") -- TODO
+
+-- ls.filetype_extend("ecma", { "javascript", "typescript", "javascriptreact", "typescriptreact" })
+-- ls.filetype_extend("javascript", { "ecma" })
+-- ls.filetype_extend("javascriptreact", { "ecma" })
+-- -- ls.filetype_extend("javascriptreact", { "javascript" })
+-- ls.filetype_extend("typescript", { "ecma" })
+-- ls.filetype_extend("typescriptreact", { "ecma" })
+-- -- ls.filetype_extend("typescriptreact", { "typescript" })
+
+local snippets = {
+  javascript = {},
+  javascriptreact = {},
+  typescript = {},
+  typescriptreact = {},
+}
+
+local ft_ts_lang = {
+  javascriptreact = "javascript",
+  typescriptreact = "typescript",
+}
+
+local define_all = function(snippet)
+  for lang, _ in pairs(snippets) do
+    table.insert(snippets[lang], snippet)
+  end
+end
+
+local define_postfix = function(opts)
+  for _, lang in ipairs(opts.langs or { "javascript", "javascriptreact", "typescript", "typescriptreact" }) do
+    for _, trig in ipairs(opts.trig) do
+      local snippet = treesitter_postfix({
+        trig = trig,
+        matchTSNode = {
+          query = opts.query,
+          query_lang = ft_ts_lang[lang] or lang,
+        },
+        reparseBuffer = "live",
+      }, {
+        d(1, function(_, parent)
+          local match = parent.snippet.env.LS_TSMATCH
+          return opts.expand(match)
+        end),
+      })
+      table.insert(snippets[lang], snippet)
+    end
+  end
+end
+
+for trig, method in pairs({
+  cl = "log",
+  clc = "count",
+  cld = "debug",
+  cldir = "dir",
+  cle = "error",
+  cli = "info",
+  clt = "trace",
+  clw = "warn",
+  log = "log",
+}) do
+  define_all(s(trig, { t("console." .. method .. "("), i(1), t(");") }))
+  define_postfix({
+    trig = { "." .. trig },
+    query = expression,
+    expand = function(match) return sn(nil, fmt("console." .. method .. "({1});", { t(match) })) end,
+  })
+  define_postfix({
+    trig = { "." .. trig .. "v" },
+    query = [[
+        [
+          (identifier)
+          (member_expression)
+        ] @prefix
+      ]],
+    expand = function(match) return sn(nil, fmt("console." .. method .. "('{1}', {1});", { t(match) })) end,
+  })
+end
+
+define_postfix({
+  trig = { ".forof" },
+  query = expression,
+  expand = function(match)
+    return sn(nil, fmt("for (const {} of {}) {{\n  {}\n}}", { i(1, "iterator"), t(match), i(2, {}, "") }))
+  end,
+})
+
+define_postfix({
+  trig = { ".json" },
+  query = expression,
+  expand = function(match) return sn(nil, fmt("JSON.stringify({}, undefined, 2)", { t(match) })) end,
+})
+
+-- TODO: only in test files
+define_all(s("descr", {
+  t("describe('"),
+  i(1),
+  t({ "', () => {", "" }),
+  i(2, "  //"),
+  t({ "", "});" }),
+}))
+
+define_all(s("it", {
+  t("it('"),
+  i(1),
+  t({ "', () => {", "" }),
+  i(2, "  //"),
+  t({ "", "});" }),
+}))
+
+define_all(s("sleep", {
+  t("await new Promise((resolve) => setTimeout(resolve, "),
+  i(1, "5000"),
+  t("));"),
+}))
+
+for lang, lang_snippets in pairs(snippets) do
+  ls.add_snippets(lang, lang_snippets, {
+    key = "user." .. lang,
+    default_priority = 1000,
+  })
+end
+
+-- require("luasnip").get_snippets("javascriptreact")
+
+-- require("luasnip.session").loaded_fts
+-- require("luasnip.session").ft_redirect

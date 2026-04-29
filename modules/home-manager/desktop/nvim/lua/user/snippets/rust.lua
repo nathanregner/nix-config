@@ -100,5 +100,4 @@ ls.add_snippets("rust", {
   }),
 }, {
   key = "user.rust",
-  -- key = "__autosnippets__" .. ft .. "__" .. filename,
 })
