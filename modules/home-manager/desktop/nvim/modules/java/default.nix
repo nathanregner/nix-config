@@ -7,11 +7,10 @@
 let
   inherit (lib) mkOption types mkIf;
   cfg = config.programs.neovim.modules.java;
-  formatterCfg = "nvim/lsp/jdtls/formatter.xml";
 in
 {
-  options = {
-    programs.neovim.modules.java.enable = mkOption {
+  options.programs.neovim.modules.java = {
+    enable = mkOption {
       type = types.bool;
       default = true;
     };
@@ -34,18 +33,18 @@ in
 
   config = mkIf cfg.enable {
     programs.neovim = {
-      extraPackages = with pkgs.unstable; [
-        jdt-language-server
+      extraPackages = [
+        config.programs.neovim.modules.java.finalPackage
       ];
 
-      lua.globals.jdtls = {
-        lombok = pkgs.fetchurl {
-          url = "https://repo1.maven.org/maven2/org/projectlombok/lombok/1.18.36/lombok-1.18.36.jar";
-          sha256 = "sha256-c7awW2otNltwC6sI0w+U3p0zZJC8Cszlthgf70jL8Y4=";
+      lua.globals = {
+        junit_jar = pkgs.fetchurl {
+          url = "https://repo1.maven.org/maven2/org/junit/platform/junit-platform-console-standalone/1.10.1/junit-platform-console-standalone-1.10.1.jar";
+          hash = "sha256-tC6qU9E1dtF9tfuLKAcipq6eNtr5X0JivG6W1Msgcl8=";
         };
-        settings = {
-          java = {
-            format.settings.url = "file://${config.xdg.configHome}/${formatterCfg}";
+        jdtls = {
+          lombok = "${pkgs.local.lombok}/share/java/lombok.jar";
+          settings = {
           };
         };
       };
@@ -64,14 +63,15 @@ in
         source = config.lib.file.mkFlakeSymlink ./java.lua;
         force = true;
       };
-      ${formatterCfg} = {
-        source = config.lib.file.mkFlakeSymlink ./formatter.xml;
-        force = true;
-      };
     };
 
     home.file.".gradle/init.d/add-versions-plugin.init.gradle.kts" = {
       source = ./add-versions-plugin.init.gradle.kts;
+      force = true;
+    };
+
+    home.file.".m2/mvnd.properties" = {
+      source = ./mvnd.properties;
       force = true;
     };
   };
