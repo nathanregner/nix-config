@@ -22,6 +22,7 @@
     home-manager = {
       useGlobalPkgs = true;
       useUserPackages = true;
+      overwriteBackup = true;
       extraSpecialArgs = {
         inherit
           self
