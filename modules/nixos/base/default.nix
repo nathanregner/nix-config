@@ -11,7 +11,6 @@
     ./networking.nix
     ./nix.nix
     ./services
-    ./sops.nix
     ./tailscale.nix
     ./users.nix
     ./zswap.nix
