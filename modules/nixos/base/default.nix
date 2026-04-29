@@ -15,7 +15,10 @@
     ./tailscale.nix
     ./users.nix
     ./zswap.nix
-  ];
+  ]
+  ++ (with inputs.self.modules.nixos; [
+    base
+  ]);
 
   time.timeZone = "America/Boise";
   i18n.defaultLocale = "en_US.UTF-8";
