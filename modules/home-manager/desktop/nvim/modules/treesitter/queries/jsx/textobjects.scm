@@ -9,3 +9,12 @@
   _* @tag.inner
   close_tag: _
 )
+
+(jsx_attribute) @parameter.outer
+
+(jsx_attribute
+  (property_identifier)
+  (_
+    (_) @parameter.inner
+  )
+)
