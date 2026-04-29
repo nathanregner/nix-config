@@ -29,12 +29,6 @@
     accent = "blue";
   };
 
-  nix.gc = {
-    automatic = true;
-    options = "--delete-older-than 7d";
-    dates = "weekly";
-  };
-
   system.configurationRevision = self.rev or self.dirtyRev or null;
 
   # https://github.com/NixOS/nixpkgs/issues/83694
