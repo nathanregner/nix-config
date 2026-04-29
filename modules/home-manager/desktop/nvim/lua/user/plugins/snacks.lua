@@ -3,7 +3,6 @@ local grep_exclude = {
 }
 
 ---@module "lazy"
----@module "snacks"
 ---@type LazySpec
 return {
   "folke/snacks.nvim",
