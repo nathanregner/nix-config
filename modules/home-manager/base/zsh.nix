@@ -54,7 +54,14 @@
 
         cdiff = "diff --new-line-format='+%L' --old-line-format='-%L' --unchanged-line-format=' %L'"; # diff with full context
 
-        g- = ''cd "$(git rev-parse --show-toplevel)"'';
+        g- = /* bash */ ''
+          root="$(git rev-parse --show-toplevel)";
+          if [ "$PWD" = "$root" ]; then
+            parent="$(git -C .. rev-parse --show-toplevel 2>/dev/null)" && cd "$parent";
+          else
+            cd "$root";
+          fi
+        '';
         lg = "lazygit";
 
         # https://www.reddit.com/r/NixOS/comments/8m1n3d/comment/dzkfwhl/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button
