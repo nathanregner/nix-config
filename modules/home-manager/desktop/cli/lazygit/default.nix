@@ -33,6 +33,9 @@
       };
 
       keybinding = {
+        branches = {
+          forceCheckoutBranch = "<disabled>";
+        };
         commits = {
           # fix conflicts with tmux
           moveDownCommit = "<c-N>";
