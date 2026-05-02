@@ -4,11 +4,6 @@
     allowUnfree = true;
     # Workaround for https://github.com/nix-community/home-manager/issues/2942
     allowUnfreePredicate = _: true;
-
-    # FIXME: openrgb
-    permittedInsecurePackages = [
-      "mbedtls-2.28.10"
-    ];
   };
 
   overlays = [
