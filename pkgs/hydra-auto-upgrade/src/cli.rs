@@ -6,7 +6,7 @@ use std::path::PathBuf;
 pub struct Args {
     pub profile: Profile,
 
-    #[arg(long, default_value = "https://hydra.nregner.net")]
+    #[arg(long, default_value = "http://sagittarius:3001")]
     pub instance: String,
     #[arg(long, default_value = "nix-config")]
     pub project: String,

@@ -2,12 +2,16 @@
 {
   lib,
   cargo-update-script,
+  dix,
   installShellFiles,
+  makeWrapper,
   mkRustShell,
-  nvd,
   rustPlatform,
 }:
 let
+  runtimePath = lib.makeBinPath [
+    dix
+  ];
   pkg = rustPlatform.buildRustPackage {
     pname = "hydra-auto-upgrade";
     version = "1.0.0";
@@ -15,9 +19,10 @@ let
     src = lib.cleanSource ./.;
     cargoLock.lockFile = ./Cargo.lock;
 
-    nativeBuildInputs = [ installShellFiles ];
-
-    runtimeInputs = [ nvd ];
+    nativeBuildInputs = [
+      installShellFiles
+      makeWrapper
+    ];
 
     cargoBuildFlags = [
       "-Z"
@@ -26,13 +31,12 @@ let
       "completions"
     ];
 
-    postConfigure = ''
-      substituteInPlace src/main.rs \
-        --replace-fail '"nvd"' '"${lib.getExe nvd}"'
-    '';
-
     postInstall = ''
       installShellCompletion target/completions/*
+    '';
+
+    postFixup = ''
+      wrapProgram $out/bin/hydra-auto-upgrade --prefix PATH : "${runtimePath}"
     '';
 
     passthru = {

@@ -45,6 +45,13 @@ in
 
       queue_runner_metrics_address = ${prometheusAddress}
 
+      using_frontend_proxy = 1
+      <proxy_auth>
+        user_header = X-Remote-User
+        roles_header = X-Remote-Roles
+        disable_password_login = 1
+      </proxy_auth>
+
       <webhooks>
         Include ${config.sops.templates.hydra-webhook-secrets.path}
       </webhooks>
@@ -167,10 +174,28 @@ in
     '';
 
   nginx.subdomain.hydra = {
-    "/".extraConfig = # nginx
-      "return 302 http://sagittarius:${toString config.services.hydra.port}$request_uri;";
-    "/github/webhook".proxyPass =
-      "http://127.0.0.1:${toString config.services.hydra.port}/api/push-github";
+    "/" = {
+      proxyPass = "http://127.0.0.1:${toString config.services.hydra.port}";
+      extraConfig = ''
+        proxy_set_header X-Remote-User $user;
+        proxy_set_header X-Remote-Roles $hydra_roles;
+      '';
+    };
+    "/github/webhook" = {
+      proxyPass = "http://127.0.0.1:${toString config.services.hydra.port}/api/push-github";
+      extraConfig = "auth_request off;";
+    };
+  };
+
+  services.nginx.appendHttpConfig = ''
+    map $email $hydra_roles {
+      "nathanregner@gmail.com" "admin";
+      default                  "";
+    }
+  '';
+
+  services.oauth2-proxy = {
+    nginx.virtualHosts."hydra.nregner.net" = { };
   };
 }
 

@@ -46,10 +46,9 @@ fn copy(build: &Build) -> io::Result<()> {
 }
 
 fn diff(profile_path: &Path, build: &Build) -> io::Result<()> {
-    let mut command = Command::new("nvd");
+    let mut command = Command::new("dix");
     command
         .arg("--color=always")
-        .arg("diff")
         .arg(profile_path)
         .arg(build.out_path());
     exec(&mut command)
