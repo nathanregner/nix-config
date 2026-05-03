@@ -33,7 +33,6 @@
     rectangle
 
     # cli
-    awscli2
     gh
   ];
 

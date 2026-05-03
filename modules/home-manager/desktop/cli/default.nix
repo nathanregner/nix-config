@@ -3,6 +3,7 @@
   imports = [
     ./amux.nix
     ./ast-grep
+    ./aws.nix
     ./bat.nix
     ./btop.nix
     ./claude.nix
