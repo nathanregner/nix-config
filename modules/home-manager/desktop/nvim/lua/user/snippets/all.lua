@@ -20,5 +20,4 @@ ls.add_snippets("all", {
   }),
 }, {
   key = "user.all",
-  -- key = "__autosnippets__" .. ft .. "__" .. filename,
 })

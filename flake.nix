@@ -17,6 +17,7 @@
       url = "github:LnL7/nix-darwin/nix-darwin-25.11";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    import-tree.url = "github:vic/import-tree";
 
     agent-sandbox = {
       url = "./agent-sandbox.nix";
@@ -113,9 +114,11 @@
         "aarch64-darwin"
       ];
       imports = [
+        inputs.flake-parts.flakeModules.modules
         inputs.pkgs-by-name-for-flake-parts.flakeModule
         inputs.treefmt-nix.flakeModule
-      ];
+      ]
+      ++ (inputs.import-tree ./modules/flake).imports;
 
       perSystem =
         {

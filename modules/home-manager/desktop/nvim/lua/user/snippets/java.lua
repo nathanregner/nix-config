@@ -49,5 +49,4 @@ ls.add_snippets("java", {
   }),
 }, {
   key = "user.java",
-  -- key = "__autosnippets__" .. ft .. "__" .. filename,
 })

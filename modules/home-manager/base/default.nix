@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ inputs, pkgs, ... }:
 {
   imports = [
     ../lib
@@ -6,7 +6,10 @@
     ./tmux.nix
     ./vim.nix
     ./zsh.nix
-  ];
+  ]
+  ++ (with inputs.self.modules.homeManager; [
+    base
+  ]);
 
   config = {
     programs.ssh = {
@@ -28,11 +31,5 @@
       nix-tree
       pik
     ];
-
-    nix.gc = {
-      automatic = true;
-      options = "--delete-older-than 7d";
-      dates = "weekly";
-    };
   };
 }

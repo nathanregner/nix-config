@@ -13,7 +13,6 @@
     ./insync.nix
     ./jetbrains
     ./nvim
-    ./sops.nix
     ./theme.nix
   ];
 

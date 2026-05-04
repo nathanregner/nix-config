@@ -1,10 +1,3 @@
--- fmt("for (const {} of {}) {{\n  {}\n}}", { i(1, "element"), t(node_content), isn(3, {}, "") })
--- fmt("for (const {} of {}) {{\n  {}\n}}", { i(1, "element"), t(node_content), isn(3, {}, "") })
--- fmt("for (const {} of {}) {{\n  {}\n}}", { i(1, "element"), t(node_content), isn(3, {}, "") })
--- fmt("for (const {} of {}) {{\n  {}\n}}", { i(1, "element"), t(node_content), isn(3, {}, "") })
--- require("luasnip.session.snippet_collection").clear_snippets("javascript")
--- require("luasnip.session.snippet_collection").clear_snippets("ecma") -- TODO
-
 local ls = require("luasnip")
 local s = ls.snippet
 local sn = ls.snippet_node
@@ -158,7 +151,7 @@ define_all(s("sleep", {
 
 for lang, lang_snippets in pairs(snippets) do
   ls.add_snippets(lang, lang_snippets, {
-    key = lang .. "/custom",
+    key = "user." .. lang,
     default_priority = 1000,
   })
 end

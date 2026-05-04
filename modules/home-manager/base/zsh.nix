@@ -38,29 +38,34 @@
     };
     shellAliases =
       let
-        nixRebuild = if pkgs.stdenv.isDarwin then "darwin-rebuild" else "nixos-rebuild";
+        sudo = if pkgs.stdenv.isLinux then "sudo " else "";
+        sys = if pkgs.stdenv.isDarwin then "darwin" else "os";
       in
-      rec {
-        jqless = "jq -C | less -r";
+      {
+        nrb = "nh ${sys} build .";
+        nrr = "nh ${sys} repl .";
+        snrb = "${sudo} nh ${sys} boot .";
+        snrs = "${sudo} nh ${sys} switch .";
+        snrt = "${sudo} nh ${sys} test .";
+
+        hmb = "nh home build .";
+        hmr = "nh home repl .";
+        hms = "nh home switch .";
+
         cdiff = "diff --new-line-format='+%L' --old-line-format='-%L' --unchanged-line-format=' %L'"; # diff with full context
 
-        nr = "${nixRebuild} --flake .";
-        nrb = "${nr} build";
-        snr = "sudo ${nr}";
-        snrb = "${snr} boot";
-        snrs = "${snr} switch";
-        snrt = "${snr} test";
-
-        hm = "HOME_MANAGER_BACKUP_OVERWRITE=true home-manager -b backup --flake .";
-        hmb = "${hm} build";
-        hms = "${hm} switch";
-
-        "g-" = ''root="$(git rev-parse --show-toplevel)"; if [ "$PWD" = "$root" ]; then parent="$(git -C .. rev-parse --show-toplevel 2>/dev/null)" && cd "$parent"; else cd "$root"; fi'';
-        "lg" = "lazygit";
+        g- = /* bash */ ''
+          root="$(git rev-parse --show-toplevel)";
+          if [ "$PWD" = "$root" ]; then
+            parent="$(git -C .. rev-parse --show-toplevel 2>/dev/null)" && cd "$parent";
+          else
+            cd "$root";
+          fi
+        '';
+        lg = "lazygit";
 
         # https://www.reddit.com/r/NixOS/comments/8m1n3d/comment/dzkfwhl/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button
-        "nix-stray-roots" =
-          ''nix-store --gc --print-roots | egrep -v "^(/nix/var|/run/\w+-system|\{memory)"'';
+        nix-stray-roots = ''nix-store --gc --print-roots | egrep -v "^(/nix/var|/run/\w+-system|\{memory)"'';
       };
   };
 }
