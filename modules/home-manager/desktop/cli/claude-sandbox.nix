@@ -65,7 +65,7 @@ let
   allExtraEnv = {
     COLORTERM = "$COLORTERM";
     EDITOR = "$EDITOR";
-    PATH = "$HOME/.nix-profile/bin";
+    PATH = "$HOME/.nix-profile/bin:/bin:/usr/bin";
   }
   // lib.optionalAttrs (cfg.eksClusters != [ ]) {
     KUBECONFIG = "$HOME/.claude/kube/config";
@@ -112,7 +112,7 @@ let
       sandboxedBash;
 
   claudePackage = pkgs.writers.writeBashBin "sb-claude" ''
-    exec ${lib.getExe cfg.package} "$@" -c '${lib.getExe config.programs.claude-code.package} --dangerously-skip-permissions "$@"' bash
+    exec ${lib.getExe cfg.package} -c '${lib.getExe config.programs.claude-code.package} --dangerously-skip-permissions "$@"' bash "$@"
   '';
 in
 {
