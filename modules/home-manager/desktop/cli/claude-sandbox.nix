@@ -55,11 +55,17 @@ let
     "$HOME/.local/state/nix/profiles"
     "$HOME/.nix-profile"
   ]
+  ++ [
+    "$HOME/.config/nvim"
+    "$HOME/.local/share/nvim"
+    config.home.flakePath
+  ]
   ++ cfg.roStateDirs;
 
   allExtraEnv = {
+    COLORTERM = "$COLORTERM";
+    EDITOR = "$EDITOR";
     PATH = "$HOME/.nix-profile/bin";
-    CLAUDE_CODE_OAUTH_TOKEN = "$CLAUDE_CODE_OAUTH_TOKEN";
   }
   // lib.optionalAttrs (cfg.eksClusters != [ ]) {
     KUBECONFIG = "$HOME/.claude/kube/config";
@@ -154,17 +160,19 @@ in
     };
 
     eksClusters = mkOption {
-      type = types.listOf (types.submodule {
-        options = {
-          profile = mkOption { type = types.str; };
-          cluster = mkOption { type = types.str; };
-          alias = mkOption { type = types.str; };
-          region = mkOption {
-            type = types.str;
-            default = "us-west-2";
+      type = types.listOf (
+        types.submodule {
+          options = {
+            profile = mkOption { type = types.str; };
+            cluster = mkOption { type = types.str; };
+            alias = mkOption { type = types.str; };
+            region = mkOption {
+              type = types.str;
+              default = "us-west-2";
+            };
           };
-        };
-      });
+        }
+      );
       default = [ ];
     };
 

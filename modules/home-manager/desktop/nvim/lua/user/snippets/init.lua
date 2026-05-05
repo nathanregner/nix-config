@@ -34,6 +34,7 @@ end
 -- Register nix-configured extra modules (filetype -> list of modules)
 for ft, modules in pairs(vim.g.nix.luasnip.extraModules or {}) do
   for _, module in ipairs(modules) do
+    -- print("register", ft, module)
     register(ft, module)
   end
 end
@@ -42,9 +43,13 @@ end
 require("user.snippets.all")
 
 -- Lazy-load filetype-specific snippets
+local group = vim.api.nvim_create_augroup("user.snippets", { clear = true })
 vim.api.nvim_create_autocmd("FileType", {
+  group = group,
   callback = function(ev)
+    -- print("loading", ev.match)
     for _, module in ipairs(ft_modules[ev.match] or {}) do
+      -- print("  loading", module)
       require(module)
     end
   end,
