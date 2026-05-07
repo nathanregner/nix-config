@@ -14,6 +14,17 @@ let
     ;
   cfg = config.programs.claude-code.sandbox;
 
+  mockSecurity = pkgs.writeShellScriptBin "security" ''
+    case "$1" in
+      find-generic-password|find-internet-password)
+        exit 44
+        ;;
+      *)
+        exit 0
+        ;;
+    esac
+  '';
+
   mkProfileEnvVars =
     profile:
     let
@@ -65,7 +76,7 @@ let
   allExtraEnv = {
     COLORTERM = "$COLORTERM";
     EDITOR = "$EDITOR";
-    PATH = "$HOME/.nix-profile/bin:/bin:/usr/bin";
+    PATH = "${lib.getBin mockSecurity}/bin:$HOME/.nix-profile/bin:/bin:/usr/bin";
   }
   // lib.optionalAttrs (cfg.eksClusters != [ ]) {
     KUBECONFIG = "$HOME/.claude/kube/config";
@@ -80,7 +91,8 @@ let
     pkg = pkgs.bash;
     binName = "bash";
     outName = "bash-sandboxed";
-    inherit (cfg) allowedPackages isolateNixStore;
+    allowedPackages = [ mockSecurity ] ++ cfg.allowedPackages;
+    inherit (cfg) isolateNixStore;
     stateDirs = allStateDirs;
     stateFiles = allStateFiles;
     roStateDirs = allRoStateDirs;
