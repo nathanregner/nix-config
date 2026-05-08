@@ -50,12 +50,39 @@ local on_attach = function(_, bufnr)
   -- end
 end
 
+local log = require("user.log").create("lsp")
+
 -- https://github.com/neovim/neovim/issues/30985#issuecomment-2447329525
 for _, method in ipairs({ "textDocument/diagnostic", "workspace/diagnostic" }) do
   local default_diagnostic_handler = vim.lsp.handlers[method]
   vim.lsp.handlers[method] = function(err, result, context, config)
     if err ~= nil and err.code == -32802 then return end
     return default_diagnostic_handler(err, result, context, config)
+  end
+end
+
+local severity = vim.diagnostic.severity
+local function make_eslint_diagnostic_handler(method)
+  local default_handler = vim.lsp.handlers[method]
+  local max_severity = {
+    ["prettier/prettier"] = severity.WARN,
+    ["@typescript-eslint/no-unused-vars"] = severity.WARN,
+    ["no-unused-vars"] = severity.WARN,
+  }
+  return function(err, result, context, config)
+    -- log(method .. " handler called")
+    -- log("result: " .. vim.inspect(result))
+    if result and result.items then
+      for _, diagnostic in ipairs(result.items) do
+        -- log("diagnostic: code=" .. tostring(diagnostic.code) .. " severity=" .. tostring(diagnostic.severity))
+        local cap = max_severity[diagnostic.code]
+        if cap and diagnostic.severity < cap then
+          diagnostic.severity = cap
+          -- log("downgraded " .. diagnostic.code .. " to " .. cap)
+        end
+      end
+    end
+    return default_handler(err, result, context, config)
   end
 end
 
@@ -113,7 +140,11 @@ local servers = {
       },
     },
   },
-  eslint = {},
+  eslint = {
+    handlers = {
+      ["textDocument/diagnostic"] = make_eslint_diagnostic_handler("textDocument/diagnostic"),
+    },
+  },
   gopls = {},
   graphql = {
     filetypes = { "graphql", "javascript", "javascriptreact", "typescript", "typescriptreact" },
