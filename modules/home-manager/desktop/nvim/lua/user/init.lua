@@ -29,6 +29,9 @@ vim.api.nvim_create_autocmd({ "FileChangedShellPost" }, {
   end,
 })
 
+-- suppress swap file warnings
+vim.opt.shortmess:append("A")
+
 vim.g.fugitive_legacy_commands = 0
 
 require("user.treesitter")
