@@ -88,7 +88,6 @@ local function make_eslint_diagnostic_handler(method)
   end
 end
 
-
 local downgrade_js_errors = function(method)
   local default_diagnostic_handler = vim.lsp.handlers[method]
   return function(err, result, context, config)
@@ -252,47 +251,47 @@ local servers = {
     -- root_dir = util.root_pattern(".terraform", ".terraform.lock.hcl", ".git", ".tflint.hcl"),
   },
   tinymist = {},
-  -- tsgo = {},
-  vtsls = {
-    capabilities = {
-      workspace = {
-        didChangeWorkspaceFolders = {
-          -- https://github.com/neovim/neovim/pull/22405
-          -- https://github.com/neovim/neovim/issues/1380
-          dynamicRegistration = true,
-        },
-      },
-    },
-    -- handlers = {
-    --   ["textDocument/publishDiagnostics"] = function(err, result, ctx)
-    --     require("ts-error-translator").translate_diagnostics(err, result, ctx)
-    --     vim.lsp.diagnostic.on_publish_diagnostics(err, result, ctx)
-    --   end,
-    --   ["workspace/publishDiagnostics"] = function(err, result, ctx)
-    --     require("ts-error-translator").translate_diagnostics(err, result, ctx)
-    --     vim.lsp.diagnostic.on_publish_diagnostics(err, result, ctx)
-    --   end,
-    -- },
-    settings = {
-      javascript = {
-        updateImportsOnFileMove = "always",
-      },
-      typescript = {
-        updateImportsOnFileMove = "always",
-        -- https://github.com/microsoft/vscode/issues/13953
-        tsserver = { experimental = { enableProjectDiagnostics = true } },
-      },
-      vtsls = {
-        enableMoveToFileCodeAction = true,
-        experimental = {
-          completion = {
-            enableServerSideFuzzyMatch = true,
-            entriesLimit = 1000,
-          },
-        },
-      },
-    },
-  },
+  tsgo = {},
+  -- vtsls = {
+  --   capabilities = {
+  --     workspace = {
+  --       didChangeWorkspaceFolders = {
+  --         -- https://github.com/neovim/neovim/pull/22405
+  --         -- https://github.com/neovim/neovim/issues/1380
+  --         dynamicRegistration = true,
+  --       },
+  --     },
+  --   },
+  --   -- handlers = {
+  --   --   ["textDocument/publishDiagnostics"] = function(err, result, ctx)
+  --   --     require("ts-error-translator").translate_diagnostics(err, result, ctx)
+  --   --     vim.lsp.diagnostic.on_publish_diagnostics(err, result, ctx)
+  --   --   end,
+  --   --   ["workspace/publishDiagnostics"] = function(err, result, ctx)
+  --   --     require("ts-error-translator").translate_diagnostics(err, result, ctx)
+  --   --     vim.lsp.diagnostic.on_publish_diagnostics(err, result, ctx)
+  --   --   end,
+  --   -- },
+  --   settings = {
+  --     javascript = {
+  --       updateImportsOnFileMove = "always",
+  --     },
+  --     typescript = {
+  --       updateImportsOnFileMove = "always",
+  --       -- https://github.com/microsoft/vscode/issues/13953
+  --       tsserver = { experimental = { enableProjectDiagnostics = true } },
+  --     },
+  --     vtsls = {
+  --       enableMoveToFileCodeAction = true,
+  --       experimental = {
+  --         completion = {
+  --           enableServerSideFuzzyMatch = true,
+  --           entriesLimit = 1000,
+  --         },
+  --       },
+  --     },
+  --   },
+  -- },
   yamlls = {
     settings = {
       yaml = {
