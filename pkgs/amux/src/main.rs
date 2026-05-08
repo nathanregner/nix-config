@@ -14,7 +14,8 @@ mod status_line;
 mod theme;
 
 fn main() {
-    let base_dirs = etcetera::choose_base_strategy().expect("failed to determine base directories");
+    let base_dirs =
+        etcetera::base_strategy::Xdg::new().expect("failed to determine base directories");
     init_logging(&base_dirs);
 
     let cli = Cli::parse();
