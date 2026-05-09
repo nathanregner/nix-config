@@ -1,6 +1,7 @@
-{ config, ... }:
+{ inputs, config, ... }:
 {
   imports = [
+    inputs.microvm.nixosModules.host
     ../../modules/nixos/server
     ./hardware-configuration.nix
     ./services
