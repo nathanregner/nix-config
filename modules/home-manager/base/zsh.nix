@@ -38,15 +38,14 @@
     };
     shellAliases =
       let
-        sudo = if pkgs.stdenv.isLinux then "sudo " else "";
         sys = if pkgs.stdenv.isDarwin then "darwin" else "os";
       in
       {
         nrb = "nh ${sys} build .";
         nrr = "nh ${sys} repl .";
-        snrb = "${sudo} nh ${sys} boot .";
-        snrs = "${sudo} nh ${sys} switch .";
-        snrt = "${sudo} nh ${sys} test .";
+        snrb = "nh ${sys} boot .";
+        snrs = "nh ${sys} switch .";
+        snrt = "nh ${sys} test .";
 
         hmb = "nh home build .";
         hmr = "nh home repl .";
