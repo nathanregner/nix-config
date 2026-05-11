@@ -17,13 +17,21 @@ in
   };
 
   config = mkIf cfg.enable {
-    home.packages = with pkgs.unstable; [
-      cargo-autoinherit
-      cargo-generate
-      cargo-nextest
-      cargo-outdated
-      cargo-udeps
-    ];
+    home.packages =
+      (with pkgs.unstable; [
+        cargo-autoinherit
+        cargo-flamegraph
+        cargo-generate
+        cargo-nextest
+        cargo-outdated
+        cargo-udeps
+      ])
+      ++ [
+        # https://github.com/rust-lang/cargo/issues/2904?timeline_page=1
+        (pkgs.writeShellScriptBin "cargo-why-rebuild" /* bash */ ''
+          CARGO_LOG=cargo::core::compiler::fingerprint=info cargo "$@" 2>&1 | grep -E "dirty|stale|rerun"
+        '')
+      ];
 
     # rustc -Z unstable-options --print target-spec-json | jq '.["llvm-target"]' -r
     # https://github.com/rui314/mold?tab=readme-ov-file#how-to-use

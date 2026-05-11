@@ -29,7 +29,6 @@
     super-slicer-beta
 
     # cli
-    awscli2
     gh
     nix-fast-build
     rclone

@@ -14,7 +14,7 @@ jobs:
           token: ${{ secrets.GH_TOKEN_FOR_UPDATES }}
           ref: staging
       - name: Run flake update
-        run: nix flake update
+        run: nix flake update --no-use-registries
       - name: Commit and push
         run: |
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'

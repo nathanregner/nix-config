@@ -147,6 +147,11 @@ local servers = {
       ["textDocument/diagnostic"] = make_eslint_diagnostic_handler("textDocument/diagnostic"),
     },
   },
+  eslint = {
+    handlers = {
+      ["textDocument/diagnostic"] = make_eslint_diagnostic_handler("textDocument/diagnostic"),
+    },
+  },
   gopls = {},
   graphql = {
     filetypes = { "graphql", "javascript", "javascriptreact", "typescript", "typescriptreact" },
