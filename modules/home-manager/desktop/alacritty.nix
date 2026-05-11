@@ -23,21 +23,6 @@
       };
       keyboard.bindings = [
         {
-          mods = "Control";
-          key = "Return";
-          chars = "\\u001B[13;5u";
-        }
-        {
-          mods = "Shift";
-          key = "Return";
-          chars = "\\u001B[13;2u";
-        }
-        {
-          mods = "Control|Shift";
-          key = "Return";
-          chars = "\\u001B[13;7u";
-        }
-        {
           mods = "Shift";
           key = "Return";
           chars = "\n";
