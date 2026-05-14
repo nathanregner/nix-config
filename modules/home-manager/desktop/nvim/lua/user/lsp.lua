@@ -147,15 +147,27 @@ local servers = {
       ["textDocument/diagnostic"] = make_eslint_diagnostic_handler("textDocument/diagnostic"),
     },
     on_attach = function(client, bufnr)
-      vim.api.nvim_create_autocmd("BufWritePre", {
-        buffer = bufnr,
-        callback = function()
-          vim.lsp.buf.code_action({
-            context = { only = { "source.fixAll.eslint" } },
-            apply = true,
-          })
-        end,
-      })
+      vim.api.nvim_buf_create_user_command(bufnr, "Fix", function()
+        local line_count = vim.api.nvim_buf_line_count(bufnr)
+        local last_line = vim.api.nvim_buf_get_lines(bufnr, line_count - 1, line_count, false)[1] or ""
+        local params = {
+          textDocument = { uri = vim.uri_from_bufnr(bufnr) },
+          range = {
+            start = { line = 0, character = 0 },
+            ["end"] = { line = line_count - 1, character = #last_line },
+          },
+          context = { only = { "source.fixAll" }, diagnostics = {} },
+        }
+        client:request("textDocument/codeAction", params, function(err, result)
+          if err then
+            vim.notify("ESLint fix error: " .. err.message, vim.log.levels.ERROR)
+            return
+          end
+          if result and result[1] and result[1].edit then
+            vim.lsp.util.apply_workspace_edit(result[1].edit, client.offset_encoding)
+          end
+        end, bufnr)
+      end, { desc = "Fix all eslint issues" })
     end,
   },
   gopls = {},
