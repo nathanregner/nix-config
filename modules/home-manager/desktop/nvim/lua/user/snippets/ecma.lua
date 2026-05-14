@@ -149,6 +149,11 @@ define_all(s("sleep", {
   t("));"),
 }))
 
+define_all(s("@ts-expect-error", {
+  t("// @ts-expect-error: "),
+  i(1, "TODO"),
+}))
+
 for lang, lang_snippets in pairs(snippets) do
   ls.add_snippets(lang, lang_snippets, {
     key = "user." .. lang,

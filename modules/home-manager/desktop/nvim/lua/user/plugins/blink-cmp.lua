@@ -111,15 +111,24 @@ return nix_spec({
           end,
         },
 
-        -- snippets = {
-        --   score_offset = function(ctx)
-        --     vim.notify("kw: " .. ctx.trigger.initial_kind)
-        --     -- TODO: trigger_character: only suffix
-        --     local trigger = ctx.trigger.initial_kind
-        --     if trigger == "manual" then return -3 end
-        --     return 1
-        --   end,
-        -- },
+        snippets = {
+          transform_items = function(ctx, items)
+            local line = ctx.line:sub(1, ctx.cursor[2])
+            local after_dot = line:match("%.$") or line:match("%.%w+$")
+            if after_dot then
+              return vim
+                .iter(items)
+                :filter(function(item) return item.label:sub(1, 1) == "." end)
+                :map(function(item)
+                  item.label = item.label:sub(2)
+                  item.filterText = item.label
+                  return item
+                end)
+                :totable()
+            end
+            return items
+          end,
+        },
       },
     },
 
@@ -129,6 +138,7 @@ return nix_spec({
         download = false,
       },
       sorts = {
+        "exact",
         function(a, b)
           if a.source_id == "snippets" and b.source_id == "buffer" then return true end
           if a.source_id == "buffer" and b.source_id == "snippets" then return false end
