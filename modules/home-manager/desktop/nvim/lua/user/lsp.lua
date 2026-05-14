@@ -146,11 +146,17 @@ local servers = {
     handlers = {
       ["textDocument/diagnostic"] = make_eslint_diagnostic_handler("textDocument/diagnostic"),
     },
-  },
-  eslint = {
-    handlers = {
-      ["textDocument/diagnostic"] = make_eslint_diagnostic_handler("textDocument/diagnostic"),
-    },
+    on_attach = function(client, bufnr)
+      vim.api.nvim_create_autocmd("BufWritePre", {
+        buffer = bufnr,
+        callback = function()
+          vim.lsp.buf.code_action({
+            context = { only = { "source.fixAll.eslint" } },
+            apply = true,
+          })
+        end,
+      })
+    end,
   },
   gopls = {},
   graphql = {
