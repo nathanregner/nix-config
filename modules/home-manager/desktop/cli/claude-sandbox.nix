@@ -41,13 +41,20 @@ let
 
   profileEnvVars = lib.foldl' (acc: profile: acc // mkProfileEnvVars profile) { } allAwsProfiles;
 
-  defaultAwsEnvVars = lib.optionalAttrs (allAwsProfiles != [ ]) {
-    AWS_ACCESS_KEY_ID = "$AWS_ACCESS_KEY_ID";
-    AWS_SECRET_ACCESS_KEY = "$AWS_SECRET_ACCESS_KEY";
-    AWS_SESSION_TOKEN = "$AWS_SESSION_TOKEN";
-    AWS_REGION = "$AWS_REGION";
-    AWS_DEFAULT_REGION = "$AWS_DEFAULT_REGION";
-  };
+  defaultAwsEnvVars =
+    if cfg.awsCredsDir != null then {
+      AWS_SHARED_CREDENTIALS_FILE = "$AWS_SHARED_CREDENTIALS_FILE";
+      AWS_CONFIG_FILE = "$AWS_CONFIG_FILE";
+      AWS_PROFILE = "$AWS_PROFILE";
+      AWS_DEFAULT_REGION = "$AWS_DEFAULT_REGION";
+    }
+    else lib.optionalAttrs (allAwsProfiles != [ ]) {
+      AWS_ACCESS_KEY_ID = "$AWS_ACCESS_KEY_ID";
+      AWS_SECRET_ACCESS_KEY = "$AWS_SECRET_ACCESS_KEY";
+      AWS_SESSION_TOKEN = "$AWS_SESSION_TOKEN";
+      AWS_REGION = "$AWS_REGION";
+      AWS_DEFAULT_REGION = "$AWS_DEFAULT_REGION";
+    };
 
   allStateDirs = [
     "$HOME/.claude"
@@ -71,6 +78,7 @@ let
     "$HOME/.local/share/nvim"
     config.home.flakePath
   ]
+  ++ lib.optional (cfg.awsCredsDir != null) cfg.awsCredsDir
   ++ cfg.roStateDirs;
 
   allExtraEnv = {
@@ -82,7 +90,7 @@ let
     KUBECONFIG = "$HOME/.claude/kube/config";
   }
   // cfg.extraEnv
-  // profileEnvVars
+  // lib.optionalAttrs (cfg.awsCredsDir == null) profileEnvVars
   // defaultAwsEnvVars;
 
   mkSandbox = inputs.agent-sandbox.lib.${pkgs.stdenv.hostPlatform.system}.mkSandbox;
@@ -102,6 +110,7 @@ let
   configJson = builtins.toJSON {
     awsProfiles = cfg.awsProfiles;
     awsExtraProfiles = cfg.awsExtraProfiles;
+    awsCredsDir = cfg.awsCredsDir;
     eksClusters = cfg.eksClusters;
     sandboxedBash = lib.getExe sandboxedBash;
   };
@@ -202,6 +211,12 @@ in
     wrapperScriptExtraPackages = mkOption {
       type = types.listOf types.package;
       default = [ ];
+    };
+
+    awsCredsDir = mkOption {
+      type = types.nullOr types.str;
+      default = null;
+      description = "Directory containing cached AWS credentials JSON files (one per profile)";
     };
 
     sandboxedBash = mkOption {
