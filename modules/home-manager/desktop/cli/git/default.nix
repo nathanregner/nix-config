@@ -14,6 +14,19 @@
       alias = {
         convert-to-worktrees = "!${lib.getExe pkgs.local.git-convert-to-worktrees}";
         ddiff = "-c diff.external=difft diff";
+        blame-ignore-rev = "!${
+          pkgs.writers.writeNu "git-blame-ignore-rev" {
+            makeWrapperArgs = [
+              "--prefix"
+              "PATH"
+              ":"
+              "${lib.makeBinPath [
+                pkgs.git
+                pkgs.fzf
+              ]}"
+            ];
+          } ./git-blame-ignore-rev.nu
+        }";
         default-branch = "!${pkgs.writers.writeBash "git-default-branch" ''
           [ -f $(git rev-parse --git-common-dir)/refs/remotes/origin/main ] && echo -n main || echo -n master
         ''}";
@@ -35,6 +48,9 @@
           -c gc.rerereresolved=0
           -c gc.rerereunresolved=0
           gc'';
+      };
+      blame = {
+        ignoreRevsFile = ".git-blame-ignore-revs";
       };
       branch = {
         sort = "-committerdate";
