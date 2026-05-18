@@ -7,11 +7,11 @@ return {
   dependencies = {
     "MunifTanjim/nui.nvim",
   },
-  event = "VeryLazy",
+  ---@module "noice"
   ---@type NoiceConfig
   opts = {
     cmdline = { enabled = false },
-    messages = { enabled = false },
+    -- messages = { enabled = false },
     routes = {
       {
         filter = {
@@ -19,6 +19,8 @@ return {
             --- jdtls
             { event = "lsp", kind = "progress", find = "Validate documents" },
             { event = "lsp", kind = "progress", find = "Publish Diagnostics" },
+            --- tsgo
+            { find = "Invalid glob: bundled:" },
           },
         },
         opts = { skip = true },

@@ -16,7 +16,25 @@
 
   # Networking
   networking.hostName = "iapetus";
-  networking.networkmanager.enable = true;
+  networking.networkmanager = {
+    enable = true;
+    dns = "systemd-resolved";
+  };
+  services.resolved.enable = true;
+
+  # Allow users in wheel group to configure DNS via systemd-resolved
+  security.polkit.extraConfig = ''
+    polkit.addRule(function(action, subject) {
+      if (action.id == "org.freedesktop.resolve1.set-dns-servers" ||
+          action.id == "org.freedesktop.resolve1.set-domains" ||
+          action.id == "org.freedesktop.resolve1.set-default-route" ||
+          action.id == "org.freedesktop.resolve1.revert") {
+        if (subject.isInGroup("wheel")) {
+          return polkit.Result.YES;
+        }
+      }
+    });
+  '';
   systemd.services.NetworkManager-wait-online.enable = false;
   services.blueman.enable = true;
   hardware.bluetooth.enable = true;

@@ -333,7 +333,14 @@ local servers = {
 }
 
 local capabilities = vim.lsp.protocol.make_client_capabilities()
-capabilities = vim.tbl_deep_extend("force", capabilities, require("blink.cmp").get_lsp_capabilities({}, false))
+capabilities = vim.tbl_deep_extend(
+  "force",
+  capabilities,
+  require("blink.cmp").get_lsp_capabilities({
+    -- https://github.com/rust-lang/rust-analyzer/issues/12613#issuecomment-2096386344
+    workspace = { didChangeWatchedFiles = { dynamicRegistration = true } },
+  }, false)
+)
 
 for server_name, server_config in pairs(servers) do
   local custom_capabilities = server_config.capabilities
