@@ -104,6 +104,9 @@ local downgrade_js_errors = function(method)
   end
 end
 
+--- @class user.lsp.Config : vim.lsp.ClientConfig
+--- @field workspace_diagnostics? boolean
+
 --- @type { [string]: vim.lsp.Config }
 local servers = {
   ast_grep = {},
@@ -169,6 +172,7 @@ local servers = {
         end, bufnr)
       end, { desc = "Fix all eslint issues" })
     end,
+    workspace_diagnostics = true,
   },
   gopls = {},
   graphql = {
@@ -274,7 +278,35 @@ local servers = {
     -- root_dir = util.root_pattern(".terraform", ".terraform.lock.hcl", ".git", ".tflint.hcl"),
   },
   tinymist = {},
-  tsgo = {},
+  tsgo = {
+    workspace_diagnostics = true,
+    handlers = {
+      ["client/registerCapability"] = function(err, result, ctx)
+        if result and result.registrations then
+          for _, reg in ipairs(result.registrations) do
+            if
+              reg.method == "workspace/didChangeWatchedFiles"
+              and reg.registerOptions
+              and reg.registerOptions.watchers
+            then
+              reg.registerOptions.watchers = vim.tbl_filter(function(w)
+                local gp = w.globPattern
+                if type(gp) == "string" then
+                  return not gp:match("^bundled://")
+                elseif type(gp) == "table" then
+                  local uri = type(gp.baseUri) == "string" and gp.baseUri
+                    or (gp.baseUri and gp.baseUri.uri or "")
+                  return not uri:match("^bundled://")
+                end
+                return true
+              end, reg.registerOptions.watchers)
+            end
+          end
+        end
+        return vim.lsp.handlers["client/registerCapability"](err, result, ctx)
+      end,
+    },
+  },
   -- vtsls = {
   --   capabilities = {
   --     workspace = {
@@ -350,15 +382,28 @@ for server_name, server_config in pairs(servers) do
     server_config.capabilities = capabilities
   end
 
-  local custom_on_attach = server_config.on_attach
-  if custom_on_attach then
-    server_config.on_attach = function(...)
-      on_attach(...)
-      custom_on_attach(...)
+  local function chain(...)
+    local handlers = { ... }
+    return function(...)
+      for _, f in ipairs(handlers) do
+        if f then f(...) end
+      end
     end
-  else
-    server_config.on_attach = on_attach
   end
+
+  -- https://github.com/artemave/workspace-diagnostics.nvim
+  local on_attach_workspace
+  if server_config.workspace_diagnostics then
+    on_attach_workspace = function(client, bufnr)
+      if client:supports_method("workspace/diagnostic", bufnr) then
+        vim.lsp.buf.workspace_diagnostics({ client_id = client.id })
+      else
+        require("workspace-diagnostics").populate_workspace_diagnostics(client, bufnr)
+      end
+    end
+  end
+
+  server_config.on_attach = chain(on_attach, server_config.on_attach, on_attach_workspace)
 
   vim.lsp.config(server_name, server_config)
   vim.lsp.enable(server_name, true)
