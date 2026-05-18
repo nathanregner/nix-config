@@ -2,7 +2,7 @@
 ---@type LazySpec
 return {
   "git@github.com:nathanregner/diffview.nvim",
-  lazy = false,
+  cmd = { "DiffviewOpen", "DiffviewFileHistory" },
   keys = function()
     local git = require("user.git")
     return {
