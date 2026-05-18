@@ -102,6 +102,9 @@ local downgrade_js_errors = function(method)
   end
 end
 
+--- @class user.lsp.Config : vim.lsp.ClientConfig
+--- @field workspace_diagnostics? boolean
+
 --- @type { [string]: vim.lsp.Config }
 local servers = {
   ast_grep = {},
@@ -154,6 +157,7 @@ local servers = {
     handlers = {
       ["textDocument/diagnostic"] = make_eslint_diagnostic_handler("textDocument/diagnostic"),
     },
+    workspace_diagnostics = true,
   },
   gopls = {},
   graphql = {
@@ -259,40 +263,49 @@ local servers = {
     -- root_dir = util.root_pattern(".terraform", ".terraform.lock.hcl", ".git", ".tflint.hcl"),
   },
   tinymist = {},
-  vtsls = {
-    capabilities = {
-      workspace = {
-        didChangeWorkspaceFolders = {
-          -- https://github.com/neovim/neovim/pull/22405
-          -- https://github.com/neovim/neovim/issues/1380
-          dynamicRegistration = true,
-        },
-      },
-    },
-    -- handlers = {
-    --   ["textDocument/publishDiagnostics"] = function(err, result, ctx)
-    --     require("ts-error-translator").translate_diagnostics(err, result, ctx)
-    --     vim.lsp.diagnostic.on_publish_diagnostics(err, result, ctx)
-    --   end,
-    --   ["workspace/publishDiagnostics"] = function(err, result, ctx)
-    --     require("ts-error-translator").translate_diagnostics(err, result, ctx)
-    --     vim.lsp.diagnostic.on_publish_diagnostics(err, result, ctx)
-    --   end,
-    -- },
-    settings = {
-      javascript = {
-        updateImportsOnFileMove = "always",
-      },
-      typescript = {
-        updateImportsOnFileMove = "always",
-        -- https://github.com/microsoft/vscode/issues/13953
-        tsserver = { experimental = { enableProjectDiagnostics = true } },
-      },
-      vtsls = {
-        enableMoveToFileCodeAction = true,
-      },
-    },
+  tsgo = {
+    workspace_diagnostics = true,
   },
+  -- vtsls = {
+  --   capabilities = {
+  --     workspace = {
+  --       didChangeWorkspaceFolders = {
+  --         -- https://github.com/neovim/neovim/pull/22405
+  --         -- https://github.com/neovim/neovim/issues/1380
+  --         dynamicRegistration = true,
+  --       },
+  --     },
+  --   },
+  --   -- handlers = {
+  --   --   ["textDocument/publishDiagnostics"] = function(err, result, ctx)
+  --   --     require("ts-error-translator").translate_diagnostics(err, result, ctx)
+  --   --     vim.lsp.diagnostic.on_publish_diagnostics(err, result, ctx)
+  --   --   end,
+  --   --   ["workspace/publishDiagnostics"] = function(err, result, ctx)
+  --   --     require("ts-error-translator").translate_diagnostics(err, result, ctx)
+  --   --     vim.lsp.diagnostic.on_publish_diagnostics(err, result, ctx)
+  --   --   end,
+  --   -- },
+  --   settings = {
+  --     javascript = {
+  --       updateImportsOnFileMove = "always",
+  --     },
+  --     typescript = {
+  --       updateImportsOnFileMove = "always",
+  --       -- https://github.com/microsoft/vscode/issues/13953
+  --       tsserver = { experimental = { enableProjectDiagnostics = true } },
+  --     },
+  --     vtsls = {
+  --       enableMoveToFileCodeAction = true,
+  --       experimental = {
+  --         completion = {
+  --           enableServerSideFuzzyMatch = true,
+  --           entriesLimit = 1000,
+  --         },
+  --       },
+  --     },
+  --   },
+  -- },
   yamlls = {
     settings = {
       yaml = {
@@ -321,20 +334,36 @@ capabilities = vim.tbl_deep_extend(
 )
 
 for server_name, server_config in pairs(servers) do
-  if server_config.capabilities then
-    capabilities = vim.tbl_deep_extend("force", capabilities, server_config.capabilities)
+  local custom_capabilities = server_config.capabilities
+  if custom_capabilities then
+    server_config.capabilities = vim.tbl_deep_extend("force", capabilities, custom_capabilities)
+  else
+    server_config.capabilities = capabilities
   end
-  vim.lsp.config(server_name, {
-    cmd = server_config.cmd,
-    capabilities = capabilities,
-    on_attach = function(...)
-      on_attach(...)
-      if server_config.on_attach then server_config.on_attach(...) end
-    end,
-    settings = server_config.settings,
-    filetypes = server_config.filetypes,
-    init_options = server_config.init_options,
-    root_dir = server_config.root_dir,
-  })
-  vim.lsp.enable(server_name)
+
+  local function chain(...)
+    local handlers = { ... }
+    return function(...)
+      for _, f in ipairs(handlers) do
+        if f then f(...) end
+      end
+    end
+  end
+
+  -- https://github.com/artemave/workspace-diagnostics.nvim
+  local on_attach_workspace
+  if server_config.workspace_diagnostics then
+    on_attach_workspace = function(client, bufnr)
+      if client:supports_method("workspace/diagnostic", bufnr) then
+        vim.lsp.buf.workspace_diagnostics({ client_id = client.id })
+      else
+        require("workspace-diagnostics").populate_workspace_diagnostics(client, bufnr)
+      end
+    end
+  end
+
+  server_config.on_attach = chain(on_attach, server_config.on_attach, on_attach_workspace)
+
+  vim.lsp.config(server_name, server_config)
+  vim.lsp.enable(server_name, true)
 end
