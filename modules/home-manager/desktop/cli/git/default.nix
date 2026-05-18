@@ -117,6 +117,15 @@
     ];
   };
 
+  xdg.configFile."git/hooks/post-rewrite".source = pkgs.writers.writeNu "post-rewrite" {
+    makeWrapperArgs = [
+      "--prefix"
+      "PATH"
+      ":"
+      "${lib.makeBinPath [ pkgs.git ]}"
+    ];
+  } ./post-rewrite.nu;
+
   home.packages = with pkgs.unstable; [
     difftastic
     git-filter-repo
