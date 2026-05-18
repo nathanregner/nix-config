@@ -3,6 +3,7 @@
 return {
   "Olical/conjure",
   branch = "main",
+  lazy = true,
   dependencies = {
     -- https://github.com/guns/vim-sexp
     "guns/vim-sexp",
