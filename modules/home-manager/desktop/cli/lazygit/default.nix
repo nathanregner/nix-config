@@ -34,7 +34,7 @@
 
       keybinding = {
         branches = {
-          forceCheckoutBranch = "<c-s-F>";
+          forceCheckoutBranch = "<c-F>";
         };
         commits = {
           # fix conflicts with tmux
