@@ -50,6 +50,9 @@
           -c gc.rerereunresolved=0
           gc'';
       };
+      blame = {
+        ignoreRevsFile = ".git-blame-ignore-revs";
+      };
       branch = {
         sort = "-committerdate";
       };
