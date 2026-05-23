@@ -19,7 +19,7 @@ def tag-eval [] {
 }
 
 let tags = (
-  http get https://hydra.nregner.net/jobset/nix-config/master/evals
+  http get http://sagittarius:3001/jobset/nix-config/master/evals
   --headers {'Content-Type': 'application/json'}
 )
   | get evals
