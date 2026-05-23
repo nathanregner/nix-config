@@ -3,9 +3,9 @@
 keys:
   - &host_enceladus age19hzwnm5dfl6m9vv2sq9z9r0ykn8djvjqaauuruyhf4q4vuxpev2sx4rcsd
   - &host_iapetus age1rl8hhks47u8d70fg9u820adumj0u7kpfj66eu7nkrl6f3xfa0c3ska8amf
-  - &host_print_farm age16zk73cejuepyskjeq0625ecf727y3nmmw32qq0ta97q9e4uj2sqstq6240
   - &host_sagittarius age1yfflu4pxlt32sy4xaa04m5gs7kyrccyj9y5hh0qvndmxtrxrtpns7mf682
   - &host_server age1g2mgt0s80nc5yzkjnwmn6qwf8udnapx92vhwussjpa9d4et5v5zskgap5y
+  - &host_sunlu_s8 age16zk73cejuepyskjeq0625ecf727y3nmmw32qq0ta97q9e4uj2sqstq6240
   - &host_voron age1umfkmuh36yaefgagfnummrgcyragzuhayq9fqsnujs67te07qeasnqfxa8
   - &user_nregner age1edzgfqhfrg5a6p9dgte7s8dqt87vu8a50up5mys0h34x3dsrj90qr743qw
   - &user_nregner_enceladus age1me7gswd8w750e30m8au67mv9npvkqtvjugz50ydn9tajezu0lccs9qw38c
@@ -18,34 +18,38 @@ creation_rules:
   - path_regex: modules/nixos/server/.*/secrets.yaml
     key_groups:
       - age:
-          - *user_nregner_enceladus
           - *host_enceladus
           - *host_iapetus
-          - *host_print_farm
           - *host_sagittarius
           - *host_server
+          - *host_sunlu_s8
           - *host_voron
           - *user_nregner
+          - *user_nregner_enceladus
   - path_regex: machines/voron/secrets.yaml
     key_groups:
       - age:
-          - *user_nregner
           - *host_voron
-  - path_regex: machines/print-farm/secrets.yaml
+          - *user_nregner
+          - *user_nregner_enceladus
+  - path_regex: machines/sunlu-s8/secrets.yaml
     key_groups:
       - age:
           - *user_nregner
-          - *host_print_farm
+          - *user_nregner_enceladus
+          - *host_sunlu_s8
   - path_regex: machines/sagittarius/secrets.yaml
     key_groups:
       - age:
-          - *user_nregner
           - *host_sagittarius
+          - *user_nregner
+          - *user_nregner_enceladus
   - path_regex: machines/iapetus/secrets.yaml
     key_groups:
       - age:
-          - *user_nregner
           - *host_iapetus
+          - *user_nregner
+          - *user_nregner_enceladus
   - path_regex: modules/home-manager/desktop/(.*/)?secrets.yaml
     key_groups:
       - age:
