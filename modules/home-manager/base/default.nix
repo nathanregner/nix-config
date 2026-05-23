@@ -15,13 +15,13 @@
     programs.ssh = {
       enable = true;
       enableDefaultConfig = false;
-      matchBlocks."*" = {
+      settings."Host *" = {
         # https://docs.ssh.com/manuals/server-zos-user/64/disabling-agent-forwarding.html
-        forwardAgent = false;
+        ForwardAgent = false;
         # share connections
-        controlMaster = "auto";
-        controlPersist = "10m";
-        sendEnv = [ "TMUX" ];
+        ControlMaster = "auto";
+        ControlPersist = "10m";
+        SendEnv = [ "TMUX" ];
       };
     };
 
