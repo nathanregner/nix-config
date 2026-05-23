@@ -56,9 +56,17 @@
   };
 
   klipper-stack = {
-    configFile = ./klipper/sunlu-s8.cfg;
     productId = "614e";
     vendorId = "1d50";
+    includes = [
+      ./klipper/sunlu-s8.cfg
+      ./klipper/macros.cfg
+      ./klipper/mainsail.cfg
+      ./klipper/kamp.cfg
+    ];
+    mutableConfig = {
+      bltouch.z_offset = "3.998";
+    };
   };
 
   # This value determines the NixOS release from which the default

@@ -6,19 +6,31 @@
 }:
 let
   cfg = config.klipper-stack;
+  toINI = lib.generators.toINI { mkKeyValue = lib.generators.mkKeyValueDefault { } ": "; };
 in
 {
   options.klipper-stack = {
-    configFile = lib.mkOption {
-      type = lib.types.path;
-      description = "Klipper base config";
+    includes = lib.mkOption {
+      type = lib.types.listOf lib.types.path;
+      default = [ ];
+      description = "Config files to include (linked to /etc/klipper/)";
+    };
+    config = lib.mkOption {
+      type = lib.types.attrs;
+      default = { };
+      description = "Klipper printer configuration (merged with includes)";
+    };
+    mutableConfig = lib.mkOption {
+      type = lib.types.attrs;
+      default = { };
+      description = "Mutable config wrapper (includes immutable + runtime-editable settings)";
     };
     productId = lib.mkOption {
-      type = lib.types.string;
+      type = lib.types.str;
       description = "USB product ID";
     };
     vendorId = lib.mkOption {
-      type = lib.types.string;
+      type = lib.types.str;
       description = "USB vendor ID";
     };
   };
@@ -31,25 +43,21 @@ in
       package = pkgs.unstable.klipper;
       user = "moonraker";
       group = "moonraker";
-      configFile = pkgs.writeText "printer.cfg" ''
-        [include /etc/klipper/printer.cfg]
+      configFile = pkgs.writeText "printer.cfg" (''
+        [include /etc/klipper/includes.cfg]
 
-        [bltouch]
-        z_offset: 3.998
-      '';
+        ${toINI cfg.config}
+      '');
       mutableConfig = true;
     };
 
     environment.etc = {
       "klipper/KAMP".source = pkgs.local.klipper-adaptive-meshing-purging;
       "klipper/adxl.cfg".source = ./adxl.cfg;
-      "klipper/printer.cfg".source = pkgs.writeText "printer.immutable.cfg" ''
-        [include ${cfg.configFile}]
-        # [include /etc/klipper/adxl.cfg]
-        [include ${./macros.cfg}]
-        [include ${./mainsail.cfg}]
-        [include ${./kamp.cfg}]
-      '';
+      "klipper/includes.cfg".source = pkgs.concatTextFile {
+        name = "klipper-includes.cfg";
+        files = cfg.includes;
+      };
     };
 
     # restart Klipper when printer is powered on
