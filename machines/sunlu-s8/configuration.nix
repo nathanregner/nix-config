@@ -40,13 +40,9 @@
     enable = true;
     userControlled.enable = true;
     secretsFile = config.sops.secrets.wireless.path;
-    networks."4Cosands" = {
-      priority = 1;
-      psk = "ext:Cosands";
-    };
     networks."REGNERD" = {
-      priority = 2;
-      psk = "ext:REGNERD";
+      priority = 1;
+      pskRaw = "ext:REGNERD";
     };
   };
 
