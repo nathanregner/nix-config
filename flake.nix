@@ -187,10 +187,17 @@
               ./machines/voron/configuration.nix
             ];
           };
-        }
-        // (import ./machines/print-farm {
-          inherit self inputs outputs;
-        });
+
+          # Sunlu S8 Klipper
+          sunlu-s8 = lib.nixosSystem {
+            specialArgs = {
+              inherit self inputs outputs;
+            };
+            modules = [
+              ./machines/sunlu-s8/configuration.nix
+            ];
+          };
+        };
 
         darwinConfigurations = {
           "enceladus" = nix-darwin.lib.darwinSystem {

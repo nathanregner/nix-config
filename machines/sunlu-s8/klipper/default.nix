@@ -1,17 +1,14 @@
 {
-  self,
   config,
   lib,
   pkgs,
   ...
 }:
 let
-  cfg = config.print-farm.klipper;
+  cfg = config.klipper-stack;
 in
 {
-  options.print-farm.klipper = {
-    enable = lib.mkEnableOption (lib.mkDoc "Enable Klipper profile");
-
+  options.klipper-stack = {
     configFile = lib.mkOption {
       type = lib.types.path;
       description = "Klipper base config";
@@ -26,7 +23,7 @@ in
     };
   };
 
-  config = lib.mkIf cfg.enable {
+  config = {
 
     # klipper
     services.klipper = {
