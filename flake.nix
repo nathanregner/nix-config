@@ -186,7 +186,6 @@
             modules = [
               ./machines/voron/configuration.nix
             ];
-            system = "aarch64-linux";
           };
         }
         // (import ./machines/print-farm {
