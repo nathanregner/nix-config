@@ -37,6 +37,16 @@ def add [lines: list<string> rev: string] {
   $lines | append $hash
 }
 
+def configure-git [] {
+  if ($file | path exists) {
+    git config blame.ignoreRevsFile $file
+    log info $"Configured blame.ignoreRevsFile = ($file)"
+  } else {
+    do -i { git config --unset blame.ignoreRevsFile }
+    log info "Removed blame.ignoreRevsFile from config"
+  }
+}
+
 def main [rev?: string] {
   mut lines = if ($file | path exists) { open $file | lines } else { [] }
   $lines = (prune $lines)
@@ -46,5 +56,11 @@ def main [rev?: string] {
     $lines = (add $lines $commit)
   }
 
-  $lines | str join "\n" | save -f $file
+  if ($lines | is-empty) {
+    rm -f $file
+  } else {
+    $lines | str join "\n" | save -f $file
+  }
+
+  configure-git
 }

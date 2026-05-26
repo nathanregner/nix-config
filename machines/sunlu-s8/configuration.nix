@@ -7,6 +7,7 @@
 {
   imports = [
     ../../modules/nixos/server
+    ./hardware-configuration.nix
     ./klipper
   ];
 
@@ -33,28 +34,31 @@
   environment.etc."nix/flake-channels/system".source = self;
 
   # Networking
+  networking.hostName = "sunlu-s8";
   sops.secrets.wireless.sopsFile = ./secrets.yaml;
   networking.wireless = {
     enable = true;
     userControlled.enable = true;
     secretsFile = config.sops.secrets.wireless.path;
-    networks."4Cosands" = {
-      priority = 1;
-      psk = "ext:Cosands";
-    };
     networks."REGNERD" = {
-      priority = 2;
-      psk = "ext:REGNERD";
+      priority = 1;
+      pskRaw = "ext:REGNERD";
     };
   };
 
   sops.secrets.ddns.key = "route53/ddns";
   services.route53-ddns = {
     enable = true;
-    domain = "${config.networking.hostName}.print.nregner.net";
+    domain = "${config.networking.hostName}.nregner.net";
     ipType = "lan";
     ttl = 60;
     environmentFile = config.sops.secrets.ddns.path;
+  };
+
+  klipper-stack = {
+    configFile = ./klipper/sunlu-s8.cfg;
+    productId = "614e";
+    vendorId = "1d50";
   };
 
   # This value determines the NixOS release from which the default

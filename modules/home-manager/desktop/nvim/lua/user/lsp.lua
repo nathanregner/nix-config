@@ -278,75 +278,74 @@ local servers = {
     -- root_dir = util.root_pattern(".terraform", ".terraform.lock.hcl", ".git", ".tflint.hcl"),
   },
   tinymist = {},
-  -- tsgo = {
-  --   workspace_diagnostics = true,
-  --   handlers = {
-  --     ["client/registerCapability"] = function(err, result, ctx)
-  --       if result and result.registrations then
-  --         for _, reg in ipairs(result.registrations) do
-  --           if
-  --             reg.method == "workspace/didChangeWatchedFiles"
-  --             and reg.registerOptions
-  --             and reg.registerOptions.watchers
-  --           then
-  --             reg.registerOptions.watchers = vim.tbl_filter(function(w)
-  --               local gp = w.globPattern
-  --               if type(gp) == "string" then
-  --                 return not gp:match("^bundled://")
-  --               elseif type(gp) == "table" then
-  --                 local uri = type(gp.baseUri) == "string" and gp.baseUri
-  --                   or (gp.baseUri and gp.baseUri.uri or "")
-  --                 return not uri:match("^bundled://")
-  --               end
-  --               return true
-  --             end, reg.registerOptions.watchers)
-  --           end
-  --         end
-  --       end
-  --       return vim.lsp.handlers["client/registerCapability"](err, result, ctx)
-  --     end,
-  --   },
-  -- },
-  vtsls = {
-    capabilities = {
-      workspace = {
-        didChangeWorkspaceFolders = {
-          -- https://github.com/neovim/neovim/pull/22405
-          -- https://github.com/neovim/neovim/issues/1380
-          dynamicRegistration = true,
-        },
-      },
-    },
-    -- handlers = {
-    --   ["textDocument/publishDiagnostics"] = function(err, result, ctx)
-    --     require("ts-error-translator").translate_diagnostics(err, result, ctx)
-    --     vim.lsp.diagnostic.on_publish_diagnostics(err, result, ctx)
-    --   end,
-    --   ["workspace/publishDiagnostics"] = function(err, result, ctx)
-    --     require("ts-error-translator").translate_diagnostics(err, result, ctx)
-    --     vim.lsp.diagnostic.on_publish_diagnostics(err, result, ctx)
-    --   end,
-    -- },
-    settings = {
-      javascript = {
-        updateImportsOnFileMove = "always",
-      },
-      typescript = {
-        updateImportsOnFileMove = "always",
-        -- https://github.com/microsoft/vscode/issues/13953
-        tsserver = { experimental = { enableProjectDiagnostics = true } },
-      },
-      vtsls = {
-        enableMoveToFileCodeAction = true,
-        experimental = {
-          completion = {
-            enableServerSideFuzzyMatch = true,
-            entriesLimit = 1000,
-          },
-        },
-      },
+  tsgo = {
+    workspace_diagnostics = true,
+    handlers = {
+      ["client/registerCapability"] = function(err, result, ctx)
+        if result and result.registrations then
+          for _, reg in ipairs(result.registrations) do
+            if
+              reg.method == "workspace/didChangeWatchedFiles"
+              and reg.registerOptions
+              and reg.registerOptions.watchers
+            then
+              reg.registerOptions.watchers = vim.tbl_filter(function(w)
+                local gp = w.globPattern
+                if type(gp) == "string" then
+                  return not gp:match("^bundled://")
+                elseif type(gp) == "table" then
+                  local uri = type(gp.baseUri) == "string" and gp.baseUri or (gp.baseUri and gp.baseUri.uri or "")
+                  return not uri:match("^bundled://")
+                end
+                return true
+              end, reg.registerOptions.watchers)
+            end
+          end
+        end
+        return vim.lsp.handlers["client/registerCapability"](err, result, ctx)
+      end,
     },
   },
+  -- vtsls = {
+  --   capabilities = {
+  --     workspace = {
+  --       didChangeWorkspaceFolders = {
+  --         -- https://github.com/neovim/neovim/pull/22405
+  --         -- https://github.com/neovim/neovim/issues/1380
+  --         dynamicRegistration = true,
+  --       },
+  --     },
+  --   },
+  --   -- handlers = {
+  --   --   ["textDocument/publishDiagnostics"] = function(err, result, ctx)
+  --   --     require("ts-error-translator").translate_diagnostics(err, result, ctx)
+  --   --     vim.lsp.diagnostic.on_publish_diagnostics(err, result, ctx)
+  --   --   end,
+  --   --   ["workspace/publishDiagnostics"] = function(err, result, ctx)
+  --   --     require("ts-error-translator").translate_diagnostics(err, result, ctx)
+  --   --     vim.lsp.diagnostic.on_publish_diagnostics(err, result, ctx)
+  --   --   end,
+  --   -- },
+  --   settings = {
+  --     javascript = {
+  --       updateImportsOnFileMove = "always",
+  --     },
+  --     typescript = {
+  --       updateImportsOnFileMove = "always",
+  --       -- https://github.com/microsoft/vscode/issues/13953
+  --       tsserver = { experimental = { enableProjectDiagnostics = true } },
+  --     },
+  --     vtsls = {
+  --       enableMoveToFileCodeAction = true,
+  --       experimental = {
+  --         completion = {
+  --           enableServerSideFuzzyMatch = true,
+  --           entriesLimit = 1000,
+  --         },
+  --       },
+  --     },
+  --   },
+  -- },
   yamlls = {
     settings = {
       yaml = {

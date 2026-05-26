@@ -18,7 +18,7 @@ local bufname_blacklist = vim.regex([[conjure-log-.*]])
 ---@type LazySpec
 return nix_spec({
   "saghen/blink.cmp",
-  dependencies = { "L3MON4D3/LuaSnip" },
+  event = { "InsertEnter", "CmdlineEnter" },
 
   ---@module 'blink.cmp'
   ---@type blink.cmp.Config
@@ -68,7 +68,6 @@ return nix_spec({
     -- Default list of enabled providers defined so that you can extend it
     -- elsewhere in your config, without redefining it, due to `opts_extend`
     sources = {
-      -- add lazydev to your completion providers
       default = { "lazydev", "snippets", "lsp", "path", "buffer" },
       providers = {
         buffer = {

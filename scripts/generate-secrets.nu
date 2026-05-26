@@ -6,7 +6,7 @@ use std log
 let hosts = [
   "iapetus"
   "sagittarius"
-  "print-farm"
+  "sunlu-s8"
   "voron"
 ]
 

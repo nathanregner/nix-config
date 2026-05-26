@@ -1,0 +1,64 @@
+From 63d62b9d0d0e93f43b1462921a3e75d4e1684f7b Mon Sep 17 00:00:00 2001
+From: Nathan Regner <nathanregner@gmail.com>
+Date: Sat, 23 May 2026 13:14:30 -0600
+Subject: [PATCH] Use catppuccin-friendly palette
+
+ANSI colors 41/42 map poorly on dark themes like catppuccin where the
+default text color doesn't contrast well with bright red/green backgrounds.
+Switch to 24-bit true color escape codes with catppuccin-inspired colors:
+
+- Red: #f38ba8 text on #4d2d3a background
+- Green: #a6e3a1 text on #2d4035 background
+
+Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>
+---
+ src/Nix/Diff/Render/HumanReadable.hs | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
+
+diff --git a/src/Nix/Diff/Render/HumanReadable.hs b/src/Nix/Diff/Render/HumanReadable.hs
+index 44efc44..1b8a3ab 100644
+--- a/src/Nix/Diff/Render/HumanReadable.hs
++++ b/src/Nix/Diff/Render/HumanReadable.hs
+@@ -81,15 +81,15 @@ red :: TTY -> Text -> Text
+ red  IsTTY text = escape "\ESC[1;31m" text
+ red NotTTY text = text
+ 
+--- | Color text background red
++-- | Color text background red (catppuccin: red text on dark red bg)
+ redBackground  :: Orientation -> TTY -> Text -> Text
+-redBackground Line IsTTY text = escape "\ESC[41m" prefix <> suffix
++redBackground Line IsTTY text = escape "\ESC[38;2;243;139;168;48;2;77;45;58m" prefix <> suffix
+   where
+     (prefix, suffix) = Text.break lineBoundary text
+-redBackground Word IsTTY text = escape "\ESC[41m" prefix <> suffix
++redBackground Word IsTTY text = escape "\ESC[38;2;243;139;168;48;2;77;45;58m" prefix <> suffix
+   where
+     (prefix, suffix) = Text.break wordBoundary text
+-redBackground Character IsTTY text = escape "\ESC[41m" text
++redBackground Character IsTTY text = escape "\ESC[38;2;243;139;168;48;2;77;45;58m" text
+ redBackground Line NotTTY text = "- " <> text
+ redBackground _    NotTTY text = "←" <> text <> "←"
+ 
+@@ -98,15 +98,15 @@ green :: TTY -> Text -> Text
+ green IsTTY  text = escape "\ESC[1;32m" text
+ green NotTTY text = text
+ 
+--- | Color text background green
++-- | Color text background green (catppuccin: green text on dark green bg)
+ greenBackground :: Orientation -> TTY -> Text -> Text
+-greenBackground Line IsTTY text = escape "\ESC[42m" prefix <> suffix
++greenBackground Line IsTTY text = escape "\ESC[38;2;166;227;161;48;2;45;64;53m" prefix <> suffix
+   where
+     (prefix, suffix) = Text.break lineBoundary text
+-greenBackground Word IsTTY text = escape "\ESC[42m" prefix <> suffix
++greenBackground Word IsTTY text = escape "\ESC[38;2;166;227;161;48;2;45;64;53m" prefix <> suffix
+   where
+     (prefix, suffix) = Text.break wordBoundary text
+-greenBackground Character IsTTY  text = escape "\ESC[42m" text
++greenBackground Character IsTTY  text = escape "\ESC[38;2;166;227;161;48;2;45;64;53m" text
+ greenBackground Line NotTTY text = "+ " <> text
+ greenBackground _    NotTTY text = "→" <> text <> "→"
+ 
+-- 
+2.54.0
+

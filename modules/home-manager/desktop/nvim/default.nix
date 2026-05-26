@@ -78,6 +78,7 @@ in
           inherit (pkgs.unstable)
             bash-language-server
             emmet-language-server
+            emmylua-ls
             gopls
             graphql-language-service-cli
             harper
