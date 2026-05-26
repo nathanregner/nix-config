@@ -22,7 +22,7 @@
   services.github-runners.nix-config = {
     enable = true;
     name = config.networking.hostName;
-    package = pkgs.unstable.github-runner;
+    # package = pkgs.unstable.github-runner;
     replace = true;
     url = "https://github.com/nathanregner/nix-config";
     tokenFile = config.sops.secrets.nix-config-github-runner-pat.path;
@@ -33,7 +33,7 @@
   services.github-runners.hydra-sentinel = {
     enable = true;
     name = config.networking.hostName;
-    package = pkgs.unstable.github-runner;
+    # package = pkgs.unstable.github-runner;
     replace = true;
     url = "https://github.com/nathanregner/hydra-sentinel";
     tokenFile = config.sops.secrets.nix-config-github-runner-pat.path;
@@ -44,7 +44,7 @@
   services.github-runners.platformio2nix = {
     enable = true;
     name = config.networking.hostName;
-    package = pkgs.unstable.github-runner;
+    # package = pkgs.unstable.github-runner;
     replace = true;
     url = "https://github.com/nathanregner/platformio2nix";
     tokenFile = config.sops.secrets.nix-config-github-runner-pat.path;
