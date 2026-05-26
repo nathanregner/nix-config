@@ -1,4 +1,5 @@
 {
+  inputs,
   config,
   pkgs,
   lib,
@@ -59,6 +60,7 @@ in
             harper
             helm-ls
             libclang
+            lua-language-server
             nil
             nixd
             terraform-ls
