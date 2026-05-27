@@ -32,9 +32,9 @@ in
           args = [ "stdio" ];
         };
 
-        playwright = {
-          command = lib.getExe pkgs.playwright-mcp;
-        };
+        # playwright = {
+        #   command = lib.getExe pkgs.playwright-mcp;
+        # };
       };
 
       settings = {

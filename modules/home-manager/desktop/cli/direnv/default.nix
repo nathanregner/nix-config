@@ -6,10 +6,12 @@
 }:
 let
   toml = pkgs.formats.toml { };
-  direnvConfig = pkgs.linkFarm "direnv-sandbox-config" [{
-    name = "direnv/direnv.toml";
-    path = toml.generate "direnv.toml" { whitelist.prefix = [ "/" ]; };
-  }];
+  direnvConfig = pkgs.linkFarm "direnv-sandbox-config" [
+    {
+      name = "direnv/direnv.toml";
+      path = toml.generate "direnv.toml" { whitelist.prefix = [ "/" ]; };
+    }
+  ];
 
   direnvWrapper =
     pkgs.runCommand "direnv-sandbox-wrapper"
@@ -31,9 +33,9 @@ in
     nix-direnv.enable = true;
   };
 
-  programs.claude-code.merged-hooks.PreToolUse = [
-    { command = toString ./direnv-hook.nu; }
-  ];
+  # programs.claude-code.merged-hooks.PreToolUse = [
+  #   { command = toString ./direnv-hook.nu; }
+  # ];
 
   programs.claude-code.sandbox.allowedPackages = [ direnvWrapper ];
 
