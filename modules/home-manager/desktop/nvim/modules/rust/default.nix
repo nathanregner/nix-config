@@ -34,12 +34,13 @@ in
       ];
 
     # rustc -Z unstable-options --print target-spec-json | jq '.["llvm-target"]' -r
-    # https://github.com/rui314/mold?tab=readme-ov-file#how-to-use
-    # https://discourse.nixos.org/t/create-nix-develop-shell-for-rust-with-mold/35894/6
+    # https://github.com/wild-linker/wild
+    # readelf --string-dump .comment target/release/...
     home.file.".cargo/config.toml".source = pkgs.writeText "config.toml" (
       lib.optionalString pkgs.stdenv.isLinux ''
         [target.x86_64-unknown-linux-gnu]
-        linker = "${(lib.getExe' (pkgs.unstable.stdenvAdapters.useMoldLinker pkgs.unstable.clangStdenv).cc "clang")}"
+        linker = "${(lib.getExe' (pkgs.unstable.stdenvAdapters.useWildLinker pkgs.unstable.clangStdenv).cc "clang")}"
+        rustflags = ["-Clink-arg=-fuse-ld=wild"]
       ''
     );
 
