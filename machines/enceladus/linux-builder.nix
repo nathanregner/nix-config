@@ -4,6 +4,7 @@
   outputs,
   config,
   lib,
+  pkgs,
   ...
 }:
 {
@@ -48,10 +49,40 @@
     AllowTcpForwarding yes
   '';
 
+  # Allow user SSH key for linux-builder (in addition to the root-only builder key)
+  environment.etc."ssh/ssh_config.d/50-linux-builder.conf".text = ''
+    Host linux-builder
+      IdentityFile ~/.ssh/id_ed25519
+  '';
+
   launchd.daemons.linux-builder.serviceConfig = {
-    StandardOutPath = "/var/log/darwin-builder.log";
-    StandardErrorPath = "/var/log/darwin-builder.log";
+    StandardOutPath = "/var/log/linux-builder.log";
+    StandardErrorPath = "/var/log/linux-builder.log";
   };
+
+  # Sync linux-builder VM time on wake from sleep
+  launchd.daemons.linux-builder-time-sync =
+    let
+      wakeScript = pkgs.writeShellScript "linux-builder-wake" ''
+        ${pkgs.openssh}/bin/ssh -o ConnectTimeout=5 -o BatchMode=yes \
+          -i /etc/ssh/ssh_host_ed25519_key -o IdentitiesOnly=yes \
+          timesync@linux-builder "sudo date -s '@$(date +%s)'" 2>/dev/null || true
+      '';
+    in
+    {
+      serviceConfig = {
+        ProgramArguments = [
+          "${pkgs.sleepwatcher}/bin/sleepwatcher"
+          "-V"
+          "-w"
+          "${wakeScript}"
+        ];
+        RunAtLoad = true;
+        KeepAlive = true;
+        StandardOutPath = "/var/log/linux-builder-time-sync.log";
+        StandardErrorPath = "/var/log/linux-builder-time-sync.log";
+      };
+    };
 
   sops.secrets.tailscale-auth-key = {
     sopsFile = ../../modules/nixos/server/services/secrets.yaml;
