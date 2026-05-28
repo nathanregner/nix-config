@@ -6,17 +6,17 @@
 }:
 
 buildGoModule (finalAttrs: {
-  pname = "genai-toolbox";
-  version = "0.31.0";
+  pname = "mcp-toolbox";
+  version = "1.3.0";
 
   src = fetchFromGitHub {
     owner = "googleapis";
-    repo = "genai-toolbox";
+    repo = "mcp-toolbox";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-hD5HumHx+juSkJCA6pRYzForAqZKvNRFpnhmeylgHZ4=";
+    hash = "sha256-bGtRRMFKFi2SQIHCAHcbV1ljRupBfrnNodrekTQ44tE=";
   };
 
-  vendorHash = "sha256-ByCaEsv+SdzbqAdwWmzfUDKwJ76iyojG0qlp3SWo01M=";
+  vendorHash = "sha256-tk46JLmXiVzkD0yovQm8juXpEui0HT9O6mADIBQQE7U=";
 
   subPackages = [ "." ];
 
@@ -32,11 +32,11 @@ buildGoModule (finalAttrs: {
   passthru.updateScript = nix-update-script { };
 
   meta = {
-    changelog = "https://github.com/googleapis/genai-toolbox/releases/tag/v${finalAttrs.version}";
+    changelog = "https://github.com/googleapis/mcp-toolbox/releases/tag/v${finalAttrs.version}";
     description = "MCP Toolbox for Databases - an open source MCP server for databases";
-    homepage = "https://github.com/googleapis/genai-toolbox";
+    homepage = "https://github.com/googleapis/mcp-toolbox";
     license = lib.licenses.asl20;
-    mainProgram = "genai-toolbox";
+    mainProgram = "mcp-toolbox";
     maintainers = [ ];
   };
 })
