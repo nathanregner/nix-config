@@ -61,6 +61,12 @@
         treefmt-nix.follows = "treefmt-nix";
       };
     };
+    kanata-switcher = {
+      url = "github:7mind/kanata-switcher";
+      inputs = {
+        nixpkgs.follows = "nixpkgs-unstable";
+      };
+    };
     mac-app-util = {
       url = "github:hraban/mac-app-util";
       inputs = {
