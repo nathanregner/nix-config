@@ -1,5 +1,5 @@
 use crate::state::{AgentStatus, StatusFile};
-use anyhow::{Context, Result, bail};
+use anyhow::{Context, Result};
 use serde::{Deserialize, Serialize};
 use std::io::Read;
 use tmux_interface::{DisplayMessage, RefreshClient, Tmux};
@@ -42,10 +42,7 @@ pub fn run(stdin: impl Read) {
 }
 
 fn handle_inner(mut stdin: impl Read) -> Result<()> {
-    let session = match get_current_tmux_session()? {
-        Some(s) => s,
-        None => return Ok(()), // Not in tmux
-    };
+    let context = TmuxPaneContext::current()?;
 
     let mut json = String::new();
     stdin
@@ -75,7 +72,7 @@ fn handle_inner(mut stdin: impl Read) -> Result<()> {
 
         // Use parent PID (Claude Code's PID) rather than our own
         let pid = std::os::unix::process::parent_id();
-        status_file.set_agent(&session, pid, status);
+        status_file.set_agent(&context.session_name, pid, status);
         status_file.save()?;
 
         // Refresh tmux status bar immediately
@@ -94,22 +91,37 @@ fn handle_inner(mut stdin: impl Read) -> Result<()> {
     Ok(())
 }
 
-fn get_current_tmux_session() -> Result<Option<String>> {
-    let cmd = DisplayMessage::new().message("#{session_name}").print();
-    let output = Tmux::new()
-        .command(cmd)
-        .output()
-        .context("failed to run tmux display-message")?;
+pub struct TmuxPaneContext {
+    pub session_name: String,
+    pub window_name: String,
+    pub pane_id: PaneId,
+}
 
-    if !output.success() {
-        // Not in tmux session
-        return Ok(None);
+impl TmuxPaneContext {
+    pub fn current() -> Result<Self> {
+        let cmd = DisplayMessage::new()
+            .message("#{session_name}\0#{window_name}\0#{pane_id}")
+            .print();
+        let output = Tmux::new()
+            .command(cmd)
+            .output()
+            .context("failed to run tmux display-message")?;
+
+        if !output.success() {
+            anyhow::bail!("{}", String::from_utf8_lossy(&output.stderr()));
+        }
+
+        let stdout = String::from_utf8_lossy(&output.stdout()).trim();
+        let Ok([session_name, window_name, pane_id]) =
+            <[&str; 3]>::try_from(stdout.split('\0').collect::<Vec<_>>())
+        else {
+            anyhow::bail!("Unparseable display-message output: {stdout}");
+        };
+
+        Ok(Self {
+            session_name: session_name.to_owned(),
+            window_name: window_name.to_owned(),
+            pane_id: PaneId::from(pane_id),
+        })
     }
-
-    let session = String::from_utf8_lossy(&output.stdout()).trim().to_string();
-    if session.is_empty() {
-        bail!("tmux display-message returned empty session name");
-    }
-
-    Ok(Some(session))
 }

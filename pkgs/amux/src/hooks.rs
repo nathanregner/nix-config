@@ -1,4 +1,7 @@
-use crate::state::{AgentStatus, PaneId, StatusFile};
+use crate::{
+    state::{AgentStatus, Pid, StatusFile},
+    tmux::{PaneId, TmuxPaneContext},
+};
 use anyhow::{Context, Result};
 use etcetera::BaseStrategy;
 use serde::{Deserialize, Serialize};
@@ -36,10 +39,10 @@ struct HookOutput {
 }
 
 pub fn run(base_dirs: &dyn BaseStrategy, stdin: impl Read) {
-    let pane_id = match std::env::var("TMUX_PANE") {
-        Ok(id) => PaneId::new(id),
+    let ctx = match TmuxPaneContext::current() {
+        Ok(ctx) => ctx,
         Err(err) => {
-            tracing::warn!("Failed to read TMUX_PANE: {err}, exiting");
+            tracing::warn!("Failed to load tmux pane context: {err}");
             return;
         }
     };
@@ -47,10 +50,10 @@ pub fn run(base_dirs: &dyn BaseStrategy, stdin: impl Read) {
     // Use parent PID (Claude Code's PID) rather than our own
     let parent_pid = std::os::unix::process::parent_id();
 
-    let span = error_span!("hook", pane_id = pane_id.as_str(), parent_pid);
+    let span = error_span!("hook", %ctx, parent_pid);
     let _span = span.enter();
 
-    if let Err(err) = handle_inner(base_dirs, stdin, pane_id, parent_pid) {
+    if let Err(err) = handle_inner(base_dirs, stdin, ctx.pane_id, parent_pid) {
         tracing::error!("{err:#}");
         let output = HookOutput {
             system_message: format!("amux hook error: {err:#}"),
@@ -63,16 +66,17 @@ fn handle_inner(
     base_dirs: &dyn BaseStrategy,
     mut stdin: impl Read,
     pane_id: PaneId,
-    parent_pid: u32,
+    parent_pid: Pid,
 ) -> Result<()> {
     let mut json = String::new();
     stdin
         .read_to_string(&mut json)
         .context("failed to read stdin")?;
+    tracing::trace!("Parsing stdin: {json}");
     let event = serde_json::from_str::<HookInput>(&json)
         .with_context(|| format!("failed to parse input: {json}"))?;
 
-    let status = match event {
+    let status = match &event {
         HookInput::UserPromptSubmit | HookInput::PreToolUse | HookInput::PostToolUseFailure => {
             AgentStatus::Working
         }
@@ -99,8 +103,9 @@ fn handle_inner(
     let mut status_file = StatusFile::load_for_write(base_dirs)?;
     let should_notify = status == AgentStatus::Waiting;
 
-    status_file.set_agent(pane_id, parent_pid, status);
+    let prev = status_file.set_agent(pane_id, parent_pid, status);
     status_file.save()?;
+    tracing::debug!("Handled event {event:?}: {prev:?} -> {status:?}");
 
     // Refresh tmux status bar immediately
     if let Err(err) = Tmux::new()

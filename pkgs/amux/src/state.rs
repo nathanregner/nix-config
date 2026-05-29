@@ -1,4 +1,5 @@
 use crate::theme;
+use crate::tmux::PaneId;
 use anyhow::{Context, Result};
 use etcetera::BaseStrategy;
 use nix::fcntl::{Flock, FlockArg};
@@ -8,20 +9,6 @@ use std::fs::{self, File, OpenOptions};
 use std::io::{Read, Seek, Write};
 use std::os::fd::{AsFd, OwnedFd};
 use std::path::{Path, PathBuf};
-
-#[derive(Serialize, Deserialize, Hash, PartialEq, Eq, PartialOrd, Ord, Clone, Debug)]
-#[serde(transparent)]
-pub struct PaneId(String);
-
-impl PaneId {
-    pub fn new(pane_id: impl Into<String>) -> Self {
-        Self(pane_id.into())
-    }
-
-    pub fn as_str(&self) -> &str {
-        &self.0
-    }
-}
 
 #[derive(Serialize, Deserialize, Hash, Eq, PartialEq, PartialOrd, Ord, Copy, Clone, Debug)]
 #[serde(rename_all = "snake_case")]
@@ -52,9 +39,11 @@ impl AgentStatus {
     }
 }
 
+pub type Pid = u32;
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Agent {
-    pub pid: u32,
+    pub pid: Pid,
     pub status: AgentStatus,
     #[serde(default, with = "humantime_serde")]
     pub last_update: Option<std::time::SystemTime>,
@@ -194,8 +183,13 @@ impl<'b> StatusFile<'b, WriteMode> {
     }
 
     /// Set or update an agent's status.
-    pub fn set_agent(&mut self, pane_id: PaneId, pid: u32, status: AgentStatus) {
-        self.data.agents.insert(
+    pub fn set_agent(
+        &mut self,
+        pane_id: PaneId,
+        pid: Pid,
+        status: AgentStatus,
+    ) -> Option<AgentStatus> {
+        let prev = self.data.agents.insert(
             pane_id,
             Agent {
                 pid,
@@ -203,6 +197,7 @@ impl<'b> StatusFile<'b, WriteMode> {
                 last_update: Some(std::time::SystemTime::now()),
             },
         );
+        Some(prev?.status)
     }
 
     /// Remove agents by their keys.
@@ -237,7 +232,7 @@ fn ensure_status_dir(path: &Path) -> Result<()> {
     Ok(())
 }
 
-fn is_process_alive(pid: u32) -> anyhow::Result<bool> {
+fn is_process_alive(pid: Pid) -> anyhow::Result<bool> {
     let pid = pid.try_into()?;
     let pid = nix::unistd::Pid::from_raw(pid);
     match nix::sys::signal::kill(pid, None) {

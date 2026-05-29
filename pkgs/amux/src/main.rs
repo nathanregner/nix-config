@@ -2,6 +2,7 @@ use crate::cli::*;
 use clap::Parser;
 use etcetera::BaseStrategy;
 use std::fs::{self, File, OpenOptions};
+use tracing::level_filters::LevelFilter;
 use tracing_subscriber::EnvFilter;
 use tracing_subscriber::layer::SubscriberExt;
 use tracing_subscriber::util::SubscriberInitExt;
@@ -12,6 +13,7 @@ mod list;
 mod state;
 mod status_line;
 mod theme;
+mod tmux;
 
 fn main() {
     let base_dirs =
@@ -53,7 +55,11 @@ fn init_logging(base_dirs: &dyn BaseStrategy) {
     };
 
     tracing_subscriber::registry()
-        .with(EnvFilter::from_default_env())
+        .with(
+            EnvFilter::builder()
+                .with_default_directive(LevelFilter::DEBUG.into())
+                .from_env_lossy(),
+        )
         .with(stderr_layer)
         .with(file_layer)
         .init();
