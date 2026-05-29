@@ -67,7 +67,7 @@ local severity = vim.diagnostic.severity
 local function make_eslint_diagnostic_handler(method)
   local default_handler = vim.lsp.handlers[method]
   local max_severity = {
-    ["prettier/prettier"] = severity.WARN,
+    ["prettier/prettier"] = severity.HINT,
     ["@typescript-eslint/no-unused-vars"] = severity.WARN,
     ["no-unused-vars"] = severity.WARN,
   }
