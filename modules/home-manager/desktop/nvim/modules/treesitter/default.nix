@@ -34,6 +34,14 @@ in
         lib.splitString "\n" (builtins.readFile ./grammars.txt)
       );
     };
+
+    customGrammars = mkOption {
+      type = types.attrsOf types.package;
+      default = {
+        selfie_snapshot = pkgs.local.tree-sitter-selfie-snapshot;
+      };
+      description = "Custom treesitter grammars not included in nvim-treesitter";
+    };
   };
 
   config = {
@@ -110,6 +118,13 @@ in
             )
           ) cfg.finalPackage.passthru.dependencies
         ))
+        ++ (lib.mapAttrsToList (language: grammar: {
+          name = "${parserPrefix}/parser/${language}.so";
+          value = {
+            source = "${grammar}/parser";
+            force = true;
+          };
+        }) cfg.customGrammars)
       )
     );
 

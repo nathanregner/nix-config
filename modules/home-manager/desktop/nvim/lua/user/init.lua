@@ -196,6 +196,7 @@ vim.filetype.add({
     log = "log",
     conf = "conf",
     env = "sh",
+    ss = "selfie_snapshot",
     x = "ld",
   },
   -- Detect and apply filetypes based on the entire filename
