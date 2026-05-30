@@ -140,16 +140,6 @@ local servers = {
       },
     },
   },
-  emmylua_ls = {
-    -- https://github.com/EmmyLuaLs/emmylua-analyzer-rust/blob/main/docs/config/emmyrc_json_EN.md
-    cmd = { "emmylua_ls", "--log-level", "debug" },
-    -- TODO: Do not add `settings.emmylua` here - it causes emmylua_ls to ignore lazydev's
-    -- `Lua` scope config (which has library paths). emmylua_ls checks scopes ["Lua", "emmylua"]
-    -- and uses the LAST non-empty one, overwriting instead of merging.
-    -- See: https://github.com/EmmyLuaLs/emmylua-analyzer-rust/blob/main/crates/emmylua_ls/src/handlers/initialized/client_config/default_config.rs
-    -- Related: https://github.com/EmmyLuaLs/emmylua-analyzer-rust/issues/765
-    -- Put workspace settings in .emmyrc.json instead.
-  },
   eslint = {
     handlers = {
       ["textDocument/diagnostic"] = make_eslint_diagnostic_handler("textDocument/diagnostic"),
@@ -208,14 +198,14 @@ local servers = {
       },
     },
   },
-  -- lua_ls = {
-  --   Lua = {
-  --     workspace = { checkThirdParty = false },
-  --     telemetry = { enable = false },
-  --     -- NOTE: toggle below to ignore Lua_LS's noisy `missing-fields` warnings
-  --     -- diagnostics = { disable = { 'missing-fields' } },
-  --   },
-  -- },
+  lua_ls = {
+    Lua = {
+      workspace = { checkThirdParty = false },
+      telemetry = { enable = false },
+      -- NOTE: toggle below to ignore Lua_LS's noisy `missing-fields` warnings
+      -- diagnostics = { disable = { 'missing-fields' } },
+    },
+  },
   nil_ls = {},
   nixd = {},
   nushell = {},
