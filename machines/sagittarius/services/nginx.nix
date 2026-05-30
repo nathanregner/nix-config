@@ -30,10 +30,18 @@ in
               example
               ;
           };
+          trusted-ips = mkOption {
+            type = types.listOf types.str;
+            default = [ ];
+            example = [
+              "100.0.0.0/8"
+              "192.168.0.0/16"
+            ];
+            description = "IP ranges that bypass oauth2-proxy authentication";
+          };
         };
       }
     );
-    description = "subdomain -> virtualHosts.*.location";
   };
 
   config = {
@@ -66,33 +74,38 @@ in
 
       virtualHosts =
         let
-          virtualHost = locations: {
-            inherit locations;
-            forceSSL = true;
-            useACMEHost = "nregner.net";
-          };
+          virtualHost =
+            {
+              locations,
+              extraConfig ? "",
+            }:
+            {
+              inherit locations extraConfig;
+              forceSSL = true;
+              useACMEHost = "nregner.net";
+            };
         in
         {
           "nregner.net" = virtualHost {
-            "/" = {
-              extraConfig = ''
-                rewrite ^/craigslist(.*)$ https://craigslist.nregner.net$1 redirect;
-              '';
+            locations = {
+              "/" = {
+                extraConfig = ''
+                  rewrite ^/craigslist(.*)$ https://craigslist.nregner.net$1 redirect;
+                '';
+              };
             };
           };
         }
         // lib.mapAttrs' (subdomain: cfg: {
           name = "${subdomain}.nregner.net";
-          value = virtualHost (
-            cfg.locations
-            // lib.optionalAttrs (cfg.oauth2-proxy != null) {
-              # "@redirectToAuth2ProxyLogin" = {
-              #   # retain subdomain
-              #   # return = "307 https://${cfg.domain}/oauth2/start?rd=$scheme://$host$request_uri";
-              #   return = lib.mkForce "307 https://$host/oauth2/start?rd=$scheme://$host$request_uri";
-              # };
-            }
-          );
+          value = virtualHost {
+            inherit (cfg) locations;
+            extraConfig = lib.optionalString (cfg.trusted-ips != [ ]) ''
+              satisfy any;
+              ${lib.concatMapStringsSep "\n" (ip: "allow ${ip};") cfg.trusted-ips}
+              deny all;
+            '';
+          };
         }) config.nginx.subdomain;
     };
 
