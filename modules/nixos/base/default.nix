@@ -13,7 +13,6 @@
     ./services
     ./tailscale.nix
     ./users.nix
-    ./zswap.nix
   ]
   ++ (with inputs.self.modules.nixos; [
     base

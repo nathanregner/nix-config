@@ -38,8 +38,8 @@
         };
         commits = {
           # fix conflicts with tmux
-          moveDownCommit = "<c-N>";
-          moveUpCommit = "<c-P>";
+          moveDownCommit = "<c-n>";
+          moveUpCommit = "<c-n>";
           openLogMenu = "<c-g>";
         };
         files = {

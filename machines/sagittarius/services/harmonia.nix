@@ -4,11 +4,13 @@ let
 in
 {
   services.harmonia = {
-    enable = true;
-    package = pkgs.unstable.harmonia;
-    settings = {
-      bind = "[::]:${toString port}";
+    cache = {
+      enable = true;
+      settings = {
+        bind = "[::]:${toString port}";
+      };
     };
+    package = pkgs.unstable.harmonia;
   };
 
   nginx.subdomain.cache = {
