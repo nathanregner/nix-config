@@ -28,7 +28,8 @@
           } ./git-blame-ignore-rev.nu
         }";
         default-branch = "!${pkgs.writers.writeBash "git-default-branch" ''
-          [ -f $(git rev-parse --git-common-dir)/refs/remotes/origin/main ] && echo -n main || echo -n master
+          ref=$(git symbolic-ref refs/remotes/''${remote:-origin}/HEAD)
+          echo ''${ref##*/}
         ''}";
         # https://github.com/orgs/community/discussions/9632#discussioncomment-4702442
         diff-refactor = ''
