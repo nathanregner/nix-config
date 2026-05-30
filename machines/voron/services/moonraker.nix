@@ -1,4 +1,9 @@
-{ config, pkgs, ... }:
+{
+  self,
+  config,
+  pkgs,
+  ...
+}:
 {
   services.moonraker = {
     enable = true;
@@ -18,9 +23,13 @@
           "100.0.0.0/8"
         ];
       };
-      history = { };
       # required by KAMP
       file_manager.enable_object_processing = "True";
+      history = { };
+      # https://moonraker.readthedocs.io/en/latest/configuration/#spoolman
+      spoolman = {
+        server = "http://sagittarius:${toString self.globals.services.spoolman.port}";
+      };
     };
   };
 
@@ -30,4 +39,22 @@
 
   # required for allowSystemControl
   security.polkit.enable = true;
+
+  virtualisation.vmVariant = {
+    # Open the port inside the guest firewall
+    networking.firewall.allowedTCPPorts = [ config.services.spoolman.port ];
+
+    services.spoolman.openFirewall = true;
+
+    virtualisation.forwardPorts = [
+      {
+        from = "host";
+        host.port = config.services.spoolman.port;
+        guest.address = "127.0.0.1";
+        guest.port = config.services.spoolman.port;
+      }
+    ];
+
+    services.getty.autologinUser = "root";
+  };
 }

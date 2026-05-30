@@ -1,11 +1,10 @@
 {
   "services": {
     "hydra": { "port": 3001 },
+    "spoolman": { "port": 7912 },
     "prometheus": {
       "node": { "port": 9001 }
     },
-    "restic-server": {
-      "port": 8002
-    }
+    "restic-server": { "port": 8002 }
   }
 }
