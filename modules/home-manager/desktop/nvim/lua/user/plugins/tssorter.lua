@@ -3,6 +3,7 @@
 return {
   -- "mtrajano/tssorter.nvim",
   "nathanregner/tssorter.nvim",
+  branch = "query",
   keys = function()
     return {
       { "<leader>st", function() require("tssorter").sort({ range = "paragraph" }) end, desc = "[S]ort [t]ree" },
@@ -33,23 +34,11 @@ return {
           end,
         },
       },
-      javascript = {
-        -- TODO: merge
-        keys = { node = "pair" },
-        shorthand = { node = "shorthand_property_identifier" },
-      },
-      javascriptreact = {
-        keys = { node = "pair" },
-        shorthand = { node = "shorthand_property_identifier" },
-      },
       nu = {
         map = { node = "record_entry" },
         list = { node = "val_entry" },
       },
       nix = {
-        -- TODO: inherit(a) b c d;
-        -- attr = { node = { "attr" } },
-        attrset = { node = { "binding" } },
         formal = {
           node = { "formal" },
           order_by = function(node1, node2)
