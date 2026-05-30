@@ -1,4 +1,5 @@
 {
+  inputs,
   config,
   pkgs,
   lib,
@@ -53,12 +54,12 @@ in
           inherit (pkgs.unstable)
             bash-language-server
             emmet-language-server
-            emmylua-ls
             gopls
             graphql-language-service-cli
             harper
             helm-ls
             libclang
+            lua-language-server
             nil
             nixd
             terraform-ls
