@@ -1,9 +1,12 @@
-### Nix
+# Nix
 result
 result-*
 .direnv/
 
-### Editors
+# Editors
 .clj-kondo/
 .lsp/
 .nrepl-port
+
+# VMs
+*.qcow2
