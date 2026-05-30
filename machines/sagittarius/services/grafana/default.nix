@@ -12,6 +12,9 @@
         whitelist = "127.0.0.0/8";
         sync_ttl = 15;
       };
+      # Either hard-code the old key ("SW2YcwTIb9zpOOhoPsMm") if your setup doesn't have any secrets in the DB that need
+      # special protection or perform a rotation with a 3rd-party tool
+      security.secret_key = "SW2YcwTIb9zpOOhoPsMm";
       server = {
         domain = "grafana.nregner.net";
         http_addr = "127.0.0.1";

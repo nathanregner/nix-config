@@ -20,7 +20,7 @@ in
         # propagation check always times out... issue with IPv6 configuration?
         # https://github.com/go-acme/lego/issues/355
         dnsPropagationCheck = false;
-        credentialsFile = config.sops.secrets.acme.path;
+        environmentFile = config.sops.secrets.acme.path;
       };
     };
 
@@ -100,13 +100,11 @@ in
         domain = "nregner.net";
       };
       clientID = "397693947419-n7dljfbjdrs7da82o1mpa9fhoafo7467.apps.googleusercontent.com";
-      clientSecret = null;
       google = {
         serviceAccountJSON = config.sops.secrets.oauth2-proxy-google-service-account.path;
       };
       cookie = {
         domain = "nregner.net";
-        secret = null;
       };
       approvalPrompt = "auto";
       extraConfig = {

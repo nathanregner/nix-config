@@ -1,10 +1,10 @@
 {
   inputs = {
     # Nix
-    nixpkgs.url = "github:nixos/nixpkgs/release-25.11";
+    nixpkgs.url = "github:nixos/nixpkgs/release-26.05";
     nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
     home-manager = {
-      url = "github:nix-community/home-manager/release-25.11";
+      url = "github:nix-community/home-manager/release-26.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     home-manager-unstable = {
@@ -12,7 +12,7 @@
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
     nix-darwin = {
-      url = "github:LnL7/nix-darwin/nix-darwin-25.11";
+      url = "github:LnL7/nix-darwin/nix-darwin-26.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     microvm = {
@@ -23,7 +23,7 @@
 
     # Misc
     catppuccin-nix = {
-      url = "github:catppuccin/nix/release-25.11";
+      url = "github:catppuccin/nix/release-26.05";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
     deploy-rs = {
@@ -62,9 +62,14 @@
     mac-app-util = {
       url = "github:hraban/mac-app-util";
       inputs = {
+        cl-nix-lite.inputs = {
+          nixpkgs.follows = "nixpkgs-unstable";
+          treefmt-nix.follows = "treefmt-nix";
+          flake-parts.follows = "flake-parts";
+        };
         flake-compat.follows = "flake-compat";
-        nixpkgs.follows = "nixpkgs";
-        treefmt-nix.follows = "";
+        # nixpkgs.follows = "nixpkgs-unstable";
+        treefmt-nix.follows = "treefmt-nix";
       };
     };
     nix-index-database = {
@@ -75,7 +80,10 @@
       url = "github:nix-community/nixos-generators";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    nixos-hardware.url = "github:nixos/nixos-hardware";
+    nixos-hardware = {
+      url = "github:nixos/nixos-hardware";
+      inputs.nixpkgs.follows = "nixpkgs-unstable";
+    };
     pkgs-by-name-for-flake-parts.url = "github:drupol/pkgs-by-name-for-flake-parts/e0f9d279fe1f97184482b202ebaf52d013d38f7f";
     sops-nix = {
       url = "github:Mic92/sops-nix";
