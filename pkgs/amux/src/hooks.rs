@@ -5,20 +5,33 @@ use crate::{
 use anyhow::{Context, Result};
 use etcetera::BaseStrategy;
 use serde::{Deserialize, Serialize};
-use std::io::Read;
+use std::{collections::HashMap, io::Read};
 use tmux_interface::{RefreshClient, Tmux};
 use tracing::error_span;
+
+type ExtraFields = HashMap<String, serde_json::Value>;
 
 /// https://code.claude.com/docs/en/hooks
 #[derive(Deserialize, Debug)]
 #[serde(tag = "hook_event_name")]
 enum HookInput {
-    UserPromptSubmit,
-    PreToolUse,
-    PostToolUse { tool_name: String },
-    PostToolUseFailure,
-    Notification { notification_type: NotificationType },
-    Stop,
+    UserPromptSubmit(#[expect(dead_code)] ExtraFields),
+    PreToolUse(#[expect(dead_code)] ExtraFields),
+    PostToolUse {
+        tool_name: String,
+        #[expect(dead_code)]
+        #[serde(flatten)]
+        extra_fields: ExtraFields,
+    },
+    PostToolUseFailure(#[expect(dead_code)] ExtraFields),
+    Notification {
+        notification_type: NotificationType,
+        #[expect(dead_code)]
+        #[serde(flatten)]
+        extra_fields: ExtraFields,
+    },
+    PermissionPrompt(#[expect(dead_code)] ExtraFields),
+    Stop(#[expect(dead_code)] ExtraFields),
 }
 
 /// https://code.claude.com/docs/en/hooks#notification
@@ -77,17 +90,20 @@ fn handle_inner(
         .with_context(|| format!("failed to parse input: {json}"))?;
 
     let status = match &event {
-        HookInput::UserPromptSubmit | HookInput::PreToolUse | HookInput::PostToolUseFailure => {
-            AgentStatus::Working
-        }
-        HookInput::PostToolUse { tool_name } => {
+        HookInput::UserPromptSubmit(..)
+        | HookInput::PreToolUse(..)
+        | HookInput::PostToolUseFailure(..) => AgentStatus::Working,
+        HookInput::PermissionPrompt(..) => AgentStatus::Waiting,
+        HookInput::PostToolUse { tool_name, .. } => {
             if tool_name == "AskUserQuestion" {
                 AgentStatus::Waiting
             } else {
                 AgentStatus::Working
             }
         }
-        HookInput::Notification { notification_type } => match notification_type {
+        HookInput::Notification {
+            notification_type, ..
+        } => match notification_type {
             NotificationType::IdlePrompt => AgentStatus::Idle,
             NotificationType::PermissionPrompt | NotificationType::ElicitationDialog => {
                 AgentStatus::Waiting
@@ -97,7 +113,7 @@ fn handle_inner(
                 return Ok(());
             }
         },
-        HookInput::Stop => AgentStatus::Idle,
+        HookInput::Stop(..) => AgentStatus::Idle,
     };
 
     let mut status_file = StatusFile::load_for_write(base_dirs)?;
@@ -120,4 +136,73 @@ fn handle_inner(
     }
 
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use amux_test::TestDirs;
+    use rstest::rstest;
+
+    fn run_hook(base_dirs: &dyn BaseStrategy, json: &str) {
+        let pane_id = PaneId::new("%0");
+        let parent_pid = std::process::id();
+        handle_inner(base_dirs, json.as_bytes(), pane_id, parent_pid).unwrap();
+    }
+
+    fn get_status(base_dirs: &dyn BaseStrategy) -> Option<AgentStatus> {
+        let status_file = StatusFile::load(base_dirs).unwrap();
+        let pane_id = PaneId::new("%0");
+        status_file.agents().get(&pane_id).map(|a| a.status)
+    }
+
+    #[rstest]
+    #[case(
+        r#"{ "hook_event_name": "UserPromptSubmit" }"#,
+        Some(AgentStatus::Working)
+    )]
+    #[case( //
+        r#"{ "hook_event_name": "PreToolUse" }"#,
+        Some(AgentStatus::Working)
+    )]
+    #[case(
+        r#"{ "hook_event_name": "PostToolUseFailure" }"#,
+        Some(AgentStatus::Working)
+    )]
+    #[case(
+        r#"{ "hook_event_name": "PostToolUse", "tool_name": "Bash" }"#,
+        Some(AgentStatus::Working)
+    )]
+    #[case(
+        r#"{ "hook_event_name": "PostToolUse", "tool_name": "AskUserQuestion" }"#,
+        Some(AgentStatus::Waiting)
+    )]
+    #[case(
+        r#"{ "hook_event_name": "Notification", "notification_type": "idle_prompt" }"#,
+        Some(AgentStatus::Idle)
+    )]
+    #[case(
+        r#"{ "hook_event_name": "Notification", "notification_type": "permission_prompt" }"#,
+        Some(AgentStatus::Waiting)
+    )]
+    #[case(
+        r#"{ "hook_event_name": "Notification", "notification_type": "elicitation_dialog" }"#,
+        Some(AgentStatus::Waiting)
+    )]
+    #[case(
+        r#"{ "hook_event_name": "Notification", "notification_type": "some_future_type" }"#,
+        None
+    )]
+    #[case(
+        r#"{ "hook_event_name": "PermissionPrompt" }"#,
+        Some(AgentStatus::Waiting)
+    )]
+    #[case(r#"{ "hook_event_name": "Stop" }"#, Some(AgentStatus::Idle))]
+    fn hook_sets_status(#[case] json: &str, #[case] expected: Option<AgentStatus>) {
+        let (_dir, base_dirs) = TestDirs::temp();
+
+        run_hook(&base_dirs, json);
+
+        assert_eq!(get_status(&base_dirs), expected, "{json}");
+    }
 }
