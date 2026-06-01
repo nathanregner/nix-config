@@ -31,14 +31,12 @@ in
       '';
     }
   ];
-
-  nginx.subdomain.spoolman."/" = {
-    proxyPass = "http://127.0.0.1:${toString self.globals.services.spoolman.port}/";
-    # https://oauth2-proxy.github.io/oauth2-proxy/configuration/integration/
-    # https://docs.gitea.com/administration/config-cheat-sheet?_highlight=reverse_proxy_authentication_email#security-security
-  };
-
-  services.oauth2-proxy = {
-    nginx.virtualHosts."spoolman.nregner.net" = { };
+  nginx.subdomain.spoolman = {
+    locations = {
+      "/" = {
+        proxyPass = "http://127.0.0.1:${toString self.globals.services.spoolman.port}/";
+      };
+    };
+    oauth2-proxy = { };
   };
 }

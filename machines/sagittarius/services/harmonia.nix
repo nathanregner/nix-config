@@ -14,6 +14,8 @@ in
   };
 
   nginx.subdomain.cache = {
-    "/".proxyPass = "http://127.0.0.1:${toString port}/";
+    locations."/" = {
+      proxyPass = "http://127.0.0.1:${toString port}/";
+    };
   };
 }

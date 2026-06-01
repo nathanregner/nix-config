@@ -7,8 +7,12 @@
     allowedUDPPorts = [ 25565 ];
   };
 
-  nginx.subdomain.minecraft."/" = {
-    proxyPass = "http://127.0.0.1:65000/";
+  nginx.subdomain.minecraft = {
+    locations = {
+      "/" = {
+        proxyPass = "http://127.0.0.1:65000/";
+      };
+    };
   };
 
   local.services.backup.jobs.minecraft = {

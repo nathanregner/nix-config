@@ -12,7 +12,7 @@
   '';
 
   nginx.subdomain = {
-    craigslist."/".proxyPass = "http://127.0.0.1:8888/";
-    craigslist-api."/".proxyPass = "http://127.0.0.1:6000/";
+    craigslist.locations."/".proxyPass = "http://127.0.0.1:8888/";
+    craigslist-api.locations."/".proxyPass = "http://127.0.0.1:6000/";
   };
 }

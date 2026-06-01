@@ -15,9 +15,13 @@
       };
     };
   };
-
-  nginx.subdomain.qb."/".extraConfig = # nginx
-    "return 302 http://sagittarius:${toString config.services.qbittorrent.webuiPort}$request_uri;";
+  nginx.subdomain.qb = {
+    locations = {
+      "/" = {
+        return = "307 http://${config.networking.hostName}:${toString config.services.qbittorrent.webuiPort}$request_uri";
+      };
+    };
+  };
 
   users.users.nregner.extraGroups = [ config.services.qbittorrent.group ];
 }

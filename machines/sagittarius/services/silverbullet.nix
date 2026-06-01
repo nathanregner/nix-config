@@ -7,14 +7,10 @@
   };
 
   nginx.subdomain.notes = {
-    "/" = {
+    locations."/" = {
       proxyPass = "http://localhost:${toString config.services.silverbullet.listenPort}/";
     };
-  };
-
-  services.oauth2-proxy = {
-    nginx.virtualHosts."notes.nregner.net" = {
-    };
+    oauth2-proxy = { };
   };
 
   local.services.backup.jobs.silverbullet = {

@@ -5,9 +5,12 @@
   networking.firewall = {
     allowedUDPPorts = [ 34197 ];
   };
-
-  nginx.subdomain.factorio."/" = {
-    proxyPass = "http://127.0.0.1:65001/";
+  nginx.subdomain.factorio = {
+    locations = {
+      "/" = {
+        proxyPass = "http://127.0.0.1:65001/";
+      };
+    };
   };
 
   local.services.backup.jobs.factorio = {
