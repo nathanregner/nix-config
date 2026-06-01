@@ -1,5 +1,6 @@
-use crate::state::{Agent, PaneId, StatusFile};
+use crate::state::{Agent, StatusFile};
 use crate::theme::ansi_rgb;
+use crate::tmux::PaneId;
 use anyhow::{Context, Result, bail};
 use etcetera::BaseStrategy;
 use std::collections::HashMap;
@@ -23,7 +24,10 @@ fn list_panes() -> Result<HashMap<PaneId, PaneInfo>> {
         .context("failed to list tmux sessions")?;
 
     if !output.success() {
-        bail!("tmux list-sessions failed");
+        bail!(
+            "tmux list-sessions failed: {}",
+            String::from_utf8_lossy(&output.stderr())
+        );
     }
 
     let stdout_bytes = output.stdout();

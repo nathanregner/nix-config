@@ -17,6 +17,7 @@ let
       fileset = lib.fileset.unions [
         ./Cargo.lock
         ./Cargo.toml
+        ./amux-test
         ./build.rs
         ./src
         ./tests
