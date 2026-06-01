@@ -12,6 +12,9 @@
         whitelist = "127.0.0.0/8";
         sync_ttl = 15;
       };
+      # Either hard-code the old key ("SW2YcwTIb9zpOOhoPsMm") if your setup doesn't have any secrets in the DB that need
+      # special protection or perform a rotation with a 3rd-party tool
+      security.secret_key = "SW2YcwTIb9zpOOhoPsMm";
       server = {
         domain = "grafana.nregner.net";
         http_addr = "127.0.0.1";
@@ -64,19 +67,17 @@
   '';
 
   nginx.subdomain.grafana = {
-    "/" = {
-      proxyPass = "http://127.0.0.1:${toString config.services.grafana.settings.server.http_port}";
-      proxyWebsockets = true;
-      extraConfig = # nginx
-        ''
+    locations = {
+      "/" = {
+        proxyPass = "http://127.0.0.1:${toString config.services.grafana.settings.server.http_port}";
+        proxyWebsockets = true;
+        extraConfig = /* nginx */ ''
           proxy_set_header X-WEBAUTH-EMAIL $email;
           proxy_set_header X-WEBAUTH-ROLE  $grafana_role;
         '';
+      };
     };
-  };
-
-  services.oauth2-proxy = {
-    nginx.virtualHosts."grafana.nregner.net" = { };
+    oauth2-proxy = { };
   };
 
   local.services.backup.jobs.grafana = {

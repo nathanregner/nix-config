@@ -4,14 +4,18 @@ let
 in
 {
   services.harmonia = {
-    enable = true;
-    package = pkgs.unstable.harmonia;
-    settings = {
-      bind = "[::]:${toString port}";
+    cache = {
+      enable = true;
+      settings = {
+        bind = "[::]:${toString port}";
+      };
     };
+    package = pkgs.unstable.harmonia;
   };
 
   nginx.subdomain.cache = {
-    "/".proxyPass = "http://127.0.0.1:${toString port}/";
+    locations."/" = {
+      proxyPass = "http://127.0.0.1:${toString port}/";
+    };
   };
 }

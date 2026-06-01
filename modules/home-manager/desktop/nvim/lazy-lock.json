@@ -51,7 +51,7 @@
   "toggle.nvim": { "branch": "main", "commit": "64436258e6854c929a46f359c5331aaedb1125da" },
   "trouble.nvim": { "branch": "main", "commit": "bd67efe408d4816e25e8491cc5ad4088e708a69a" },
   "ts-autotag.nvim": { "branch": "master", "commit": "35f79f6253dff5cc43cf943d74c4b2734370a81d" },
-  "tssorter.nvim": { "branch": "main", "commit": "03f8e15ca4bdad34303ea5f552c0e39953536410" },
+  "tssorter.nvim": { "branch": "query", "commit": "74e6f5f2f1be68b7f5841eda9482f45ffb243807" },
   "undotree": { "branch": "master", "commit": "6fa6b57cda8459e1e4b2ca34df702f55242f4e4d" },
   "vim-fugitive": { "branch": "master", "commit": "3b753cf8c6a4dcde6edee8827d464ba9b8c4a6f0" },
   "vim-helm": { "branch": "master", "commit": "2c8525fd98e57472769d137317bca83e477858ce" },

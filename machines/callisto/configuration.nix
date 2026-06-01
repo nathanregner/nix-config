@@ -34,11 +34,9 @@
 
   services.displayManager = {
     gdm.enable = true;
-    gdm.wayland = false;
+    autoLogin.enable = true;
+    autoLogin.user = "nregner";
   };
-
-  services.displayManager.autoLogin.enable = true;
-  services.displayManager.autoLogin.user = "nregner";
 
   # workaround for GNOME autologin: https://github.com/NixOS/nixpkgs/issues/103746#issuecomment-945091229
   systemd.services."getty@tty1".enable = false;
@@ -70,6 +68,7 @@
 
   virtualisation.docker = {
     enable = true;
+    package = pkgs.unstable.docker;
     # enableOnBoot = false; # lazy start with docker.socket
     # extraOptions = "--insecure-registry sagittarius:5000";
     daemon.settings = {
