@@ -174,29 +174,28 @@ in
     '';
 
   nginx.subdomain.hydra = {
-    "/" = {
-      proxyPass = "http://127.0.0.1:${toString config.services.hydra.port}";
-      extraConfig = ''
-        proxy_set_header X-Remote-User $user;
-        proxy_set_header X-Remote-Roles $hydra_roles;
-      '';
+    locations = {
+      "/" = {
+        proxyPass = "http://127.0.0.1:${toString config.services.hydra.port}";
+        extraConfig = /* nginx */ ''
+          proxy_set_header X-Remote-User $user;
+          proxy_set_header X-Remote-Roles $hydra_roles;
+        '';
+      };
+      "/github/webhook" = {
+        proxyPass = "http://127.0.0.1:${toString config.services.hydra.port}/api/push-github";
+        extraConfig = "auth_request off;";
+      };
     };
-    "/github/webhook" = {
-      proxyPass = "http://127.0.0.1:${toString config.services.hydra.port}/api/push-github";
-      extraConfig = "auth_request off;";
-    };
+    oauth2-proxy = { };
   };
 
-  services.nginx.appendHttpConfig = ''
+  services.nginx.appendHttpConfig = /* nginx */ ''
     map $email $hydra_roles {
       "nathanregner@gmail.com" "admin";
       default                  "";
     }
   '';
-
-  services.oauth2-proxy = {
-    nginx.virtualHosts."hydra.nregner.net" = { };
-  };
 }
 
 # programs.ssh.extraConfig = ''

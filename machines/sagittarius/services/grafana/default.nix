@@ -67,19 +67,17 @@
   '';
 
   nginx.subdomain.grafana = {
-    "/" = {
-      proxyPass = "http://127.0.0.1:${toString config.services.grafana.settings.server.http_port}";
-      proxyWebsockets = true;
-      extraConfig = # nginx
-        ''
+    locations = {
+      "/" = {
+        proxyPass = "http://127.0.0.1:${toString config.services.grafana.settings.server.http_port}";
+        proxyWebsockets = true;
+        extraConfig = /* nginx */ ''
           proxy_set_header X-WEBAUTH-EMAIL $email;
           proxy_set_header X-WEBAUTH-ROLE  $grafana_role;
         '';
+      };
     };
-  };
-
-  services.oauth2-proxy = {
-    nginx.virtualHosts."grafana.nregner.net" = { };
+    oauth2-proxy = { };
   };
 
   local.services.backup.jobs.grafana = {

@@ -24,21 +24,19 @@
     };
   };
 
-  nginx.subdomain.git."/" = {
-    proxyPass = "http://127.0.0.1:${toString config.services.gitea.settings.server.HTTP_PORT}/";
-    # https://oauth2-proxy.github.io/oauth2-proxy/configuration/integration/
-    # https://docs.gitea.com/administration/config-cheat-sheet?_highlight=reverse_proxy_authentication_email#security-security
-    extraConfig = # nginx
-      ''
+  nginx.subdomain.git = {
+    locations."/" = {
+      proxyPass = "http://127.0.0.1:${toString config.services.gitea.settings.server.HTTP_PORT}/";
+      # https://oauth2-proxy.github.io/oauth2-proxy/configuration/integration/
+      # https://docs.gitea.com/administration/config-cheat-sheet?_highlight=reverse_proxy_authentication_email#security-security
+      extraConfig = /* nginx */ ''
         client_max_body_size 0;
 
         proxy_set_header X-WEBAUTH-USER $user;
         proxy_set_header X-WEBAUTH-EMAIL $email;
       '';
-  };
-
-  services.oauth2-proxy = {
-    nginx.virtualHosts."git.nregner.net" = { };
+    };
+    oauth2-proxy = { };
   };
 
   sops.secrets.gitea-github-mirror = { };

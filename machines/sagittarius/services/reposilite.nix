@@ -16,9 +16,13 @@
       "admin:tailscale"
     ];
   };
-
-  nginx.subdomain.maven."/".extraConfig = # nginx
-    "return 302 http://sagittarius:${toString config.services.reposilite.settings.port}$request_uri;";
+  nginx.subdomain.maven = {
+    locations = {
+      "/" = {
+        return = "307 http://${config.networking.hostName}:${toString config.services.reposilite.settings.port}$request_uri";
+      };
+    };
+  };
 
   local.services.backup.jobs.reposilite = {
     root = config.services.reposilite.workingDirectory;
