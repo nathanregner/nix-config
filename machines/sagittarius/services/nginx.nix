@@ -1,10 +1,38 @@
-{ config, lib, ... }:
+{
+  options,
+  config,
+  lib,
+  ...
+}:
 let
   oauth2-proxy-user = config.systemd.services.oauth2-proxy.serviceConfig.User;
+  inherit (lib) types mkOption;
 in
 {
-  options.nginx.subdomain = lib.mkOption {
-    type = lib.types.attrs;
+  options.nginx.subdomain = mkOption {
+    type = types.attrsOf (
+      types.submodule {
+        options = {
+          oauth2-proxy = mkOption (
+            let
+              base = options.services.oauth2-proxy.nginx.virtualHosts;
+            in
+            {
+              type = types.nullOr base.type;
+              inherit (base) example;
+              default = null;
+            }
+          );
+          locations = mkOption {
+            inherit ((options.services.nginx.virtualHosts.type.getSubOptions [ ]).locations)
+              type
+              default
+              example
+              ;
+          };
+        };
+      }
+    );
     description = "subdomain -> virtualHosts.*.location";
   };
 
@@ -53,9 +81,18 @@ in
             };
           };
         }
-        // lib.mapAttrs' (subdomain: location: {
+        // lib.mapAttrs' (subdomain: cfg: {
           name = "${subdomain}.nregner.net";
-          value = virtualHost location;
+          value = virtualHost (
+            cfg.locations
+            // lib.optionalAttrs (cfg.oauth2-proxy != null) {
+              # "@redirectToAuth2ProxyLogin" = {
+              #   # retain subdomain
+              #   # return = "307 https://${cfg.domain}/oauth2/start?rd=$scheme://$host$request_uri";
+              #   return = lib.mkForce "307 https://$host/oauth2/start?rd=$scheme://$host$request_uri";
+              # };
+            }
+          );
         }) config.nginx.subdomain;
     };
 
@@ -98,6 +135,15 @@ in
       enable = true;
       nginx = {
         domain = "nregner.net";
+        virtualHosts = lib.pipe config.nginx.subdomain [
+          (lib.filterAttrs (_: cfg: cfg.oauth2-proxy != null))
+          (lib.mapAttrs' (
+            subdomain: cfg: {
+              name = "${subdomain}.nregner.net";
+              value = cfg.oauth2-proxy;
+            }
+          ))
+        ];
       };
       clientID = "397693947419-n7dljfbjdrs7da82o1mpa9fhoafo7467.apps.googleusercontent.com";
       google = {
@@ -110,6 +156,7 @@ in
       extraConfig = {
         authenticated-emails-file = config.sops.secrets.oauth2-proxy-emails.path;
         client-secret-file = config.sops.secrets.oauth2-proxy-client-secret.path;
+        whitelist-domain = ".nregner.net";
       };
       keyFile = config.sops.templates.oauth2-proxy-env.path;
       setXauthrequest = true;
