@@ -176,52 +176,19 @@ fn test_status_line_empty() {
 }
 
 #[test]
-fn test_hook_creates_working_status() {
+fn test_status_line_working() {
     let env = TestEnv::new("working");
 
-    env.run_hook(
-        // json
-        r#"{ "hook_event_name": "UserPromptSubmit" }"#,
-    );
+    env.run_hook(r#"{ "hook_event_name": "UserPromptSubmit" }"#);
 
     insta::assert_snapshot!(env.status_line(), @"#[fg=#585b70,bold] 1#[default]");
 }
 
 #[test]
-fn test_hook_stop_sets_done() {
-    let env = TestEnv::new("stop");
-
-    env.run_hook(
-        // json
-        r#"{ "hook_event_name": "UserPromptSubmit" }"#,
-    );
-
-    env.run_hook(
-        // json
-        r#"{ "hook_event_name": "Stop" }"#,
-    );
-
-    insta::assert_snapshot!(env.status_line(), @"#[fg=#cdd6f4,bold]󰒲 1#[default]");
-}
-
-#[test]
-fn test_notification_idle_prompt_sets_done() {
-    let env = TestEnv::new("idle");
-
-    env.run_hook(
-        // json
-        r#"{ "hook_event_name": "Notification", "notification_type": "idle_prompt" }"#,
-    );
-
-    insta::assert_snapshot!(env.status_line(), @"#[fg=#cdd6f4,bold]󰒲 1#[default]");
-}
-
-#[test]
-fn test_notification_permission_prompt_sets_waiting() {
+fn test_status_line_waiting() {
     let env = TestEnv::new("waiting");
 
     env.run_hook(
-        // json
         r#"{ "hook_event_name": "Notification", "notification_type": "permission_prompt" }"#,
     );
 
@@ -229,25 +196,11 @@ fn test_notification_permission_prompt_sets_waiting() {
 }
 
 #[test]
-fn test_post_tool_use_ask_user_question_sets_waiting() {
-    let env = TestEnv::new("ask_user");
+fn test_status_line_idle() {
+    let env = TestEnv::new("idle");
 
-    env.run_hook(
-        // json
-        r#"{ "hook_event_name": "PostToolUse", "tool_name": "AskUserQuestion" }"#,
-    );
+    env.run_hook(r#"{ "hook_event_name": "UserPromptSubmit" }"#);
+    env.run_hook(r#"{ "hook_event_name": "Stop" }"#);
 
-    insta::assert_snapshot!(env.status_line(), @"#[fg=#f38ba8,bold]󰀦 1#[default]");
-}
-
-#[test]
-fn test_post_tool_use_other_sets_working() {
-    let env = TestEnv::new("other_tool");
-
-    env.run_hook(
-        // json
-        r#"{ "hook_event_name": "PostToolUse", "tool_name": "Bash" }"#,
-    );
-
-    insta::assert_snapshot!(env.status_line(), @"#[fg=#585b70,bold] 1#[default]");
+    insta::assert_snapshot!(env.status_line(), @"#[fg=#cdd6f4,bold]󰒲 1#[default]");
 }

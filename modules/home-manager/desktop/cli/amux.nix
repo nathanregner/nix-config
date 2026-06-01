@@ -1,11 +1,12 @@
 { pkgs, lib, ... }:
 {
   programs.claude-code.merged-hooks = lib.genAttrs [
-    "UserPromptSubmit"
+    "Notification"
+    "PermissionPrompt"
     "PostToolUse"
     "PostToolUseFailure"
-    "Notification"
     "Stop"
+    "UserPromptSubmit"
   ] (_: [ { command = "amux hook"; } ]);
 
   home.packages = [

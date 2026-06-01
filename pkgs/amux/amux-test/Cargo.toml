@@ -1,0 +1,9 @@
+[package]
+name = "amux-test"
+version = "0.1.0"
+edition = "2024"
+description = "Test utilities for amux"
+
+[dependencies]
+etcetera = "0.11"
+tempfile = "3"

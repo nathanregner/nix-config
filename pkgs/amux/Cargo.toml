@@ -1,3 +1,6 @@
+[workspace]
+members = ["amux-test"]
+
 [package]
 name = "amux"
 version = "0.1.0"
@@ -21,7 +24,9 @@ clap = { version = "4", features = ["derive"] }
 clap_complete = "4"
 
 [dev-dependencies]
+amux-test = { path = "amux-test" }
 assert_cmd = "2"
 insta = "1"
+rstest = "0.24"
 tempfile = "3"
 tmux_interface = "0.4"

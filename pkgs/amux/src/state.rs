@@ -250,53 +250,23 @@ fn is_process_alive(pid: u32) -> anyhow::Result<bool> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::path::Path;
-
-    struct TestDirs(PathBuf);
-
-    impl TestDirs {
-        fn new(path: &Path) -> Self {
-            Self(path.to_path_buf())
-        }
-    }
-
-    impl BaseStrategy for TestDirs {
-        fn home_dir(&self) -> &Path {
-            &self.0
-        }
-        fn config_dir(&self) -> PathBuf {
-            self.0.join("config")
-        }
-        fn data_dir(&self) -> PathBuf {
-            self.0.join("data")
-        }
-        fn cache_dir(&self) -> PathBuf {
-            self.0.join("cache")
-        }
-        fn state_dir(&self) -> Option<PathBuf> {
-            Some(self.0.join("state"))
-        }
-        fn runtime_dir(&self) -> Option<PathBuf> {
-            Some(self.0.join("runtime"))
-        }
-    }
+    use amux_test::TestDirs;
 
     #[test]
     fn test_read_mode_handles_truncated_file() {
-        let dir = tempfile::tempdir().unwrap();
-        let base_dirs = TestDirs::new(dir.path());
+        let (dir, base_dirs) = TestDirs::temp();
         let path = StatusFile::<()>::status_file_path(&base_dirs);
         fs::create_dir_all(path.parent().unwrap()).unwrap();
         fs::write(&path, r#"{"agents": {"#).unwrap();
 
         let status = StatusFile::load(&base_dirs).unwrap();
         assert!(status.data.agents.is_empty());
+        drop(dir);
     }
 
     #[test]
     fn test_read_mode_handles_missing_file() {
-        let dir = tempfile::tempdir().unwrap();
-        let base_dirs = TestDirs::new(dir.path());
+        let (_dir, base_dirs) = TestDirs::temp();
 
         let status = StatusFile::load(&base_dirs).unwrap();
         assert!(status.data.agents.is_empty());
@@ -304,13 +274,13 @@ mod tests {
 
     #[test]
     fn test_write_mode_handles_truncated_file() {
-        let dir = tempfile::tempdir().unwrap();
-        let base_dirs = TestDirs::new(dir.path());
+        let (dir, base_dirs) = TestDirs::temp();
         let path = StatusFile::<()>::status_file_path(&base_dirs);
         fs::create_dir_all(path.parent().unwrap()).unwrap();
         fs::write(&path, r#"{"agents": {"#).unwrap();
 
         let status = StatusFile::load_for_write(&base_dirs).unwrap();
         assert!(status.data.agents.is_empty());
+        drop(dir);
     }
 }
