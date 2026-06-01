@@ -1,1 +1,1 @@
-(block (header) @context)
+(block (header) (content) @context.end) @context
