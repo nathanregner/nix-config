@@ -154,7 +154,105 @@ define_all(s("@ts-expect-error", {
   i(1, "TODO"),
 }))
 
+local function get_i18n_prefixes()
+  local counts = {}
+  local bufnr = vim.api.nvim_get_current_buf()
+
+  local query_str = [[
+    (jsx_self_closing_element
+      name: (identifier) @_tag (#eq? @_tag "Trans")
+      (jsx_attribute
+        (property_identifier) @_attr (#eq? @_attr "i18nKey")
+        (string (string_fragment) @key)))
+    (jsx_element
+      open_tag: (jsx_opening_element
+        name: (identifier) @_tag (#eq? @_tag "Trans")
+        (jsx_attribute
+          (property_identifier) @_attr (#eq? @_attr "i18nKey")
+          (string (string_fragment) @key))))
+    (call_expression
+      function: (identifier) @_fn (#eq? @_fn "t")
+      arguments: (arguments
+        (string (string_fragment) @key)))
+  ]]
+
+  local ok, query = pcall(vim.treesitter.query.parse, "tsx", query_str)
+  if not ok then return {} end
+
+  local parser = vim.treesitter.get_parser(bufnr, "tsx")
+  if not parser then return {} end
+
+  local tree = parser:parse()[1]
+  if not tree then return {} end
+
+  for id, node in query:iter_captures(tree:root(), bufnr) do
+    if query.captures[id] == "key" then
+      local text = vim.treesitter.get_node_text(node, bufnr)
+      local prefix = text:match("^([^.]+)%.")
+      if prefix then counts[prefix] = (counts[prefix] or 0) + 1 end
+    end
+  end
+
+  local prefixes = {}
+  for prefix, _ in pairs(counts) do
+    table.insert(prefixes, prefix)
+  end
+  table.sort(prefixes, function(a, b) return counts[a] > counts[b] end)
+
+  return prefixes
+end
+
+local function i18n_key_node()
+  return d(1, function()
+    local prefixes = get_i18n_prefixes()
+    if #prefixes > 0 then
+      local choices = {}
+      for _, prefix in ipairs(prefixes) do
+        table.insert(choices, sn(nil, { t(prefix .. "."), i(1) }))
+      end
+      table.insert(choices, i(nil))
+      return sn(nil, c(1, choices))
+    else
+      return sn(nil, { i(1) })
+    end
+  end)
+end
+
+local function selected_text_node(pos)
+  return f(function(_, snip)
+    local sel = snip.env.TM_SELECTED_TEXT
+    return sel and #sel > 0 and sel or {}
+  end, {})
+end
+
+for _, lang in ipairs({ "javascriptreact", "typescriptreact" }) do
+  table.insert(
+    snippets[lang],
+    s("i18t", {
+      t("i18next.t('"),
+      i18n_key_node(),
+      t("', \""),
+      selected_text_node(),
+      i(2),
+      t('")'),
+    })
+  )
+
+  table.insert(
+    snippets[lang],
+    s("Trans", {
+      t('<Trans i18nKey="'),
+      i18n_key_node(),
+      t('">'),
+      selected_text_node(),
+      i(2),
+      t("</Trans>"),
+    })
+  )
+end
+
 for lang, lang_snippets in pairs(snippets) do
+  vim.notify("add " .. lang)
   ls.add_snippets(lang, lang_snippets, {
     key = "user." .. lang,
     default_priority = 1000,
