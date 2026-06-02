@@ -16,22 +16,6 @@ in
       sops
       # tenv
     ];
-    env = [
-      {
-        name = "SOPS_AGE_KEY_CMD";
-        value = pkgs.writers.writeBash "sops-age-key" {
-          makeWrapperArgs = [
-            "--prefix"
-            "PATH"
-            ":"
-            "${lib.makeBinPath [
-              pkgs.ssh-to-age
-              pkgs.age
-            ]}"
-          ];
-        } "ssh-to-age -private-key -i ~/.ssh/id_ed25519";
-      }
-    ];
   };
 
   terraform = pkgs.devshell.mkShell {
