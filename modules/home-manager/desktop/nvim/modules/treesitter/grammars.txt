@@ -12,6 +12,7 @@ git_rebase
 gitattributes
 gitcommit
 gitignore
+go
 graphql
 groovy
 hcl
