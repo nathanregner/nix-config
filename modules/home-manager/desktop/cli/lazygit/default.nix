@@ -38,9 +38,9 @@
         };
         commits = {
           # fix conflicts with tmux
-          moveDownCommit = "<c-n>";
-          moveUpCommit = "<c-n>";
-          openLogMenu = "<c-g>";
+          moveDownCommit = "<c+n>";
+          moveUpCommit = "<c+p>";
+          openLogMenu = "<c+g>";
         };
         files = {
           # always commit with EDITOR (also prevents us from getting stuck thanks to "q" remap)
@@ -48,7 +48,7 @@
           commitChangesWithEditor = "c";
         };
         universal = {
-          quit = "<c-c>";
+          quit = "<c+c>";
         };
       };
 

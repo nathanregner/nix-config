@@ -35,6 +35,7 @@ in
     extraConfig = ''
       evaluator_workers = 10
       max_output_size = ${toString (4 * 1024 * 1024 * 1024)}
+      max_unsupported_time_in_s = ${toString (1 * 60 * 60)}
       always_supported_system_types = ${
         lib.concatStringsSep "," [
           "x86_64-linux"
