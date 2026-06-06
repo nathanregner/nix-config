@@ -1,7 +1,7 @@
 ---@module "lazy"
 ---@type LazySpec
 return {
-  "numToStr/Comment.nvim",
+  "nathanregner/Comment.nvim",
   dependencies = {
     { "JoosepAlviste/nvim-ts-context-commentstring", opts = { enable_autocmd = false } },
   },
