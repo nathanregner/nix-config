@@ -1,5 +1,4 @@
 use std::error::Error;
-use std::path::PathBuf;
 use std::time::Duration;
 
 use anyhow::Result;
@@ -9,10 +8,8 @@ use tuirealm::listener::EventListenerCfg;
 use tuirealm::ratatui::layout::{Constraint, Direction, Layout};
 use tuirealm::terminal::{CrosstermTerminalAdapter, TerminalAdapter, TerminalResult};
 
-use crate::cache::Cache;
 use crate::components::{Progress, TreeView};
 use crate::msg::{Id, Msg};
-use crate::nix;
 
 #[derive(Clone, Copy, PartialEq)]
 pub enum AppView {
@@ -145,11 +142,12 @@ where
     }
 
     pub fn load_roots(&mut self) -> Result<()> {
-        let roots = nix::gc_roots()?;
-        // TODO: base_dirs
-        let cache = Cache::new(&PathBuf::from("/home/nregner/.cache/nix-gc-roots"))?;
-        let roots = cache.get_sizes(roots)?;
-        self.update(Msg::LoadingComplete(roots));
-        Ok(())
+        todo!()
+        // let roots = nix::gc_roots()?;
+        // // TODO: base_dirs
+        // let cache = Cache::new(&PathBuf::from("/home/nregner/.cache/nix-gc-roots"))?;
+        // let roots = cache.get_sizes roots)?;
+        // self.update(Msg::LoadingComplete(roots));
+        // Ok(())
     }
 }

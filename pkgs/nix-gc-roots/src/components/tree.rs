@@ -22,7 +22,7 @@ use tuirealm::state::{State, StateValue};
 use crate::cache::GcRootWithSize;
 use crate::model::{GcRootModel, Node, format_size, is_direnv_path};
 use crate::msg::Msg;
-use crate::nix::{GcRoot, PathInfo};
+use crate::cache::PathInfo;
 
 #[derive(Clone, Copy, PartialEq)]
 pub enum PendingAction {
