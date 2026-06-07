@@ -1,4 +1,5 @@
 mod app;
+mod arena_path;
 mod cache;
 mod components;
 mod model;

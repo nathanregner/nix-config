@@ -9,9 +9,12 @@ use std::time::SystemTime;
 
 use anyhow::Context;
 use anyhow::Result;
+use context_deserialize::ContextDeserialize;
 use heed::WithTls;
 use heed::types;
+use stumpalo::Arena;
 
+use crate::arena_path::PathInfoMap as ArenaPathInfoMap;
 use crate::nix::GcRoot;
 use crate::nix::PathInfoMap;
 use crate::nix::path_info;
@@ -195,4 +198,10 @@ pub fn deserialize(buf: &[u8]) -> Result<PathInfoMap> {
     // Ok(serde_json::from_reader(reader)?)
     let buf = zstd::decode_all(buf)?;
     Ok(serde_json::from_slice(&buf)?)
+}
+
+pub fn deserialize_arena<'a>(arena: &'a Arena, buf: &[u8]) -> Result<ArenaPathInfoMap<'a>> {
+    let buf = zstd::decode_all(buf)?;
+    let mut de = serde_json::Deserializer::from_slice(&buf);
+    Ok(ArenaPathInfoMap::context_deserialize(&mut de, arena)?)
 }
