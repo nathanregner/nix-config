@@ -6,7 +6,7 @@ use anyhow::{Context, Result};
 use tui_treelistview::TreeModel;
 
 use crate::cache::GcRootWithSize;
-use crate::nix::{GcRoot, PathInfo, PathInfoMap};
+use crate::cache::{PathInfo, PathInfoMap};
 
 #[derive(Clone)]
 pub struct GcRootEntry {

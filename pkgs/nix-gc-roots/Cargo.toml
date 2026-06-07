@@ -2,6 +2,7 @@
 name = "nix-gc-roots"
 version = "0.1.0"
 edition = "2024"
+default-run = "nix-gc-roots"
 
 [dependencies]
 ratatui = "0.30"
@@ -23,9 +24,11 @@ petgraph = "0.8.3"
 radix_trees = "0.2.0"
 stumpalo = "0.2.0"
 context_deserialize = "0.2.1"
+rkyv = { version = "0.8", features = ["bytecheck"] }
 
 [dev-dependencies]
 criterion = "0.6"
+tempfile = "3"
 
 [[bench]]
 name = "cache"

@@ -1,12 +1,12 @@
 use anyhow::Result;
-use serde::{Deserialize, Serialize};
 use std::{
-    collections::HashMap,
     ffi::OsStr,
-    path::{Path, PathBuf},
+    path::PathBuf,
     process::Command,
     time::SystemTime,
 };
+
+use crate::cache::PathInfoMap;
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct GcRoot {
@@ -50,15 +50,6 @@ pub fn gc_roots() -> Result<Vec<GcRoot>> {
     }
 
     Ok(roots)
-}
-
-pub type PathInfoMap = HashMap<PathBuf, PathInfo>;
-
-#[derive(Serialize, Deserialize, Debug)]
-#[serde(rename_all = "camelCase")]
-pub struct PathInfo {
-    pub nar_size: u64,
-    pub references: Vec<PathBuf>,
 }
 
 pub fn path_info(
