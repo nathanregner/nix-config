@@ -1,6 +1,4 @@
 use std::cell::Cell as StdCell;
-use std::collections::HashMap;
-use std::path::PathBuf;
 
 use chrono::{DateTime, Local};
 use ratatui::layout::Constraint;
@@ -22,7 +20,6 @@ use tuirealm::state::{State, StateValue};
 use crate::cache::GcRootWithSize;
 use crate::model::{GcRootModel, Node, format_size, is_direnv_path};
 use crate::msg::Msg;
-use crate::cache::PathInfo;
 
 #[derive(Clone, Copy, PartialEq)]
 pub enum PendingAction {

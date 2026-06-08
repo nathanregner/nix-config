@@ -1,7 +1,12 @@
+use std::os::unix::ffi::OsStrExt;
+
 use criterion::{Criterion, criterion_group, criterion_main};
 use heed::EnvOpenOptions;
 use heed::types::Bytes;
-use nix_gc_roots::{cache, nix};
+use nix_gc_roots::{
+    cache::{self, ArchivedPathInfoMap},
+    nix,
+};
 use stumpalo::Arena;
 use tempfile::TempDir;
 
@@ -12,16 +17,27 @@ fn fetch_firefox_derivation() -> anyhow::Result<cache::PathInfoMap> {
     Ok(paths)
 }
 
-fn setup_cache(arena: &Arena) -> (TempDir, String, &[u8]) {
+fn access(buf: &[u8]) -> Result<&ArchivedPathInfoMap, rkyv::rancor::Error> {
+    rkyv::access(buf)
+}
+
+fn setup_cache(arena: &Arena) -> (TempDir, Vec<u8>, &[u8]) {
     let paths = fetch_firefox_derivation().expect("Failed to fetch derivation");
 
     let tmpdir = TempDir::new().expect("Failed to create temp dir");
     let cache_path = tmpdir.path().to_path_buf();
 
     let serialized = cache::serialize(arena, &paths).expect("Failed to serialize");
-    eprintln!("rkyv size: {} bytes", serialized.len());
+    eprintln!("rkyv size: {} bytes", serialized.as_slice().len());
 
-    let store_path = paths.keys().next().unwrap().clone();
+    let store_path = paths
+        .keys()
+        .next()
+        .unwrap()
+        .0
+        .as_os_str()
+        .as_bytes()
+        .to_vec();
 
     {
         let env = unsafe {
@@ -35,7 +51,7 @@ fn setup_cache(arena: &Arena) -> (TempDir, String, &[u8]) {
         let db = env
             .create_database::<Bytes, Bytes>(&mut txn, None)
             .expect("Failed to create db");
-        db.put(&mut txn, store_path.as_bytes(), serialized.as_slice())
+        db.put(&mut txn, &store_path, serialized.as_slice())
             .expect("Failed to put");
         txn.commit().expect("Failed to commit");
     }
@@ -52,7 +68,7 @@ fn bench_cache(c: &mut Criterion) {
 
     group.bench_function("rkyv access (in-memory)", |b| {
         b.iter(|| {
-            let archived = cache::access(serialized).expect("Failed to access");
+            let archived = access(serialized).expect("Failed to access");
             std::hint::black_box(archived.len());
         });
     });
@@ -73,10 +89,10 @@ fn bench_cache(c: &mut Criterion) {
     group.bench_function("lmdb read + rkyv access", |b| {
         b.iter(|| {
             let data = db
-                .get(&txn, store_path.as_bytes())
+                .get(&txn, &store_path)
                 .expect("Failed to get")
                 .expect("No data");
-            let archived = cache::access(data).expect("Failed to access");
+            let archived = access(data).expect("Failed to access");
             std::hint::black_box(archived.len());
         });
     });

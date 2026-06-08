@@ -1,11 +1,10 @@
 mod app;
-mod arena_path;
 mod cache;
 mod components;
 mod model;
 mod msg;
 mod nix;
-mod radix_tree;
+mod types;
 
 use anyhow::Result;
 use app::Model;
@@ -13,7 +12,7 @@ use petgraph::graph::{DiGraph, NodeIndex};
 use std::{
     collections::HashMap,
     env,
-    path::{Path, PathBuf},
+    path::PathBuf,
     time::{Duration, Instant},
 };
 use stumpalo::Arena;
@@ -34,22 +33,24 @@ fn perf() -> Result<()> {
 
     eprintln!("[{:?}] Build graph...", start.elapsed());
     let mut graph = DiGraph::<(), ()>::new();
-    let mut nodes = HashMap::<String, NodeIndex>::new();
+    let mut nodes = HashMap::<PathBuf, NodeIndex>::new();
 
     macro_rules! node_id {
         ($path:expr) => {
-            *nodes.entry($path).or_insert_with(|| graph.add_node(()))
+            *nodes
+                .entry($path.to_owned())
+                .or_insert_with(|| graph.add_node(()))
         };
     }
 
     for root in &roots {
         // TODO: just store Path
-        let path_node = node_id!(root.symlink.to_string_lossy().into_owned());
-        let store_node = node_id!(root.store_path.to_string_lossy().into_owned());
+        let path_node = node_id!(root.symlink);
+        let store_node = node_id!(root.store_path);
         graph.add_edge(path_node, store_node, ());
 
         for (path, _path_info) in root.path_info.iter() {
-            let dep_node = node_id!(path.to_string());
+            let dep_node = node_id!(path.to_path_buf());
             graph.add_edge(store_node, dep_node, ());
         }
     }

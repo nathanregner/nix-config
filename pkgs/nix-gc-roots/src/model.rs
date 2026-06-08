@@ -6,7 +6,6 @@ use anyhow::{Context, Result};
 use tui_treelistview::TreeModel;
 
 use crate::cache::GcRootWithSize;
-use crate::cache::{PathInfo, PathInfoMap};
 
 #[derive(Clone)]
 pub struct GcRootEntry {
@@ -332,8 +331,6 @@ pub fn format_size(bytes: u64) -> String {
 mod tests {
     use radix_trees::ptree::PTreeMap;
     use radix_trie::{Trie, TrieCommon};
-
-    use super::*;
 
     #[test]
     fn trie_old() {

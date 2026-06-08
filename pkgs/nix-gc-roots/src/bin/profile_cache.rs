@@ -1,7 +1,14 @@
 use std::time::{Duration, Instant};
 
-use nix_gc_roots::{cache, nix};
+use nix_gc_roots::{
+    cache::{self, ArchivedPathInfoMap},
+    nix,
+};
 use stumpalo::Arena;
+
+fn access(buf: &[u8]) -> Result<&ArchivedPathInfoMap, rkyv::rancor::Error> {
+    rkyv::access(buf)
+}
 
 fn main() -> anyhow::Result<()> {
     let arena = Arena::new();
@@ -24,7 +31,7 @@ fn main() -> anyhow::Result<()> {
     let mut iterations = 0u64;
 
     while start.elapsed() < duration {
-        let archived = cache::access(slice.as_slice()).expect("Failed to access");
+        let archived = access(slice.as_slice()).expect("Failed to access");
         std::hint::black_box(archived.len());
         iterations += 1;
     }
