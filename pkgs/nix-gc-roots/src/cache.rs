@@ -11,7 +11,6 @@ use anyhow::{Context, Result};
 use heed::{WithTls, types};
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
 use rkyv::collections::swiss_table::ArchivedHashMap;
-use rkyv::util::AlignedVec;
 use rkyv::{Archive, Deserialize as RkyvDeserialize, Serialize as RkyvSerialize};
 use serde::{Deserialize, Serialize};
 
@@ -77,27 +76,18 @@ impl Cache {
         let uncached = to_compute
             .into_par_iter()
             .map_with(counter, |counter, store_path| {
-                let nix_path_info = path_info(false, [&store_path])
+                let path_info = path_info(false, [&store_path])
                     .with_context(|| format!("Failed to compute path-info for {store_path:?}"))?;
                 let progress = counter.fetch_add(1, atomic::Ordering::Relaxed) + 1;
                 eprintln!("path_info ({:?}) {}/{}", store_path, progress, total);
-                anyhow::Ok((store_path, nix_path_info))
+                Ok((
+                    store_path,
+                    ArchivedBytes::from_value(&path_info).expect("Serialization should not fail"),
+                ))
             })
             // TODO: batched
             .collect::<Result<HashMap<_, _>>>()?;
 
-        // TODO: move to previous mapping...
-        let uncached = uncached
-            .into_iter()
-            .map(|(store_path, paths)| {
-                (
-                    store_path,
-                    ArchivedBytes::from_value(&paths).expect("Serialization should not fail"),
-                )
-            })
-            .collect::<HashMap<_, _>>();
-
-        // eprintln!("Uncached {}", uncached.len());
         self.put_all(&uncached)?;
         let mut merged = HashMap::with_capacity(cached.len() + uncached.len());
         for (store_path, path_info) in uncached {
@@ -128,17 +118,13 @@ impl Cache {
             .iter()
             .filter_map(
                 |path| match self.db.get(&txn, path.as_os_str().as_encoded_bytes()) {
-                    Ok(Some(data)) => {
-                        let mut bytes = AlignedVec::<16>::with_capacity(data.len());
-                        bytes.extend_from_slice(data);
-                        match ArchivedBytes::from_bytes(bytes) {
-                            Ok(archived) => Some((path.clone(), archived)),
-                            Err(err) => {
-                                eprintln!("Failed to load cached path info {path:?}: {err}");
-                                None
-                            }
+                    Ok(Some(data)) => match ArchivedBytes::from_bytes(data) {
+                        Ok(archived) => Some((path.clone(), archived)),
+                        Err(err) => {
+                            eprintln!("Failed to load cached path info {path:?}: {err}");
+                            None
                         }
-                    }
+                    },
                     Ok(None) => None,
                     Err(err) => {
                         eprintln!("Failed to load cached path info {path:?}: {err}");

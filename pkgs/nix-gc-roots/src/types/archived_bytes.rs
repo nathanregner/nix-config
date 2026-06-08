@@ -27,12 +27,16 @@ impl<T: Archive> ArchivedBytes<T> {
         })
     }
 
-    pub fn from_bytes(bytes: AlignedVec) -> Result<Self, Error>
+    pub fn from_bytes(bytes: &[u8]) -> Result<Self, Error>
     where
         T::Archived: for<'a> CheckBytes<HighValidator<'a, Error>>,
     {
+        let mut aligned = AlignedVec::with_capacity(bytes.len());
+        aligned.extend_from_slice(bytes);
+        let bytes = aligned;
+
         // Safety: verify `bytes` is a valid representation of `T::Archived`
-        let _ = rkyv::access::<T::Archived, Error>(&bytes)?;
+        let _ = rkyv::access::<T::Archived, Error>(bytes.as_slice())?;
         Ok(Self {
             bytes,
             _ty: PhantomData,
