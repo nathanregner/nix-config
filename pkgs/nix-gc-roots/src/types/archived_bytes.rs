@@ -1,3 +1,6 @@
+use rkyv::Serialize;
+use rkyv::api::high::HighSerializer;
+use rkyv::ser::allocator::ArenaHandle;
 use rkyv::util::AlignedVec;
 use rkyv::{Portable, api::high::HighValidator, bytecheck::CheckBytes, rancor::Error};
 use std::marker::PhantomData;
@@ -7,12 +10,12 @@ use std::sync::Arc;
 /// Owned rkyv-serialized data with zero-copy access.
 ///
 /// Invariant: `bytes` always contains valid rkyv data for type `T`.
-pub struct OwnedArchive<T: Portable> {
+pub struct ArchivedBytes<T> {
     bytes: Arc<AlignedVec>,
     _marker: PhantomData<T>,
 }
 
-impl<T: Portable> Clone for OwnedArchive<T> {
+impl<T> Clone for ArchivedBytes<T> {
     fn clone(&self) -> Self {
         Self {
             bytes: Arc::clone(&self.bytes),
@@ -21,8 +24,18 @@ impl<T: Portable> Clone for OwnedArchive<T> {
     }
 }
 
-impl<T: Portable> OwnedArchive<T> {
-    /// Create from bytes, validating they contain valid `T`.
+impl<T: Portable> ArchivedBytes<T> {
+    pub fn from_value(value: &T) -> Result<Self, Error>
+    where
+        for<'t, 'a> &'t T: Serialize<HighSerializer<AlignedVec, ArenaHandle<'a>, Error>>,
+    {
+        let bytes = rkyv::to_bytes::<Error>(value)?;
+        Ok(Self {
+            bytes: Arc::new(bytes),
+            _marker: PhantomData,
+        })
+    }
+
     pub fn from_bytes(bytes: AlignedVec) -> Result<Self, Error>
     where
         T: for<'a> CheckBytes<HighValidator<'a, Error>>,
@@ -32,14 +45,6 @@ impl<T: Portable> OwnedArchive<T> {
             bytes: Arc::new(bytes),
             _marker: PhantomData,
         })
-    }
-
-    /// Create from bytes known to be valid (e.g. just serialized).
-    pub fn from_bytes_unchecked(bytes: AlignedVec) -> Self {
-        Self {
-            bytes: Arc::new(bytes),
-            _marker: PhantomData,
-        }
     }
 
     pub fn as_slice(&self) -> &[u8] {
@@ -52,7 +57,7 @@ impl<T: Portable> OwnedArchive<T> {
     }
 }
 
-impl<T: Portable> Deref for OwnedArchive<T> {
+impl<T: Portable> Deref for ArchivedBytes<T> {
     type Target = T;
 
     fn deref(&self) -> &Self::Target {

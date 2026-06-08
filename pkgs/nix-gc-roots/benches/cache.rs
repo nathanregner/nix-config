@@ -6,7 +6,6 @@ use heed::types::Bytes;
 use nix_gc_roots::{
     cache::{self, ArchivedPathInfoMap},
     nix,
-    types::OwnedArchive,
 };
 use tempfile::TempDir;
 
@@ -21,7 +20,7 @@ fn access(buf: &[u8]) -> Result<&ArchivedPathInfoMap, rkyv::rancor::Error> {
     rkyv::access(buf)
 }
 
-fn setup_cache() -> (TempDir, Vec<u8>, OwnedArchive<ArchivedPathInfoMap>) {
+fn setup_cache() -> (TempDir, Vec<u8>) {
     let paths = fetch_firefox_derivation().expect("Failed to fetch derivation");
 
     let tmpdir = TempDir::new().expect("Failed to create temp dir");
@@ -30,6 +29,7 @@ fn setup_cache() -> (TempDir, Vec<u8>, OwnedArchive<ArchivedPathInfoMap>) {
     let serialized = cache::serialize(&paths);
     eprintln!("rkyv size: {} bytes", serialized.as_slice().len());
 
+    // TODO: this is stupid...
     let store_path = paths
         .keys()
         .next()
@@ -56,11 +56,11 @@ fn setup_cache() -> (TempDir, Vec<u8>, OwnedArchive<ArchivedPathInfoMap>) {
         txn.commit().expect("Failed to commit");
     }
 
-    (tmpdir, store_path, serialized)
+    (tmpdir, store_path)
 }
 
 fn bench_cache(c: &mut Criterion) {
-    let (tmpdir, store_path, serialized) = setup_cache();
+    let (tmpdir, store_path) = setup_cache();
     let cache_path = tmpdir.path();
 
     let mut group = c.benchmark_group("cache");

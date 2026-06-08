@@ -1,5 +1,5 @@
-mod archived_slice;
+mod archived_bytes;
 mod store_path;
 
-pub use archived_slice::OwnedArchive;
+pub use archived_bytes::ArchivedBytes;
 pub use store_path::{ArchivedStorePath, StorePath};

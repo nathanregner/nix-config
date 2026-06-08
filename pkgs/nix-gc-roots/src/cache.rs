@@ -11,14 +11,12 @@ use anyhow::{Context, Result};
 use heed::{WithTls, types};
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
 use rkyv::collections::swiss_table::ArchivedHashMap;
-use rkyv::hash::FxHasher64;
-use rkyv::rancor::Error as RkyvError;
 use rkyv::util::AlignedVec;
 use rkyv::{Archive, Deserialize as RkyvDeserialize, Serialize as RkyvSerialize};
 use serde::{Deserialize, Serialize};
 
 use crate::nix::{GcRoot, path_info};
-use crate::types::{ArchivedStorePath, OwnedArchive, StorePath};
+use crate::types::{ArchivedBytes, ArchivedStorePath, StorePath};
 
 pub struct Cache {
     env: heed::Env<WithTls>,
@@ -35,7 +33,7 @@ pub struct GcRootWithSize {
 
 pub struct GcRootWithPaths {
     root: GcRoot,
-    pub path_info: OwnedArchive<ArchivedPathInfoMap>,
+    pub path_info: ArchivedBytes<ArchivedPathInfoMap>,
 }
 
 impl Deref for GcRootWithPaths {
@@ -88,9 +86,10 @@ impl Cache {
             // TODO: batched
             .collect::<Result<HashMap<_, _>>>()?;
 
+        // TODO: move to previous mapping...
         let uncached = uncached
             .into_iter()
-            .map(|(store_path, paths)| (store_path, serialize(&paths)))
+            .map(|(store_path, paths)| (store_path, ArchivedBytes::from_value(&paths)?))
             .collect::<HashMap<_, _>>();
 
         // eprintln!("Uncached {}", uncached.len());
@@ -118,7 +117,7 @@ impl Cache {
     fn get_all(
         &self,
         paths: &HashSet<PathBuf>,
-    ) -> Result<HashMap<PathBuf, OwnedArchive<ArchivedPathInfoMap>>> {
+    ) -> Result<HashMap<PathBuf, ArchivedBytes<ArchivedPathInfoMap>>> {
         let txn = self.env.read_txn().context("Failed to start read txn")?;
         let entries = paths
             .iter()
@@ -127,7 +126,7 @@ impl Cache {
                     Ok(Some(data)) => {
                         let mut bytes = AlignedVec::<16>::with_capacity(data.len());
                         bytes.extend_from_slice(data);
-                        match OwnedArchive::from_bytes(bytes) {
+                        match ArchivedBytes::from_bytes(bytes) {
                             Ok(archived) => Some((path.clone(), archived)),
                             Err(err) => {
                                 eprintln!("Failed to load cached path info {path:?}: {err}");
@@ -147,7 +146,7 @@ impl Cache {
         Ok(entries)
     }
 
-    fn put_all(&self, paths: &HashMap<PathBuf, OwnedArchive<ArchivedPathInfoMap>>) -> Result<()> {
+    fn put_all(&self, paths: &HashMap<PathBuf, ArchivedBytes<ArchivedPathInfoMap>>) -> Result<()> {
         if paths.is_empty() {
             return Ok(());
         }
@@ -175,9 +174,4 @@ pub struct PathInfo {
 
 pub type PathInfoMap = HashMap<StorePath, PathInfo>;
 
-pub type ArchivedPathInfoMap = ArchivedHashMap<ArchivedStorePath, ArchivedPathInfo, FxHasher64>;
-
-pub fn serialize(paths: &PathInfoMap) -> OwnedArchive<ArchivedPathInfoMap> {
-    let bytes = rkyv::to_bytes::<RkyvError>(paths).expect("serialization should not fail");
-    OwnedArchive::from_bytes_unchecked(bytes)
-}
+pub type ArchivedPathInfoMap = ArchivedHashMap<ArchivedStorePath, ArchivedPathInfo>;
