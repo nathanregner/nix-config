@@ -4,28 +4,21 @@ use std::ops::Deref;
 use std::path::Path;
 use std::path::PathBuf;
 use std::sync::Arc;
-use std::sync::atomic;
-use std::sync::atomic::AtomicU32;
+use std::sync::atomic::{self, AtomicU32};
 use std::time::SystemTime;
 
-use anyhow::Context;
-use anyhow::Result;
-use heed::WithTls;
-use heed::types;
-use rayon::iter::IntoParallelIterator;
-use rayon::iter::ParallelIterator;
+use anyhow::{Context, Result};
+use heed::{WithTls, types};
+use rayon::iter::{IntoParallelIterator, ParallelIterator};
 use rkyv::collections::swiss_table::ArchivedHashMap;
 use rkyv::hash::FxHasher64;
 use rkyv::rancor::Error as RkyvError;
+use rkyv::util::AlignedVec;
 use rkyv::{Archive, Deserialize as RkyvDeserialize, Serialize as RkyvSerialize};
 use serde::{Deserialize, Serialize};
-use stumpalo::Arena;
 
-use crate::nix::GcRoot;
-use crate::nix::path_info;
-use crate::types::ArchivedSlice;
-use crate::types::ArchivedStorePath;
-use crate::types::StorePath;
+use crate::nix::{GcRoot, path_info};
+use crate::types::{ArchivedStorePath, OwnedArchive, StorePath};
 
 pub struct Cache {
     env: heed::Env<WithTls>,
@@ -40,12 +33,12 @@ pub struct GcRootWithSize {
     pub nar_size: Option<u64>,
 }
 
-pub struct GcRootWithPaths<'a> {
+pub struct GcRootWithPaths {
     root: GcRoot,
-    pub path_info: ArchivedSlice<'a, ArchivedPathInfoMap>,
+    pub path_info: OwnedArchive<ArchivedPathInfoMap>,
 }
 
-impl Deref for GcRootWithPaths<'_> {
+impl Deref for GcRootWithPaths {
     type Target = GcRoot;
 
     fn deref(&self) -> &Self::Target {
@@ -67,16 +60,12 @@ impl Cache {
         Ok(Self { env, db })
     }
 
-    pub fn build_graph<'a>(
-        &self,
-        arena: &'a Arena,
-        roots: Vec<GcRoot>,
-    ) -> Result<Vec<GcRootWithPaths<'a>>> {
+    pub fn build_graph(&self, roots: Vec<GcRoot>) -> Result<Vec<GcRootWithPaths>> {
         let store_paths = roots
             .iter()
             .map(|root| root.store_path.clone())
             .collect::<HashSet<_>>();
-        let cached = self.get_all(arena, &store_paths)?;
+        let cached = self.get_all(&store_paths)?;
         eprintln!("Cached {}", cached.len());
 
         let to_compute = store_paths
@@ -101,8 +90,8 @@ impl Cache {
 
         let uncached = uncached
             .into_iter()
-            .map(|(store_path, paths)| Ok((store_path, serialize(arena, &paths)?)))
-            .collect::<Result<HashMap<_, _>>>()?;
+            .map(|(store_path, paths)| (store_path, serialize(&paths)))
+            .collect::<HashMap<_, _>>();
 
         // eprintln!("Uncached {}", uncached.len());
         self.put_all(&uncached)?;
@@ -117,7 +106,7 @@ impl Cache {
         let mut result = Vec::with_capacity(roots.len());
         for root in roots {
             let path_info = merged
-                .get(&*root.store_path)
+                .get(&root.store_path)
                 .ok_or_else(|| anyhow::anyhow!("Missing path_info for {:?}", root.store_path))?
                 .clone();
             result.push(GcRootWithPaths { root, path_info });
@@ -126,19 +115,19 @@ impl Cache {
         Ok(result)
     }
 
-    fn get_all<'a>(
+    fn get_all(
         &self,
-        arena: &'a Arena,
         paths: &HashSet<PathBuf>,
-    ) -> Result<HashMap<PathBuf, ArchivedSlice<'a, ArchivedPathInfoMap>>> {
+    ) -> Result<HashMap<PathBuf, OwnedArchive<ArchivedPathInfoMap>>> {
         let txn = self.env.read_txn().context("Failed to start read txn")?;
         let entries = paths
             .iter()
             .filter_map(
                 |path| match self.db.get(&txn, path.as_os_str().as_encoded_bytes()) {
                     Ok(Some(data)) => {
-                        let bytes = alloc_aligned_8(arena, data);
-                        match ArchivedSlice::new(bytes) {
+                        let mut bytes = AlignedVec::<16>::with_capacity(data.len());
+                        bytes.extend_from_slice(data);
+                        match OwnedArchive::from_bytes(bytes) {
                             Ok(archived) => Some((path.clone(), archived)),
                             Err(err) => {
                                 eprintln!("Failed to load cached path info {path:?}: {err}");
@@ -158,10 +147,7 @@ impl Cache {
         Ok(entries)
     }
 
-    fn put_all<'a>(
-        &self,
-        paths: &HashMap<PathBuf, ArchivedSlice<'a, ArchivedPathInfoMap>>,
-    ) -> Result<()> {
+    fn put_all(&self, paths: &HashMap<PathBuf, OwnedArchive<ArchivedPathInfoMap>>) -> Result<()> {
         if paths.is_empty() {
             return Ok(());
         }
@@ -191,27 +177,7 @@ pub type PathInfoMap = HashMap<StorePath, PathInfo>;
 
 pub type ArchivedPathInfoMap = ArchivedHashMap<ArchivedStorePath, ArchivedPathInfo, FxHasher64>;
 
-pub fn serialize<'a>(
-    arena: &'a Arena,
-    paths: &PathInfoMap,
-) -> Result<ArchivedSlice<'a, ArchivedPathInfoMap>> {
-    // FIXME: intermediate allocation, do we care?
-    let to_bytes = rkyv::to_bytes::<RkyvError>(paths)?;
-    let bytes = alloc_aligned_8(arena, &to_bytes);
-    Ok(ArchivedSlice::new(bytes)?)
-}
-
-// TODO: expose alloc_layout in stumpalo to avoid zero+copy
-fn alloc_aligned_8<'a>(arena: &'a Arena, src: &[u8]) -> &'a [u8] {
-    let u64_len = src.len().div_ceil(8);
-    let storage = arena.alloc_slice_fill_with(u64_len, |_| 0u64);
-    debug_assert_eq!(
-        storage.as_ptr() as usize % 8,
-        0,
-        "stumpalo didn't align u64 slice"
-    );
-    unsafe {
-        std::ptr::copy_nonoverlapping(src.as_ptr(), storage.as_mut_ptr().cast::<u8>(), src.len());
-        std::slice::from_raw_parts(storage.as_ptr().cast::<u8>(), src.len())
-    }
+pub fn serialize(paths: &PathInfoMap) -> OwnedArchive<ArchivedPathInfoMap> {
+    let bytes = rkyv::to_bytes::<RkyvError>(paths).expect("serialization should not fail");
+    OwnedArchive::from_bytes_unchecked(bytes)
 }

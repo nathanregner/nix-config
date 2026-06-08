@@ -4,14 +4,12 @@ use nix_gc_roots::{
     cache::{self, ArchivedPathInfoMap},
     nix,
 };
-use stumpalo::Arena;
 
 fn access(buf: &[u8]) -> Result<&ArchivedPathInfoMap, rkyv::rancor::Error> {
     rkyv::access(buf)
 }
 
 fn main() -> anyhow::Result<()> {
-    let arena = Arena::new();
     let duration_secs: u64 = std::env::args()
         .nth(1)
         .and_then(|s| s.parse().ok())
@@ -21,8 +19,8 @@ fn main() -> anyhow::Result<()> {
     let paths = nix::path_info(true, ["nixpkgs#firefox"])?;
     eprintln!("Got {} store paths", paths.len());
 
-    let slice = cache::serialize(&arena, &paths)?;
-    eprintln!("Serialized size: {} bytes", slice.as_slice().len());
+    let owned = cache::serialize(&paths);
+    eprintln!("Serialized size: {} bytes", owned.as_slice().len());
 
     let duration = Duration::from_secs(duration_secs);
     eprintln!("Running access for {duration_secs}s...");
@@ -31,7 +29,7 @@ fn main() -> anyhow::Result<()> {
     let mut iterations = 0u64;
 
     while start.elapsed() < duration {
-        let archived = access(slice.as_slice()).expect("Failed to access");
+        let archived = access(owned.as_slice()).expect("Failed to access");
         std::hint::black_box(archived.len());
         iterations += 1;
     }
