@@ -4,13 +4,13 @@ use criterion::{Criterion, criterion_group, criterion_main};
 use heed::EnvOpenOptions;
 use heed::types::Bytes;
 use nix_gc_roots::{
-    cache::{self, ArchivedPathInfoMap},
+    cache::{ArchivedPathInfoMap, PathInfoMap},
     nix,
-    types::OwnedArchive,
+    types::ArchivedBytes,
 };
 use tempfile::TempDir;
 
-fn fetch_firefox_derivation() -> anyhow::Result<cache::PathInfoMap> {
+fn fetch_firefox_derivation() -> anyhow::Result<PathInfoMap> {
     eprintln!("Fetching firefox path-info --derivation...");
     let paths = nix::path_info(true, ["nixpkgs#firefox"])?;
     eprintln!("Got {} store paths", paths.len());
@@ -21,15 +21,16 @@ fn access(buf: &[u8]) -> Result<&ArchivedPathInfoMap, rkyv::rancor::Error> {
     rkyv::access(buf)
 }
 
-fn setup_cache() -> (TempDir, Vec<u8>, OwnedArchive<ArchivedPathInfoMap>) {
+fn setup_cache() -> (TempDir, Vec<u8>) {
     let paths = fetch_firefox_derivation().expect("Failed to fetch derivation");
 
     let tmpdir = TempDir::new().expect("Failed to create temp dir");
     let cache_path = tmpdir.path().to_path_buf();
 
-    let serialized = cache::serialize(&paths);
+    let serialized = ArchivedBytes::<PathInfoMap>::from_value(&paths).expect("Failed to serialize");
     eprintln!("rkyv size: {} bytes", serialized.as_slice().len());
 
+    // TODO: this is stupid...
     let store_path = paths
         .keys()
         .next()
@@ -56,11 +57,11 @@ fn setup_cache() -> (TempDir, Vec<u8>, OwnedArchive<ArchivedPathInfoMap>) {
         txn.commit().expect("Failed to commit");
     }
 
-    (tmpdir, store_path, serialized)
+    (tmpdir, store_path)
 }
 
 fn bench_cache(c: &mut Criterion) {
-    let (tmpdir, store_path, serialized) = setup_cache();
+    let (tmpdir, store_path) = setup_cache();
     let cache_path = tmpdir.path();
 
     let mut group = c.benchmark_group("cache");

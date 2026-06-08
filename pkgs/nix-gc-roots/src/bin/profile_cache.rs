@@ -1,8 +1,9 @@
 use std::time::{Duration, Instant};
 
 use nix_gc_roots::{
-    cache::{self, ArchivedPathInfoMap},
+    cache::{ArchivedPathInfoMap, PathInfoMap},
     nix,
+    types::ArchivedBytes,
 };
 
 fn access(buf: &[u8]) -> Result<&ArchivedPathInfoMap, rkyv::rancor::Error> {
@@ -19,7 +20,7 @@ fn main() -> anyhow::Result<()> {
     let paths = nix::path_info(true, ["nixpkgs#firefox"])?;
     eprintln!("Got {} store paths", paths.len());
 
-    let owned = cache::serialize(&paths);
+    let owned = ArchivedBytes::<PathInfoMap>::from_value(&paths)?;
     eprintln!("Serialized size: {} bytes", owned.as_slice().len());
 
     let duration = Duration::from_secs(duration_secs);
