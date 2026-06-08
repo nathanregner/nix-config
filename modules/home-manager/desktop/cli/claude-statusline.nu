@@ -14,6 +14,9 @@ def main [] {
   # Model
   let model = $input | get -o model.display_name | model-name | default "unknown"
 
+  # Sandbox
+  let sandbox = if ($input | get -o sandbox | default false) { $"(ansi yellow_bold)[SANDBOX](ansi reset) " } else { "" }
+
   # Context
   let pct = $input | get -o context_window.used_percentage | default 0 | math round | into int
   let bar_color = if $pct >= 90 { (ansi red) } else if $pct >= 70 { (ansi yellow) } else { (ansi reset) }
@@ -34,5 +37,5 @@ def main [] {
   let mins = $duration_ms // 60000
   let secs = ($duration_ms mod 60000) // 1000
 
-  print -n $"[($model)]($branch) ($bar_color)($bar)(ansi reset) ($pct)% | ($cost_fmt) | ⏱️($mins)m ($secs)s"
+  print -n $"($sandbox)[($model)]($branch) ($bar_color)($bar)(ansi reset) ($pct)% | ($cost_fmt) | ⏱️($mins)m ($secs)s"
 }
