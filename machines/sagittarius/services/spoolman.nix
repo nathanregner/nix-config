@@ -1,4 +1,4 @@
-{ self, config, ... }:
+{ config, ... }:
 let
   dataDir = "/var/lib/spoolman";
 in
@@ -9,7 +9,6 @@ in
   services.spoolman = {
     enable = true;
     listen = "0.0.0.0";
-    inherit (self.globals.services.spoolman) port;
     # package = pkgs.unstable.spoolman;
     environment = {
       # SPOOLMAN_CORS_ORIGIN = "source1.domain.com:p1, source2.domain.com:p2";
@@ -32,11 +31,14 @@ in
     }
   ];
   nginx.subdomain.spoolman = {
-    locations = {
-      "/" = {
-        proxyPass = "http://127.0.0.1:${toString self.globals.services.spoolman.port}/";
-      };
+    locations."/" = {
+      proxyPass = "http://127.0.0.1:${toString config.services.spoolman.port}/";
+      proxyWebsockets = true;
     };
     oauth2-proxy = { };
+    trusted-ips = [
+      "100.0.0.0/8" # tailscale
+      "192.168.0.0/16" # local network
+    ];
   };
 }

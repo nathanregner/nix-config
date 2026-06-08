@@ -1,9 +1,4 @@
-{
-  self,
-  config,
-  pkgs,
-  ...
-}:
+{ config, pkgs, ... }:
 {
   services.moonraker = {
     enable = true;
@@ -28,7 +23,7 @@
       history = { };
       # https://moonraker.readthedocs.io/en/latest/configuration/#spoolman
       spoolman = {
-        server = "http://sagittarius:${toString self.globals.services.spoolman.port}";
+        server = "https://spoolman.nregner.net";
       };
     };
   };
@@ -39,6 +34,8 @@
 
   # required for allowSystemControl
   security.polkit.enable = true;
+
+  # systemd.services.moonraker.environment.MOONRAKER_VERBOSE_LOGGING = "y";
 
   virtualisation.vmVariant = {
     # Open the port inside the guest firewall

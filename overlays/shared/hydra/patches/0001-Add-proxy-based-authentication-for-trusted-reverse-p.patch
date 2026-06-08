@@ -1,4 +1,4 @@
-From f31b4d485bbd4191ea76862e3d8945c3798af2f5 Mon Sep 17 00:00:00 2001
+From 9d1410ce039cec30d05bbef66f84bbf7b2a194d6 Mon Sep 17 00:00:00 2001
 From: Nathan Regner <nathanregner@gmail.com>
 Date: Sat, 2 May 2026 11:00:43 -0600
 Subject: [PATCH] Add proxy-based authentication for trusted reverse proxy
@@ -17,24 +17,24 @@ Configuration via <proxy_auth> block in hydra.conf:
 
 Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>
 ---
- doc/manual/src/configuration.md               | 55 +++++++++++++++++
- src/lib/Hydra/Controller/Root.pm              | 11 ++++
- src/lib/Hydra/Controller/User.pm              | 48 +++++++++++++++
+ subprojects/hydra-manual/src/configuration.md | 55 +++++++++++++++++
  .../User/proxy-auth-disable-password.t        | 50 ++++++++++++++++
  .../Controller/User/proxy-auth-roles-header.t | 44 ++++++++++++++
- t/Hydra/Controller/User/proxy-auth.t          | 59 +++++++++++++++++++
+ .../Hydra/Controller/User/proxy-auth.t        | 59 +++++++++++++++++++
+ .../hydra/lib/Hydra/Controller/Root.pm        | 11 ++++
+ .../hydra/lib/Hydra/Controller/User.pm        | 48 +++++++++++++++
  6 files changed, 267 insertions(+)
- create mode 100644 t/Hydra/Controller/User/proxy-auth-disable-password.t
- create mode 100644 t/Hydra/Controller/User/proxy-auth-roles-header.t
- create mode 100644 t/Hydra/Controller/User/proxy-auth.t
+ create mode 100644 subprojects/hydra-tests/Hydra/Controller/User/proxy-auth-disable-password.t
+ create mode 100644 subprojects/hydra-tests/Hydra/Controller/User/proxy-auth-roles-header.t
+ create mode 100644 subprojects/hydra-tests/Hydra/Controller/User/proxy-auth.t
 
-diff --git a/doc/manual/src/configuration.md b/doc/manual/src/configuration.md
-index 491376b3..2d337fbe 100644
---- a/doc/manual/src/configuration.md
-+++ b/doc/manual/src/configuration.md
-@@ -266,6 +266,61 @@ default role mapping:
- Note that configuring both the LDAP parameters in the hydra.conf and via
- the environment variable is a fatal error.
+diff --git a/subprojects/hydra-manual/src/configuration.md b/subprojects/hydra-manual/src/configuration.md
+index fa2da07f..0f9da35f 100644
+--- a/subprojects/hydra-manual/src/configuration.md
++++ b/subprojects/hydra-manual/src/configuration.md
+@@ -241,6 +241,61 @@ When Hydra uses the deprecated YAML file, Hydra applies the following default ro
+ 
+ Note that configuring both the LDAP parameters in the hydra.conf and via the environment variable is a fatal error.
  
 +Proxy-Based Authentication
 +--------------------------
@@ -94,10 +94,181 @@ index 491376b3..2d337fbe 100644
  Webhook Authentication
  ---------------------
  
-diff --git a/src/lib/Hydra/Controller/Root.pm b/src/lib/Hydra/Controller/Root.pm
-index 264b4bbb..87f0ead3 100644
---- a/src/lib/Hydra/Controller/Root.pm
-+++ b/src/lib/Hydra/Controller/Root.pm
+diff --git a/subprojects/hydra-tests/Hydra/Controller/User/proxy-auth-disable-password.t b/subprojects/hydra-tests/Hydra/Controller/User/proxy-auth-disable-password.t
+new file mode 100644
+index 00000000..67a22e75
+--- /dev/null
++++ b/subprojects/hydra-tests/Hydra/Controller/User/proxy-auth-disable-password.t
+@@ -0,0 +1,50 @@
++use strict;
++use warnings;
++use Setup;
++use Test2::V0;
++use HTTP::Request::Common;
++
++my $ctx = test_context(
++    hydra_config => q|
++using_frontend_proxy = 1
++<proxy_auth>
++  user_header = X-Remote-User
++  disable_password_login = 1
++</proxy_auth>
++|
++);
++
++setup_catalyst_test($ctx);
++my $db = $ctx->db();
++
++my $user = $db->resultset('Users')->create({
++    username => 'localuser',
++    emailaddress => 'local@test.org',
++    password => '!',
++    type => 'hydra'
++});
++$user->setPassword('testpass');
++
++subtest "Password login is blocked when disabled" => sub {
++    my $req = request(POST '/login',
++        Referer => 'http://localhost/',
++        Content => {
++            username => 'localuser',
++            password => 'testpass'
++        }
++    );
++
++    is($req->code, 403, "Password login returns 403");
++};
++
++subtest "Proxy auth still works" => sub {
++    my $req = request(GET '/current-user',
++        Accept => 'application/json',
++        'X-Remote-User' => 'proxyadmin',
++        'X-Remote-Roles' => 'admin'
++    );
++
++    is($req->code, 200, "Proxy auth succeeds");
++};
++
++done_testing;
+diff --git a/subprojects/hydra-tests/Hydra/Controller/User/proxy-auth-roles-header.t b/subprojects/hydra-tests/Hydra/Controller/User/proxy-auth-roles-header.t
+new file mode 100644
+index 00000000..5dec79d1
+--- /dev/null
++++ b/subprojects/hydra-tests/Hydra/Controller/User/proxy-auth-roles-header.t
+@@ -0,0 +1,44 @@
++use strict;
++use warnings;
++use Setup;
++use Test2::V0;
++use HTTP::Request::Common;
++use JSON::MaybeXS;
++
++my $ctx = test_context(
++    hydra_config => q|
++using_frontend_proxy = 1
++<proxy_auth>
++  user_header = X-Remote-User
++  roles_header = X-Custom-Roles
++  auto_create_user = 1
++</proxy_auth>
++|
++);
++
++setup_catalyst_test($ctx);
++
++subtest "Roles from custom header" => sub {
++    my $req = request(GET '/current-user',
++        Accept => 'application/json',
++        'X-Remote-User' => 'customroles',
++        'X-Custom-Roles' => 'eval-jobset,restart-jobs'
++    );
++
++    is($req->code, 200, "Request succeeds");
++    my $data = decode_json($req->content());
++    is([sort @{$data->{"userroles"}}], [sort qw(eval-jobset restart-jobs)], "Roles from custom header");
++};
++
++subtest "No roles when header absent" => sub {
++    my $req = request(GET '/current-user',
++        Accept => 'application/json',
++        'X-Remote-User' => 'noroles'
++    );
++
++    is($req->code, 200, "Request succeeds");
++    my $data = decode_json($req->content());
++    is($data->{"userroles"}, [], "No roles assigned");
++};
++
++done_testing;
+diff --git a/subprojects/hydra-tests/Hydra/Controller/User/proxy-auth.t b/subprojects/hydra-tests/Hydra/Controller/User/proxy-auth.t
+new file mode 100644
+index 00000000..20f30334
+--- /dev/null
++++ b/subprojects/hydra-tests/Hydra/Controller/User/proxy-auth.t
+@@ -0,0 +1,59 @@
++use strict;
++use warnings;
++use Setup;
++use Test2::V0;
++use HTTP::Request::Common;
++use JSON::MaybeXS;
++
++my $ctx = test_context(
++    hydra_config => q|
++using_frontend_proxy = 1
++<proxy_auth>
++  user_header = X-Remote-User
++  auto_create_user = 1
++</proxy_auth>
++|
++);
++
++setup_catalyst_test($ctx);
++my $db = $ctx->db();
++
++subtest "Proxy authentication creates user with roles from header" => sub {
++    my $req = request(GET '/current-user',
++        Accept => 'application/json',
++        'X-Remote-User' => 'proxyuser',
++        'X-Remote-Roles' => 'admin,create-projects'
++    );
++
++    is($req->code, 200, "Request succeeds");
++
++    my $data = decode_json($req->content());
++    is($data->{"username"}, "proxyuser", "Username matches header");
++    is([sort @{$data->{"userroles"}}], [sort qw(admin create-projects)], "Roles match header");
++
++    my $user = $db->resultset('Users')->find({ username => 'proxyuser' });
++    ok(defined $user, "User was created in database");
++    is($user->type, "proxy", "User type is 'proxy'");
++};
++
++subtest "Proxy auth normalizes username to lowercase" => sub {
++    my $req = request(GET '/current-user',
++        Accept => 'application/json',
++        'X-Remote-User' => 'MixedCaseUser',
++        'X-Remote-Roles' => 'admin'
++    );
++
++    is($req->code, 200, "Request succeeds");
++    my $data = decode_json($req->content());
++    is($data->{"username"}, "mixedcaseuser", "Username is lowercased");
++};
++
++subtest "Request without header requires login" => sub {
++    my $req = request(GET '/current-user',
++        Accept => 'application/json'
++    );
++
++    is($req->code, 403, "Request without proxy header is denied");
++};
++
++done_testing;
+diff --git a/subprojects/hydra/lib/Hydra/Controller/Root.pm b/subprojects/hydra/lib/Hydra/Controller/Root.pm
+index 4c73b270..73561a63 100644
+--- a/subprojects/hydra/lib/Hydra/Controller/Root.pm
++++ b/subprojects/hydra/lib/Hydra/Controller/Root.pm
 @@ -62,6 +62,17 @@ sub begin :Private {
      $c->stash->{successMsg} = $c->flash->{successMsg};
      $c->stash->{localStore} = isLocalStore;
@@ -116,10 +287,10 @@ index 264b4bbb..87f0ead3 100644
      $c->stash->{isPrivateHydra} = $c->config->{private} // "0" ne "0";
  
      if ($c->stash->{isPrivateHydra} && ! noLoginNeeded($c)) {
-diff --git a/src/lib/Hydra/Controller/User.pm b/src/lib/Hydra/Controller/User.pm
-index 8d9b3f78..02c31199 100644
---- a/src/lib/Hydra/Controller/User.pm
-+++ b/src/lib/Hydra/Controller/User.pm
+diff --git a/subprojects/hydra/lib/Hydra/Controller/User.pm b/subprojects/hydra/lib/Hydra/Controller/User.pm
+index 2a38c411..7775c08e 100644
+--- a/subprojects/hydra/lib/Hydra/Controller/User.pm
++++ b/subprojects/hydra/lib/Hydra/Controller/User.pm
 @@ -25,6 +25,11 @@ sub login :Local :Args(0) :ActionClass('REST') { }
  sub login_POST {
      my ($self, $c) = @_;
@@ -182,177 +353,6 @@ index 8d9b3f78..02c31199 100644
  sub doEmailLogin {
      my ($self, $c, $type, $email, $fullName) = @_;
  
-diff --git a/t/Hydra/Controller/User/proxy-auth-disable-password.t b/t/Hydra/Controller/User/proxy-auth-disable-password.t
-new file mode 100644
-index 00000000..67a22e75
---- /dev/null
-+++ b/t/Hydra/Controller/User/proxy-auth-disable-password.t
-@@ -0,0 +1,50 @@
-+use strict;
-+use warnings;
-+use Setup;
-+use Test2::V0;
-+use HTTP::Request::Common;
-+
-+my $ctx = test_context(
-+    hydra_config => q|
-+using_frontend_proxy = 1
-+<proxy_auth>
-+  user_header = X-Remote-User
-+  disable_password_login = 1
-+</proxy_auth>
-+|
-+);
-+
-+setup_catalyst_test($ctx);
-+my $db = $ctx->db();
-+
-+my $user = $db->resultset('Users')->create({
-+    username => 'localuser',
-+    emailaddress => 'local@test.org',
-+    password => '!',
-+    type => 'hydra'
-+});
-+$user->setPassword('testpass');
-+
-+subtest "Password login is blocked when disabled" => sub {
-+    my $req = request(POST '/login',
-+        Referer => 'http://localhost/',
-+        Content => {
-+            username => 'localuser',
-+            password => 'testpass'
-+        }
-+    );
-+
-+    is($req->code, 403, "Password login returns 403");
-+};
-+
-+subtest "Proxy auth still works" => sub {
-+    my $req = request(GET '/current-user',
-+        Accept => 'application/json',
-+        'X-Remote-User' => 'proxyadmin',
-+        'X-Remote-Roles' => 'admin'
-+    );
-+
-+    is($req->code, 200, "Proxy auth succeeds");
-+};
-+
-+done_testing;
-diff --git a/t/Hydra/Controller/User/proxy-auth-roles-header.t b/t/Hydra/Controller/User/proxy-auth-roles-header.t
-new file mode 100644
-index 00000000..5dec79d1
---- /dev/null
-+++ b/t/Hydra/Controller/User/proxy-auth-roles-header.t
-@@ -0,0 +1,44 @@
-+use strict;
-+use warnings;
-+use Setup;
-+use Test2::V0;
-+use HTTP::Request::Common;
-+use JSON::MaybeXS;
-+
-+my $ctx = test_context(
-+    hydra_config => q|
-+using_frontend_proxy = 1
-+<proxy_auth>
-+  user_header = X-Remote-User
-+  roles_header = X-Custom-Roles
-+  auto_create_user = 1
-+</proxy_auth>
-+|
-+);
-+
-+setup_catalyst_test($ctx);
-+
-+subtest "Roles from custom header" => sub {
-+    my $req = request(GET '/current-user',
-+        Accept => 'application/json',
-+        'X-Remote-User' => 'customroles',
-+        'X-Custom-Roles' => 'eval-jobset,restart-jobs'
-+    );
-+
-+    is($req->code, 200, "Request succeeds");
-+    my $data = decode_json($req->content());
-+    is([sort @{$data->{"userroles"}}], [sort qw(eval-jobset restart-jobs)], "Roles from custom header");
-+};
-+
-+subtest "No roles when header absent" => sub {
-+    my $req = request(GET '/current-user',
-+        Accept => 'application/json',
-+        'X-Remote-User' => 'noroles'
-+    );
-+
-+    is($req->code, 200, "Request succeeds");
-+    my $data = decode_json($req->content());
-+    is($data->{"userroles"}, [], "No roles assigned");
-+};
-+
-+done_testing;
-diff --git a/t/Hydra/Controller/User/proxy-auth.t b/t/Hydra/Controller/User/proxy-auth.t
-new file mode 100644
-index 00000000..20f30334
---- /dev/null
-+++ b/t/Hydra/Controller/User/proxy-auth.t
-@@ -0,0 +1,59 @@
-+use strict;
-+use warnings;
-+use Setup;
-+use Test2::V0;
-+use HTTP::Request::Common;
-+use JSON::MaybeXS;
-+
-+my $ctx = test_context(
-+    hydra_config => q|
-+using_frontend_proxy = 1
-+<proxy_auth>
-+  user_header = X-Remote-User
-+  auto_create_user = 1
-+</proxy_auth>
-+|
-+);
-+
-+setup_catalyst_test($ctx);
-+my $db = $ctx->db();
-+
-+subtest "Proxy authentication creates user with roles from header" => sub {
-+    my $req = request(GET '/current-user',
-+        Accept => 'application/json',
-+        'X-Remote-User' => 'proxyuser',
-+        'X-Remote-Roles' => 'admin,create-projects'
-+    );
-+
-+    is($req->code, 200, "Request succeeds");
-+
-+    my $data = decode_json($req->content());
-+    is($data->{"username"}, "proxyuser", "Username matches header");
-+    is([sort @{$data->{"userroles"}}], [sort qw(admin create-projects)], "Roles match header");
-+
-+    my $user = $db->resultset('Users')->find({ username => 'proxyuser' });
-+    ok(defined $user, "User was created in database");
-+    is($user->type, "proxy", "User type is 'proxy'");
-+};
-+
-+subtest "Proxy auth normalizes username to lowercase" => sub {
-+    my $req = request(GET '/current-user',
-+        Accept => 'application/json',
-+        'X-Remote-User' => 'MixedCaseUser',
-+        'X-Remote-Roles' => 'admin'
-+    );
-+
-+    is($req->code, 200, "Request succeeds");
-+    my $data = decode_json($req->content());
-+    is($data->{"username"}, "mixedcaseuser", "Username is lowercased");
-+};
-+
-+subtest "Request without header requires login" => sub {
-+    my $req = request(GET '/current-user',
-+        Accept => 'application/json'
-+    );
-+
-+    is($req->code, 403, "Request without proxy header is denied");
-+};
-+
-+done_testing;
 -- 
-2.53.0
+2.51.2
 

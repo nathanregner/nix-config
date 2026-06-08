@@ -60,7 +60,6 @@
     StandardErrorPath = "/var/log/linux-builder.log";
   };
 
-  # Sync linux-builder VM time on wake from sleep
   launchd.daemons.linux-builder-time-sync =
     let
       wakeScript = pkgs.writeShellScript "linux-builder-wake" ''
