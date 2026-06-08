@@ -1,3 +1,4 @@
+use std::borrow::Borrow;
 use std::ffi::OsStr;
 use std::ops::Deref;
 use std::os::unix::ffi::OsStrExt;
@@ -26,9 +27,15 @@ impl<T: Into<PathBuf>> From<T> for StorePath {
 }
 
 impl Deref for StorePath {
-    type Target = Path;
+    type Target = PathBuf;
 
     fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
+impl Borrow<PathBuf> for StorePath {
+    fn borrow(&self) -> &PathBuf {
         &self.0
     }
 }

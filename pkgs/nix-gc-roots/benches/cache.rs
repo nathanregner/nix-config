@@ -3,11 +3,8 @@ use std::os::unix::ffi::OsStrExt;
 use criterion::{Criterion, criterion_group, criterion_main};
 use heed::EnvOpenOptions;
 use heed::types::Bytes;
-use nix_gc_roots::{
-    cache::{ArchivedPathInfoMap, PathInfoMap},
-    nix,
-    types::ArchivedBytes,
-};
+use nix_gc_roots::{cache::PathInfoMap, nix, types::ArchivedBytes};
+use rkyv::Archived;
 use tempfile::TempDir;
 
 fn fetch_firefox_derivation() -> anyhow::Result<PathInfoMap> {
@@ -17,7 +14,7 @@ fn fetch_firefox_derivation() -> anyhow::Result<PathInfoMap> {
     Ok(paths)
 }
 
-fn access(buf: &[u8]) -> Result<&ArchivedPathInfoMap, rkyv::rancor::Error> {
+fn access(buf: &[u8]) -> Result<&Archived<PathInfoMap>, rkyv::rancor::Error> {
     rkyv::access(buf)
 }
 

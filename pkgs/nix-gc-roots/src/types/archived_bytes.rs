@@ -46,11 +46,6 @@ impl<T: Archive> ArchivedBytes<T> {
     pub fn as_slice(&self) -> &[u8] {
         &self.bytes
     }
-
-    pub fn get(&self) -> &T::Archived {
-        // Safety: struct invariant guarantees `bytes` are valid for `T::Archived`
-        unsafe { rkyv::access_unchecked::<T::Archived>(&self.bytes) }
-    }
 }
 
 impl<T: Archive> Deref for ArchivedBytes<T>
@@ -60,6 +55,7 @@ where
     type Target = T::Archived;
 
     fn deref(&self) -> &Self::Target {
-        self.get()
+        // Safety: struct invariant guarantees `bytes` are valid for `T::Archived`
+        unsafe { rkyv::access_unchecked::<T::Archived>(&self.bytes) }
     }
 }
