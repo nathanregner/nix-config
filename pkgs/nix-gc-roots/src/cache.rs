@@ -1,8 +1,5 @@
-use std::borrow::Borrow;
-use std::borrow::Cow;
 use std::collections::HashMap;
 use std::collections::HashSet;
-use std::marker::PhantomData;
 use std::ops::Deref;
 use std::path::Path;
 use std::path::PathBuf;
@@ -26,49 +23,9 @@ use stumpalo::Arena;
 
 use crate::nix::GcRoot;
 use crate::nix::path_info;
-
-#[derive(Clone)]
-pub struct ArchivedSlice<'a> {
-    bytes: &'a [u8],
-    pub archived: &'a ArchivedPathInfoMap,
-}
-
-impl<'a> ArchivedSlice<'a> {
-    pub fn as_slice(&self) -> &'a [u8] {
-        self.bytes
-    }
-}
-
-impl Deref for ArchivedSlice<'_> {
-    type Target = ArchivedPathInfoMap;
-
-    fn deref(&self) -> &Self::Target {
-        self.archived
-    }
-}
-
-pub struct OwnedSlice(PathInfoMap);
-
-// impl ToOwned for ArchivedSlice<'_> {
-//     type Owned = OwnedSlice;
-//
-//     fn to_owned(&self) -> Self::Owned {
-//         todo!()
-//     }
-// }
-
-// impl<'a> Borrow<ArchivedSlice<'a>> for OwnedSlice {
-//     fn borrow(&self) -> &ArchivedSlice<'a> {
-//         todo!()
-//     }
-// }
-
-// impl OwnedSlice {
-//     pub fn new(value: &PathInfoMap) -> Result<Self> {
-//         let bytes = rkyv::to_bytes::<RkyvError>(value)?;
-//         Ok(Self { bytes })
-//     }
-// }
+use crate::types::ArchivedSlice;
+use crate::types::ArchivedStorePath;
+use crate::types::StorePath;
 
 pub struct Cache {
     env: heed::Env<WithTls>,
@@ -85,19 +42,8 @@ pub struct GcRootWithSize {
 
 pub struct GcRootWithPaths<'a> {
     root: GcRoot,
-    pub path_info: ArchivedSlice<'a>,
+    pub path_info: ArchivedSlice<'a, ArchivedPathInfoMap>,
 }
-
-// impl<'a> Deref for Paths<'a> {
-//     type Target = PathInfoMap
-//
-//     fn deref(&self) -> &Self::Target {
-//         match self {
-//             Paths::Owned(owned_slice) => owned_slice.as_ref(),
-//             Paths::Borrowed(archived_slice) => archived_slice,
-//         }
-//     }
-// }
 
 impl Deref for GcRootWithPaths<'_> {
     type Target = GcRoot;
@@ -159,7 +105,7 @@ impl Cache {
             .collect::<Result<HashMap<_, _>>>()?;
 
         // eprintln!("Uncached {}", uncached.len());
-        // self.put_all(&uncached)?;
+        self.put_all(&uncached)?;
         let mut merged = HashMap::with_capacity(cached.len() + uncached.len());
         for (store_path, path_info) in uncached {
             merged.insert(store_path, path_info);
@@ -180,11 +126,11 @@ impl Cache {
         Ok(result)
     }
 
-    fn get_all<'a, 'p>(
+    fn get_all<'a>(
         &self,
         arena: &'a Arena,
         paths: &HashSet<PathBuf>,
-    ) -> Result<HashMap<PathBuf, ArchivedSlice<'a>>> {
+    ) -> Result<HashMap<PathBuf, ArchivedSlice<'a, ArchivedPathInfoMap>>> {
         let txn = self.env.read_txn().context("Failed to start read txn")?;
         let entries = paths
             .iter()
@@ -192,8 +138,8 @@ impl Cache {
                 |path| match self.db.get(&txn, path.as_os_str().as_encoded_bytes()) {
                     Ok(Some(data)) => {
                         let bytes = alloc_aligned_8(arena, data);
-                        match access(bytes) {
-                            Ok(archived) => Some((path.clone(), ArchivedSlice { bytes, archived })),
+                        match ArchivedSlice::new(bytes) {
+                            Ok(archived) => Some((path.clone(), archived)),
                             Err(err) => {
                                 eprintln!("Failed to load cached path info {path:?}: {err}");
                                 None
@@ -212,7 +158,10 @@ impl Cache {
         Ok(entries)
     }
 
-    fn put_all<'a>(&self, paths: &HashMap<PathBuf, Cow<'a, ArchivedSlice>>) -> Result<()> {
+    fn put_all<'a>(
+        &self,
+        paths: &HashMap<PathBuf, ArchivedSlice<'a, ArchivedPathInfoMap>>,
+    ) -> Result<()> {
         if paths.is_empty() {
             return Ok(());
         }
@@ -235,25 +184,26 @@ impl Cache {
 #[serde(rename_all = "camelCase")]
 pub struct PathInfo {
     pub nar_size: u64,
-    pub references: Vec<String>,
+    pub references: Vec<StorePath>,
 }
 
-pub type PathInfoMap = HashMap<String, PathInfo /* , FxHasher64 */>;
+pub type PathInfoMap = HashMap<StorePath, PathInfo>;
 
-pub type ArchivedPathInfoMap =
-    ArchivedHashMap<rkyv::string::ArchivedString, ArchivedPathInfo, FxHasher64>;
+pub type ArchivedPathInfoMap = ArchivedHashMap<ArchivedStorePath, ArchivedPathInfo, FxHasher64>;
 
-pub fn serialize<'a>(arena: &'a Arena, paths: &PathInfoMap) -> Result<ArchivedSlice<'a>> {
+pub fn serialize<'a>(
+    arena: &'a Arena,
+    paths: &PathInfoMap,
+) -> Result<ArchivedSlice<'a, ArchivedPathInfoMap>> {
     // FIXME: intermediate allocation, do we care?
     let to_bytes = rkyv::to_bytes::<RkyvError>(paths)?;
     let bytes = alloc_aligned_8(arena, &to_bytes);
-    let archived = access(bytes)?;
-    Ok(ArchivedSlice { bytes, archived })
+    Ok(ArchivedSlice::new(bytes)?)
 }
 
 // TODO: expose alloc_layout in stumpalo to avoid zero+copy
 fn alloc_aligned_8<'a>(arena: &'a Arena, src: &[u8]) -> &'a [u8] {
-    let u64_len = (src.len() + 7) / 8;
+    let u64_len = src.len().div_ceil(8);
     let storage = arena.alloc_slice_fill_with(u64_len, |_| 0u64);
     debug_assert_eq!(
         storage.as_ptr() as usize % 8,
@@ -264,8 +214,4 @@ fn alloc_aligned_8<'a>(arena: &'a Arena, src: &[u8]) -> &'a [u8] {
         std::ptr::copy_nonoverlapping(src.as_ptr(), storage.as_mut_ptr().cast::<u8>(), src.len());
         std::slice::from_raw_parts(storage.as_ptr().cast::<u8>(), src.len())
     }
-}
-
-pub fn access(buf: &[u8]) -> Result<&ArchivedPathInfoMap> {
-    Ok(rkyv::access::<ArchivedPathInfoMap, RkyvError>(buf)?)
 }

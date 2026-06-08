@@ -1,10 +1,5 @@
 use anyhow::Result;
-use std::{
-    ffi::OsStr,
-    path::PathBuf,
-    process::Command,
-    time::SystemTime,
-};
+use std::{ffi::OsStr, path::PathBuf, process::Command, time::SystemTime};
 
 use crate::cache::PathInfoMap;
 
