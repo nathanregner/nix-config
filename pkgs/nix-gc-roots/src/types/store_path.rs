@@ -1,3 +1,4 @@
+use std::borrow::Borrow;
 use std::ffi::OsStr;
 use std::ops::Deref;
 use std::os::unix::ffi::OsStrExt;
@@ -19,16 +20,25 @@ use rkyv::with::{ArchiveWith, DeserializeWith, SerializeWith};
 #[serde(transparent)]
 pub struct StorePath(#[rkyv(with = PathBufAsBytes)] pub PathBuf);
 
-impl<T: Into<PathBuf>> From<T> for StorePath {
+impl<T> From<T> for StorePath
+where
+    PathBuf: From<T>,
+{
     fn from(path: T) -> Self {
         Self(path.into())
     }
 }
 
 impl Deref for StorePath {
-    type Target = Path;
+    type Target = PathBuf;
 
     fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
+impl Borrow<PathBuf> for StorePath {
+    fn borrow(&self) -> &PathBuf {
         &self.0
     }
 }

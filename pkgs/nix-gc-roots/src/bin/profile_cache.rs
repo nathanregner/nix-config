@@ -1,12 +1,9 @@
 use std::time::{Duration, Instant};
 
-use nix_gc_roots::{
-    cache::{ArchivedPathInfoMap, PathInfoMap},
-    nix,
-    types::ArchivedBytes,
-};
+use nix_gc_roots::{cache::PathInfoMap, nix, types::ArchivedBytes};
+use rkyv::Archived;
 
-fn access(buf: &[u8]) -> Result<&ArchivedPathInfoMap, rkyv::rancor::Error> {
+fn access(buf: &[u8]) -> Result<&Archived<PathInfoMap>, rkyv::rancor::Error> {
     rkyv::access(buf)
 }
 

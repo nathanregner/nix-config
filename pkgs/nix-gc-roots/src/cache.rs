@@ -10,12 +10,12 @@ use std::time::SystemTime;
 use anyhow::{Context, Result};
 use heed::{WithTls, types};
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
-use rkyv::collections::swiss_table::ArchivedHashMap;
+use rkyv::rancor::Error;
 use rkyv::{Archive, Deserialize as RkyvDeserialize, Serialize as RkyvSerialize};
 use serde::{Deserialize, Serialize};
 
 use crate::nix::{GcRoot, path_info};
-use crate::types::{ArchivedBytes, ArchivedStorePath, StorePath};
+use crate::types::{ArchivedBytes, StorePath};
 
 pub struct Cache {
     env: heed::Env<WithTls>,
@@ -30,12 +30,12 @@ pub struct GcRootWithSize {
     pub nar_size: Option<u64>,
 }
 
-pub struct GcRootWithPaths {
-    root: GcRoot,
-    pub path_info: Arc<ArchivedBytes<PathInfoMap>>,
+pub struct GcRootClosure {
+    pub root: GcRoot,
+    pub path_info: Arc<PathInfoMap>,
 }
 
-impl Deref for GcRootWithPaths {
+impl Deref for GcRootClosure {
     type Target = GcRoot;
 
     fn deref(&self) -> &Self::Target {
@@ -57,33 +57,32 @@ impl Cache {
         Ok(Self { env, db })
     }
 
-    pub fn build_graph(&self, roots: Vec<GcRoot>) -> Result<Vec<GcRootWithPaths>> {
+    // TODO: free-standing
+    pub fn get_path_info(&self, roots: Vec<GcRoot>) -> Result<Vec<GcRootClosure>> {
         let store_paths = roots
             .iter()
             .map(|root| root.store_path.clone())
             .collect::<HashSet<_>>();
+
         let cached = self.get_all(&store_paths)?;
         eprintln!("Cached {}", cached.len());
 
-        let to_compute = store_paths
+        let to_lookup = store_paths
             .into_iter()
             .filter(|store_path| !cached.contains_key(store_path.as_path()))
             .collect::<Vec<_>>();
 
-        let total = to_compute.len();
+        let total = to_lookup.len();
         let counter = Arc::new(AtomicU32::new(0));
 
-        let uncached = to_compute
+        let uncached = to_lookup
             .into_par_iter()
             .map_with(counter, |counter, store_path| {
                 let path_info = path_info(false, [&store_path])
                     .with_context(|| format!("Failed to compute path-info for {store_path:?}"))?;
                 let progress = counter.fetch_add(1, atomic::Ordering::Relaxed) + 1;
                 eprintln!("path_info ({:?}) {}/{}", store_path, progress, total);
-                Ok((
-                    store_path,
-                    ArchivedBytes::from_value(&path_info).expect("Serialization should not fail"),
-                ))
+                Ok((store_path, path_info))
             })
             // TODO: batched
             .collect::<Result<HashMap<_, _>>>()?;
@@ -103,51 +102,54 @@ impl Cache {
                 .get(&root.store_path)
                 .ok_or_else(|| anyhow::anyhow!("Missing path_info for {:?}", root.store_path))?
                 .clone();
-            result.push(GcRootWithPaths { root, path_info });
+            result.push(GcRootClosure { root, path_info });
         }
 
         Ok(result)
     }
 
-    fn get_all(
-        &self,
-        paths: &HashSet<PathBuf>,
-    ) -> Result<HashMap<PathBuf, ArchivedBytes<PathInfoMap>>> {
+    pub fn get_all(&self, paths: &HashSet<PathBuf>) -> Result<HashMap<PathBuf, PathInfoMap>> {
         let txn = self.env.read_txn().context("Failed to start read txn")?;
+
+        let get_one = |path: &Path| {
+            let Some(data) = self.db.get(&txn, path.as_os_str().as_encoded_bytes())? else {
+                return anyhow::Ok(None);
+            };
+            // TODO: don't copy if aligned
+            // TODO: reuse buffer
+            let archived = ArchivedBytes::<PathInfoMap>::from_bytes(data)?;
+            let path_info = rkyv::deserialize::<_, Error>(archived.deref())?;
+            Ok(Some(path_info))
+        };
+
         let entries = paths
             .iter()
-            .filter_map(
-                |path| match self.db.get(&txn, path.as_os_str().as_encoded_bytes()) {
-                    Ok(Some(data)) => match ArchivedBytes::from_bytes(data) {
-                        Ok(archived) => Some((path.clone(), archived)),
-                        Err(err) => {
-                            eprintln!("Failed to load cached path info {path:?}: {err}");
-                            None
-                        }
-                    },
-                    Ok(None) => None,
-                    Err(err) => {
-                        eprintln!("Failed to load cached path info {path:?}: {err}");
-                        None
-                    }
-                },
-            )
+            .filter_map(|path| match get_one(path) {
+                Ok(archived) => Some((path.clone(), archived?)),
+                Err(err) => {
+                    eprintln!("Failed to load cached path info {path:?}: {err}");
+                    None
+                }
+            })
             .collect::<HashMap<_, _>>();
         txn.commit().context("Failed to commit read txn")?;
         Ok(entries)
     }
 
-    fn put_all(&self, paths: &HashMap<PathBuf, ArchivedBytes<PathInfoMap>>) -> Result<()> {
+    pub fn put_all(&self, paths: &HashMap<PathBuf, PathInfoMap>) -> Result<()> {
         if paths.is_empty() {
             return Ok(());
         }
         let mut txn = self.env.write_txn().context("Failed to start write txn")?;
-        for (path, data) in paths {
+        for (path, path_info) in paths {
+            let path_info = ArchivedBytes::from_value(path_info)
+                .context("Failed to serialize path_info for {store_path:?}")?;
+
             self.db
                 .put(
                     &mut txn,
                     path.as_os_str().as_encoded_bytes(),
-                    data.as_slice(),
+                    path_info.as_slice(),
                 )
                 .with_context(|| format!("Failed to write {path:?} to cache"))?;
         }
@@ -164,5 +166,3 @@ pub struct PathInfo {
 }
 
 pub type PathInfoMap = HashMap<StorePath, PathInfo>;
-
-pub type ArchivedPathInfoMap = ArchivedHashMap<ArchivedStorePath, ArchivedPathInfo>;

@@ -1,6 +1,6 @@
 use std::cell::Cell as StdCell;
 
-use chrono::{DateTime, Local};
+use petgraph::graph::NodeIndex;
 use ratatui::layout::Constraint;
 use ratatui::style::{Color, Modifier, Style};
 use ratatui::text::{Line, Span};
@@ -17,9 +17,9 @@ use tuirealm::ratatui::Frame;
 use tuirealm::ratatui::layout::Rect;
 use tuirealm::state::{State, StateValue};
 
-use crate::cache::GcRootWithSize;
-use crate::model::{GcRootModel, Node, format_size, is_direnv_path};
+use crate::model::{GcRootModel, format_size, is_direnv_path};
 use crate::msg::Msg;
+use crate::store_graph::DominatorGraph;
 
 #[derive(Clone, Copy, PartialEq)]
 pub enum PendingAction {
@@ -30,7 +30,7 @@ pub enum PendingAction {
 
 struct Label {
     current_row: StdCell<usize>,
-    selected_id: StdCell<Option<usize>>,
+    selected_id: StdCell<Option<NodeIndex>>,
     selected_row: StdCell<Option<usize>>,
 }
 
@@ -43,7 +43,7 @@ impl Label {
         }
     }
 
-    fn reset(&self, selected_id: Option<usize>) {
+    fn reset(&self, selected_id: Option<NodeIndex>) {
         self.current_row.set(0);
         self.selected_id.set(selected_id);
         self.selected_row.set(None);
@@ -54,24 +54,12 @@ impl TreeLabelRenderer<GcRootModel> for Label {
     fn cell<'a>(
         &'a self,
         model: &'a GcRootModel,
-        id: usize,
+        id: NodeIndex,
         ctx: &TreeRowContext,
         glyphs: &TreeGlyphs<'a>,
     ) -> Cell<'a> {
-        let (name, is_marked) = match &model.nodes[id] {
-            Node::Directory { name, marked, .. } => (name.as_str(), *marked),
-            Node::Root { root, marked, .. } => {
-                let name = root
-                    .path
-                    .file_name()
-                    .map(|s| s.to_string_lossy())
-                    .unwrap_or_else(|| root.path.to_string_lossy());
-                (
-                    Box::leak(name.into_owned().into_boxed_str()) as &str,
-                    *marked,
-                )
-            }
-        };
+        let name = model.name(id).unwrap_or("");
+        let is_marked = model.is_marked(id);
 
         let mut spans: Vec<Span<'a>> = Vec::new();
 
@@ -135,80 +123,44 @@ impl TreeLabelRenderer<GcRootModel> for Label {
         } else {
             Style::default()
         };
-        spans.push(Span::styled(name, name_style));
+        spans.push(Span::styled(name.to_string(), name_style));
 
         Cell::from(Line::from(spans))
     }
 }
 
-fn marked_style(model: &GcRootModel, id: usize) -> Style {
-    let is_marked = match &model.nodes[id] {
-        Node::Directory { marked, .. } | Node::Root { marked, .. } => *marked,
-    };
-    if is_marked {
+fn marked_style(model: &GcRootModel, id: NodeIndex) -> Style {
+    if model.is_marked(id) {
         Style::default().add_modifier(Modifier::CROSSED_OUT | Modifier::DIM)
     } else {
         Style::default()
     }
 }
 
-fn modified_cell(model: &GcRootModel, id: usize) -> Cell<'_> {
-    match &model.nodes[id] {
-        Node::Directory { .. } => Cell::from(""),
-        Node::Root { root, .. } => {
-            let datetime: DateTime<Local> = DateTime::from(root.modified);
-            Cell::from(datetime.format("%Y-%m-%d %H:%M").to_string()).style(marked_style(model, id))
-        }
-    }
-}
-
-fn target_cell(model: &GcRootModel, id: usize) -> Cell<'_> {
-    match &model.nodes[id] {
-        Node::Directory { .. } => Cell::from(""),
-        Node::Root { root, .. } => {
-            let target = root.target.to_string_lossy();
-            let display = if target.len() > 50 {
-                format!("...{}", &target[target.len() - 47..])
-            } else {
-                target.to_string()
-            };
-            Cell::from(display).style(marked_style(model, id))
-        }
-    }
-}
-
-fn size_cell(model: &GcRootModel, id: usize) -> Cell<'_> {
-    match &model.nodes[id] {
-        Node::Directory { .. } => Cell::from(""),
-        Node::Root { root, .. } => {
-            let display = root
-                .closure_size
-                .map(format_size)
-                .unwrap_or_else(|| "?".to_string());
-            Cell::from(display).style(marked_style(model, id))
-        }
+fn size_cell(model: &GcRootModel, id: NodeIndex) -> Cell<'_> {
+    let size = model.closure_size(id);
+    if size == 0 {
+        Cell::from("")
+    } else {
+        Cell::from(format_size(size)).style(marked_style(model, id))
     }
 }
 
 pub struct TreeViewInner {
     props: Props,
     model: GcRootModel,
-    state: TreeListViewState<usize>,
+    state: TreeListViewState<NodeIndex>,
     label: Label,
-    columns: SimpleColumns<3, GcRootModel>,
+    columns: SimpleColumns<1, GcRootModel>,
     pending_action: PendingAction,
     pending_g: bool,
 }
 
-fn make_columns() -> SimpleColumns<3, GcRootModel> {
+fn make_columns() -> SimpleColumns<1, GcRootModel> {
     SimpleColumns::new(
         Constraint::Fill(1),
         "Name",
-        [
-            ColumnDef::new("Size", Constraint::Length(8), size_cell),
-            ColumnDef::new("Modified", Constraint::Length(16), modified_cell),
-            ColumnDef::new("Store Path", Constraint::Length(50), target_cell),
-        ],
+        [ColumnDef::new("Size", Constraint::Length(8), size_cell)],
     )
     .header_style(
         Style::default()
@@ -217,40 +169,21 @@ fn make_columns() -> SimpleColumns<3, GcRootModel> {
     )
 }
 
-impl Default for TreeViewInner {
-    fn default() -> Self {
-        Self {
-            props: Props::default(),
-            model: GcRootModel::new(),
-            state: TreeListViewState::new(),
-            label: Label::new(),
-            columns: make_columns(),
-            pending_action: PendingAction::None,
-            pending_g: false,
-        }
-    }
-}
-
 impl TreeViewInner {
-    pub fn with_roots(roots: Vec<GcRootWithSize>) -> Self {
-        let model = GcRootModel::build_from_roots(roots);
+    pub fn with_graph(graph: DominatorGraph) -> Self {
+        let model = GcRootModel::new(graph);
         let mut state = TreeListViewState::with_capacity(model.size_hint());
 
-        for (id, node) in model.nodes.iter().enumerate() {
-            if let Node::Directory {
-                parent,
-                visible_children,
-                path,
-                ..
-            } = node
-                && !visible_children.is_empty()
-                && !is_direnv_path(path)
-            {
-                state.set_expanded(id, *parent, true);
+        for ni in model.graph.node_indices() {
+            if let Some(path) = model.path(ni) {
+                let children = model.children(ni);
+                if !children.is_empty() && !is_direnv_path(path) {
+                    state.set_expanded(ni, model.root_id, true);
+                }
             }
         }
 
-        if let Some(root_id) = model.root() {
+        if let Some(root_id) = model.root_id {
             let children = model.children(root_id);
             if !children.is_empty() {
                 state.select_by_id(&model, children[0]);
@@ -328,9 +261,9 @@ pub struct TreeView {
 }
 
 impl TreeView {
-    pub fn new(roots: Vec<GcRootWithSize>) -> Self {
+    pub fn new(graph: DominatorGraph) -> Self {
         Self {
-            component: TreeViewInner::with_roots(roots),
+            component: TreeViewInner::with_graph(graph),
         }
     }
 }
@@ -409,10 +342,8 @@ impl AppComponent<Msg, NoUserEvent> for TreeView {
             | KeyEvent {
                 code: Key::Left, ..
             } => {
-                if let Some(id) = inner.state.selected_id()
-                    && let Node::Directory { parent, .. } = &inner.model.nodes[id]
-                {
-                    inner.state.set_expanded(id, *parent, false);
+                if let Some(id) = inner.state.selected_id() {
+                    inner.state.set_expanded(id, inner.model.root_id, false);
                 }
                 inner
                     .state
@@ -428,10 +359,8 @@ impl AppComponent<Msg, NoUserEvent> for TreeView {
             | KeyEvent {
                 code: Key::Right, ..
             } => {
-                if let Some(id) = inner.state.selected_id()
-                    && let Node::Directory { parent, .. } = &inner.model.nodes[id]
-                {
-                    inner.state.set_expanded(id, *parent, true);
+                if let Some(id) = inner.state.selected_id() {
+                    inner.state.set_expanded(id, inner.model.root_id, true);
                 }
                 inner
                     .state

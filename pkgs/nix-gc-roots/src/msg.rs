@@ -1,9 +1,20 @@
-use crate::cache::GcRootWithSize;
+use crate::store_graph::DominatorGraph;
+
+#[derive(Debug)]
+pub struct EqHack(pub DominatorGraph);
+
+impl PartialEq for EqHack {
+    fn eq(&self, _: &Self) -> bool {
+        false
+    }
+}
+
+impl Eq for EqHack {}
 
 #[derive(Debug, PartialEq)]
 pub enum Msg {
     AppClose,
-    LoadingComplete(Vec<GcRootWithSize>),
+    LoadingComplete(EqHack),
     LoadingProgress(usize, usize),
     ToggleMark,
     ToggleProfiles,

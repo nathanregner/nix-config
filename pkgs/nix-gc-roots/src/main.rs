@@ -4,20 +4,20 @@ mod components;
 mod model;
 mod msg;
 mod nix;
+mod store_graph;
 mod types;
 
 use anyhow::Result;
 use app::Model;
-use petgraph::graph::{DiGraph, NodeIndex};
+use petgraph::dot::Dot;
 use std::{
-    collections::HashMap,
     env,
     path::PathBuf,
     time::{Duration, Instant},
 };
 use tuirealm::application::PollStrategy;
 
-use crate::cache::Cache;
+use crate::{cache::Cache, store_graph::StoreGraph};
 
 fn perf() -> Result<()> {
     let start = Instant::now();
@@ -26,35 +26,16 @@ fn perf() -> Result<()> {
 
     eprintln!("[{:?}] Lookup PathInfo...", start.elapsed());
     let cache = Cache::new(&PathBuf::from("/home/nregner/.cache/nix-gc-roots"))?;
-    let roots = cache.build_graph(roots)?;
+    let roots = cache.get_path_info(roots)?;
+    eprintln!(
+        "{:#?}",
+        roots.iter().map(|r| &r.store_path).collect::<Vec<_>>()
+    );
 
     eprintln!("[{:?}] Build graph...", start.elapsed());
-    let mut graph = DiGraph::<(), ()>::new();
-    let mut nodes = HashMap::<PathBuf, NodeIndex>::new();
-
-    macro_rules! node_id {
-        ($path:expr) => {
-            *nodes
-                .entry($path.to_owned())
-                .or_insert_with(|| graph.add_node(()))
-        };
-    }
-
-    for root in &roots {
-        // TODO: just store Path
-        let path_node = node_id!(root.symlink);
-        let store_node = node_id!(root.store_path);
-        graph.add_edge(path_node, store_node, ());
-
-        for (path, _path_info) in root.path_info.iter() {
-            let dep_node = node_id!(path.to_path_buf());
-            graph.add_edge(store_node, dep_node, ());
-        }
-    }
-    dbg!(graph.node_count());
-    dbg!(graph.edge_count());
-
+    let dominators = StoreGraph::build(&roots);
     eprintln!("[{:?}] Done...", start.elapsed());
+    println!("{:?}", Dot::new(&dominators));
     Ok(())
 }
 
