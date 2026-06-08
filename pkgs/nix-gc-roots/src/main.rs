@@ -15,21 +15,18 @@ use std::{
     path::PathBuf,
     time::{Duration, Instant},
 };
-use stumpalo::Arena;
 use tuirealm::application::PollStrategy;
 
 use crate::cache::Cache;
 
 fn perf() -> Result<()> {
     let start = Instant::now();
-    let arena = Arena::new();
-
     eprintln!("[{:>12?}] Find gc roots...", Duration::from_secs(0));
     let roots = nix::gc_roots()?;
 
     eprintln!("[{:?}] Lookup PathInfo...", start.elapsed());
     let cache = Cache::new(&PathBuf::from("/home/nregner/.cache/nix-gc-roots"))?;
-    let roots = cache.build_graph(&arena, roots)?;
+    let roots = cache.build_graph(roots)?;
 
     eprintln!("[{:?}] Build graph...", start.elapsed());
     let mut graph = DiGraph::<(), ()>::new();

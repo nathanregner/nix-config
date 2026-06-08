@@ -1,38 +1,61 @@
+use rkyv::util::AlignedVec;
 use rkyv::{Portable, api::high::HighValidator, bytecheck::CheckBytes, rancor::Error};
+use std::marker::PhantomData;
 use std::ops::Deref;
+use std::sync::Arc;
 
-pub struct ArchivedSlice<'a, T> {
-    bytes: &'a [u8],
-    archived: &'a T,
+/// Owned rkyv-serialized data with zero-copy access.
+///
+/// Invariant: `bytes` always contains valid rkyv data for type `T`.
+pub struct OwnedArchive<T: Portable> {
+    bytes: Arc<AlignedVec>,
+    _marker: PhantomData<T>,
 }
 
-impl<'a, T> Clone for ArchivedSlice<'a, T> {
+impl<T: Portable> Clone for OwnedArchive<T> {
     fn clone(&self) -> Self {
         Self {
-            bytes: self.bytes,
-            archived: self.archived,
+            bytes: Arc::clone(&self.bytes),
+            _marker: PhantomData,
         }
     }
 }
 
-impl<'a, T> ArchivedSlice<'a, T>
-where
-    T: Portable + for<'b> CheckBytes<HighValidator<'b, Error>>,
-{
-    pub fn new(bytes: &'a [u8]) -> Result<Self, Error> {
-        let archived = rkyv::access::<T, Error>(bytes)?;
-        Ok(Self { bytes, archived })
+impl<T: Portable> OwnedArchive<T> {
+    /// Create from bytes, validating they contain valid `T`.
+    pub fn from_bytes(bytes: AlignedVec) -> Result<Self, Error>
+    where
+        T: for<'a> CheckBytes<HighValidator<'a, Error>>,
+    {
+        let _ = rkyv::access::<T, Error>(&bytes)?;
+        Ok(Self {
+            bytes: Arc::new(bytes),
+            _marker: PhantomData,
+        })
     }
 
-    pub fn as_slice(&self) -> &'a [u8] {
-        self.bytes
+    /// Create from bytes known to be valid (e.g. just serialized).
+    pub fn from_bytes_unchecked(bytes: AlignedVec) -> Self {
+        Self {
+            bytes: Arc::new(bytes),
+            _marker: PhantomData,
+        }
+    }
+
+    pub fn as_slice(&self) -> &[u8] {
+        &self.bytes
+    }
+
+    pub fn get(&self) -> &T {
+        // Safety: struct invariant guarantees bytes are valid
+        unsafe { rkyv::access_unchecked::<T>(&self.bytes) }
     }
 }
 
-impl<T> Deref for ArchivedSlice<'_, T> {
+impl<T: Portable> Deref for OwnedArchive<T> {
     type Target = T;
 
     fn deref(&self) -> &Self::Target {
-        self.archived
+        self.get()
     }
 }

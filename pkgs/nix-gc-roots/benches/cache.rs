@@ -6,8 +6,8 @@ use heed::types::Bytes;
 use nix_gc_roots::{
     cache::{self, ArchivedPathInfoMap},
     nix,
+    types::OwnedArchive,
 };
-use stumpalo::Arena;
 use tempfile::TempDir;
 
 fn fetch_firefox_derivation() -> anyhow::Result<cache::PathInfoMap> {
@@ -21,13 +21,13 @@ fn access(buf: &[u8]) -> Result<&ArchivedPathInfoMap, rkyv::rancor::Error> {
     rkyv::access(buf)
 }
 
-fn setup_cache(arena: &Arena) -> (TempDir, Vec<u8>, &[u8]) {
+fn setup_cache() -> (TempDir, Vec<u8>, OwnedArchive<ArchivedPathInfoMap>) {
     let paths = fetch_firefox_derivation().expect("Failed to fetch derivation");
 
     let tmpdir = TempDir::new().expect("Failed to create temp dir");
     let cache_path = tmpdir.path().to_path_buf();
 
-    let serialized = cache::serialize(arena, &paths).expect("Failed to serialize");
+    let serialized = cache::serialize(&paths);
     eprintln!("rkyv size: {} bytes", serialized.as_slice().len());
 
     let store_path = paths
@@ -56,22 +56,14 @@ fn setup_cache(arena: &Arena) -> (TempDir, Vec<u8>, &[u8]) {
         txn.commit().expect("Failed to commit");
     }
 
-    (tmpdir, store_path, serialized.as_slice())
+    (tmpdir, store_path, serialized)
 }
 
 fn bench_cache(c: &mut Criterion) {
-    let arena = Arena::new();
-    let (tmpdir, store_path, serialized) = setup_cache(&arena);
+    let (tmpdir, store_path, serialized) = setup_cache();
     let cache_path = tmpdir.path();
 
     let mut group = c.benchmark_group("cache");
-
-    group.bench_function("rkyv access (in-memory)", |b| {
-        b.iter(|| {
-            let archived = access(serialized).expect("Failed to access");
-            std::hint::black_box(archived.len());
-        });
-    });
 
     let env = unsafe {
         EnvOpenOptions::new()
