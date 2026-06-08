@@ -33,7 +33,7 @@ pub struct GcRootWithSize {
 
 pub struct GcRootWithPaths {
     root: GcRoot,
-    pub path_info: ArchivedBytes<ArchivedPathInfoMap>,
+    pub path_info: Arc<ArchivedBytes<PathInfoMap>>,
 }
 
 impl Deref for GcRootWithPaths {
@@ -89,17 +89,22 @@ impl Cache {
         // TODO: move to previous mapping...
         let uncached = uncached
             .into_iter()
-            .map(|(store_path, paths)| (store_path, ArchivedBytes::from_value(&paths)?))
+            .map(|(store_path, paths)| {
+                (
+                    store_path,
+                    ArchivedBytes::from_value(&paths).expect("Serialization should not fail"),
+                )
+            })
             .collect::<HashMap<_, _>>();
 
         // eprintln!("Uncached {}", uncached.len());
         self.put_all(&uncached)?;
         let mut merged = HashMap::with_capacity(cached.len() + uncached.len());
         for (store_path, path_info) in uncached {
-            merged.insert(store_path, path_info);
+            merged.insert(store_path, Arc::new(path_info));
         }
         for (store_path, path_info) in cached {
-            merged.insert(store_path, path_info);
+            merged.insert(store_path, Arc::new(path_info));
         }
 
         let mut result = Vec::with_capacity(roots.len());
@@ -117,7 +122,7 @@ impl Cache {
     fn get_all(
         &self,
         paths: &HashSet<PathBuf>,
-    ) -> Result<HashMap<PathBuf, ArchivedBytes<ArchivedPathInfoMap>>> {
+    ) -> Result<HashMap<PathBuf, ArchivedBytes<PathInfoMap>>> {
         let txn = self.env.read_txn().context("Failed to start read txn")?;
         let entries = paths
             .iter()
@@ -146,7 +151,7 @@ impl Cache {
         Ok(entries)
     }
 
-    fn put_all(&self, paths: &HashMap<PathBuf, ArchivedBytes<ArchivedPathInfoMap>>) -> Result<()> {
+    fn put_all(&self, paths: &HashMap<PathBuf, ArchivedBytes<PathInfoMap>>) -> Result<()> {
         if paths.is_empty() {
             return Ok(());
         }

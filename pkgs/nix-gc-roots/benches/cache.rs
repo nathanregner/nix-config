@@ -4,12 +4,13 @@ use criterion::{Criterion, criterion_group, criterion_main};
 use heed::EnvOpenOptions;
 use heed::types::Bytes;
 use nix_gc_roots::{
-    cache::{self, ArchivedPathInfoMap},
+    cache::{ArchivedPathInfoMap, PathInfoMap},
     nix,
+    types::ArchivedBytes,
 };
 use tempfile::TempDir;
 
-fn fetch_firefox_derivation() -> anyhow::Result<cache::PathInfoMap> {
+fn fetch_firefox_derivation() -> anyhow::Result<PathInfoMap> {
     eprintln!("Fetching firefox path-info --derivation...");
     let paths = nix::path_info(true, ["nixpkgs#firefox"])?;
     eprintln!("Got {} store paths", paths.len());
@@ -26,7 +27,7 @@ fn setup_cache() -> (TempDir, Vec<u8>) {
     let tmpdir = TempDir::new().expect("Failed to create temp dir");
     let cache_path = tmpdir.path().to_path_buf();
 
-    let serialized = cache::serialize(&paths);
+    let serialized = ArchivedBytes::<PathInfoMap>::from_value(&paths).expect("Failed to serialize");
     eprintln!("rkyv size: {} bytes", serialized.as_slice().len());
 
     // TODO: this is stupid...
