@@ -65,7 +65,7 @@ impl Cache {
             .collect::<HashSet<_>>();
 
         let cached = self.get_all(&store_paths)?;
-        eprintln!("Cached {}", cached.len());
+        // eprintln!("Cached {}", cached.len());
 
         let to_lookup = store_paths
             .into_iter()

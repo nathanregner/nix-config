@@ -3,6 +3,7 @@ use std::path::{Path, PathBuf};
 use anyhow::{Context, Result};
 use petgraph::graph::NodeIndex;
 use petgraph::visit::EdgeRef;
+use petgraph::Direction;
 use tui_treelistview::TreeModel;
 
 use crate::store_graph::DominatorGraph;
@@ -13,6 +14,7 @@ pub struct GcRootModel {
     pub show_profiles: bool,
     pub marked: Vec<bool>,
     children_cache: Vec<Vec<NodeIndex>>,
+    parent_cache: Vec<Option<NodeIndex>>,
 }
 
 impl GcRootModel {
@@ -27,9 +29,17 @@ impl GcRootModel {
         });
 
         let mut children_cache: Vec<Vec<NodeIndex>> = vec![Vec::new(); node_count];
+        let mut parent_cache: Vec<Option<NodeIndex>> = vec![None; node_count];
+
         for ni in graph.node_indices() {
             let children: Vec<NodeIndex> = graph.edges(ni).map(|e| e.target()).collect();
             children_cache[ni.index()] = children;
+
+            let parent = graph
+                .edges_directed(ni, Direction::Incoming)
+                .next()
+                .map(|e| e.source());
+            parent_cache[ni.index()] = parent;
         }
 
         for children in &mut children_cache {
@@ -46,6 +56,7 @@ impl GcRootModel {
             show_profiles: false,
             marked: vec![false; node_count],
             children_cache,
+            parent_cache,
         }
     }
 
@@ -57,6 +68,14 @@ impl GcRootModel {
         self.graph
             .node_weight(id)
             .and_then(|d| d.path.file_name().map(|s| s.to_str().unwrap_or("")))
+    }
+
+    pub fn parent(&self, id: NodeIndex) -> Option<NodeIndex> {
+        self.parent_cache.get(id.index()).copied().flatten()
+    }
+
+    pub fn children(&self, id: NodeIndex) -> &[NodeIndex] {
+        &self.children_cache[id.index()]
     }
 
     pub fn added_size(&self, id: NodeIndex) -> u64 {

@@ -22,11 +22,13 @@ pub enum Msg {
     ResetMarks,
     ConfirmYes,
     ConfirmNo,
+    SwitchView,
     None,
 }
 
 #[derive(Debug, Eq, PartialEq, Clone, Hash)]
 pub enum Id {
     Tree,
+    Ranger,
     Progress,
 }

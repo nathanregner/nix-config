@@ -304,6 +304,11 @@ impl AppComponent<Msg, NoUserEvent> for TreeView {
 
         match key {
             KeyEvent {
+                modifiers: KeyModifiers::CONTROL,
+                code: Key::Char('c'),
+                ..
+            }
+            | KeyEvent {
                 code: Key::Char('q'),
                 ..
             }
@@ -436,6 +441,11 @@ impl AppComponent<Msg, NoUserEvent> for TreeView {
                 inner.state.invalidate_all();
                 inner.pending_g = false;
                 Some(Msg::ToggleProfiles)
+            }
+
+            KeyEvent { code: Key::Tab, .. } => {
+                inner.pending_g = false;
+                Some(Msg::SwitchView)
             }
 
             _ => {
