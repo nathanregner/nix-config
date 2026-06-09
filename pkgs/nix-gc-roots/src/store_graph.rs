@@ -167,7 +167,7 @@ impl Deref for NodeEntry {
 
 pub type DominatorGraph = DiGraph<Dominator, &'static str>;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Dominator {
     pub path: PathBuf,
     pub added_size: u64,

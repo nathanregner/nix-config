@@ -10,14 +10,16 @@ use tuirealm::ratatui::layout::{Constraint, Direction, Layout};
 use tuirealm::terminal::{CrosstermTerminalAdapter, TerminalAdapter, TerminalResult};
 
 use crate::cache::Cache;
-use crate::components::{Progress, TreeView};
+use crate::components::{Progress, RangerView, TreeView};
 use crate::msg::{EqHack, Id, Msg};
+use crate::store_graph::DominatorGraph;
 use crate::{StoreGraph, nix};
 
 #[derive(Clone, Copy, PartialEq)]
 pub enum AppView {
     Loading,
     Tree,
+    Ranger,
 }
 
 pub struct Model<T>
@@ -29,6 +31,7 @@ where
     pub redraw: bool,
     pub view: AppView,
     pub terminal: T,
+    graph: Option<DominatorGraph>,
 }
 
 impl Default for Model<CrosstermTerminalAdapter> {
@@ -39,6 +42,7 @@ impl Default for Model<CrosstermTerminalAdapter> {
             redraw: true,
             view: AppView::Loading,
             terminal: Self::init_adapter().expect("Cannot initialize terminal"),
+            graph: None,
         }
     }
 }
@@ -85,6 +89,9 @@ where
                 AppView::Tree => {
                     self.app.view(&Id::Tree, f, area);
                 }
+                AppView::Ranger => {
+                    self.app.view(&Id::Ranger, f, area);
+                }
             }
         });
     }
@@ -97,12 +104,44 @@ where
                 self.quit = true;
             }
             Msg::LoadingComplete(dominators) => {
+                self.graph = Some(dominators.0);
                 let _ = self.app.umount(&Id::Progress);
-                let _ = self
-                    .app
-                    .mount(Id::Tree, Box::new(TreeView::new(dominators.0)), vec![]);
-                let _ = self.app.active(&Id::Tree);
-                self.view = AppView::Tree;
+                if let Some(ref graph) = self.graph {
+                    let _ = self.app.mount(
+                        Id::Ranger,
+                        Box::new(RangerView::new(graph.clone())),
+                        vec![],
+                    );
+                    let _ = self.app.active(&Id::Ranger);
+                }
+                self.view = AppView::Ranger;
+            }
+            Msg::SwitchView => {
+                if let Some(ref graph) = self.graph {
+                    match self.view {
+                        AppView::Tree => {
+                            let _ = self.app.umount(&Id::Tree);
+                            let _ = self.app.mount(
+                                Id::Ranger,
+                                Box::new(RangerView::new(graph.clone())),
+                                vec![],
+                            );
+                            let _ = self.app.active(&Id::Ranger);
+                            self.view = AppView::Ranger;
+                        }
+                        AppView::Ranger => {
+                            let _ = self.app.umount(&Id::Ranger);
+                            let _ = self.app.mount(
+                                Id::Tree,
+                                Box::new(TreeView::new(graph.clone())),
+                                vec![],
+                            );
+                            let _ = self.app.active(&Id::Tree);
+                            self.view = AppView::Tree;
+                        }
+                        AppView::Loading => {}
+                    }
+                }
             }
             Msg::LoadingProgress(_current, _total) => {
                 // Progress updates handled by Progress component directly
@@ -124,7 +163,7 @@ where
             | Msg::ResetMarks
             | Msg::ConfirmNo
             | Msg::None => {
-                // These are handled by the TreeView component itself
+                // Handled by tree/ranger components
             }
         }
     }
@@ -150,7 +189,7 @@ where
         // eprintln!("[{:>12?}] Find gc roots...", Duration::from_secs(0));
         let roots = nix::gc_roots()?;
 
-        eprintln!("[{:?}] Lookup PathInfo...", start.elapsed());
+        // eprintln!("[{:?}] Lookup PathInfo...", start.elapsed());
         let cache = Cache::new(Path::new("/home/nregner/.cache/nix-gc-roots"))?;
         let roots = cache.get_path_info(roots)?;
 
