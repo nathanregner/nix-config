@@ -22,37 +22,49 @@ use std::{
 };
 use tuirealm::application::PollStrategy;
 
-use crate::cache::{Cache, PathInfo};
+use crate::{
+    cache::{Cache, PathInfo},
+    nix::GcRoot,
+};
 
 #[derive(Default)]
-struct PathGraph {
+struct StoreGraph {
     graph: DiGraph<Node, ()>,
     nodes: HashMap<PathBuf, NodeIndex>,
 }
 
 #[derive(Clone, Copy)]
 struct Node {
-    retained_size: u64,
-    total_size: u64,
+    ty: NodeType,
+    added_size: u64,
+    closure_size: u64,
+}
+
+#[derive(Clone, Copy)]
+enum NodeType {
+    Path,
+    StorePath,
 }
 
 impl Node {
     fn path() -> Self {
         Self {
-            retained_size: 0,
-            total_size: 0,
+            ty: NodeType::Path,
+            added_size: 0,
+            closure_size: 0,
         }
     }
 
     fn store_path(path_info: &PathInfo) -> Self {
         Self {
-            retained_size: path_info.nar_size,
-            total_size: path_info.nar_size,
+            ty: NodeType::Path,
+            added_size: path_info.nar_size,
+            closure_size: path_info.nar_size,
         }
     }
 }
 
-impl PathGraph {
+impl StoreGraph {
     pub fn add_node(&mut self, path: impl Into<PathBuf>, node: Node) -> NodeIndex {
         *self
             .nodes
@@ -62,6 +74,31 @@ impl PathGraph {
 
     pub fn add_edge(&mut self, from: NodeIndex, to: NodeIndex) {
         self.graph.add_edge(from, to, ());
+    }
+}
+
+pub struct PathTree {
+    path: PathBuf,
+    added_size: u64,
+    closure_size: u64,
+    children: Vec<PathTree>,
+}
+
+impl PathTree {
+    pub fn new(root: GcRoot, added_size: u64, closure_size: u64) -> Self {
+        Self {
+            root,
+            added_size,
+            closure_size,
+        }
+    }
+}
+
+impl Deref for PathTree {
+    type Target = GcRoot;
+
+    fn deref(&self) -> &Self::Target {
+        &self.root
     }
 }
 
@@ -75,22 +112,10 @@ fn perf() -> Result<()> {
     let roots = cache.get_path_info(roots)?;
 
     eprintln!("[{:?}] Build graph...", start.elapsed());
-    let mut graph = PathGraph::default();
+    let mut graph = StoreGraph::default();
 
     for root in &roots {
         let referrer = graph.add_node(&root.symlink, Node::path());
-        // let reference = graph.node_or_default(
-        //     &root.store_path,
-        //     Node::StorePath {
-        //         nar_size: 0,
-        //         // nar_size: root
-        //         //     .path_info
-        //         //     .get(&ArchivedStorePath::from(root.store_path))
-        //         //     .map(|path_info| path_info.nar_size)
-        //         //     .or_default(),
-        //     },
-        // );
-        // graph.add_edge(referrer, reference);
 
         let mut stack = vec![(referrer, &root.store_path)];
         while let Some((referrer, store_path)) = stack.pop() {
@@ -128,25 +153,25 @@ fn perf() -> Result<()> {
             .graph
             .neighbors(node)
             // TODO: error if missing
-            .flat_map(|reference| Some(graph.graph.node_weight(reference)?.total_size))
+            .flat_map(|reference| Some(graph.graph.node_weight(reference)?.closure_size))
             .sum();
         // TODO: error if missing
         let Some(node_weight) = graph.graph.node_weight_mut(node) else {
             continue;
         };
-        node_weight.total_size = total_size;
+        node_weight.closure_size = total_size;
         if let Some(dominator) = dominators.immediate_dominator(node) {
             // TODO: error if missing
-            let retained = node_weight.retained_size;
+            let retained = node_weight.added_size;
             // TODO: error if missing
             let Some(dominator) = graph.graph.node_weight_mut(dominator) else {
                 continue;
             };
-            dominator.retained_size += retained;
+            dominator.added_size += retained;
         }
     }
 
-    eprintln!("[{:?}] Done...", start.elapsed());
+    let tree = PathTree::eprintln!("[{:?}] Done...", start.elapsed());
     Ok(())
 }
 
