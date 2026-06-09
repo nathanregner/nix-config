@@ -27,10 +27,6 @@ fn perf() -> Result<()> {
     eprintln!("[{:?}] Lookup PathInfo...", start.elapsed());
     let cache = Cache::new(&PathBuf::from("/home/nregner/.cache/nix-gc-roots"))?;
     let roots = cache.get_path_info(roots)?;
-    eprintln!(
-        "{:#?}",
-        roots.iter().map(|r| &r.store_path).collect::<Vec<_>>()
-    );
 
     eprintln!("[{:?}] Build graph...", start.elapsed());
     let dominators = StoreGraph::build(&roots);

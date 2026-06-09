@@ -1,12 +1,13 @@
+use fixedbitset::FixedBitSet;
 use petgraph::{
-    algo::dominators,
+    algo::dominators::{self, Dominators},
     graph::{DiGraph, NodeIndex},
-    visit::DfsPostOrder,
 };
 use std::{
     collections::{HashMap, hash_map::Entry},
     ops::Deref,
     path::{Path, PathBuf},
+    rc::Rc,
 };
 
 use crate::cache::{GcRootClosure, PathInfo};
@@ -77,31 +78,113 @@ impl StoreGraph {
 
     fn compute_dominators(&mut self) -> DominatorGraph {
         let root = *self.add_node("/", Node::path());
-
         let dominators = dominators::simple_fast(&self.graph, root);
-        let mut dfs = DfsPostOrder::new(&self.graph, root);
-        while let Some(node) = dfs.next(&self.graph) {
-            let total_size = self
-                .graph
-                .neighbors(node)
-                // TODO: error if missing
-                .flat_map(|reference| Some(self.graph.node_weight(reference)?.closure_size))
-                .sum();
-            // TODO: error if missing
-            let Some(node_weight) = self.graph.node_weight_mut(node) else {
-                continue;
-            };
-            node_weight.closure_size = total_size;
-            if let Some(dominator) = dominators.immediate_dominator(node) {
-                // TODO: error if missing
-                let retained = node_weight.added_size;
-                // TODO: error if missing
-                let Some(dominator) = self.graph.node_weight_mut(dominator) else {
-                    continue;
-                };
-                dominator.added_size += retained;
+
+        fn compute_closure_size(
+            // TODO: vec
+            visited: &mut HashMap<NodeIndex, Rc<FixedBitSet>>,
+            dominators: &Dominators<NodeIndex>,
+            graph: &mut DiGraph<Node, ()>,
+            index: NodeIndex,
+        ) -> Rc<FixedBitSet> {
+            if let Some(reachability) = visited.get(&index) {
+                return reachability.clone(); // TODO
             }
+
+            let node = graph[index];
+            let neighbors = graph.neighbors(index).collect::<Vec<_>>();
+
+            let mut reachability = FixedBitSet::with_capacity(graph.node_count());
+            for neighbor in neighbors {
+                reachability.insert(neighbor.index());
+                reachability |= &*compute_sizes(visited, dominators, graph, neighbor);
+            }
+
+            let mut closure_size = 0;
+            for i in reachability.ones() {
+                closure_size += graph[NodeIndex::new(i)].closure_size;
+            }
+            graph[index].closure_size += closure_size;
+
+            // TODO: error if missing
+            for dominator in dominators.dominators(index).into_iter().flatten() {
+                graph[dominator].added_size += node.added_size;
+            }
+
+            let reachability = Rc::new(reachability);
+            visited.insert(index, reachability.clone());
+            reachability
         }
+
+        fn compute_sizes(
+            // TODO: vec
+            visited: &mut HashMap<NodeIndex, Rc<FixedBitSet>>,
+            dominators: &Dominators<NodeIndex>,
+            graph: &mut DiGraph<Node, ()>,
+            index: NodeIndex,
+        ) -> Rc<FixedBitSet> {
+            if let Some(reachability) = visited.get(&index) {
+                return reachability.clone(); // TODO
+            }
+            visited.insert(index, Rc::new(FixedBitSet::new()));
+
+            let node = graph[index];
+            let neighbors = graph.neighbors(index).collect::<Vec<_>>();
+
+            let mut reachability = FixedBitSet::with_capacity(graph.node_count());
+            for neighbor in neighbors {
+                if matches!(node.ty, NodeType::StorePath) {
+                    reachability.insert(neighbor.index());
+                }
+                reachability |= &*compute_sizes(visited, dominators, graph, neighbor);
+            }
+
+            graph[index].closure_size += reachability
+                .ones()
+                .map(|i| graph[NodeIndex::new(i)].added_size)
+                .sum::<u64>();
+
+            // TODO: error if missing
+            for dominator in dominators.dominators(index).into_iter().flatten() {
+                graph[dominator].added_size += node.added_size;
+            }
+
+            let reachability = Rc::new(reachability);
+            visited.insert(index, reachability.clone());
+            reachability
+        }
+
+        // let mut dfs = DfsPostOrder::new(&self.graph, root);
+        // while let Some(node) = dfs.next(&self.graph) {
+        //     let total_size = self
+        //         .graph
+        //         .neighbors(node)
+        //         // TODO: error if missing
+        //         .flat_map(|reference| Some(self.graph.node_weight(reference)?.closure_size))
+        //         .sum();
+        //     // TODO: error if missing
+        //     let Some(node_weight) = self.graph.node_weight_mut(node) else {
+        //         continue;
+        //     };
+        //     node_weight.closure_size = total_size;
+        //     if let Some(dominator) = dominators.immediate_dominator(node) {
+        //         // TODO: error if missing
+        //         let retained = node_weight.added_size;
+        //         // TODO: error if missing
+        //         let Some(dominator) = self.graph.node_weight_mut(dominator) else {
+        //             continue;
+        //         };
+        //         dominator.closure_size += total_size;
+        //         dominator.added_size += retained;
+        //     }
+        // }
+
+        compute_sizes(
+            &mut HashMap::with_capacity(self.graph.node_count()),
+            &dominators,
+            &mut self.graph,
+            root,
+        );
 
         self.graph.filter_map(
             |ni, n| {
@@ -188,24 +271,37 @@ mod tests {
     fn sizes() {
         let mut store = StoreBuilder::new();
         let a = store.path_info("/store/a", 100, []);
-        let b = store.path_info("/store/b", 10, [a]);
-        let c = store.path_info("/store/c", 20, [a]);
+        let b = store.path_info("/store/b", 50, []);
+        let c = store.path_info("/store/c", 20, [b]);
+        let system = store.path_info("/store/system", 10, [a]);
+        let profile = store.path_info("/store/profile", 5, [b]);
         let store = store.build();
 
         let roots = vec![
-            store.root("/gcroots/b", b), //
-            store.root("/gcroots/c", c),
+            store.root("/run/current/sw", system), //
+            store.root("/home/user/.nix-profile", profile),
+            store.root("/tmp/c", c),
         ];
         let store_graph = StoreGraph::build(&roots);
         insta::assert_snapshot!(Dot::new(&store_graph), @r#"
         digraph {
-            0 [ label = "/gcroots/b       (closure =   0, added =  10)" ]
-            1 [ label = "/gcroots         (closure =   0, added = 130)" ]
-            2 [ label = "/                (closure =   0, added = 130)" ]
-            3 [ label = "/gcroots/c       (closure =   0, added =  20)" ]
+            0 [ label = "/run/current/sw          (closure = 200, added = 110)" ]
+            1 [ label = "/run/current             (closure = 200, added = 110)" ]
+            2 [ label = "/run                     (closure = 200, added = 110)" ]
+            3 [ label = "/                        (closure = 300, added = 185)" ]
+            4 [ label = "/home/user/.nix-profile  (closure = 100, added =   5)" ]
+            5 [ label = "/home/user               (closure = 100, added =   5)" ]
+            6 [ label = "/home                    (closure = 100, added =   5)" ]
+            7 [ label = "/tmp/c                   (closure = 100, added =  20)" ]
+            8 [ label = "/tmp                     (closure = 100, added =  20)" ]
             1 -> 0 [ label = "" ]
             2 -> 1 [ label = "" ]
-            1 -> 3 [ label = "" ]
+            3 -> 2 [ label = "" ]
+            5 -> 4 [ label = "" ]
+            6 -> 5 [ label = "" ]
+            3 -> 6 [ label = "" ]
+            8 -> 7 [ label = "" ]
+            3 -> 8 [ label = "" ]
         }
         "#)
     }
@@ -279,7 +375,7 @@ mod tests {
         fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
             write!(
                 f,
-                "{:<16} (closure = {:>3}, added = {:>3})",
+                "{:<24} (closure = {:>3}, added = {:>3})",
                 self.path.to_string_lossy(),
                 self.closure_size,
                 self.added_size

@@ -1296,6 +1296,7 @@ dependencies = [
  "context_deserialize",
  "criterion",
  "crossterm",
+ "fixedbitset 0.5.7",
  "heed",
  "insta",
  "petgraph",
