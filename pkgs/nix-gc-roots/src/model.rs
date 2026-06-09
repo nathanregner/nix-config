@@ -1,9 +1,9 @@
 use std::path::{Path, PathBuf};
 
 use anyhow::{Context, Result};
+use petgraph::Direction;
 use petgraph::graph::NodeIndex;
 use petgraph::visit::EdgeRef;
-use petgraph::Direction;
 use tui_treelistview::TreeModel;
 
 use crate::store_graph::DominatorGraph;
@@ -85,7 +85,6 @@ impl GcRootModel {
             .unwrap_or(0)
     }
 
-    #[allow(dead_code)]
     pub fn closure_size(&self, id: NodeIndex) -> u64 {
         self.graph
             .node_weight(id)
@@ -152,7 +151,7 @@ impl GcRootModel {
         self.marked.fill(false);
     }
 
-    #[allow(dead_code)]
+    #[expect(dead_code)]
     pub fn delete_marked(&mut self) -> Result<usize> {
         let marked: Vec<PathBuf> = self
             .get_marked_paths()
@@ -190,7 +189,7 @@ impl TreeModel for GcRootModel {
     }
 }
 
-#[allow(dead_code)]
+#[expect(dead_code)]
 pub fn is_profile_path(path: &Path) -> bool {
     let path_str = path.to_string_lossy();
     path_str.contains("/nix/var/nix/profiles/")
@@ -216,4 +215,3 @@ pub fn format_size(bytes: u64) -> String {
         format!("{:.1}{}", value, UNITS[unit])
     }
 }
-
