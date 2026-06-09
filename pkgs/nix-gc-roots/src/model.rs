@@ -1,269 +1,144 @@
-use std::collections::HashMap;
 use std::path::{Path, PathBuf};
-use std::time::SystemTime;
 
 use anyhow::{Context, Result};
+use petgraph::graph::NodeIndex;
+use petgraph::visit::EdgeRef;
 use tui_treelistview::TreeModel;
 
-use crate::cache::GcRootWithSize;
-
-#[derive(Clone)]
-pub struct GcRootEntry {
-    pub path: PathBuf,
-    pub target: PathBuf,
-    pub modified: SystemTime,
-    pub is_profile: bool,
-    pub closure_size: Option<u64>,
-}
-
-impl From<GcRootWithSize> for GcRootEntry {
-    fn from(root: GcRootWithSize) -> Self {
-        let is_profile = is_profile_path(&root.symlink);
-        Self {
-            path: root.symlink,
-            target: root.store_path,
-            modified: root.modified,
-            is_profile,
-            closure_size: root.nar_size,
-        }
-    }
-}
-
-pub enum Node {
-    Directory {
-        name: String,
-        path: PathBuf,
-        parent: Option<usize>,
-        all_children: Vec<usize>,
-        visible_children: Vec<usize>,
-        marked: bool,
-    },
-    Root {
-        root: GcRootEntry,
-        marked: bool,
-    },
-}
+use crate::store_graph::DominatorGraph;
 
 pub struct GcRootModel {
-    pub nodes: Vec<Node>,
-    pub root_id: Option<usize>,
+    pub graph: DominatorGraph,
+    pub root_id: Option<NodeIndex>,
     pub show_profiles: bool,
+    pub marked: Vec<bool>,
+    children_cache: Vec<Vec<NodeIndex>>,
 }
 
 impl GcRootModel {
-    pub fn new() -> Self {
-        Self {
-            nodes: Vec::new(),
-            root_id: None,
-            show_profiles: false,
+    pub fn new(graph: DominatorGraph) -> Self {
+        let node_count = graph.node_count();
+
+        let root_id = graph.node_indices().find(|&ni| {
+            graph
+                .node_weight(ni)
+                .map(|d| d.path == Path::new("/"))
+                .unwrap_or(false)
+        });
+
+        let mut children_cache: Vec<Vec<NodeIndex>> = vec![Vec::new(); node_count];
+        for ni in graph.node_indices() {
+            let children: Vec<NodeIndex> = graph.edges(ni).map(|e| e.target()).collect();
+            children_cache[ni.index()] = children;
         }
+
+        for children in &mut children_cache {
+            children.sort_by(|a, b| {
+                let path_a = graph.node_weight(*a).map(|d| &d.path);
+                let path_b = graph.node_weight(*b).map(|d| &d.path);
+                path_a.cmp(&path_b)
+            });
+        }
+
+        Self {
+            graph,
+            root_id,
+            show_profiles: false,
+            marked: vec![false; node_count],
+            children_cache,
+        }
+    }
+
+    pub fn path(&self, id: NodeIndex) -> Option<&Path> {
+        self.graph.node_weight(id).map(|d| d.path.as_path())
+    }
+
+    pub fn name(&self, id: NodeIndex) -> Option<&str> {
+        self.graph
+            .node_weight(id)
+            .and_then(|d| d.path.file_name().map(|s| s.to_str().unwrap_or("")))
+    }
+
+    pub fn added_size(&self, id: NodeIndex) -> u64 {
+        self.graph
+            .node_weight(id)
+            .map(|d| d.added_size)
+            .unwrap_or(0)
+    }
+
+    #[allow(dead_code)]
+    pub fn closure_size(&self, id: NodeIndex) -> u64 {
+        self.graph
+            .node_weight(id)
+            .map(|d| d.closure_size)
+            .unwrap_or(0)
+    }
+
+    pub fn is_marked(&self, id: NodeIndex) -> bool {
+        self.marked.get(id.index()).copied().unwrap_or(false)
     }
 
     pub fn marked_count(&self) -> usize {
-        self.get_marked_roots().len()
-    }
-
-    pub fn build_from_roots(roots: Vec<GcRootWithSize>) -> Self {
-        let entries: Vec<GcRootEntry> = roots.into_iter().map(GcRootEntry::from).collect();
-        Self::build_from_entries(entries)
-    }
-
-    pub fn build_from_entries(mut entries: Vec<GcRootEntry>) -> Self {
-        let mut model = Self::new();
-        if entries.is_empty() {
-            return model;
-        }
-
-        entries.sort_by(|a, b| a.path.cmp(&b.path));
-
-        let mut dir_map: HashMap<PathBuf, usize> = HashMap::new();
-
-        let virtual_root_id = model.nodes.len();
-        model.nodes.push(Node::Directory {
-            name: String::new(),
-            path: PathBuf::new(),
-            parent: None,
-            all_children: Vec::new(),
-            visible_children: Vec::new(),
-            marked: false,
-        });
-        model.root_id = Some(virtual_root_id);
-
-        for entry in entries {
-            let parent_path = entry.path.parent().unwrap_or(&entry.path).to_path_buf();
-
-            let parent_id =
-                model.ensure_directory_chain(&mut dir_map, &parent_path, virtual_root_id);
-
-            let root_id = model.nodes.len();
-            model.nodes.push(Node::Root {
-                root: entry,
-                marked: false,
-            });
-
-            if let Node::Directory { all_children, .. } = &mut model.nodes[parent_id] {
-                all_children.push(root_id);
-            }
-        }
-
-        model.update_visibility();
-        model
-    }
-
-    fn ensure_directory_chain(
-        &mut self,
-        dir_map: &mut HashMap<PathBuf, usize>,
-        path: &PathBuf,
-        virtual_root_id: usize,
-    ) -> usize {
-        if let Some(&id) = dir_map.get(path) {
-            return id;
-        }
-
-        let parent_id = if let Some(parent_path) = path.parent() {
-            if parent_path == path || parent_path.as_os_str().is_empty() {
-                virtual_root_id
-            } else {
-                self.ensure_directory_chain(dir_map, &parent_path.to_path_buf(), virtual_root_id)
-            }
-        } else {
-            virtual_root_id
-        };
-
-        let dir_id = self.nodes.len();
-        let name = path
-            .file_name()
-            .map(|s| s.to_string_lossy().to_string())
-            .unwrap_or_else(|| path.to_string_lossy().to_string());
-
-        self.nodes.push(Node::Directory {
-            name,
-            path: path.clone(),
-            parent: Some(parent_id),
-            all_children: Vec::new(),
-            visible_children: Vec::new(),
-            marked: false,
-        });
-
-        if let Node::Directory { all_children, .. } = &mut self.nodes[parent_id] {
-            all_children.push(dir_id);
-        }
-
-        dir_map.insert(path.clone(), dir_id);
-        dir_id
-    }
-
-    fn is_node_visible(&self, id: usize) -> bool {
-        match &self.nodes[id] {
-            Node::Directory { .. } => true,
-            Node::Root { root, .. } => self.show_profiles || !root.is_profile,
-        }
-    }
-
-    fn has_visible_descendants(&self, id: usize) -> bool {
-        match &self.nodes[id] {
-            Node::Root { .. } => self.is_node_visible(id),
-            Node::Directory { all_children, .. } => all_children
-                .iter()
-                .any(|&child_id| self.has_visible_descendants(child_id)),
-        }
-    }
-
-    pub fn update_visibility(&mut self) {
-        let len = self.nodes.len();
-        for id in 0..len {
-            if let Node::Directory { all_children, .. } = &self.nodes[id] {
-                let children_copy: Vec<usize> = all_children.clone();
-                let visible: Vec<usize> = children_copy
-                    .into_iter()
-                    .filter(|&child_id| self.has_visible_descendants(child_id))
-                    .collect();
-
-                if let Node::Directory {
-                    visible_children, ..
-                } = &mut self.nodes[id]
-                {
-                    *visible_children = visible;
-                }
-            }
-        }
+        self.get_marked_paths().len()
     }
 
     pub fn toggle_profiles(&mut self) {
         self.show_profiles = !self.show_profiles;
-        self.update_visibility();
     }
 
-    pub fn is_top_level(&self, id: usize) -> bool {
-        if Some(id) == self.root_id {
-            return true;
-        }
-        if let Node::Directory { parent, .. } = &self.nodes[id] {
-            return *parent == self.root_id;
-        }
-        false
+    pub fn is_top_level(&self, id: NodeIndex) -> bool {
+        Some(id) == self.root_id
     }
 
-    pub fn toggle_mark(&mut self, id: usize) {
+    pub fn toggle_mark(&mut self, id: NodeIndex) {
         if self.is_top_level(id) {
             return;
         }
-
-        match &mut self.nodes[id] {
-            Node::Root { marked, .. } | Node::Directory { marked, .. } => {
-                *marked = !*marked;
-            }
+        if let Some(marked) = self.marked.get_mut(id.index()) {
+            *marked = !*marked;
         }
     }
 
-    pub fn get_marked_roots(&self) -> Vec<&GcRootEntry> {
-        let mut roots = Vec::new();
+    pub fn get_marked_paths(&self) -> Vec<&Path> {
+        let mut paths = Vec::new();
         if let Some(root_id) = self.root_id {
-            self.collect_marked_roots(root_id, false, &mut roots);
+            self.collect_marked_paths(root_id, false, &mut paths);
         }
-        roots
+        paths
     }
 
-    fn collect_marked_roots<'a>(
+    fn collect_marked_paths<'a>(
         &'a self,
-        id: usize,
+        id: NodeIndex,
         parent_marked: bool,
-        roots: &mut Vec<&'a GcRootEntry>,
+        paths: &mut Vec<&'a Path>,
     ) {
-        match &self.nodes[id] {
-            Node::Root { root, marked } => {
-                if *marked || parent_marked {
-                    roots.push(root);
+        let is_marked = self.is_marked(id) || parent_marked;
+        let children = &self.children_cache[id.index()];
+
+        if children.is_empty() {
+            if is_marked {
+                if let Some(path) = self.path(id) {
+                    paths.push(path);
                 }
             }
-            Node::Directory {
-                all_children,
-                marked,
-                ..
-            } => {
-                let is_marked = *marked || parent_marked;
-                for &child in all_children {
-                    self.collect_marked_roots(child, is_marked, roots);
-                }
+        } else {
+            for &child in children {
+                self.collect_marked_paths(child, is_marked, paths);
             }
         }
     }
 
     pub fn reset_marks(&mut self) {
-        for node in &mut self.nodes {
-            match node {
-                Node::Directory { marked, .. } | Node::Root { marked, .. } => {
-                    *marked = false;
-                }
-            }
-        }
+        self.marked.fill(false);
     }
 
+    #[allow(dead_code)]
     pub fn delete_marked(&mut self) -> Result<usize> {
         let marked: Vec<PathBuf> = self
-            .get_marked_roots()
+            .get_marked_paths()
             .iter()
-            .map(|r| r.path.clone())
+            .map(|p| p.to_path_buf())
             .collect();
         let count = marked.len();
 
@@ -277,30 +152,26 @@ impl GcRootModel {
 }
 
 impl TreeModel for GcRootModel {
-    type Id = usize;
+    type Id = NodeIndex;
 
     fn root(&self) -> Option<Self::Id> {
         self.root_id
     }
 
     fn children(&self, id: Self::Id) -> &[Self::Id] {
-        match &self.nodes[id] {
-            Node::Directory {
-                visible_children, ..
-            } => visible_children,
-            Node::Root { .. } => &[],
-        }
+        &self.children_cache[id.index()]
     }
 
     fn contains(&self, id: Self::Id) -> bool {
-        id < self.nodes.len()
+        self.graph.node_weight(id).is_some()
     }
 
     fn size_hint(&self) -> usize {
-        self.nodes.len()
+        self.graph.node_count()
     }
 }
 
+#[allow(dead_code)]
 pub fn is_profile_path(path: &Path) -> bool {
     let path_str = path.to_string_lossy();
     path_str.contains("/nix/var/nix/profiles/")
@@ -327,48 +198,3 @@ pub fn format_size(bytes: u64) -> String {
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use radix_trees::ptree::PTreeMap;
-    use radix_trie::{Trie, TrieCommon};
-
-    #[test]
-    fn trie_old() {
-        let mut trie = Trie::new();
-        trie.insert("/nix/store/test", 1234);
-        trie.insert("/home/nregner/file.txt", 1234);
-        trie.insert("/home/nregner/file2.txt", 1234);
-
-        dbg!(&trie.get("/"));
-        // dbg!(&trie.get("/nix/store/test"));
-        for t in TrieCommon::children(&trie) {
-            eprintln!("{:?}", t.prefix());
-            for c in t.children() {
-                eprintln!("  {:?}", c.key());
-                for c in c.children() {
-                    eprintln!("    {:?}", c.key());
-                }
-            }
-        }
-    }
-
-    #[test]
-    fn ptree() {
-        let mut trie = PTreeMap::new();
-        trie.insert("/nix/store/test", 1234);
-        trie.insert("/home/nregner/file.txt", 1234);
-        trie.insert("/home/nregner/file2.txt", 1234);
-
-        dbg!(&trie.get("/home/nregner/"));
-        // dbg!(&trie.get("/nix/store/test"));
-        for (k, v) in trie.iter() {
-            eprintln!("{:?} {:?}", &k.key().as_bytes()[0..k.masklen() as usize], v);
-            // for c in t.children() {
-            //     eprintln!("  {:?}", c.key());
-            //     for c in c.children() {
-            //         eprintln!("    {:?}", c.key());
-            //     }
-            // }
-        }
-    }
-}

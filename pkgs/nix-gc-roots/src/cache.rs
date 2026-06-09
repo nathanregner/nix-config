@@ -30,12 +30,12 @@ pub struct GcRootWithSize {
     pub nar_size: Option<u64>,
 }
 
-pub struct GcRootWithPaths {
-    root: GcRoot,
+pub struct GcRootClosure {
+    pub root: GcRoot,
     pub path_info: Arc<PathInfoMap>,
 }
 
-impl Deref for GcRootWithPaths {
+impl Deref for GcRootClosure {
     type Target = GcRoot;
 
     fn deref(&self) -> &Self::Target {
@@ -58,7 +58,7 @@ impl Cache {
     }
 
     // TODO: free-standing
-    pub fn get_path_info(&self, roots: Vec<GcRoot>) -> Result<Vec<GcRootWithPaths>> {
+    pub fn get_path_info(&self, roots: Vec<GcRoot>) -> Result<Vec<GcRootClosure>> {
         let store_paths = roots
             .iter()
             .map(|root| root.store_path.clone())
@@ -102,7 +102,7 @@ impl Cache {
                 .get(&root.store_path)
                 .ok_or_else(|| anyhow::anyhow!("Missing path_info for {:?}", root.store_path))?
                 .clone();
-            result.push(GcRootWithPaths { root, path_info });
+            result.push(GcRootClosure { root, path_info });
         }
 
         Ok(result)

@@ -20,7 +20,10 @@ use rkyv::with::{ArchiveWith, DeserializeWith, SerializeWith};
 #[serde(transparent)]
 pub struct StorePath(#[rkyv(with = PathBufAsBytes)] pub PathBuf);
 
-impl<T: Into<PathBuf>> From<T> for StorePath {
+impl<T> From<T> for StorePath
+where
+    PathBuf: From<T>,
+{
     fn from(path: T) -> Self {
         Self(path.into())
     }

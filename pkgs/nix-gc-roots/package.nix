@@ -1,5 +1,6 @@
 {
   lib,
+  cargo-insta,
   cargo-update-script,
   mkRustShell,
   rustPlatform,
@@ -25,6 +26,7 @@ let
       devShell = mkRustShell {
         inherit pkg rustPlatform;
         env.CARGO_PROFILE_RELEASE_DEBUG = true;
+        buildInputs = [ cargo-insta ];
       };
     };
   };

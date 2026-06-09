@@ -1,5 +1,6 @@
 use std::error::Error;
-use std::time::Duration;
+use std::path::Path;
+use std::time::{Duration, Instant};
 
 use anyhow::Result;
 use tuirealm::application::Application;
@@ -8,8 +9,10 @@ use tuirealm::listener::EventListenerCfg;
 use tuirealm::ratatui::layout::{Constraint, Direction, Layout};
 use tuirealm::terminal::{CrosstermTerminalAdapter, TerminalAdapter, TerminalResult};
 
+use crate::cache::Cache;
 use crate::components::{Progress, TreeView};
-use crate::msg::{Id, Msg};
+use crate::msg::{EqHack, Id, Msg};
+use crate::{StoreGraph, nix};
 
 #[derive(Clone, Copy, PartialEq)]
 pub enum AppView {
@@ -93,11 +96,11 @@ where
             Msg::AppClose => {
                 self.quit = true;
             }
-            Msg::LoadingComplete(roots) => {
+            Msg::LoadingComplete(dominators) => {
                 let _ = self.app.umount(&Id::Progress);
                 let _ = self
                     .app
-                    .mount(Id::Tree, Box::new(TreeView::new(roots)), vec![]);
+                    .mount(Id::Tree, Box::new(TreeView::new(dominators.0)), vec![]);
                 let _ = self.app.active(&Id::Tree);
                 self.view = AppView::Tree;
             }
@@ -142,12 +145,22 @@ where
     }
 
     pub fn load_roots(&mut self) -> Result<()> {
-        todo!()
+        let start = Instant::now();
+
+        // eprintln!("[{:>12?}] Find gc roots...", Duration::from_secs(0));
+        let roots = nix::gc_roots()?;
+
+        eprintln!("[{:?}] Lookup PathInfo...", start.elapsed());
+        let cache = Cache::new(Path::new("/home/nregner/.cache/nix-gc-roots"))?;
+        let roots = cache.get_path_info(roots)?;
+
+        let dominators = StoreGraph::build(&roots);
         // let roots = nix::gc_roots()?;
         // // TODO: base_dirs
         // let cache = Cache::new(&PathBuf::from("/home/nregner/.cache/nix-gc-roots"))?;
         // let roots = cache.get_sizes roots)?;
-        // self.update(Msg::LoadingComplete(roots));
+        self.update(Msg::LoadingComplete(EqHack(dominators)));
         // Ok(())
+        Ok(())
     }
 }
