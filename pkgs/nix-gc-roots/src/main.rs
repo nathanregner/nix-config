@@ -10,37 +10,36 @@ use anyhow::Result;
 use app::Model;
 use petgraph::{
     algo::dominators,
+    dot::Dot,
     graph::{DiGraph, NodeIndex},
-    visit::DfsPostOrder,
+    visit::{DfsPostOrder, NodeRef},
 };
 use std::{
     collections::HashMap,
     env,
     ops::{ControlFlow, Deref},
-    path::PathBuf,
+    path::{Path, PathBuf},
     time::{Duration, Instant},
 };
 use tuirealm::application::PollStrategy;
 
-use crate::{
-    cache::{Cache, PathInfo},
-    nix::GcRoot,
-};
+use crate::cache::{Cache, PathInfo};
 
 #[derive(Default)]
 struct StoreGraph {
     graph: DiGraph<Node, ()>,
     nodes: HashMap<PathBuf, NodeIndex>,
+    nodes_by_index: HashMap<NodeIndex, PathBuf>,
 }
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 struct Node {
     ty: NodeType,
     added_size: u64,
     closure_size: u64,
 }
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 enum NodeType {
     Path,
     StorePath,
@@ -57,7 +56,7 @@ impl Node {
 
     fn store_path(path_info: &PathInfo) -> Self {
         Self {
-            ty: NodeType::Path,
+            ty: NodeType::StorePath,
             added_size: path_info.nar_size,
             closure_size: path_info.nar_size,
         }
@@ -66,39 +65,17 @@ impl Node {
 
 impl StoreGraph {
     pub fn add_node(&mut self, path: impl Into<PathBuf>, node: Node) -> NodeIndex {
-        *self
+        let path = path.into();
+        let index = *self
             .nodes
-            .entry(path.into())
-            .or_insert_with(|| self.graph.add_node(node))
+            .entry(path.clone())
+            .or_insert_with(|| self.graph.add_node(node));
+        self.nodes_by_index.insert(index, path);
+        index
     }
 
     pub fn add_edge(&mut self, from: NodeIndex, to: NodeIndex) {
         self.graph.add_edge(from, to, ());
-    }
-}
-
-pub struct PathTree {
-    path: PathBuf,
-    added_size: u64,
-    closure_size: u64,
-    children: Vec<PathTree>,
-}
-
-impl PathTree {
-    pub fn new(root: GcRoot, added_size: u64, closure_size: u64) -> Self {
-        Self {
-            root,
-            added_size,
-            closure_size,
-        }
-    }
-}
-
-impl Deref for PathTree {
-    type Target = GcRoot;
-
-    fn deref(&self) -> &Self::Target {
-        &self.root
     }
 }
 
@@ -110,6 +87,10 @@ fn perf() -> Result<()> {
     eprintln!("[{:?}] Lookup PathInfo...", start.elapsed());
     let cache = Cache::new(&PathBuf::from("/home/nregner/.cache/nix-gc-roots"))?;
     let roots = cache.get_path_info(roots)?;
+    eprintln!(
+        "{:#?}",
+        roots.iter().map(|r| &r.store_path).collect::<Vec<_>>()
+    );
 
     eprintln!("[{:?}] Build graph...", start.elapsed());
     let mut graph = StoreGraph::default();
@@ -117,9 +98,25 @@ fn perf() -> Result<()> {
     for root in &roots {
         let referrer = graph.add_node(&root.symlink, Node::path());
 
+        // create parents
+        let mut current = root.symlink.as_path();
+        let mut index = graph.add_node(&root.symlink, Node::path());
+        while let Some(parent) = current.parent() {
+            let maybe_parent = graph.nodes.get(parent).copied();
+            let parent_index = match maybe_parent {
+                Some(parent_index) => parent_index,
+                None => graph.add_node(parent, Node::path()),
+            };
+            graph.add_edge(parent_index, index);
+            if maybe_parent.is_some() {
+                break;
+            }
+            current = parent;
+            index = parent_index;
+        }
+
         let mut stack = vec![(referrer, &root.store_path)];
         while let Some((referrer, store_path)) = stack.pop() {
-            //
             let path_info = &root.path_info[store_path]; // TODO: don't panic?
 
             let lookup = match graph.nodes.get(store_path) {
@@ -144,9 +141,10 @@ fn perf() -> Result<()> {
     dbg!(graph.graph.node_count());
     dbg!(graph.graph.edge_count());
     eprintln!("[{:?}] Find dominators...", start.elapsed());
-    let root = graph.add_node("/", Node::path());
-    let dominators = dominators::simple_fast(&graph.graph, root);
+    let root = graph.nodes[Path::new("/")];
 
+    // compute closure_size/added_size
+    let dominators = dominators::simple_fast(&graph.graph, root);
     let mut dfs = DfsPostOrder::new(&graph.graph, root);
     while let Some(node) = dfs.next(&graph.graph) {
         let total_size = graph
@@ -171,7 +169,20 @@ fn perf() -> Result<()> {
         }
     }
 
-    let tree = PathTree::eprintln!("[{:?}] Done...", start.elapsed());
+    eprintln!("[{:?}] Done...", start.elapsed());
+
+    let tree = graph.graph.filter_map(
+        |ni, n| {
+            matches!(n.ty, NodeType::Path).then_some((
+                &graph.nodes_by_index[&ni],
+                n.added_size,
+                n.closure_size,
+            ))
+        },
+        |_, _| Some(()),
+    );
+
+    println!("{:?}", Dot::new(&tree));
     Ok(())
 }
 
