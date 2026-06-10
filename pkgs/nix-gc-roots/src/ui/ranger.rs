@@ -151,6 +151,7 @@ impl RangerViewInner {
                 if is_marked {
                     style = style.add_modifier(Modifier::CROSSED_OUT | Modifier::DIM)
                 }
+                // TODO: also highlight parent
                 if is_focused && selected == Some(i) {
                     style = style.add_modifier(Modifier::REVERSED | Modifier::BOLD)
                 }
@@ -300,8 +301,6 @@ impl RangerView {
 
 impl AppComponent<Msg, NoUserEvent> for RangerView {
     fn on(&mut self, ev: &Event<NoUserEvent>) -> Option<Msg> {
-        use Key::*;
-
         let inner = &mut self.component;
         let key = ev.as_keyboard()?;
 
@@ -320,12 +319,13 @@ impl AppComponent<Msg, NoUserEvent> for RangerView {
                     Motion::First => inner.move_first(),
                     Motion::Last => inner.move_last(),
                 }
-                return None;
+                return Some(Msg::None);
             }
-            Command::Pending => return None,
+            Command::Fold(..) | Command::Pending => return Some(Msg::None),
             Command::Unhandled => {}
         }
 
+        use Key::*;
         match (key.modifiers, key.code) {
             (_, Char('q')) | (_, Esc) | (KeyModifiers::CONTROL, Char('c')) => {
                 return Some(Msg::AppClose);
@@ -334,8 +334,12 @@ impl AppComponent<Msg, NoUserEvent> for RangerView {
                 if let Some(child) = inner.selected_child() {
                     inner.model.toggle_mark(child);
                 }
+                return Some(Msg::None);
             }
-            (_, Char('r')) => inner.model.reset_marks(),
+            (_, Char('r')) => {
+                inner.model.reset_marks();
+                return Some(Msg::None);
+            }
             (_, Tab) => return Some(Msg::SwitchView),
             _ => {}
         }
