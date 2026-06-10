@@ -37,6 +37,7 @@ in
         # };
       };
 
+      # https://code.claude.com/docs/en/settings
       settings = {
         hooks = lib.mapAttrs (
           _: hooks:
@@ -91,6 +92,17 @@ in
             "Read(**/.ssh/**)"
             "Read(**/secrets/**)"
           ];
+        };
+        sandbox = {
+          enable = true;
+          filesystem = {
+            denyRead = [ "/" ]; # deny by default
+            allowRead = [
+              "/nix/store"
+              "~/configs"
+              "~/dev/"
+            ];
+          };
         };
       };
     };
