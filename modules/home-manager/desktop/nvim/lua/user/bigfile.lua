@@ -27,7 +27,6 @@ function M.setup()
       vim.bo.filetype = ""
       vim.bo.syntax = "OFF"
       vim.b[ev.buf].bigfile = true
-      print(vim.b[ev.buf].bigfile)
     end,
   })
 end
