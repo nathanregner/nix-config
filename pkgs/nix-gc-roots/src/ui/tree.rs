@@ -19,7 +19,7 @@ use tuirealm::state::{State, StateValue};
 
 use crate::msg::Msg;
 use crate::store_graph::DominatorGraph;
-use crate::ui::key_handler::KeyHandler;
+use crate::ui::key_handler::{Fold, KeyHandler, Recurse};
 use crate::ui::{GcRootModel, format_size, is_direnv_path};
 
 #[derive(Clone, Copy, PartialEq)]
@@ -205,13 +205,18 @@ impl TreeViewInner {
     }
 
     fn style(&self) -> TreeListViewStyle<'static> {
+        let pending = self
+            .key_handler
+            .pending()
+            .map(|p| format!("| {p} | "))
+            .unwrap_or_default();
         let title = match self.pending_action {
             PendingAction::Delete => {
                 format!(" Delete {} roots? (y/n) ", self.model.marked_count())
             }
             PendingAction::Reset => " Reset all marks? (y/n) ".to_string(),
             PendingAction::None => format!(
-                " GC Roots | {} marked | profiles: {} | d:mark r:reset D:delete q:quit ",
+                " GC Roots | {} marked | profiles: {} {pending}",
                 self.model.marked_count(),
                 if self.model.show_profiles {
                     "shown"
@@ -223,9 +228,55 @@ impl TreeViewInner {
 
         TreeListViewStyle {
             title: Some(Line::from(title)),
-            highlight_style: Style::default().bg(Color::Blue).fg(Color::Black),
-            mark_style: Style::default().fg(Color::Red),
+            line_style: Style::default().add_modifier(Modifier::BOLD),
+            highlight_style: Style::default().add_modifier(Modifier::REVERSED | Modifier::BOLD),
+            mark_style: Style::default().add_modifier(Modifier::CROSSED_OUT | Modifier::DIM),
             ..TreeListViewStyle::default()
+        }
+    }
+
+    fn open_fold(&mut self) {
+        if let Some(id) = self.state.selected_id() {
+            self.state.set_expanded(id, self.model.root_id, true);
+        }
+    }
+
+    fn close_fold(&mut self) {
+        if let Some(id) = self.state.selected_id() {
+            self.state.set_expanded(id, self.model.root_id, false);
+        }
+    }
+
+    fn handle_fold(&mut self, fold: Fold, recurse: Recurse) {
+        use Fold::*;
+        use Recurse::*;
+        match (fold, recurse) {
+            (Open, No) => self.open_fold(),
+            (Open, Yes) => {
+                self.state
+                    .handle_action(&self.model, TreeAction::<()>::ExpandAll);
+            }
+            (Close, No) => self.close_fold(),
+            (Close, Yes) => {
+                self.state
+                    .handle_action(&self.model, TreeAction::<()>::CollapseAll);
+            }
+            (Alternate, No) => {
+                self.state
+                    .handle_action(&self.model, TreeAction::<()>::ToggleNode);
+            }
+            (Alternate, Yes) => {
+                self.state
+                    .handle_action(&self.model, TreeAction::<()>::ToggleRecursive);
+            }
+            (Reduce, _) => {
+                self.state
+                    .handle_action(&self.model, TreeAction::<()>::ExpandAll);
+            }
+            (More, _) => {
+                self.state
+                    .handle_action(&self.model, TreeAction::<()>::CollapseAll);
+            }
         }
     }
 }
@@ -274,8 +325,6 @@ impl TreeView {
 
 impl AppComponent<Msg, NoUserEvent> for TreeView {
     fn on(&mut self, ev: &Event<NoUserEvent>) -> Option<Msg> {
-        use Key::*;
-
         let inner = &mut self.component;
         let key = ev.as_keyboard()?;
 
@@ -310,11 +359,12 @@ impl AppComponent<Msg, NoUserEvent> for TreeView {
                     Motion::HalfPageDown => {
                         (TreeAction::SelectNext, inner.visible_rows.div_ceil(2))
                     }
-                    Motion::Left => (TreeAction::SelectParent, 1),
+                    Motion::Left => {
+                        inner.close_fold();
+                        (TreeAction::SelectParent, 1)
+                    }
                     Motion::Right => {
-                        if let Some(id) = inner.state.selected_id() {
-                            inner.state.set_expanded(id, inner.model.root_id, true);
-                        }
+                        inner.open_fold();
                         (TreeAction::SelectChild, 1)
                     }
                     Motion::First => (TreeAction::SelectFirst, 1),
@@ -323,12 +373,17 @@ impl AppComponent<Msg, NoUserEvent> for TreeView {
                 for _ in 0..count {
                     inner.state.handle_action(&inner.model, action);
                 }
-                return None;
+                return Some(Msg::None);
             }
-            Command::Pending => return None,
+            Command::Fold(fold, recurse) => {
+                inner.handle_fold(fold, recurse);
+                return Some(Msg::None);
+            }
+            Command::Pending => return Some(Msg::None),
             Command::Unhandled => {}
         }
 
+        use Key::*;
         match (key.modifiers, key.code) {
             (KeyModifiers::CONTROL, Char('c')) | (_, Char('q')) | (_, Esc) => {
                 return Some(Msg::AppClose);
