@@ -5,27 +5,24 @@ edition = "2024"
 default-run = "nix-gc-roots"
 
 [dependencies]
-ratatui = "0.30"
-tui-treelistview = { version = "0.1", features = ["keymap"] }
-crossterm = "0.29"
-chrono = "0.4"
 anyhow = "1"
+chrono = "0.4"
+crossterm = "0.29"
+fixedbitset = "0.5.7"
+heed = { version = "0.22.1", features = ["serde-json"] }
+petgraph = "0.8.3"
+ratatui = "0.30"
+rayon = "1.12.0"
+rkyv = { version = "0.8", features = ["bytecheck"] }
 serde = { version = "1.0.228", features = ["derive"] }
 serde_json = "1.0.150"
-heed = { version = "0.22.1", features = ["serde-json"] }
+# stumpalo = "0.2.0"
+tui-treelistview = { version = "0.1", features = ["keymap"] }
 tuirealm = { version = "4.1.0", default-features = false, features = [
   "derive",
   "crossterm",
 ] }
-rayon = "1.12.0"
 zstd = "0.13.3"
-radix_trie = "0.3.0"
-petgraph = "0.8.3"
-radix_trees = "0.2.0"
-stumpalo = "0.2.0"
-context_deserialize = "0.2.1"
-rkyv = { version = "0.8", features = ["bytecheck"] }
-fixedbitset = "0.5.7"
 
 [dev-dependencies]
 criterion = "0.6"

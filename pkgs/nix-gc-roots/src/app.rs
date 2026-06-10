@@ -157,12 +157,7 @@ where
                 //     let _ = self.app.active(&Id::Tree);
                 // }
             }
-            Msg::ToggleMark
-            | Msg::ToggleProfiles
-            | Msg::DeleteMarked
-            | Msg::ResetMarks
-            | Msg::ConfirmNo
-            | Msg::None => {
+            Msg::DeleteMarked | Msg::ConfirmNo | Msg::None => {
                 // Handled by tree/ranger components
             }
         }

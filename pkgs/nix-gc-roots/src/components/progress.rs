@@ -2,7 +2,7 @@ use ratatui::style::{Color, Style};
 use ratatui::widgets::{Block, Borders, Gauge};
 use tuirealm::command::{Cmd, CmdResult};
 use tuirealm::component::{AppComponent, Component};
-use tuirealm::event::{Event, Key, KeyEvent, NoUserEvent};
+use tuirealm::event::{Event, Key, KeyModifiers, NoUserEvent};
 use tuirealm::props::{AttrValue, Attribute, Props, QueryResult};
 use tuirealm::ratatui::Frame;
 use tuirealm::ratatui::layout::Rect;
@@ -101,12 +101,10 @@ impl Progress {
 
 impl AppComponent<Msg, NoUserEvent> for Progress {
     fn on(&mut self, ev: &Event<NoUserEvent>) -> Option<Msg> {
-        match ev.as_keyboard()? {
-            KeyEvent {
-                code: Key::Char('q'),
-                ..
-            }
-            | KeyEvent { code: Key::Esc, .. } => Some(Msg::AppClose),
+        let key = ev.as_keyboard()?;
+        match (key.modifiers, key.code) {
+            (KeyModifiers::NONE, Key::Char('q') | Key::Esc)
+            | (KeyModifiers::CONTROL, Key::Char('c')) => Some(Msg::AppClose),
             _ => None,
         }
     }
