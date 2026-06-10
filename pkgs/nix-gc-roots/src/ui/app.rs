@@ -10,13 +10,15 @@ use tuirealm::ratatui::layout::{Constraint, Direction, Layout};
 use tuirealm::terminal::{CrosstermTerminalAdapter, TerminalAdapter, TerminalResult};
 
 use crate::cache::Cache;
-use crate::components::{Progress, RangerView, TreeView};
 use crate::msg::{EqHack, Id, Msg};
 use crate::store_graph::DominatorGraph;
+use crate::ui::progress::Progress;
+use crate::ui::ranger::RangerView;
+use crate::ui::tree::TreeView;
 use crate::{StoreGraph, nix};
 
 #[derive(Clone, Copy, PartialEq)]
-pub enum AppView {
+enum AppView {
     Loading,
     Tree,
     Ranger,
@@ -28,9 +30,9 @@ where
 {
     pub app: Application<Id, Msg, NoUserEvent>,
     pub quit: bool,
-    pub redraw: bool,
-    pub view: AppView,
-    pub terminal: T,
+    redraw: bool,
+    view: AppView,
+    terminal: T,
     graph: Option<DominatorGraph>,
 }
 
