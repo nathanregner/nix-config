@@ -48,7 +48,9 @@ fn main() -> Result<()> {
         for msg in messages {
             model.update(msg);
         }
-        model.view();
+        if model.needs_redraw() {
+            model.view();
+        }
     }
 
     Ok(())

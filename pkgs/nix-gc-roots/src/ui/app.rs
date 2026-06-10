@@ -12,6 +12,7 @@ use tuirealm::terminal::{CrosstermTerminalAdapter, TerminalAdapter, TerminalResu
 use crate::cache::Cache;
 use crate::msg::{EqHack, Id, Msg};
 use crate::store_graph::DominatorGraph;
+use crate::ui::port::BlockingInputListener;
 use crate::ui::progress::Progress;
 use crate::ui::ranger::RangerView;
 use crate::ui::tree::TreeView;
@@ -62,7 +63,12 @@ impl<T> Model<T>
 where
     T: TerminalAdapter,
 {
+    pub fn needs_redraw(&self) -> bool {
+        self.redraw
+    }
+
     pub fn view(&mut self) {
+        self.redraw = false;
         let _ = self.terminal.draw(|f| {
             let area = f.area();
 
@@ -167,7 +173,8 @@ where
 
     fn init_app() -> Result<Application<Id, Msg, NoUserEvent>, Box<dyn Error>> {
         let mut app: Application<Id, Msg, NoUserEvent> = Application::init(
-            EventListenerCfg::default().crossterm_input_listener(Duration::from_millis(0), 0),
+            EventListenerCfg::default()
+                .add_port(Box::new(BlockingInputListener), Duration::ZERO, 1),
         );
 
         app.mount(
