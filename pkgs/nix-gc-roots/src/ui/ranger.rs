@@ -11,32 +11,33 @@ use tuirealm::props::{AttrValue, Attribute, Props, QueryResult};
 use tuirealm::ratatui::Frame;
 use tuirealm::state::{State, StateValue};
 
-use crate::model::{GcRootModel, format_size};
 use crate::msg::Msg;
 use crate::store_graph::DominatorGraph;
+use crate::ui::key_handler::KeyHandler;
+use crate::ui::{GcRootModel, format_size};
 
 pub struct RangerViewInner {
     props: Props,
     model: GcRootModel,
     current: NodeIndex,
     selected_index: usize,
+    key_handler: KeyHandler,
+    visible_rows: u16,
 }
 
 impl RangerViewInner {
     pub fn new(graph: DominatorGraph) -> Self {
         let model = GcRootModel::new(graph);
         let root = model.root_id.unwrap_or(NodeIndex::new(0));
-        let current = if !model.children(root).is_empty() {
-            model.children(root)[0]
-        } else {
-            root
-        };
+        let current = model.children(root).first().copied().unwrap_or(root);
 
         Self {
             props: Props::default(),
             model,
             current,
             selected_index: 0,
+            key_handler: Default::default(),
+            visible_rows: 20,
         }
     }
 
@@ -68,16 +69,14 @@ impl RangerViewInner {
         }
     }
 
-    fn move_up(&mut self) {
-        if self.selected_index > 0 {
-            self.selected_index -= 1;
-        }
+    fn move_up(&mut self, count: usize) {
+        self.selected_index = self.selected_index.saturating_sub(count);
     }
 
-    fn move_down(&mut self) {
+    fn move_down(&mut self, count: usize) {
         let children = self.current_children();
-        if self.selected_index + 1 < children.len() {
-            self.selected_index += 1;
+        if !children.is_empty() {
+            self.selected_index = (self.selected_index + count).min(children.len() - 1);
         }
     }
 
@@ -100,6 +99,17 @@ impl RangerViewInner {
         if let Some(child) = self.selected_child() {
             self.current = child;
             self.selected_index = 0;
+        }
+    }
+
+    fn move_first(&mut self) {
+        self.selected_index = 0;
+    }
+
+    fn move_last(&mut self) {
+        let children = self.current_children();
+        if !children.is_empty() {
+            self.selected_index = children.len() - 1;
         }
     }
 
@@ -216,6 +226,7 @@ enum ColumnPosition {
 
 impl Component for RangerViewInner {
     fn view(&mut self, frame: &mut Frame, area: Rect) {
+        self.visible_rows = area.height.saturating_sub(2);
         let chunks = Layout::default()
             .direction(Direction::Horizontal)
             .constraints([
@@ -289,28 +300,46 @@ impl RangerView {
 
 impl AppComponent<Msg, NoUserEvent> for RangerView {
     fn on(&mut self, ev: &Event<NoUserEvent>) -> Option<Msg> {
-        let inner = &mut self.component;
+        use Key::*;
 
+        let inner = &mut self.component;
         let key = ev.as_keyboard()?;
 
+        use super::key_handler::{Command, Motion};
+        match inner.key_handler.process(key.modifiers, key.code) {
+            Command::Motion(motion) => {
+                match motion {
+                    Motion::Up => inner.move_up(1),
+                    Motion::Down => inner.move_down(1),
+                    Motion::HalfPageUp => inner.move_up(inner.visible_rows.div_ceil(2) as usize),
+                    Motion::HalfPageDown => {
+                        inner.move_down(inner.visible_rows.div_ceil(2) as usize)
+                    }
+                    Motion::Left => inner.move_left(),
+                    Motion::Right => inner.move_right(),
+                    Motion::First => inner.move_first(),
+                    Motion::Last => inner.move_last(),
+                }
+                return None;
+            }
+            Command::Pending => return None,
+            Command::Unhandled => {}
+        }
+
         match (key.modifiers, key.code) {
-            (_, Key::Char('q')) | (_, Key::Esc) | (KeyModifiers::CONTROL, Key::Char('c')) => {
+            (_, Char('q')) | (_, Esc) | (KeyModifiers::CONTROL, Char('c')) => {
                 return Some(Msg::AppClose);
             }
-            (_, Key::Char('h') | Key::Left) => inner.move_left(),
-            (_, Key::Char('l') | Key::Right) => inner.move_right(),
-            (_, Key::Char('j') | Key::Down) => inner.move_down(),
-            (_, Key::Char('k') | Key::Up) => inner.move_up(),
-            (_, Key::Char('d')) => {
+            (_, Char('d')) => {
                 if let Some(child) = inner.selected_child() {
                     inner.model.toggle_mark(child);
                 }
             }
-            (_, Key::Char('r')) => inner.model.reset_marks(),
-            (_, Key::Tab) => return Some(Msg::SwitchView),
+            (_, Char('r')) => inner.model.reset_marks(),
+            (_, Tab) => return Some(Msg::SwitchView),
             _ => {}
-        };
+        }
 
-        Some(Msg::None)
+        None
     }
 }

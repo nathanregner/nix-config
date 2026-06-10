@@ -80,42 +80,6 @@ impl StoreGraph {
         let root = *self.add_node("/", Node::path());
         let dominators = dominators::simple_fast(&self.graph, root);
 
-        fn compute_closure_size(
-            // TODO: vec
-            visited: &mut HashMap<NodeIndex, Rc<FixedBitSet>>,
-            dominators: &Dominators<NodeIndex>,
-            graph: &mut DiGraph<Node, ()>,
-            index: NodeIndex,
-        ) -> Rc<FixedBitSet> {
-            if let Some(reachability) = visited.get(&index) {
-                return reachability.clone(); // TODO
-            }
-
-            let node = graph[index];
-            let neighbors = graph.neighbors(index).collect::<Vec<_>>();
-
-            let mut reachability = FixedBitSet::with_capacity(graph.node_count());
-            for neighbor in neighbors {
-                reachability.insert(neighbor.index());
-                reachability |= &*compute_sizes(visited, dominators, graph, neighbor);
-            }
-
-            let mut closure_size = 0;
-            for i in reachability.ones() {
-                closure_size += graph[NodeIndex::new(i)].closure_size;
-            }
-            graph[index].closure_size += closure_size;
-
-            // TODO: error if missing
-            for dominator in dominators.dominators(index).into_iter().flatten() {
-                graph[dominator].added_size += node.added_size;
-            }
-
-            let reachability = Rc::new(reachability);
-            visited.insert(index, reachability.clone());
-            reachability
-        }
-
         fn compute_sizes(
             // TODO: vec
             visited: &mut HashMap<NodeIndex, Rc<FixedBitSet>>,

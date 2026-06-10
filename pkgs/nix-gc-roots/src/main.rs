@@ -1,14 +1,11 @@
-mod app;
 mod cache;
-mod components;
-mod model;
 mod msg;
 mod nix;
 mod store_graph;
 mod types;
+mod ui;
 
 use anyhow::Result;
-use app::Model;
 use petgraph::dot::Dot;
 use std::{
     env,
@@ -40,7 +37,7 @@ fn main() -> Result<()> {
         return perf();
     }
 
-    let mut model = Model::default();
+    let mut model = ui::Model::default();
 
     model.view();
     model.load_roots()?;
