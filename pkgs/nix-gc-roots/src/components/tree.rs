@@ -11,7 +11,7 @@ use tui_treelistview::{
 };
 use tuirealm::command::{Cmd, CmdResult};
 use tuirealm::component::{AppComponent, Component};
-use tuirealm::event::{Event, Key, KeyEvent, KeyModifiers, NoUserEvent};
+use tuirealm::event::{Event, Key, KeyModifiers, NoUserEvent};
 use tuirealm::props::{AttrValue, Attribute, Props, QueryResult};
 use tuirealm::ratatui::Frame;
 use tuirealm::ratatui::layout::Rect;
@@ -275,15 +275,8 @@ impl AppComponent<Msg, NoUserEvent> for TreeView {
         let key = ev.as_keyboard()?;
 
         if inner.pending_action != PendingAction::None {
-            match key {
-                KeyEvent {
-                    code: Key::Char('y'),
-                    ..
-                }
-                | KeyEvent {
-                    code: Key::Char('Y'),
-                    ..
-                } => {
+            match (key.modifiers, key.code) {
+                (_, Key::Char('y' | 'Y')) => {
                     let action = inner.pending_action;
                     inner.pending_action = PendingAction::None;
                     return match action {
@@ -302,22 +295,22 @@ impl AppComponent<Msg, NoUserEvent> for TreeView {
             }
         }
 
-        match key {
-            KeyEvent {
-                modifiers: KeyModifiers::CONTROL,
-                code: Key::Char('c'),
-                ..
+        match (key.modifiers, key.code) {
+            (KeyModifiers::CONTROL, Key::Char('c')) | (_, Key::Char('q')) | (_, Key::Esc) => {
+                return Some(Msg::AppClose);
             }
-            | KeyEvent {
-                code: Key::Char('q'),
-                ..
+            (_, Key::Char('D')) => {
+                if inner.model.marked_count() > 0 {
+                    inner.pending_action = PendingAction::Delete;
+                }
+                inner.pending_g = false;
+                return Some(Msg::DeleteMarked);
             }
-            | KeyEvent { code: Key::Esc, .. } => Some(Msg::AppClose),
-
-            KeyEvent {
-                code: Key::Char('g'),
-                modifiers: KeyModifiers::NONE,
-            } => {
+            (_, Key::Tab) => {
+                inner.pending_g = false;
+                return Some(Msg::SwitchView);
+            }
+            (KeyModifiers::NONE, Key::Char('g')) => {
                 if inner.pending_g {
                     inner
                         .state
@@ -326,27 +319,14 @@ impl AppComponent<Msg, NoUserEvent> for TreeView {
                 } else {
                     inner.pending_g = true;
                 }
-                Some(Msg::None)
             }
-
-            KeyEvent {
-                code: Key::Char('G'),
-                ..
-            } => {
+            (_, Key::Char('G')) => {
                 inner
                     .state
                     .handle_action(&inner.model, TreeAction::<()>::SelectLast);
                 inner.pending_g = false;
-                Some(Msg::None)
             }
-
-            KeyEvent {
-                code: Key::Char('h'),
-                ..
-            }
-            | KeyEvent {
-                code: Key::Left, ..
-            } => {
+            (_, Key::Char('h') | Key::Left) => {
                 if let Some(id) = inner.state.selected_id() {
                     inner.state.set_expanded(id, inner.model.root_id, false);
                 }
@@ -354,16 +334,8 @@ impl AppComponent<Msg, NoUserEvent> for TreeView {
                     .state
                     .handle_action(&inner.model, TreeAction::<()>::SelectParent);
                 inner.pending_g = false;
-                Some(Msg::None)
             }
-
-            KeyEvent {
-                code: Key::Char('l'),
-                ..
-            }
-            | KeyEvent {
-                code: Key::Right, ..
-            } => {
+            (_, Key::Char('l') | Key::Right) => {
                 if let Some(id) = inner.state.selected_id() {
                     inner.state.set_expanded(id, inner.model.root_id, true);
                 }
@@ -371,87 +343,41 @@ impl AppComponent<Msg, NoUserEvent> for TreeView {
                     .state
                     .handle_action(&inner.model, TreeAction::<()>::SelectChild);
                 inner.pending_g = false;
-                Some(Msg::None)
             }
-
-            KeyEvent {
-                code: Key::Char('j'),
-                ..
-            }
-            | KeyEvent {
-                code: Key::Down, ..
-            } => {
+            (_, Key::Char('j') | Key::Down) => {
                 inner
                     .state
                     .handle_action(&inner.model, TreeAction::<()>::SelectNext);
                 inner.pending_g = false;
-                Some(Msg::None)
             }
-
-            KeyEvent {
-                code: Key::Char('k'),
-                ..
-            }
-            | KeyEvent { code: Key::Up, .. } => {
+            (_, Key::Char('k') | Key::Up) => {
                 inner
                     .state
                     .handle_action(&inner.model, TreeAction::<()>::SelectPrev);
                 inner.pending_g = false;
-                Some(Msg::None)
             }
-
-            KeyEvent {
-                code: Key::Char('d'),
-                modifiers: KeyModifiers::NONE,
-            } => {
+            (KeyModifiers::NONE, Key::Char('d')) => {
                 if let Some(id) = inner.state.selected_id() {
                     inner.model.toggle_mark(id);
                 }
                 inner.pending_g = false;
-                Some(Msg::ToggleMark)
             }
-
-            KeyEvent {
-                code: Key::Char('D'),
-                ..
-            } => {
-                if inner.model.marked_count() > 0 {
-                    inner.pending_action = PendingAction::Delete;
-                }
-                inner.pending_g = false;
-                Some(Msg::DeleteMarked)
-            }
-
-            KeyEvent {
-                code: Key::Char('r'),
-                modifiers: KeyModifiers::NONE,
-            } => {
+            (KeyModifiers::NONE, Key::Char('r')) => {
                 if inner.model.marked_count() > 0 {
                     inner.pending_action = PendingAction::Reset;
                 }
                 inner.pending_g = false;
-                Some(Msg::ResetMarks)
             }
-
-            KeyEvent {
-                code: Key::Char('p'),
-                modifiers: KeyModifiers::NONE,
-            } => {
+            (KeyModifiers::NONE, Key::Char('p')) => {
                 inner.model.toggle_profiles();
                 inner.state.invalidate_all();
                 inner.pending_g = false;
-                Some(Msg::ToggleProfiles)
             }
-
-            KeyEvent { code: Key::Tab, .. } => {
-                inner.pending_g = false;
-                Some(Msg::SwitchView)
-            }
-
             _ => {
                 inner.pending_g = false;
-                None
             }
         }
+
+        None
     }
 }

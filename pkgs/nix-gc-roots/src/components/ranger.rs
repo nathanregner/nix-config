@@ -6,7 +6,7 @@ use ratatui::text::{Line, Span};
 use ratatui::widgets::{Block, Borders, List, ListItem, ListState};
 use tuirealm::command::{Cmd, CmdResult};
 use tuirealm::component::{AppComponent, Component};
-use tuirealm::event::{Event, Key, KeyEvent, KeyModifiers, NoUserEvent};
+use tuirealm::event::{Event, Key, KeyModifiers, NoUserEvent};
 use tuirealm::props::{AttrValue, Attribute, Props, QueryResult};
 use tuirealm::ratatui::Frame;
 use tuirealm::state::{State, StateValue};
@@ -293,76 +293,24 @@ impl AppComponent<Msg, NoUserEvent> for RangerView {
 
         let key = ev.as_keyboard()?;
 
-        match key {
-            KeyEvent {
-                code: Key::Char('q'),
-                ..
+        match (key.modifiers, key.code) {
+            (_, Key::Char('q')) | (_, Key::Esc) | (KeyModifiers::CONTROL, Key::Char('c')) => {
+                return Some(Msg::AppClose);
             }
-            | KeyEvent { code: Key::Esc, .. } => Some(Msg::AppClose),
-
-            KeyEvent {
-                code: Key::Char('h'),
-                ..
-            }
-            | KeyEvent {
-                code: Key::Left, ..
-            } => {
-                inner.move_left();
-                Some(Msg::None)
-            }
-
-            KeyEvent {
-                code: Key::Char('l'),
-                ..
-            }
-            | KeyEvent {
-                code: Key::Right, ..
-            } => {
-                inner.move_right();
-                Some(Msg::None)
-            }
-
-            KeyEvent {
-                code: Key::Char('j'),
-                ..
-            }
-            | KeyEvent {
-                code: Key::Down, ..
-            } => {
-                inner.move_down();
-                Some(Msg::None)
-            }
-
-            KeyEvent {
-                code: Key::Char('k'),
-                ..
-            }
-            | KeyEvent { code: Key::Up, .. } => {
-                inner.move_up();
-                Some(Msg::None)
-            }
-
-            KeyEvent {
-                code: Key::Char('d'),
-                modifiers: KeyModifiers::NONE,
-            } => {
+            (_, Key::Char('h') | Key::Left) => inner.move_left(),
+            (_, Key::Char('l') | Key::Right) => inner.move_right(),
+            (_, Key::Char('j') | Key::Down) => inner.move_down(),
+            (_, Key::Char('k') | Key::Up) => inner.move_up(),
+            (_, Key::Char('d')) => {
                 if let Some(child) = inner.selected_child() {
                     inner.model.toggle_mark(child);
                 }
-                Some(Msg::ToggleMark)
             }
+            (_, Key::Char('r')) => inner.model.reset_marks(),
+            (_, Key::Tab) => return Some(Msg::SwitchView),
+            _ => {}
+        };
 
-            KeyEvent {
-                code: Key::Char('r'),
-                modifiers: KeyModifiers::NONE,
-            } => {
-                inner.model.reset_marks();
-                Some(Msg::ResetMarks)
-            }
-
-            KeyEvent { code: Key::Tab, .. } => Some(Msg::SwitchView),
-
-            _ => None,
-        }
+        Some(Msg::None)
     }
 }
