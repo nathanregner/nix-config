@@ -308,16 +308,16 @@ impl AppComponent<Msg, NoUserEvent> for RangerView {
         match inner.key_handler.process(key.modifiers, key.code) {
             Command::Motion(motion) => {
                 match motion {
-                    Motion::Up => inner.move_up(1),
-                    Motion::Down => inner.move_down(1),
-                    Motion::HalfPageUp => inner.move_up(inner.visible_rows.div_ceil(2) as usize),
-                    Motion::HalfPageDown => {
-                        inner.move_down(inner.visible_rows.div_ceil(2) as usize)
-                    }
+                    Motion::Up(count) => inner.move_up(count),
+                    Motion::Down(count) => inner.move_down(count),
                     Motion::Left => inner.move_left(),
                     Motion::Right => inner.move_right(),
                     Motion::First => inner.move_first(),
                     Motion::Last => inner.move_last(),
+                    Motion::HalfPageUp => inner.move_up(inner.visible_rows.div_ceil(2) as usize),
+                    Motion::HalfPageDown => {
+                        inner.move_down(inner.visible_rows.div_ceil(2) as usize)
+                    }
                 }
                 return Some(Msg::None);
             }
