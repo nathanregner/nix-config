@@ -6,7 +6,7 @@ use ratatui::style::{Color, Modifier, Style};
 use ratatui::text::{Line, Span};
 use ratatui::widgets::Cell;
 use tui_treelistview::{
-    ColumnDef, SimpleColumns, TreeAction, TreeGlyphs, TreeLabelRenderer, TreeListView,
+    ColumnDef, SimpleColumns, TreeAction, TreeEvent, TreeGlyphs, TreeLabelRenderer, TreeListView,
     TreeListViewState, TreeListViewStyle, TreeModel, TreeRowContext,
 };
 use tuirealm::command::{Cmd, CmdResult};
@@ -27,6 +27,12 @@ pub enum PendingAction {
     None,
     Delete,
     Reset,
+}
+
+#[derive(Clone, Copy)]
+enum FoldAction {
+    Open,
+    Close,
 }
 
 struct Label {
@@ -235,49 +241,32 @@ impl TreeViewInner {
         }
     }
 
-    fn open_fold(&mut self) {
-        if let Some(id) = self.state.selected_id() {
-            self.state.set_expanded(id, self.model.root_id, true);
-        }
-    }
-
-    fn close_fold(&mut self) {
-        if let Some(id) = self.state.selected_id() {
-            self.state.set_expanded(id, self.model.root_id, false);
-        }
-    }
-
-    fn handle_fold(&mut self, fold: Fold, recurse: Recurse) {
+    fn handle_fold(&mut self, fold: Fold, recurse: Recurse) -> bool {
         use Fold::*;
         use Recurse::*;
-        match (fold, recurse) {
-            (Open, No) => self.open_fold(),
-            (Open, Yes) => {
-                self.state
-                    .handle_action(&self.model, TreeAction::<()>::ExpandAll);
-            }
-            (Close, No) => self.close_fold(),
-            (Close, Yes) => {
-                self.state
-                    .handle_action(&self.model, TreeAction::<()>::CollapseAll);
-            }
-            (Alternate, No) => {
-                self.state
-                    .handle_action(&self.model, TreeAction::<()>::ToggleNode);
-            }
-            (Alternate, Yes) => {
-                self.state
-                    .handle_action(&self.model, TreeAction::<()>::ToggleRecursive);
-            }
-            (Reduce, _) => {
-                self.state
-                    .handle_action(&self.model, TreeAction::<()>::ExpandAll);
-            }
-            (More, _) => {
-                self.state
-                    .handle_action(&self.model, TreeAction::<()>::CollapseAll);
-            }
+        let action = match (fold, recurse) {
+            (Open, No) => TreeAction::Custom(FoldAction::Open),
+            (Open, Yes) => TreeAction::ExpandAll,
+            (Close, No) => TreeAction::Custom(FoldAction::Close),
+            (Close, Yes) => TreeAction::CollapseAll,
+            (Alternate, No) => TreeAction::ToggleNode,
+            (Alternate, Yes) => TreeAction::ToggleRecursive,
+            (Reduce, _) => TreeAction::ExpandAll,
+            (More, _) => TreeAction::CollapseAll,
+        };
+
+        if let TreeEvent::Action(TreeAction::Custom(fold_action)) =
+            self.state.handle_action(&self.model, action)
+            && let Some(id) = self.state.selected_id()
+        {
+            // TODO: rest
+            let expand = matches!(fold_action, FoldAction::Open);
+            self.state
+                .set_expanded(id, self.state.selected_parent_id(), expand);
+            return true;
         }
+
+        false
     }
 }
 
@@ -349,34 +338,41 @@ impl AppComponent<Msg, NoUserEvent> for TreeView {
             }
         }
 
-        use super::key_handler::{Command, Motion};
+        use super::key_handler::{Command, Fold, Motion, Recurse};
         match inner.key_handler.process(key.modifiers, key.code) {
             Command::Motion(motion) => {
                 let (action, count): (TreeAction<()>, u16) = match motion {
-                    Motion::Up => (TreeAction::SelectPrev, 1),
-                    Motion::Down => (TreeAction::SelectNext, 1),
+                    Motion::Up(count) => {
+                        (TreeAction::SelectPrev, count.try_into().unwrap_or(u16::MAX))
+                    }
+                    Motion::Down(count) => {
+                        (TreeAction::SelectNext, count.try_into().unwrap_or(u16::MAX))
+                    }
+                    Motion::Left => {
+                        inner.handle_fold(Fold::Close, Recurse::No);
+                        (TreeAction::SelectParent, 1)
+                    }
+                    Motion::Right => {
+                        inner.handle_fold(Fold::Open, Recurse::No);
+                        (TreeAction::SelectChild, 1)
+                    }
                     Motion::HalfPageUp => (TreeAction::SelectPrev, inner.visible_rows.div_ceil(2)),
                     Motion::HalfPageDown => {
                         (TreeAction::SelectNext, inner.visible_rows.div_ceil(2))
                     }
-                    Motion::Left => {
-                        inner.close_fold();
-                        (TreeAction::SelectParent, 1)
-                    }
-                    Motion::Right => {
-                        inner.open_fold();
-                        (TreeAction::SelectChild, 1)
-                    }
                     Motion::First => (TreeAction::SelectFirst, 1),
                     Motion::Last => (TreeAction::SelectLast, 1),
                 };
+                // FIXME: inefficient, stop once nothing changed
                 for _ in 0..count {
                     inner.state.handle_action(&inner.model, action);
                 }
                 return Some(Msg::None);
             }
-            Command::Fold(fold, recurse) => {
-                inner.handle_fold(fold, recurse);
+            Command::Fold(fold, recurse, mut count) => {
+                while count > 0 && inner.handle_fold(fold, recurse) {
+                    count -= 1;
+                }
                 return Some(Msg::None);
             }
             Command::Pending => return Some(Msg::None),
