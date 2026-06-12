@@ -6,21 +6,10 @@ use ratatui::style::{Color, Modifier, Style};
 use ratatui::text::{Line, Span};
 use ratatui::widgets::Cell;
 use tui_treelistview::{
-    ColumnDef, SimpleColumns, TreeAction, TreeEvent, TreeGlyphs, TreeLabelRenderer, TreeListView,
-    TreeListViewState, TreeListViewStyle, TreeModel, TreeRowContext,
+    ColumnDef, SimpleColumns, TreeGlyphs, TreeLabelRenderer, TreeRowContext,
 };
-use tuirealm::command::{Cmd, CmdResult};
-use tuirealm::component::{AppComponent, Component};
-use tuirealm::event::{Event, Key, KeyModifiers, NoUserEvent};
-use tuirealm::props::{AttrValue, Attribute, Props, QueryResult};
-use tuirealm::ratatui::Frame;
-use tuirealm::ratatui::layout::Rect;
-use tuirealm::state::{State, StateValue};
 
-use crate::msg::Msg;
-use crate::store_graph::DominatorGraph;
-use crate::ui::key_handler::{Fold, KeyHandler, Recurse};
-use crate::ui::{GcRootModel, format_size, is_direnv_path};
+use crate::ui::GcRootModel;
 
 #[derive(Clone, Copy, PartialEq)]
 pub enum PendingAction {
@@ -29,20 +18,14 @@ pub enum PendingAction {
     Reset,
 }
 
-#[derive(Clone, Copy)]
-enum FoldAction {
-    Open,
-    Close,
-}
-
-struct Label {
+pub struct Label {
     current_row: StdCell<usize>,
     selected_id: StdCell<Option<NodeIndex>>,
     selected_row: StdCell<Option<usize>>,
 }
 
 impl Label {
-    fn new() -> Self {
+    pub fn new() -> Self {
         Self {
             current_row: StdCell::new(0),
             selected_id: StdCell::new(None),
@@ -50,7 +33,7 @@ impl Label {
         }
     }
 
-    fn reset(&self, selected_id: Option<NodeIndex>) {
+    pub fn reset(&self, selected_id: Option<NodeIndex>) {
         self.current_row.set(0);
         self.selected_id.set(selected_id);
         self.selected_row.set(None);
@@ -144,7 +127,9 @@ fn marked_style(model: &GcRootModel, id: NodeIndex) -> Style {
     }
 }
 
-fn size_cell(model: &GcRootModel, id: NodeIndex) -> Cell<'_> {
+use crate::ui::format_size;
+
+pub fn size_cell(model: &GcRootModel, id: NodeIndex) -> Cell<'_> {
     let size = model.closure_size(id);
     if size == 0 {
         Cell::from("")
@@ -153,18 +138,7 @@ fn size_cell(model: &GcRootModel, id: NodeIndex) -> Cell<'_> {
     }
 }
 
-pub struct TreeViewInner {
-    props: Props,
-    model: GcRootModel,
-    state: TreeListViewState<NodeIndex>,
-    label: Label,
-    columns: SimpleColumns<1, GcRootModel>,
-    pending_action: PendingAction,
-    key_handler: KeyHandler,
-    visible_rows: u16,
-}
-
-fn make_columns() -> SimpleColumns<1, GcRootModel> {
+pub fn make_columns() -> SimpleColumns<1, GcRootModel> {
     SimpleColumns::new(
         Constraint::Fill(1),
         "Name",
@@ -175,243 +149,4 @@ fn make_columns() -> SimpleColumns<1, GcRootModel> {
             .fg(Color::Yellow)
             .add_modifier(Modifier::BOLD),
     )
-}
-
-impl TreeViewInner {
-    pub fn with_graph(graph: DominatorGraph) -> Self {
-        let model = GcRootModel::new(graph);
-        let mut state = TreeListViewState::with_capacity(model.size_hint());
-
-        for ni in model.graph.node_indices() {
-            if let Some(path) = model.path(ni) {
-                let children = model.children(ni);
-                if !children.is_empty() && !is_direnv_path(path) {
-                    state.set_expanded(ni, model.root_id, true);
-                }
-            }
-        }
-
-        if let Some(root_id) = model.root_id {
-            let children = model.children(root_id);
-            if !children.is_empty() {
-                state.select_by_id(&model, children[0]);
-            }
-        }
-
-        Self {
-            props: Props::default(),
-            model,
-            state,
-            label: Label::new(),
-            columns: make_columns(),
-            pending_action: PendingAction::None,
-            key_handler: Default::default(),
-            visible_rows: 20,
-        }
-    }
-
-    fn style(&self) -> TreeListViewStyle<'static> {
-        let pending = self
-            .key_handler
-            .pending()
-            .map(|p| format!("| {p} | "))
-            .unwrap_or_default();
-        let title = match self.pending_action {
-            PendingAction::Delete => {
-                format!(" Delete {} roots? (y/n) ", self.model.marked_count())
-            }
-            PendingAction::Reset => " Reset all marks? (y/n) ".to_string(),
-            PendingAction::None => format!(
-                " GC Roots | {} marked | profiles: {} {pending}",
-                self.model.marked_count(),
-                if self.model.show_profiles {
-                    "shown"
-                } else {
-                    "hidden"
-                }
-            ),
-        };
-
-        TreeListViewStyle {
-            title: Some(Line::from(title)),
-            line_style: Style::default().add_modifier(Modifier::BOLD),
-            highlight_style: Style::default().add_modifier(Modifier::REVERSED | Modifier::BOLD),
-            mark_style: Style::default().add_modifier(Modifier::CROSSED_OUT | Modifier::DIM),
-            ..TreeListViewStyle::default()
-        }
-    }
-
-    fn handle_fold(&mut self, fold: Fold, recurse: Recurse) -> bool {
-        use Fold::*;
-        use Recurse::*;
-        let action = match (fold, recurse) {
-            (Open, No) => TreeAction::Custom(FoldAction::Open),
-            (Open, Yes) => TreeAction::ExpandAll,
-            (Close, No) => TreeAction::Custom(FoldAction::Close),
-            (Close, Yes) => TreeAction::CollapseAll,
-            (Alternate, No) => TreeAction::ToggleNode,
-            (Alternate, Yes) => TreeAction::ToggleRecursive,
-            (Reduce, _) => TreeAction::ExpandAll,
-            (More, _) => TreeAction::CollapseAll,
-        };
-
-        if let TreeEvent::Action(TreeAction::Custom(fold_action)) =
-            self.state.handle_action(&self.model, action)
-            && let Some(id) = self.state.selected_id()
-        {
-            // TODO: rest
-            let expand = matches!(fold_action, FoldAction::Open);
-            self.state
-                .set_expanded(id, self.state.selected_parent_id(), expand);
-            return true;
-        }
-
-        false
-    }
-}
-
-impl Component for TreeViewInner {
-    fn view(&mut self, frame: &mut Frame, area: Rect) {
-        self.visible_rows = area.height.saturating_sub(2);
-        self.label.reset(self.state.selected_id());
-        let style = self.style();
-        let widget = TreeListView::new(&self.model, &self.label, &self.columns, style);
-        frame.render_stateful_widget(widget, area, &mut self.state);
-    }
-
-    fn query<'a>(&'a self, attr: Attribute) -> Option<QueryResult<'a>> {
-        self.props.get_for_query(attr)
-    }
-
-    fn attr(&mut self, attr: Attribute, value: AttrValue) {
-        self.props.set(attr, value);
-    }
-
-    fn state(&self) -> State {
-        State::Single(StateValue::Usize(self.model.marked_count()))
-    }
-
-    fn perform(&mut self, cmd: Cmd) -> CmdResult {
-        match cmd {
-            Cmd::Custom("reload") => CmdResult::NoChange,
-            _ => CmdResult::Invalid(cmd),
-        }
-    }
-}
-
-#[derive(Component)]
-pub struct TreeView {
-    component: TreeViewInner,
-}
-
-impl TreeView {
-    pub fn new(graph: DominatorGraph) -> Self {
-        Self {
-            component: TreeViewInner::with_graph(graph),
-        }
-    }
-}
-
-impl AppComponent<Msg, NoUserEvent> for TreeView {
-    fn on(&mut self, ev: &Event<NoUserEvent>) -> Option<Msg> {
-        let inner = &mut self.component;
-        let key = ev.as_keyboard()?;
-
-        if inner.pending_action != PendingAction::None {
-            match (key.modifiers, key.code) {
-                (_, Key::Char('y' | 'Y')) => {
-                    let action = inner.pending_action;
-                    inner.pending_action = PendingAction::None;
-                    return match action {
-                        PendingAction::Delete => Some(Msg::ConfirmYes),
-                        PendingAction::Reset => {
-                            inner.model.reset_marks();
-                            Some(Msg::None)
-                        }
-                        PendingAction::None => None,
-                    };
-                }
-                _ => {
-                    inner.pending_action = PendingAction::None;
-                    return Some(Msg::ConfirmNo);
-                }
-            }
-        }
-
-        use super::key_handler::{Command, Fold, Motion, Recurse};
-        match inner.key_handler.process(key.modifiers, key.code) {
-            Command::Motion(motion) => {
-                let (action, count): (TreeAction<()>, u16) = match motion {
-                    Motion::Up(count) => {
-                        (TreeAction::SelectPrev, count.try_into().unwrap_or(u16::MAX))
-                    }
-                    Motion::Down(count) => {
-                        (TreeAction::SelectNext, count.try_into().unwrap_or(u16::MAX))
-                    }
-                    Motion::Left => {
-                        inner.handle_fold(Fold::Close, Recurse::No);
-                        (TreeAction::SelectParent, 1)
-                    }
-                    Motion::Right => {
-                        inner.handle_fold(Fold::Open, Recurse::No);
-                        (TreeAction::SelectChild, 1)
-                    }
-                    Motion::HalfPageUp => (TreeAction::SelectPrev, inner.visible_rows.div_ceil(2)),
-                    Motion::HalfPageDown => {
-                        (TreeAction::SelectNext, inner.visible_rows.div_ceil(2))
-                    }
-                    Motion::First => (TreeAction::SelectFirst, 1),
-                    Motion::Last => (TreeAction::SelectLast, 1),
-                };
-                // FIXME: inefficient, stop once nothing changed
-                for _ in 0..count {
-                    inner.state.handle_action(&inner.model, action);
-                }
-                return Some(Msg::None);
-            }
-            Command::Fold(fold, recurse, mut count) => {
-                while count > 0 && inner.handle_fold(fold, recurse) {
-                    count -= 1;
-                }
-                return Some(Msg::None);
-            }
-            Command::Pending => return Some(Msg::None),
-            Command::Unhandled => {}
-        }
-
-        use Key::*;
-        match (key.modifiers, key.code) {
-            (KeyModifiers::CONTROL, Char('c')) | (_, Char('q')) | (_, Esc) => {
-                return Some(Msg::AppClose);
-            }
-            (KeyModifiers::NONE, Enter) => {
-                if let Some(id) = inner.state.selected_id() {
-                    inner.state.set_expanded(id, inner.model.root_id, true);
-                }
-            }
-            (KeyModifiers::NONE, Char('D')) => {
-                if inner.model.marked_count() > 0 {
-                    inner.pending_action = PendingAction::Delete;
-                }
-                return Some(Msg::DeleteMarked);
-            }
-            (KeyModifiers::NONE, Tab) => return Some(Msg::SwitchView),
-            (KeyModifiers::NONE, Char('d')) => {
-                if let Some(id) = inner.state.selected_id() {
-                    inner.model.toggle_mark(id);
-                }
-            }
-            (KeyModifiers::NONE, Char('r')) if inner.model.marked_count() > 0 => {
-                inner.pending_action = PendingAction::Reset;
-            }
-            (KeyModifiers::NONE, Char('r')) => {}
-            (KeyModifiers::NONE, Char('p')) => {
-                inner.model.toggle_profiles();
-                inner.state.invalidate_all();
-            }
-            _ => {}
-        }
-
-        None
-    }
 }

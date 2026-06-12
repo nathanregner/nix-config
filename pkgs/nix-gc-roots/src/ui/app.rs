@@ -1,209 +1,665 @@
-use std::error::Error;
+use std::io::{self, Stdout};
 use std::path::Path;
-use std::time::{Duration, Instant};
 
 use anyhow::Result;
-use tuirealm::application::Application;
-use tuirealm::event::NoUserEvent;
-use tuirealm::listener::EventListenerCfg;
-use tuirealm::ratatui::layout::{Constraint, Direction, Layout};
-use tuirealm::terminal::{CrosstermTerminalAdapter, TerminalAdapter, TerminalResult};
+use arboard::Clipboard;
+use crossterm::event::{KeyCode, KeyEventKind, KeyModifiers};
+use crossterm::execute;
+use crossterm::terminal::{
+    EnterAlternateScreen, LeaveAlternateScreen, disable_raw_mode, enable_raw_mode,
+};
+use petgraph::graph::NodeIndex;
+use ratatui::Terminal;
+use ratatui::backend::CrosstermBackend;
+use ratatui::layout::{Constraint, Direction, Layout, Rect};
+use ratatui::prelude::Frame;
+use ratatui::style::{Color, Modifier, Style};
+use ratatui::symbols::{border, line};
+use ratatui::text::{Line, Span};
+use ratatui::widgets::{Block, Borders, Gauge, List, ListItem, ListState};
+use tui_treelistview::{
+    SimpleColumns, TreeAction, TreeEvent, TreeListView, TreeListViewState, TreeListViewStyle,
+};
 
 use crate::cache::Cache;
-use crate::msg::{EqHack, Id, Msg};
-use crate::store_graph::DominatorGraph;
-use crate::ui::port::BlockingInputListener;
-use crate::ui::progress::Progress;
-use crate::ui::ranger::RangerView;
-use crate::ui::tree::TreeView;
-use crate::{StoreGraph, nix};
+use crate::nix;
+use crate::store_graph::StoreGraph;
+use crate::ui::key_handler::{Command, Fold, KeyHandler, Motion, Recurse};
+use crate::ui::tree::{Label, PendingAction, make_columns};
+use crate::ui::{GcRootModel, format_size, is_direnv_path};
 
-#[derive(Clone, Copy, PartialEq)]
-enum AppView {
-    Loading,
+#[derive(Clone, Copy, PartialEq, Default)]
+pub enum PrimaryFocus {
+    #[default]
+    Progress,
     Tree,
     Ranger,
 }
 
-pub struct Model<T>
-where
-    T: TerminalAdapter,
-{
-    pub app: Application<Id, Msg, NoUserEvent>,
-    pub quit: bool,
-    redraw: bool,
-    view: AppView,
-    terminal: T,
-    graph: Option<DominatorGraph>,
+#[derive(Clone, Copy, PartialEq, Default)]
+pub enum SecondaryFocus {
+    #[default]
+    None,
+    Search,
 }
 
-impl Default for Model<CrosstermTerminalAdapter> {
+pub struct App {
+    pub quit: bool,
+    pub needs_redraw: bool,
+    pub primary_focus: PrimaryFocus,
+    pub secondary_focus: SecondaryFocus,
+    pub clipboard: Clipboard,
+
+    pub model: Option<GcRootModel>,
+    pub view: Option<ViewState>,
+    pub progress: Option<ProgressState>,
+}
+
+pub struct ViewState {
+    pub tree: TreeListViewState<NodeIndex>,
+    pub label: Label,
+    pub columns: SimpleColumns<1, GcRootModel>,
+    pub pending_action: PendingAction,
+    pub key_handler: KeyHandler,
+    pub visible_rows: u16,
+}
+
+pub struct ProgressState {
+    pub current: usize,
+    pub total: usize,
+    pub message: String,
+}
+
+impl Default for App {
     fn default() -> Self {
         Self {
-            app: Self::init_app().expect("Failed to initialize application"),
             quit: false,
-            redraw: true,
-            view: AppView::Loading,
-            terminal: Self::init_adapter().expect("Cannot initialize terminal"),
-            graph: None,
+            needs_redraw: true,
+            primary_focus: PrimaryFocus::Progress,
+            secondary_focus: SecondaryFocus::None,
+            // TODO: handle error
+            clipboard: Clipboard::new().unwrap(),
+            model: None,
+            view: None,
+            progress: Some(ProgressState {
+                current: 0,
+                total: 0,
+                message: "Loading GC roots".to_string(),
+            }),
         }
     }
 }
 
-impl Model<CrosstermTerminalAdapter> {
-    fn init_adapter() -> TerminalResult<CrosstermTerminalAdapter> {
-        let mut adapter = CrosstermTerminalAdapter::new()?;
-        adapter.enable_raw_mode()?;
-        adapter.enter_alternate_screen()?;
-        Ok(adapter)
-    }
-}
+impl App {
+    pub fn run(&mut self) -> Result<()> {
+        enable_raw_mode()?;
+        let mut stdout = io::stdout();
+        execute!(stdout, EnterAlternateScreen)?;
+        let backend = CrosstermBackend::new(stdout);
+        let mut terminal = Terminal::new(backend)?;
 
-impl<T> Model<T>
-where
-    T: TerminalAdapter,
-{
-    pub fn needs_redraw(&self) -> bool {
-        self.redraw
+        self.render(&mut terminal)?;
+        self.load_roots()?;
+
+        while !self.quit {
+            if self.needs_redraw {
+                self.render(&mut terminal)?;
+                self.needs_redraw = false;
+            }
+
+            if crossterm::event::poll(std::time::Duration::from_millis(100))?
+                && let crossterm::event::Event::Key(key) = crossterm::event::read()?
+                && key.kind == KeyEventKind::Press
+            {
+                self.handle_key(key.modifiers, key.code);
+            }
+        }
+
+        disable_raw_mode()?;
+        execute!(terminal.backend_mut(), LeaveAlternateScreen)?;
+        Ok(())
     }
 
-    pub fn view(&mut self) {
-        self.redraw = false;
-        let _ = self.terminal.draw(|f| {
+    fn render(&mut self, terminal: &mut Terminal<CrosstermBackend<Stdout>>) -> Result<()> {
+        terminal.draw(|f| {
             let area = f.area();
-
-            match self.view {
-                AppView::Loading => {
-                    let [_, center, _] = Layout::default()
-                        .direction(Direction::Vertical)
-                        .constraints([
-                            Constraint::Percentage(40),
-                            Constraint::Length(3),
-                            Constraint::Percentage(40),
-                        ])
-                        .areas(area);
-
-                    let [_, middle, _] = Layout::default()
-                        .direction(Direction::Horizontal)
-                        .constraints([
-                            Constraint::Percentage(20),
-                            Constraint::Percentage(60),
-                            Constraint::Percentage(20),
-                        ])
-                        .areas(center);
-
-                    self.app.view(&Id::Progress, f, middle);
+            match self.primary_focus {
+                PrimaryFocus::Progress => {
+                    if let Some(ref progress) = self.progress {
+                        let center = centered_rect(area, 60, 3);
+                        render_progress(f, progress, center);
+                    }
                 }
-                AppView::Tree => {
-                    self.app.view(&Id::Tree, f, area);
+                PrimaryFocus::Tree => {
+                    if let (Some(model), Some(view)) = (&self.model, &mut self.view) {
+                        render_tree(f, model, view, area);
+                    }
                 }
-                AppView::Ranger => {
-                    self.app.view(&Id::Ranger, f, area);
-                }
-            }
-        });
-    }
-
-    pub fn update(&mut self, msg: Msg) {
-        self.redraw = true;
-
-        match msg {
-            Msg::AppClose => {
-                self.quit = true;
-            }
-            Msg::LoadingComplete(dominators) => {
-                self.graph = Some(dominators.0);
-                let _ = self.app.umount(&Id::Progress);
-                if let Some(ref graph) = self.graph {
-                    let _ = self.app.mount(
-                        Id::Ranger,
-                        Box::new(RangerView::new(graph.clone())),
-                        vec![],
-                    );
-                    let _ = self.app.active(&Id::Ranger);
-                }
-                self.view = AppView::Ranger;
-            }
-            Msg::SwitchView => {
-                if let Some(ref graph) = self.graph {
-                    match self.view {
-                        AppView::Tree => {
-                            let _ = self.app.umount(&Id::Tree);
-                            let _ = self.app.mount(
-                                Id::Ranger,
-                                Box::new(RangerView::new(graph.clone())),
-                                vec![],
-                            );
-                            let _ = self.app.active(&Id::Ranger);
-                            self.view = AppView::Ranger;
-                        }
-                        AppView::Ranger => {
-                            let _ = self.app.umount(&Id::Ranger);
-                            let _ = self.app.mount(
-                                Id::Tree,
-                                Box::new(TreeView::new(graph.clone())),
-                                vec![],
-                            );
-                            let _ = self.app.active(&Id::Tree);
-                            self.view = AppView::Tree;
-                        }
-                        AppView::Loading => {}
+                PrimaryFocus::Ranger => {
+                    if let (Some(model), Some(view)) = (&self.model, &mut self.view) {
+                        render_ranger(f, model, view, area);
                     }
                 }
             }
-            Msg::LoadingProgress(_current, _total) => {
-                // Progress updates handled by Progress component directly
-            }
-            Msg::ConfirmYes => {
-                // // Tree handles this internally and reloads
-                // // For now, just trigger a reload
-                // if let Ok(roots) = self.load_roots() {
-                //     let _ = self.app.umount(&Id::Tree);
-                //     let _ = self
-                //         .app
-                //         .mount(Id::Tree, Box::new(TreeView::new(roots)), vec![]);
-                //     let _ = self.app.active(&Id::Tree);
-                // }
-            }
-            Msg::DeleteMarked | Msg::ConfirmNo | Msg::None => {
-                // Handled by tree/ranger components
-            }
+        })?;
+        Ok(())
+    }
+
+    fn handle_key(&mut self, modifiers: KeyModifiers, code: KeyCode) {
+        self.needs_redraw = true;
+
+        if modifiers == KeyModifiers::CONTROL && code == KeyCode::Char('c') {
+            self.quit = true;
+            return;
+        }
+
+        match self.primary_focus {
+            PrimaryFocus::Progress => self.handle_progress_key(modifiers, code),
+            PrimaryFocus::Tree => self.handle_tree_key(modifiers, code),
+            PrimaryFocus::Ranger => self.handle_ranger_key(modifiers, code),
         }
     }
 
-    fn init_app() -> Result<Application<Id, Msg, NoUserEvent>, Box<dyn Error>> {
-        let mut app: Application<Id, Msg, NoUserEvent> = Application::init(
-            EventListenerCfg::default()
-                .add_port(Box::new(BlockingInputListener), Duration::ZERO, 1),
-        );
+    fn handle_progress_key(&mut self, modifiers: KeyModifiers, code: KeyCode) {
+        if let (KeyModifiers::NONE, KeyCode::Char('q') | KeyCode::Esc) = (modifiers, code) {
+            self.quit = true;
+        }
+    }
 
-        app.mount(
-            Id::Progress,
-            Box::new(Progress::new("Loading GC roots", 0)),
-            vec![],
-        )?;
-        app.active(&Id::Progress)?;
+    // TODO: dedupe
+    fn handle_tree_key(&mut self, modifiers: KeyModifiers, code: KeyCode) {
+        let (Some(model), Some(view)) = (&mut self.model, &mut self.view) else {
+            return;
+        };
 
-        Ok(app)
+        if view.pending_action != PendingAction::None {
+            match (modifiers, code) {
+                (_, KeyCode::Char('y' | 'Y')) => {
+                    let action = view.pending_action;
+                    view.pending_action = PendingAction::None;
+                    match action {
+                        PendingAction::Delete => {
+                            // TODO: implement delete
+                        }
+                        PendingAction::Reset => {
+                            model.reset_marks();
+                        }
+                        PendingAction::None => {}
+                    }
+                }
+                _ => {
+                    view.pending_action = PendingAction::None;
+                }
+            }
+            return;
+        }
+
+        match view.key_handler.process(modifiers, code) {
+            Command::Motion(motion) => {
+                let (action, count): (TreeAction<()>, u16) = match motion {
+                    Motion::Up(count) => {
+                        (TreeAction::SelectPrev, count.try_into().unwrap_or(u16::MAX))
+                    }
+                    Motion::Down(count) => {
+                        (TreeAction::SelectNext, count.try_into().unwrap_or(u16::MAX))
+                    }
+                    Motion::Left => {
+                        handle_tree_fold(view, model, Fold::Close, Recurse::No);
+                        (TreeAction::SelectParent, 1)
+                    }
+                    Motion::Right => {
+                        handle_tree_fold(view, model, Fold::Open, Recurse::No);
+                        (TreeAction::SelectChild, 1)
+                    }
+                    Motion::HalfPageUp => (TreeAction::SelectPrev, view.visible_rows.div_ceil(2)),
+                    Motion::HalfPageDown => (TreeAction::SelectNext, view.visible_rows.div_ceil(2)),
+                    Motion::First => (TreeAction::SelectFirst, 1),
+                    Motion::Last => (TreeAction::SelectLast, 1),
+                };
+                for _ in 0..count {
+                    view.tree.handle_action(model, action);
+                }
+                return;
+            }
+            Command::Fold(fold, recurse, mut count) => {
+                while count > 0 && handle_tree_fold(view, model, fold, recurse) {
+                    count -= 1;
+                }
+                return;
+            }
+            Command::Pending => return,
+            Command::Unhandled => {}
+        }
+
+        match (modifiers, code) {
+            (KeyModifiers::NONE, KeyCode::Esc) => {
+                self.quit = true;
+            }
+            (KeyModifiers::NONE, KeyCode::Enter) => {
+                if let Some(id) = view.tree.selected_id() {
+                    view.tree.set_expanded(id, model.root_id, true);
+                }
+            }
+            (KeyModifiers::NONE, KeyCode::Char('y')) => {
+                if let Some(id) = view.tree.selected_id()
+                    && let Some(path) = model.path(id)
+                {
+                    // TODO: handle error
+                    self.clipboard
+                        .set_text(path.as_os_str().to_string_lossy())
+                        .unwrap();
+                    // TODO: show status line message
+                }
+            }
+            (KeyModifiers::NONE, KeyCode::Char('D')) if model.marked_count() > 0 => {
+                view.pending_action = PendingAction::Delete;
+            }
+            (KeyModifiers::NONE, KeyCode::Tab) => {
+                self.primary_focus = PrimaryFocus::Ranger;
+            }
+            (KeyModifiers::NONE, KeyCode::Char('d')) => {
+                if let Some(id) = view.tree.selected_id() {
+                    model.toggle_mark(id);
+                }
+            }
+            (KeyModifiers::NONE, KeyCode::Char('r')) if model.marked_count() > 0 => {
+                view.pending_action = PendingAction::Reset;
+            }
+            (KeyModifiers::NONE, KeyCode::Char('p')) => {
+                model.toggle_profiles();
+                view.tree.invalidate_all();
+            }
+            _ => {}
+        }
+    }
+
+    fn handle_ranger_key(&mut self, modifiers: KeyModifiers, code: KeyCode) {
+        let (Some(model), Some(view)) = (&mut self.model, &mut self.view) else {
+            return;
+        };
+
+        match view.key_handler.process(modifiers, code) {
+            Command::Motion(motion) => {
+                match motion {
+                    Motion::Up(count) => ranger_move_up(view, model, count),
+                    Motion::Down(count) => ranger_move_down(view, model, count),
+                    Motion::Left => ranger_move_left(view, model),
+                    Motion::Right => ranger_move_right(view, model),
+                    Motion::First => ranger_select_first(view, model),
+                    Motion::Last => ranger_select_last(view, model),
+                    Motion::HalfPageUp => {
+                        ranger_move_up(view, model, view.visible_rows.div_ceil(2) as usize)
+                    }
+                    Motion::HalfPageDown => {
+                        ranger_move_down(view, model, view.visible_rows.div_ceil(2) as usize)
+                    }
+                }
+                return;
+            }
+            Command::Fold(..) | Command::Pending => return,
+            Command::Unhandled => {}
+        }
+
+        match (modifiers, code) {
+            (_, KeyCode::Char('q')) | (_, KeyCode::Esc) => {
+                self.quit = true;
+            }
+            (_, KeyCode::Char('d')) => {
+                if let Some(id) = view.tree.selected_id() {
+                    model.toggle_mark(id);
+                }
+            }
+            (_, KeyCode::Char('r')) => {
+                model.reset_marks();
+            }
+            (_, KeyCode::Tab) => {
+                self.primary_focus = PrimaryFocus::Tree;
+            }
+            _ => {}
+        }
+    }
+
+    fn init_view(&mut self) {
+        let Some(ref model) = self.model else { return };
+
+        let mut tree = TreeListViewState::with_capacity(model.graph.node_count());
+
+        for ni in model.graph.node_indices() {
+            if let Some(path) = model.path(ni) {
+                let children = model.children(ni);
+                if !children.is_empty() && !is_direnv_path(path) {
+                    tree.set_expanded(ni, model.root_id, true);
+                }
+            }
+        }
+
+        if let Some(root_id) = model.root_id {
+            let children = model.children(root_id);
+            if !children.is_empty() {
+                tree.select_by_id(model, children[0]);
+            }
+        }
+
+        self.view = Some(ViewState {
+            tree,
+            label: Label::new(),
+            columns: make_columns(),
+            pending_action: PendingAction::None,
+            key_handler: KeyHandler::default(),
+            visible_rows: 20,
+        });
+        self.primary_focus = PrimaryFocus::Ranger;
     }
 
     pub fn load_roots(&mut self) -> Result<()> {
-        let start = Instant::now();
-
-        // eprintln!("[{:>12?}] Find gc roots...", Duration::from_secs(0));
         let roots = nix::gc_roots()?;
-
-        // eprintln!("[{:?}] Lookup PathInfo...", start.elapsed());
         let cache = Cache::new(Path::new("/home/nregner/.cache/nix-gc-roots"))?;
         let roots = cache.get_path_info(roots)?;
-
         let dominators = StoreGraph::build(&roots);
-        // let roots = nix::gc_roots()?;
-        // // TODO: base_dirs
-        // let cache = Cache::new(&PathBuf::from("/home/nregner/.cache/nix-gc-roots"))?;
-        // let roots = cache.get_sizes roots)?;
-        self.update(Msg::LoadingComplete(EqHack(dominators)));
-        // Ok(())
+
+        let model = GcRootModel::new(dominators);
+        self.model = Some(model);
+        self.progress = None;
+        self.init_view();
+
         Ok(())
     }
+}
+
+#[derive(Clone, Copy)]
+enum FoldAction {
+    Open,
+    Close,
+}
+
+fn handle_tree_fold(
+    view: &mut ViewState,
+    model: &GcRootModel,
+    fold: Fold,
+    recurse: Recurse,
+) -> bool {
+    use Fold::*;
+    use Recurse::*;
+    let action = match (fold, recurse) {
+        (Open, No) => TreeAction::Custom(FoldAction::Open),
+        (Open, Yes) => TreeAction::ExpandAll,
+        (Close, No) => TreeAction::Custom(FoldAction::Close),
+        (Close, Yes) => TreeAction::CollapseAll,
+        (Alternate, No) => TreeAction::ToggleNode,
+        (Alternate, Yes) => TreeAction::ToggleRecursive,
+        (Reduce, _) => TreeAction::ExpandAll,
+        (More, _) => TreeAction::CollapseAll,
+    };
+
+    if let TreeEvent::Action(TreeAction::Custom(fold_action)) =
+        view.tree.handle_action(model, action)
+        && let Some(id) = view.tree.selected_id()
+    {
+        let expand = matches!(fold_action, FoldAction::Open);
+        view.tree
+            .set_expanded(id, view.tree.selected_parent_id(), expand);
+        return true;
+    }
+
+    false
+}
+
+fn centered_rect(area: Rect, percent_x: u16, height: u16) -> Rect {
+    let [_, center, _] = Layout::default()
+        .direction(Direction::Vertical)
+        .constraints([
+            Constraint::Percentage(40),
+            Constraint::Length(height),
+            Constraint::Percentage(40),
+        ])
+        .areas(area);
+
+    let [_, middle, _] = Layout::default()
+        .direction(Direction::Horizontal)
+        .constraints([
+            Constraint::Percentage((100 - percent_x) / 2),
+            Constraint::Percentage(percent_x),
+            Constraint::Percentage((100 - percent_x) / 2),
+        ])
+        .areas(center);
+
+    middle
+}
+
+fn render_progress(f: &mut Frame, progress: &ProgressState, area: Rect) {
+    let ratio = if progress.total == 0 {
+        0.0
+    } else {
+        (progress.current as f64) / (progress.total as f64)
+    };
+    let label = format!(
+        "{} ({}/{})",
+        progress.message, progress.current, progress.total
+    );
+
+    let gauge = Gauge::default()
+        .block(
+            Block::default()
+                .borders(Borders::ALL)
+                .title(" Loading GC Roots "),
+        )
+        .gauge_style(Style::default().fg(Color::Cyan))
+        .ratio(ratio)
+        .label(label);
+
+    f.render_widget(gauge, area);
+}
+
+fn render_tree(f: &mut Frame, model: &GcRootModel, view: &mut ViewState, area: Rect) {
+    view.visible_rows = area.height.saturating_sub(2);
+    view.label.reset(view.tree.selected_id());
+
+    let pending = view
+        .key_handler
+        .pending()
+        .map(|p| format!("| {p} | "))
+        .unwrap_or_default();
+
+    let title = match view.pending_action {
+        PendingAction::Delete => {
+            format!(" Delete {} roots? (y/n) ", model.marked_count())
+        }
+        PendingAction::Reset => " Reset all marks? (y/n) ".to_string(),
+        PendingAction::None => format!(
+            " GC Roots | {} marked | profiles: {} {pending}",
+            model.marked_count(),
+            if model.show_profiles {
+                "shown"
+            } else {
+                "hidden"
+            }
+        ),
+    };
+
+    let style = TreeListViewStyle {
+        title: Some(Line::from(title)),
+        line_style: Style::default().add_modifier(Modifier::BOLD),
+        highlight_style: Style::default().add_modifier(Modifier::REVERSED | Modifier::BOLD),
+        mark_style: Style::default().add_modifier(Modifier::CROSSED_OUT | Modifier::DIM),
+        ..TreeListViewStyle::default()
+    };
+
+    let widget = TreeListView::new(model, &view.label, &view.columns, style);
+    f.render_stateful_widget(widget, area, &mut view.tree);
+}
+
+fn render_ranger(f: &mut Frame, model: &GcRootModel, view: &mut ViewState, area: Rect) {
+    view.visible_rows = area.height.saturating_sub(2);
+
+    let chunks = Layout::default()
+        .direction(Direction::Horizontal)
+        .constraints([
+            Constraint::Ratio(1, 3),
+            Constraint::Ratio(1, 3),
+            Constraint::Ratio(1, 3),
+        ])
+        .split(area);
+
+    let selected = view.tree.selected_id();
+    let parent = selected.and_then(|id| model.parent(id));
+    let grandparent = parent.and_then(|id| model.parent(id));
+
+    let parent_siblings = grandparent.map(|p| model.children(p)).unwrap_or(&[]);
+    let parent_idx = parent.and_then(|p| parent_siblings.iter().position(|&n| n == p));
+    render_ranger_column(
+        f,
+        model,
+        chunks[0],
+        parent_siblings,
+        parent_idx,
+        Column::Left,
+    );
+
+    let siblings = parent.map(|p| model.children(p)).unwrap_or(&[]);
+    let selected_idx = selected.and_then(|id| siblings.iter().position(|&n| n == id));
+    render_ranger_column(f, model, chunks[1], siblings, selected_idx, Column::Middle);
+
+    let children = selected.map(|id| model.children(id)).unwrap_or(&[]);
+    render_ranger_column(f, model, chunks[2], children, None, Column::Right);
+}
+
+#[derive(Clone, Copy)]
+enum Column {
+    Left,
+    Middle,
+    Right,
+}
+
+fn render_ranger_column(
+    f: &mut Frame,
+    model: &GcRootModel,
+    area: Rect,
+    nodes: &[NodeIndex],
+    selected: Option<usize>,
+    column: Column,
+) {
+    let inner_width = area.width.saturating_sub(2) as usize;
+
+    let items: Vec<ListItem> = nodes
+        .iter()
+        .enumerate()
+        .map(|(i, &node)| {
+            let name = model.name(node).unwrap_or("?");
+            let closure_size = model.closure_size(node);
+            let added_size = model.added_size(node);
+            let has_children = !model.children(node).is_empty();
+
+            let suffix = if has_children { "/" } else { "" };
+            let size_str = if closure_size > 0 || added_size > 0 {
+                format!(
+                    "{} ({})",
+                    format_size(closure_size),
+                    format_size(added_size)
+                )
+            } else {
+                String::new()
+            };
+
+            let is_marked = model.is_marked(node);
+            let is_focused = matches!(column, Column::Middle);
+            let is_selected = is_focused && selected == Some(i);
+
+            let mut style = Style::default();
+            if is_marked {
+                style = style.add_modifier(Modifier::CROSSED_OUT | Modifier::DIM)
+            }
+            if is_focused && selected == Some(i) {
+                style = style.add_modifier(Modifier::REVERSED | Modifier::BOLD)
+            }
+
+            let size_style = if is_selected {
+                style
+            } else {
+                style.fg(Color::DarkGray)
+            };
+
+            let name_with_suffix = format!("{}{}", name, suffix);
+            let name_len = name_with_suffix.chars().count();
+            let size_len = size_str.chars().count();
+
+            let padding = if name_len + size_len < inner_width {
+                inner_width - name_len - size_len
+            } else {
+                1
+            };
+
+            let line = Line::from(vec![
+                Span::styled(name_with_suffix, style),
+                Span::styled(" ".repeat(padding), style),
+                Span::styled(size_str, size_style),
+            ]);
+            ListItem::new(line)
+        })
+        .collect();
+
+    let (borders, border_set) = match column {
+        Column::Left => (
+            Borders::LEFT | Borders::TOP | Borders::BOTTOM,
+            border::PLAIN,
+        ),
+        Column::Middle => (
+            Borders::LEFT | Borders::TOP | Borders::BOTTOM,
+            border::Set {
+                top_left: line::HORIZONTAL_DOWN,
+                bottom_left: line::HORIZONTAL_UP,
+                ..border::PLAIN
+            },
+        ),
+        Column::Right => (
+            Borders::ALL,
+            border::Set {
+                top_left: line::HORIZONTAL_DOWN,
+                bottom_left: line::HORIZONTAL_UP,
+                ..border::PLAIN
+            },
+        ),
+    };
+
+    let block = Block::default()
+        .borders(borders)
+        .border_set(border_set)
+        .border_style(Style::default().fg(Color::White));
+
+    let list = List::new(items).block(block);
+
+    let mut state = ListState::default();
+    state.select(selected);
+
+    f.render_stateful_widget(list, area, &mut state);
+}
+
+fn ranger_move_up(view: &mut ViewState, model: &GcRootModel, count: usize) {
+    for _ in 0..count {
+        view.tree.handle_action(model, TreeAction::<()>::SelectPrev);
+    }
+}
+
+fn ranger_move_down(view: &mut ViewState, model: &GcRootModel, count: usize) {
+    for _ in 0..count {
+        view.tree.handle_action(model, TreeAction::<()>::SelectNext);
+    }
+}
+
+fn ranger_move_left(view: &mut ViewState, model: &GcRootModel) {
+    view.tree
+        .handle_action(model, TreeAction::<()>::SelectParent);
+}
+
+fn ranger_move_right(view: &mut ViewState, model: &GcRootModel) {
+    view.tree
+        .handle_action(model, TreeAction::<()>::SelectChild);
+}
+
+fn ranger_select_first(view: &mut ViewState, model: &GcRootModel) {
+    view.tree
+        .handle_action(model, TreeAction::<()>::SelectFirst);
+}
+
+fn ranger_select_last(view: &mut ViewState, model: &GcRootModel) {
+    view.tree.handle_action(model, TreeAction::<()>::SelectLast);
 }

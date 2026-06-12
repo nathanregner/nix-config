@@ -1,5 +1,4 @@
 mod cache;
-mod msg;
 mod nix;
 mod store_graph;
 mod types;
@@ -12,7 +11,6 @@ use std::{
     path::PathBuf,
     time::{Duration, Instant},
 };
-use tuirealm::application::PollStrategy;
 
 use crate::{cache::Cache, store_graph::StoreGraph};
 
@@ -37,21 +35,6 @@ fn main() -> Result<()> {
         return perf();
     }
 
-    let mut model = ui::Model::default();
-
-    model.view();
-    model.load_roots()?;
-    model.view();
-
-    while !model.quit {
-        let messages = model.app.tick(PollStrategy::BlockCollectUpTo(10))?;
-        for msg in messages {
-            model.update(msg);
-        }
-        if model.needs_redraw() {
-            model.view();
-        }
-    }
-
-    Ok(())
+    let mut app = ui::App::default();
+    app.run()
 }

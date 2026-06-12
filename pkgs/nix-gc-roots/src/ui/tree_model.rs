@@ -135,10 +135,8 @@ impl GcRootModel {
         let children = &self.children_cache[id.index()];
 
         if children.is_empty() {
-            if is_marked {
-                if let Some(path) = self.path(id) {
-                    paths.push(path);
-                }
+            if is_marked && let Some(path) = self.path(id) {
+                paths.push(path);
             }
         } else {
             for &child in children {

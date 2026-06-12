@@ -1,7 +1,6 @@
 use std::{fmt::Display, ops::ControlFlow};
 
-use rayon::iter::Either;
-use tuirealm::event::{Key, KeyModifiers};
+use crossterm::event::{KeyCode, KeyModifiers};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Command {
@@ -60,14 +59,14 @@ impl KeyHandler {
         }
     }
 
-    pub fn process(&mut self, modifiers: KeyModifiers, code: Key) -> Command {
+    pub fn process(&mut self, modifiers: KeyModifiers, code: KeyCode) -> Command {
         let count = match self.process_pending(modifiers, code) {
             Some(ControlFlow::Break(command)) => return command,
             Some(ControlFlow::Continue(count)) => count.max(1),
             None => 1,
         };
 
-        use Key::*;
+        use KeyCode::*;
         match (modifiers, code) {
             (KeyModifiers::NONE, Char('j') | Down) => Command::Motion(Motion::Down(count)),
             (KeyModifiers::NONE, Char('k') | Up) => Command::Motion(Motion::Up(count)),
@@ -93,11 +92,11 @@ impl KeyHandler {
     pub fn process_pending(
         &mut self,
         modifiers: KeyModifiers,
-        code: Key,
+        code: KeyCode,
     ) -> Option<ControlFlow<Command, usize>> {
         match self.pending.take() {
             Some(Pending::G) => match code {
-                Key::Char('g') => Some(ControlFlow::Break(Command::Motion(Motion::First))),
+                KeyCode::Char('g') => Some(ControlFlow::Break(Command::Motion(Motion::First))),
                 _ => None,
             },
             Some(Pending::Z(count)) => {
@@ -109,12 +108,12 @@ impl KeyHandler {
     }
 
     // TODO: count
-    fn process_fold(modifiers: KeyModifiers, code: Key, count: usize) -> Option<Command> {
+    fn process_fold(modifiers: KeyModifiers, code: KeyCode, count: usize) -> Option<Command> {
         use Fold::*;
         if modifiers & !KeyModifiers::SHIFT != KeyModifiers::NONE {
             return None;
         }
-        let Key::Char(char) = code else {
+        let KeyCode::Char(char) = code else {
             return None;
         };
         let fold = match char.to_ascii_lowercase() {
@@ -140,14 +139,14 @@ impl KeyHandler {
     fn process_count(
         &mut self,
         modifiers: KeyModifiers,
-        code: Key,
+        code: KeyCode,
         count: usize,
     ) -> Option<ControlFlow<Command, usize>> {
         if modifiers != KeyModifiers::NONE {
             return None;
         }
         Some(match code {
-            Key::Char(c @ '0'..='9') => {
+            KeyCode::Char(c @ '0'..='9') => {
                 self.pending = Some(Pending::Count(
                     count
                         .saturating_mul(10)

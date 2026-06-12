@@ -4,7 +4,7 @@ use petgraph::{
     graph::{DiGraph, NodeIndex},
 };
 use std::{
-    collections::{HashMap, hash_map::Entry},
+    collections::{BTreeMap, HashMap, hash_map::Entry},
     ops::Deref,
     path::{Path, PathBuf},
     rc::Rc,
