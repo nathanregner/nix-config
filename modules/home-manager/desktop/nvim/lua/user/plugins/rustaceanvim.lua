@@ -4,6 +4,7 @@
 ---@type rustaceanvim.Opts
 vim.g.rustaceanvim = {
   server = {
+    cmd = { "~/dev/github/rust-analyzer/target/release/rust-analyzer" },
     default_settings = {
       -- https://rust-analyzer.github.io/manual.html#configuration
       ["rust-analyzer"] = {
@@ -21,6 +22,7 @@ vim.g.rustaceanvim = {
         },
         files = {
           excludeDirs = { ".direnv", ".git" },
+          watcher = "server",
         },
       },
     },

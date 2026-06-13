@@ -48,6 +48,13 @@ in
         luasnip.dir = "${pkgs.unstable.vimPlugins.luasnip}";
       };
 
+      extraWrapperArgs = [
+        "--prefix"
+        "PATH"
+        ":"
+        (lib.makeBinPath (with pkgs.unstable; [ rust-analyzer ]))
+      ];
+
       extraPackages = builtins.attrValues (
         {
           # language servers

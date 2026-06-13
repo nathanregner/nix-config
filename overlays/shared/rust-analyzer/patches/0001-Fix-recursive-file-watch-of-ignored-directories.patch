@@ -1,0 +1,255 @@
+From 92d2089aaf45dc98283c6e97dabbd86bbd261f54 Mon Sep 17 00:00:00 2001
+From: Nathan Regner <nathanregner@gmail.com>
+Date: Fri, 12 Jun 2026 23:52:12 -0600
+Subject: [PATCH] Fix recursive file watch of ignored directories
+
+---
+ .cargo/config.toml                            |  6 ++
+ crates/rust-analyzer/tests/slow-tests/main.rs | 76 +++++++++++++++-
+ crates/vfs-notify/src/lib.rs                  | 88 ++++++++++++-------
+ shell.nix                                     | 14 +++
+ 4 files changed, 149 insertions(+), 35 deletions(-)
+ create mode 100644 shell.nix
+
+diff --git a/.cargo/config.toml b/.cargo/config.toml
+index 0193a9566e..74caae03bb 100644
+--- a/.cargo/config.toml
++++ b/.cargo/config.toml
+@@ -11,3 +11,9 @@ linker = "rust-lld"
+ 
+ [env]
+ CARGO_WORKSPACE_DIR = { value = "", relative = true }
++
++# [unstable]
++# codegen-backend = true
++#
++# [profile.dev]
++# codegen-backend = "cranelift"
+diff --git a/crates/rust-analyzer/tests/slow-tests/main.rs b/crates/rust-analyzer/tests/slow-tests/main.rs
+index b91bde8428..3510a8d5b1 100644
+--- a/crates/rust-analyzer/tests/slow-tests/main.rs
++++ b/crates/rust-analyzer/tests/slow-tests/main.rs
+@@ -20,7 +20,12 @@ mod ratoml;
+ mod support;
+ mod testdir;
+ 
+-use std::{collections::HashMap, path::PathBuf, time::Instant};
++use std::{
++    collections::HashMap,
++    fs,
++    path::PathBuf,
++    time::{Duration, Instant},
++};
+ 
+ use ide_db::FxHashMap;
+ use lsp_types::{
+@@ -28,7 +33,8 @@ use lsp_types::{
+     DocumentFormattingParams, DocumentRangeFormattingParams, FileRename, FormattingOptions,
+     GotoDefinitionParams, HoverParams, InlayHint, InlayHintLabel, InlayHintParams,
+     PartialResultParams, Position, Range, RenameFilesParams, TextDocumentItem,
+-    TextDocumentPositionParams, WorkDoneProgressParams,
++    TextDocumentPositionParams, WorkDoneProgressParams, WorkspaceSymbolParams,
++    WorkspaceSymbolResponse,
+     notification::DidOpenTextDocument,
+     request::{
+         CodeActionRequest, Completion, Formatting, GotoTypeDefinition, HoverRequest,
+@@ -1542,6 +1548,72 @@ version = "0.0.0"
+     );
+ }
+ 
++// [#19907](https://github.com/rust-lang/rust-analyzer/issues/19907)
++#[test]
++#[cfg(not(windows))]
++fn test_watch_dir_recreation() {
++    if skip_slow_tests() {
++        return;
++    }
++
++    let tmp_dir = TestDir::new();
++    let root = tmp_dir.path().to_owned();
++
++    let server = Project::with_fixture(
++        r#"
++//- /Cargo.toml
++[package]
++name = "foo"
++version = "0.0.0"
++
++//- /src/lib.rs
++mod generated;
++
++//- /src/generated/mod.rs
++pub struct GeneratedV1;
++"#,
++    )
++    .tmp_dir(tmp_dir)
++    .with_config(json!({
++        "files": {
++            "watcher": "server"
++        }
++    }))
++    .server()
++    .wait_until_workspace_is_loaded();
++
++    let wait_for_symbol = |server: &support::Server, name: &str, timeout: Duration| {
++        let start = Instant::now();
++        loop {
++            let symbols =
++                server.send_request::<WorkspaceSymbolRequest>(WorkspaceSymbolParams::default());
++            let symbols: WorkspaceSymbolResponse = serde_json::from_value(symbols).unwrap();
++            let found = match &symbols {
++                WorkspaceSymbolResponse::Flat(s) => s.iter().any(|s| s.name == name),
++                WorkspaceSymbolResponse::Nested(s) => s.iter().any(|s| s.name == name),
++            };
++            if found {
++                return;
++            }
++            if start.elapsed() >= timeout {
++                panic!("timeout waiting for symbol `{name}` to appear, last result: {symbols:?}");
++            }
++            std::thread::sleep(Duration::from_millis(100));
++        }
++    };
++
++    // Verify initial state
++    wait_for_symbol(&server, "GeneratedV1", Duration::ZERO);
++
++    // Simulate code generation recreating a directory
++    fs::remove_dir_all(root.join("src/generated")).unwrap();
++    fs::create_dir_all(root.join("src/generated")).unwrap();
++    fs::write(root.join("src/generated/mod.rs"), "pub struct GeneratedV2;").unwrap();
++
++    // Verify watch was triggered
++    wait_for_symbol(&server, "GeneratedV2", Duration::from_secs(10));
++}
++
+ #[test]
+ fn test_evaluate_predicate() {
+     if skip_slow_tests() {
+diff --git a/crates/vfs-notify/src/lib.rs b/crates/vfs-notify/src/lib.rs
+index 6465a85d2d..a4e25a55c1 100644
+--- a/crates/vfs-notify/src/lib.rs
++++ b/crates/vfs-notify/src/lib.rs
+@@ -232,44 +232,66 @@ impl NotifyActor {
+                             continue;
+                         }
+ 
+-                        let files = abs_paths
+-                            .into_iter()
+-                            .filter_map(|path| -> Option<(AbsPathBuf, Option<Vec<u8>>)> {
+-                                // Ignore events for files/directories that we're not watching.
+-                                if !(self.watched_file_entries.contains(&path)
+-                                    || self
+-                                        .watched_dir_entries
+-                                        .iter()
+-                                        .any(|dir| dir.contains_file(&path)))
+-                                {
+-                                    return None;
+-                                }
++                        let mut files: Vec<(AbsPathBuf, Option<Vec<u8>>)> = Vec::new();
++                        for path in abs_paths {
++                            // Ignore events for files/directories that we're not watching.
++                            // Note: we check contains_dir OR contains_file because directory
++                            // creation events need to pass through to trigger re-watching.
++                            let dominated_by_dir = self
++                                .watched_dir_entries
++                                .iter()
++                                .find(|dir| dir.contains_file(&path) || dir.contains_dir(&path));
++                            if !self.watched_file_entries.contains(&path)
++                                && dominated_by_dir.is_none()
++                            {
++                                continue;
++                            }
+ 
+-                                // For removed files, fs::metadata() will return Err, but
+-                                // we still want to update the VFS.
+-                                if matches!(event.kind, EventKind::Remove(_)) {
+-                                    return Some((path, None));
+-                                }
++                            // For removed files, fs::metadata() will return Err, but
++                            // we still want to update the VFS.
++                            if matches!(event.kind, EventKind::Remove(_)) {
++                                files.push((path, None));
++                                continue;
++                            }
+ 
+-                                let meta = fs::metadata(&path).ok()?;
+-                                if meta.file_type().is_dir()
+-                                    && self
+-                                        .watched_dir_entries
+-                                        .iter()
+-                                        .any(|dir| dir.contains_dir(&path))
+-                                {
+-                                    self.watch(path.as_ref());
+-                                    return None;
+-                                }
++                            let Ok(meta) = fs::metadata(&path) else {
++                                continue;
++                            };
+ 
+-                                if !meta.file_type().is_file() {
+-                                    return None;
++                            if meta.file_type().is_dir() {
++                                if let Some(dirs) = dominated_by_dir {
++                                    // Directory was recreated - watch it and scan for existing files
++                                    let entry = loader::Entry::Directories(loader::Directories {
++                                        extensions: dirs.extensions.clone(),
++                                        include: vec![path],
++                                        exclude: dirs.exclude.clone(),
++                                    });
++                                    // let mut watch_paths = vec![];
++                                    let new_files = Self::load_entry(
++                                        |f| self.watch(f),
++                                        entry,
++                                        // TODO: this seems... wrong?
++                                        // do_watch=true: the parent was watched, so any
++                                        // subdirectories discovered during the walk should
++                                        // also be watched
++                                        true,
++                                        |_| {},
++                                    );
++                                    for (file_path, contents) in new_files {
++                                        self.seen_paths.insert(file_path.clone());
++                                        files.push((file_path, contents));
++                                    }
+                                 }
++                                continue;
++                            }
+ 
+-                                let contents = read(&path);
+-                                Some((path, contents))
+-                            })
+-                            .collect();
++                            if !meta.file_type().is_file() {
++                                continue;
++                            }
++
++                            let contents = read(&path);
++                            files.push((path, contents));
++                        }
+                         self.send(loader::Message::Changed { files });
+                     }
+                 }
+diff --git a/shell.nix b/shell.nix
+new file mode 100644
+index 0000000000..4a0e89a3b7
+--- /dev/null
++++ b/shell.nix
+@@ -0,0 +1,14 @@
++{
++  pkgs ? import <nixpkgs> { },
++}:
++
++pkgs.mkShell {
++  buildInputs = with pkgs; [
++    # cargo
++    # rustfmt
++    # clippy
++  ];
++  env.RUN_SLOW_TESTS = "1";
++  env.RA_LOG = "error";
++  # env.RUSTC_BOOTSTRAP = "1";
++}
+-- 
+2.54.0
+
