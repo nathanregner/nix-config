@@ -15,7 +15,6 @@ mkShell (
       ++ [
         cargo
         clippy
-        rust-analyzer
         rustfmt
       ]
       ++ (args.packages or [ ]);
