@@ -68,6 +68,7 @@
     iotop
     lm_sensors # for `sensors` command
     nmon
+    pstree
 
     # networking
     curl
