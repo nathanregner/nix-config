@@ -45,6 +45,7 @@ in
 
       lua.globals = {
         ${"blink.cmp"}.dir = "${pkgs.unstable.vimPlugins.blink-cmp}";
+        ${"codediff.nvim"}.dir = "${pkgs.unstable.vimPlugins.codediff-nvim}";
         luasnip.dir = "${pkgs.unstable.vimPlugins.luasnip}";
       };
 

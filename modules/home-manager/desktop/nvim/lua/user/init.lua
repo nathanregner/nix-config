@@ -40,7 +40,10 @@ require("user.shada").setup()
 ---@return LazyPluginSpec
 function nix_spec(spec)
   local name = vim.fs.basename(spec[1])
-  if name == nil then return spec end
+  if name == nil then
+    vim.notify("Invalid plugin name " .. spec[1], vim.log.levels.WARN)
+    return spec
+  end
 
   local nix = vim.g.nix[string.lower(name)]
   if nix == nil then
