@@ -24,30 +24,35 @@
 
   programs.tmux-sessionizer.enable = true;
 
-  home.packages = with pkgs.unstable; [
-    # text manipulation
-    gawk
-    gnused
-    jq
-    ripgrep
+  home.packages =
+    with pkgs.unstable;
+    [
+      # text manipulation
+      gawk
+      gnused
+      jq
+      ripgrep
 
-    # filesystem
-    dua
-    fd
-    file
-    pv
-    rsync
-    tree
-    which
-    trash-cli
+      # filesystem
+      dua
+      fd
+      file
+      pv
+      rsync
+      trash-cli
+      tree
+      which
 
-    # archive formats
-    ouch
+      # archive formats
+      ouch
 
-    # system monitoring
-    htop-vim
+      # system monitoring
+      htop-vim
 
-    # misc
-    sops
-  ];
+      # misc
+      sops
+    ]
+    ++ lib.optionals pkgs.stdenv.isLinux [
+      inotify-info
+    ];
 }
