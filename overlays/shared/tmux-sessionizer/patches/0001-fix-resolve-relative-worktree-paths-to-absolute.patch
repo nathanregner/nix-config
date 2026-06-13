@@ -1,0 +1,101 @@
+Subject: [PATCH] fix: resolve relative worktree paths to absolute
+
+Git 2.48+ can store worktree paths as relative paths in the gitdir file
+(e.g., "../../../main" relative to .git/worktrees/<name>/). The gix
+library's worktree::Proxy::base() returns these as-is, breaking commands
+like refresh that pass these paths to tmux.
+
+This fix resolves relative paths against the worktree's git directory
+and canonicalizes the result.
+
+Workaround for https://github.com/GitoxideLabs/gitoxide/pull/2599
+
+Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>
+---
+ src/repos.rs | 62 ++++++++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 60 insertions(+), 2 deletions(-)
+
+diff --git a/src/repos.rs b/src/repos.rs
+index 06496b4..2463dbb 100644
+--- a/src/repos.rs
++++ b/src/repos.rs
+@@ -39,11 +39,26 @@ impl Worktree for gix::worktree::Proxy<'_> {
+     }
+
+     fn path(&self) -> Result<PathBuf> {
+-        self.base().change_context(TmsError::GitError)
++        let base = self.base().change_context(TmsError::GitError)?;
++        let resolved = if base.is_relative() {
++            self.git_dir().join(&base)
++        } else {
++            base
++        };
++        fs::canonicalize(&resolved).change_context(TmsError::IoError)
+     }
+
+     fn is_prunable(&self) -> bool {
+-        !self.base().is_ok_and(|path| path.exists())
++        self.base()
++            .map(|path| {
++                let resolved = if path.is_relative() {
++                    self.git_dir().join(&path)
++                } else {
++                    path
++                };
++                !resolved.exists()
++            })
++            .unwrap_or(true)
+     }
+ }
+
+@@ -525,4 +540,47 @@ mod tests {
+         let repo = LazyRepoProvider::new(root, &[VcsProviders::Git]).unwrap();
+         assert!(!repo.is_worktree().unwrap());
+     }
++
++    #[test]
++    fn worktree_with_relative_gitdir_resolves_to_absolute() {
++        let dir = tempdir().unwrap();
++        let root = fs::canonicalize(dir.path()).unwrap();
++
++        // Create bare repo
++        let bare = root.join(".bare");
++        Command::new("git")
++            .args(["init", "--bare"])
++            .arg(&bare)
++            .status()
++            .unwrap();
++
++        // Create gitlink pointing to bare repo
++        fs::write(root.join(".git"), format!("gitdir: {}\n", bare.display())).unwrap();
++
++        // Create a worktree
++        Command::new("git")
++            .args(["worktree", "add", "-b", "feature", "feature"])
++            .current_dir(&root)
++            .status()
++            .unwrap();
++
++        // Overwrite gitdir with a relative path (simulating Git 2.48+ behavior)
++        let worktree_gitdir = bare.join("worktrees/feature/gitdir");
++        fs::write(&worktree_gitdir, "../../../feature/.git\n").unwrap();
++
++        // Test that Worktree::path() returns an absolute path
++        let repo = LazyRepoProvider::new(&root, &[VcsProviders::Git]).unwrap();
++        let repo = repo.resolve().unwrap();
++        let worktrees = repo.worktrees().unwrap();
++
++        let feature_wt = worktrees.iter().find(|wt| wt.name() == "feature").unwrap();
++        let path = feature_wt.path().unwrap();
++
++        assert!(
++            path.is_absolute(),
++            "expected absolute path, got: {:?}",
++            path
++        );
++        assert!(path.ends_with("feature"));
++    }
+ }
+--
+2.52.0
+
