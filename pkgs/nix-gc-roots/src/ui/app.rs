@@ -356,17 +356,29 @@ impl App {
         match view.key_handler.process(modifiers, code) {
             Command::Motion(motion) => {
                 match motion {
-                    Motion::Up(count) => ranger_move_up(view, model, count),
-                    Motion::Down(count) => ranger_move_down(view, model, count),
+                    Motion::Up(count) => {
+                        ranger_select_sibling(view, model, -(count as isize));
+                    }
+                    Motion::Down(count) => {
+                        ranger_select_sibling(view, model, count as isize);
+                    }
                     Motion::Left => ranger_move_left(view, model),
-                    Motion::Right => ranger_move_right(view, model),
-                    Motion::First => ranger_select_first(view, model),
-                    Motion::Last => ranger_select_last(view, model),
+                    Motion::Right => {
+                        ranger_select_child(view, model);
+                    }
+                    Motion::First => {
+                        ranger_select_sibling(view, model, isize::MIN);
+                    }
+                    Motion::Last => {
+                        ranger_select_sibling(view, model, isize::MAX);
+                    }
                     Motion::HalfPageUp => {
-                        ranger_move_up(view, model, view.visible_rows.div_ceil(2) as usize)
+                        let count = view.visible_rows.div_ceil(2) as usize;
+                        ranger_select_sibling(view, model, -(count as isize));
                     }
                     Motion::HalfPageDown => {
-                        ranger_move_down(view, model, view.visible_rows.div_ceil(2) as usize)
+                        let count = view.visible_rows.div_ceil(2) as usize;
+                        ranger_select_sibling(view, model, count as isize);
                     }
                 }
                 return;
@@ -694,33 +706,27 @@ fn render_ranger_column(
     f.render_stateful_widget(list, area, &mut state);
 }
 
-fn ranger_move_up(view: &mut ViewState, model: &GcRootModel, count: usize) {
-    for _ in 0..count {
-        view.tree.handle_action(model, TreeAction::<()>::SelectPrev);
-    }
+fn ranger_select_child(view: &mut ViewState, model: &GcRootModel) -> Option<()> {
+    let selected = view.tree.selected_id()?;
+    let child = model.children(selected).first().copied()?;
+    view.tree.select_by_id(model, child);
+    Some(())
 }
 
-fn ranger_move_down(view: &mut ViewState, model: &GcRootModel, count: usize) {
-    for _ in 0..count {
-        view.tree.handle_action(model, TreeAction::<()>::SelectNext);
-    }
+fn ranger_select_sibling(view: &mut ViewState, model: &GcRootModel, offset: isize) -> Option<()> {
+    let selected = view.tree.selected_id()?;
+    let parent = view.tree.selected_parent_id()?;
+    let siblings = model.children(parent);
+    let sibling = siblings.iter().position(|&n| n == selected)?;
+    let sibling = sibling
+        .saturating_add_signed(offset)
+        .min(siblings.len() - 1);
+
+    view.tree.select_by_id(model, siblings[sibling]);
+    Some(())
 }
 
 fn ranger_move_left(view: &mut ViewState, model: &GcRootModel) {
     view.tree
         .handle_action(model, TreeAction::<()>::SelectParent);
-}
-
-fn ranger_move_right(view: &mut ViewState, model: &GcRootModel) {
-    view.tree
-        .handle_action(model, TreeAction::<()>::SelectChild);
-}
-
-fn ranger_select_first(view: &mut ViewState, model: &GcRootModel) {
-    view.tree
-        .handle_action(model, TreeAction::<()>::SelectFirst);
-}
-
-fn ranger_select_last(view: &mut ViewState, model: &GcRootModel) {
-    view.tree.handle_action(model, TreeAction::<()>::SelectLast);
 }
