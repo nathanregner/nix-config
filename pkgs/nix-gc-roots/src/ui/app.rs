@@ -76,7 +76,7 @@ pub struct App {
 pub struct ViewState {
     pub tree: TreeListViewState<NodeIndex>,
     pub label: Label,
-    pub columns: SimpleColumns<1, GcRootModel>,
+    pub columns: SimpleColumns<2, GcRootModel>,
     pub pending_action: PendingAction,
     pub key_handler: KeyHandler,
     pub visible_rows: u16,

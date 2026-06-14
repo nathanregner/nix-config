@@ -5,9 +5,7 @@ use ratatui::layout::Constraint;
 use ratatui::style::{Color, Modifier, Style};
 use ratatui::text::{Line, Span};
 use ratatui::widgets::Cell;
-use tui_treelistview::{
-    ColumnDef, SimpleColumns, TreeGlyphs, TreeLabelRenderer, TreeRowContext,
-};
+use tui_treelistview::{ColumnDef, SimpleColumns, TreeGlyphs, TreeLabelRenderer, TreeRowContext};
 
 use crate::ui::GcRootModel;
 
@@ -61,6 +59,7 @@ impl TreeLabelRenderer<GcRootModel> for Label {
             self.selected_row.set(Some(row));
         }
 
+        // TODO: dynamic width based on count...
         let line_num = if is_selected {
             format!("{:>3} ", row)
         } else if let Some(sel_row) = self.selected_row.get() {
@@ -101,7 +100,8 @@ impl TreeLabelRenderer<GcRootModel> for Label {
         } else if ctx.level == 0 {
             ""
         } else {
-            glyphs.leaf
+            // glyphs.leaf
+            " "
         };
         if !expander.is_empty() {
             spans.push(Span::raw(expander));
@@ -129,7 +129,7 @@ fn marked_style(model: &GcRootModel, id: NodeIndex) -> Style {
 
 use crate::ui::format_size;
 
-pub fn size_cell(model: &GcRootModel, id: NodeIndex) -> Cell<'_> {
+pub fn closure_cell(model: &GcRootModel, id: NodeIndex) -> Cell<'_> {
     let size = model.closure_size(id);
     if size == 0 {
         Cell::from("")
@@ -138,11 +138,23 @@ pub fn size_cell(model: &GcRootModel, id: NodeIndex) -> Cell<'_> {
     }
 }
 
-pub fn make_columns() -> SimpleColumns<1, GcRootModel> {
+pub fn added_cell(model: &GcRootModel, id: NodeIndex) -> Cell<'_> {
+    let size = model.added_size(id);
+    if size == 0 {
+        Cell::from("")
+    } else {
+        Cell::from(format_size(size)).style(marked_style(model, id))
+    }
+}
+
+pub fn make_columns() -> SimpleColumns<2, GcRootModel> {
     SimpleColumns::new(
         Constraint::Fill(1),
         "Name",
-        [ColumnDef::new("Size", Constraint::Length(8), size_cell)],
+        [
+            ColumnDef::new("Closure", Constraint::Length(8), closure_cell),
+            ColumnDef::new("Added", Constraint::Length(8), added_cell),
+        ],
     )
     .header_style(
         Style::default()
