@@ -1,5 +1,8 @@
 use std::borrow::Borrow;
 use std::ffi::OsStr;
+use std::fmt::Debug;
+use std::hash::Hash;
+use std::hash::Hasher;
 use std::ops::Deref;
 use std::os::unix::ffi::OsStrExt;
 use std::path::Path;
@@ -13,10 +16,11 @@ use rkyv::vec::ArchivedVec;
 use rkyv::vec::VecResolver;
 use rkyv::with::{ArchiveWith, DeserializeWith, SerializeWith};
 
+// TODO: rename to RkyvPathBuf or similar
 #[derive(Hash, Eq, PartialEq, Clone, Debug)] //
-#[derive(serde::Serialize, serde::Deserialize)] //
+#[derive(serde::Deserialize)] //
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize)] //
-#[rkyv(derive(Hash, PartialEq, Eq))]
+#[rkyv(derive(PartialEq, Eq, Debug))]
 #[serde(transparent)]
 pub struct StorePath(#[rkyv(with = PathBufAsBytes)] pub PathBuf);
 
@@ -53,6 +57,12 @@ impl ArchivedStorePath {
     }
 }
 
+impl Hash for ArchivedStorePath {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.as_path().hash(state);
+    }
+}
+
 struct PathBufAsBytes;
 
 impl ArchiveWith<PathBuf> for PathBufAsBytes {
@@ -79,5 +89,32 @@ impl<D: Fallible + ?Sized> DeserializeWith<ArchivedVec<u8>, PathBuf, D> for Path
         _deserializer: &mut D,
     ) -> Result<PathBuf, <D as Fallible>::Error> {
         Ok(PathBuf::from(OsStr::from_bytes(field)))
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::types::ArchivedBytes;
+
+    use super::*;
+    use rkyv::ser::allocator::Arena;
+    use std::hash::{Hash, Hasher};
+
+    fn hash_of<T: Hash>(value: &T) -> u64 {
+        let mut hasher = rustc_hash::FxHasher::default();
+        value.hash(&mut hasher);
+        hasher.finish()
+    }
+
+    #[test]
+    fn archived_hash_eq_matches_original() {
+        let paths = ["/store/a", "/store/b", "/nix/store/abc123-foo"];
+
+        let mut arena = Arena::new();
+        for path in &paths {
+            let path = StorePath::from(*path);
+            let archived = ArchivedBytes::from_value(&path, arena.acquire()).unwrap();
+            assert_eq!(hash_of(&path), hash_of(&*archived));
+        }
     }
 }

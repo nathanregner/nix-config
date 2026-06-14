@@ -1,9 +1,13 @@
 use std::time::{Duration, Instant};
 
-use nix_gc_roots::{cache::PathInfoMap, nix, types::ArchivedBytes};
-use rkyv::Archived;
+use nix_gc_roots::{
+    cache::{ArchivedClosure, Closure},
+    nix::{self, Installable},
+    types::Aligned,
+};
+use rkyv::{Archived, ser::allocator::Arena};
 
-fn access(buf: &[u8]) -> Result<&Archived<PathInfoMap>, rkyv::rancor::Error> {
+fn access(buf: &[u8]) -> Result<&Archived<Closure>, rkyv::rancor::Error> {
     rkyv::access(buf)
 }
 
@@ -14,10 +18,11 @@ fn main() -> anyhow::Result<()> {
         .unwrap_or(10);
 
     eprintln!("Fetching firefox path-info --derivation...");
-    let paths = nix::path_info(true, ["nixpkgs#firefox"])?;
+    let paths = nix::path_info(Installable::Derivation, ["nixpkgs#firefox"])?;
     eprintln!("Got {} store paths", paths.len());
 
-    let owned = ArchivedBytes::<PathInfoMap>::from_value(&paths)?;
+    let mut arena = Arena::new();
+    let owned = ArchivedClosure::from_value(&Aligned(paths), arena.acquire())?;
     eprintln!("Serialized size: {} bytes", owned.as_slice().len());
 
     let duration = Duration::from_secs(duration_secs);

@@ -56,6 +56,7 @@ pub enum PrimaryFocus {
 pub enum SecondaryFocus {
     #[default]
     None,
+    #[expect(dead_code)] // TODO
     Search,
 }
 
@@ -63,6 +64,7 @@ pub struct App {
     pub quit: bool,
     pub needs_redraw: bool,
     pub primary_focus: PrimaryFocus,
+    #[expect(dead_code)] // TODO:
     pub secondary_focus: SecondaryFocus,
     pub clipboard: Result<Clipboard>,
 
@@ -135,8 +137,9 @@ impl App {
                 tx.send(LoadMessage::Progress(LoadProgress::GcRoots)).ok();
                 let roots = nix::gc_roots()?;
 
-                let cache = Cache::new(Path::new("/home/nregner/.cache/nix-gc-roots"))?;
-                let roots = cache.get_path_info(roots, |progress| {
+                let cache = Cache::open(Path::new("/home/nregner/.cache/nix-gc-roots"))?;
+                let txn = cache.txn()?;
+                let roots = txn.resolve(roots, |progress| {
                     tx.send(LoadMessage::Progress(progress)).ok();
                 })?;
 
