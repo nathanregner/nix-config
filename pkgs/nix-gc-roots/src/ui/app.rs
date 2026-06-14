@@ -68,7 +68,7 @@ pub struct App {
 
     pub model: Option<GcRootModel>,
     pub view: Option<ViewState>,
-    pub progress: Option<ProgressState>,
+    pub progress: Option<LoadProgress>,
     loader: Option<(JoinHandle<()>, Receiver<LoadMessage>)>,
 }
 
@@ -81,12 +81,6 @@ pub struct ViewState {
     pub visible_rows: u16,
 }
 
-pub struct ProgressState {
-    pub current: u32,
-    pub total: u32,
-    pub message: String,
-}
-
 impl Default for App {
     fn default() -> Self {
         Self {
@@ -97,11 +91,7 @@ impl Default for App {
             clipboard: Clipboard::new().map_err(Into::into),
             model: None,
             view: None,
-            progress: Some(ProgressState {
-                current: 0,
-                total: 0,
-                message: "Finding GC roots...".to_string(),
-            }),
+            progress: Some(LoadProgress::GcRoots),
             loader: None,
         }
     }
@@ -176,23 +166,7 @@ impl App {
         loop {
             match rx.try_recv() {
                 Ok(LoadMessage::Progress(progress)) => {
-                    self.progress = Some(match progress {
-                        LoadProgress::GcRoots => ProgressState {
-                            current: 0,
-                            total: 0,
-                            message: "Finding GC roots...".to_string(),
-                        },
-                        LoadProgress::PathInfo { done, total } => ProgressState {
-                            current: done,
-                            total,
-                            message: "Loading path info...".to_string(),
-                        },
-                        LoadProgress::BuildGraph => ProgressState {
-                            current: 0,
-                            total: 0,
-                            message: "Building dependency graph...".to_string(),
-                        },
-                    });
+                    self.progress = Some(progress);
                     self.needs_redraw = true;
                 }
                 Ok(LoadMessage::Done(model)) => {
@@ -200,14 +174,11 @@ impl App {
                     self.progress = None;
                     self.loader = None;
                     self.init_view();
+                    self.needs_redraw = true;
                     return;
                 }
                 Ok(LoadMessage::Error(e)) => {
-                    self.progress = Some(ProgressState {
-                        current: 0,
-                        total: 0,
-                        message: format!("Error: {e}"),
-                    });
+                    self.progress = Some(LoadProgress::Error(format!("{e}")));
                     self.loader = None;
                     self.needs_redraw = true;
                     return;
@@ -513,25 +484,25 @@ fn centered_rect(area: Rect, percent_x: u16, height: u16) -> Rect {
     middle
 }
 
-fn render_progress(f: &mut Frame, progress: &ProgressState, area: Rect) {
-    let ratio = if progress.total == 0 {
-        0.0
-    } else {
-        (progress.current as f64) / (progress.total as f64)
-    };
-    let label = if progress.total == 0 {
-        progress.message.clone()
-    } else {
-        format!(
-            "{} ({}/{})",
-            progress.message, progress.current, progress.total
-        )
+fn render_progress(f: &mut Frame, progress: &LoadProgress, area: Rect) {
+    let (label, ratio) = match progress {
+        LoadProgress::GcRoots => ("Finding GC roots...".to_string(), 0.0),
+        LoadProgress::PathInfo { done, total } => {
+            let ratio = if *total == 0 {
+                0.0
+            } else {
+                (*done as f64) / (*total as f64)
+            };
+            (format!("Loading path info... ({done}/{total})"), ratio)
+        }
+        LoadProgress::BuildGraph => ("Building dependency graph...".to_string(), 0.0),
+        LoadProgress::Error(msg) => (format!("Error: {msg}"), 0.0),
     };
 
     let gauge = Gauge::default()
         .block(Block::default().borders(Borders::ALL))
         .gauge_style(Style::default().fg(Color::DarkGray))
-        .label(label)
+        .label(Span::styled(label, Style::default().fg(Color::Reset)))
         .ratio(ratio);
 
     f.render_widget(gauge, area);

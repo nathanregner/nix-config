@@ -29,6 +29,7 @@ fn perf() -> Result<()> {
         LoadProgress::GcRoots => eprintln!("  Finding GC roots..."),
         LoadProgress::PathInfo { done, total } => eprintln!("  PathInfo: {done}/{total}"),
         LoadProgress::BuildGraph => eprintln!("  Building dependency graph..."),
+        LoadProgress::Error(e) => eprintln!("  Error: {e}"),
     })?;
 
     eprintln!("[{:?}] Build graph...", start.elapsed());

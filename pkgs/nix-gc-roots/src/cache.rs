@@ -20,11 +20,12 @@ use crate::{
     types::{ArchivedBytes, StorePath},
 };
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Debug)]
 pub enum LoadProgress {
     GcRoots,
     PathInfo { done: u32, total: u32 },
     BuildGraph,
+    Error(String),
 }
 
 pub struct Cache {
