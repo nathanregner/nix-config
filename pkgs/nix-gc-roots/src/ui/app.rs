@@ -1,5 +1,7 @@
 use std::io::{self, Stdout};
 use std::path::Path;
+use std::sync::mpsc::{self, Receiver, TryRecvError};
+use std::thread::{self, JoinHandle};
 
 use anyhow::Result;
 use arboard::Clipboard;
@@ -21,12 +23,18 @@ use tui_treelistview::{
     SimpleColumns, TreeAction, TreeEvent, TreeListView, TreeListViewState, TreeListViewStyle,
 };
 
-use crate::cache::Cache;
+use crate::cache::{Cache, LoadProgress};
 use crate::nix;
 use crate::store_graph::StoreGraph;
 use crate::ui::key_handler::{Command, Fold, KeyHandler, Motion, Recurse};
 use crate::ui::tree::{Label, PendingAction, make_columns};
 use crate::ui::{GcRootModel, format_size, is_direnv_path};
+
+enum LoadMessage {
+    Progress(LoadProgress),
+    Done(GcRootModel),
+    Error(anyhow::Error),
+}
 
 #[derive(Clone, Copy, PartialEq, Default)]
 pub enum PrimaryFocus {
@@ -50,11 +58,12 @@ pub struct App {
     pub primary_focus: PrimaryFocus,
     #[expect(dead_code)] // TODO:
     pub secondary_focus: SecondaryFocus,
-    pub clipboard: Clipboard,
+    pub clipboard: Result<Clipboard>,
 
     pub model: Option<GcRootModel>,
     pub view: Option<ViewState>,
     pub progress: Option<ProgressState>,
+    loader: Option<(JoinHandle<()>, Receiver<LoadMessage>)>,
 }
 
 pub struct ViewState {
@@ -67,8 +76,8 @@ pub struct ViewState {
 }
 
 pub struct ProgressState {
-    pub current: usize,
-    pub total: usize,
+    pub current: u32,
+    pub total: u32,
     pub message: String,
 }
 
@@ -79,15 +88,15 @@ impl Default for App {
             needs_redraw: true,
             primary_focus: PrimaryFocus::Progress,
             secondary_focus: SecondaryFocus::None,
-            // TODO: handle error
-            clipboard: Clipboard::new().unwrap(),
+            clipboard: Clipboard::new().map_err(Into::into),
             model: None,
             view: None,
             progress: Some(ProgressState {
                 current: 0,
                 total: 0,
-                message: "Loading GC roots".to_string(),
+                message: "Finding GC roots...".to_string(),
             }),
+            loader: None,
         }
     }
 }
@@ -100,16 +109,17 @@ impl App {
         let backend = CrosstermBackend::new(stdout);
         let mut terminal = Terminal::new(backend)?;
 
-        self.render(&mut terminal)?;
-        self.load_roots()?;
+        self.start_loading();
 
         while !self.quit {
+            self.poll_loader();
+
             if self.needs_redraw {
                 self.render(&mut terminal)?;
                 self.needs_redraw = false;
             }
 
-            if crossterm::event::poll(std::time::Duration::from_millis(100))?
+            if crossterm::event::poll(std::time::Duration::from_millis(50))?
                 && let crossterm::event::Event::Key(key) = crossterm::event::read()?
                 && key.kind == KeyEventKind::Press
             {
@@ -120,6 +130,90 @@ impl App {
         disable_raw_mode()?;
         execute!(terminal.backend_mut(), LeaveAlternateScreen)?;
         Ok(())
+    }
+
+    fn start_loading(&mut self) {
+        let (tx, rx) = mpsc::sync_channel(100);
+        let handle = thread::spawn(move || {
+            let result = (|| {
+                tx.send(LoadMessage::Progress(LoadProgress::GcRoots)).ok();
+                let roots = nix::gc_roots()?;
+
+                let cache = Cache::open(Path::new("/home/nregner/.cache/nix-gc-roots"))?;
+                let txn = cache.txn()?;
+                let roots = txn.resolve(roots, |progress| {
+                    tx.send(LoadMessage::Progress(progress)).ok();
+                })?;
+
+                tx.send(LoadMessage::Progress(LoadProgress::BuildGraph))
+                    .ok();
+                let dominators = StoreGraph::build(&roots);
+                let model = GcRootModel::new(dominators);
+
+                anyhow::Ok(model)
+            })();
+
+            match result {
+                Ok(model) => {
+                    tx.send(LoadMessage::Done(model)).ok();
+                }
+                Err(e) => {
+                    tx.send(LoadMessage::Error(e)).ok();
+                }
+            }
+        });
+        self.loader = Some((handle, rx));
+    }
+
+    fn poll_loader(&mut self) {
+        let Some((_, rx)) = &self.loader else { return };
+
+        loop {
+            match rx.try_recv() {
+                Ok(LoadMessage::Progress(progress)) => {
+                    self.progress = Some(match progress {
+                        LoadProgress::GcRoots => ProgressState {
+                            current: 0,
+                            total: 0,
+                            message: "Finding GC roots...".to_string(),
+                        },
+                        LoadProgress::PathInfo { done, total } => ProgressState {
+                            current: done,
+                            total,
+                            message: "Loading path info...".to_string(),
+                        },
+                        LoadProgress::BuildGraph => ProgressState {
+                            current: 0,
+                            total: 0,
+                            message: "Building dependency graph...".to_string(),
+                        },
+                    });
+                    self.needs_redraw = true;
+                }
+                Ok(LoadMessage::Done(model)) => {
+                    self.model = Some(model);
+                    self.progress = None;
+                    self.loader = None;
+                    self.init_view();
+                    return;
+                }
+                Ok(LoadMessage::Error(e)) => {
+                    self.progress = Some(ProgressState {
+                        current: 0,
+                        total: 0,
+                        message: format!("Error: {e}"),
+                    });
+                    self.loader = None;
+                    self.needs_redraw = true;
+                    return;
+                }
+                Err(TryRecvError::Empty) => return,
+                Err(TryRecvError::Disconnected) => {
+                    self.loader = None;
+                    return;
+                }
+            }
+        }
     }
 
     fn render(&mut self, terminal: &mut Terminal<CrosstermBackend<Stdout>>) -> Result<()> {
@@ -247,9 +341,9 @@ impl App {
                     && let Some(path) = model.path(id)
                 {
                     // TODO: handle error
-                    self.clipboard
-                        .set_text(path.as_os_str().to_string_lossy())
-                        .unwrap();
+                    if let Ok(clipboard) = self.clipboard.as_mut() {
+                        let _ = clipboard.set_text(path.as_os_str().to_string_lossy());
+                    }
                     // TODO: show status line message
                 }
             }
@@ -352,22 +446,6 @@ impl App {
         });
         self.primary_focus = PrimaryFocus::Ranger;
     }
-
-    pub fn load_roots(&mut self) -> Result<()> {
-        let roots = nix::gc_roots()?;
-        // TODO
-        let cache = Cache::open(Path::new("/home/nregner/.cache/nix-gc-roots"))?;
-        let txn = cache.txn()?;
-        let roots = txn.resolve(roots)?;
-        let dominators = StoreGraph::build(&roots);
-
-        let model = GcRootModel::new(dominators);
-        self.model = Some(model);
-        self.progress = None;
-        self.init_view();
-
-        Ok(())
-    }
 }
 
 #[derive(Clone, Copy)]
@@ -436,20 +514,17 @@ fn render_progress(f: &mut Frame, progress: &ProgressState, area: Rect) {
     } else {
         (progress.current as f64) / (progress.total as f64)
     };
-    let label = format!(
-        "{} ({}/{})",
-        progress.message, progress.current, progress.total
-    );
+    let label = if progress.total == 0 {
+        progress.message.clone()
+    } else {
+        format!("{} ({}/{})", progress.message, progress.current, progress.total)
+    };
 
     let gauge = Gauge::default()
-        .block(
-            Block::default()
-                .borders(Borders::ALL)
-                .title(" Loading GC Roots "),
-        )
+        .block(Block::default().borders(Borders::ALL))
         .gauge_style(Style::default().fg(Color::Cyan))
-        .ratio(ratio)
-        .label(label);
+        .label(Span::styled(label, Style::default().fg(Color::White).add_modifier(Modifier::BOLD)))
+        .ratio(ratio);
 
     f.render_widget(gauge, area);
 }

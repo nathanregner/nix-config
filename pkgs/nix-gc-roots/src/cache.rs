@@ -17,6 +17,13 @@ use crate::nix::{GcRoot, path_info};
 use crate::types::Aligned;
 use crate::types::{ArchivedBytes, StorePath};
 
+#[derive(Clone, Copy, Debug)]
+pub enum LoadProgress {
+    GcRoots,
+    PathInfo { done: u32, total: u32 },
+    BuildGraph,
+}
+
 pub struct Cache {
     env: heed::Env<WithTls>, // TODO: no tls
     db: heed::Database<Bytes, Bytes>,
@@ -111,7 +118,11 @@ pub struct CacheTxn<'a> {
 }
 
 impl<'a> CacheTxn<'a> {
-    pub fn resolve(&'a self, roots: Vec<GcRoot>) -> Result<Vec<GcRootClosure<'a>>> {
+    pub fn resolve(
+        &'a self,
+        roots: Vec<GcRoot>,
+        on_progress: impl Fn(LoadProgress) + Sync,
+    ) -> Result<Vec<GcRootClosure<'a>>> {
         let mut arena = Arena::new();
         let store_paths = roots
             .iter()
@@ -131,7 +142,8 @@ impl<'a> CacheTxn<'a> {
             .filter(|store_path| !cached.contains_key(store_path))
             .collect::<Vec<_>>();
 
-        let _total = to_lookup.len();
+        let total = to_lookup.len() as u32;
+        on_progress(LoadProgress::PathInfo { done: 0, total });
         let counter = Arc::new(AtomicU32::new(0));
 
         fn resolve_one(
@@ -144,21 +156,29 @@ impl<'a> CacheTxn<'a> {
             Ok((key, value))
         }
 
+        const BATCH_SIZE: usize = 50;
         let uncached = to_lookup
-            .into_par_iter()
-            .map_init(
-                || (Arena::new(), counter.clone()),
-                |(arena, counter), store_path| {
-                    let entry = resolve_one(store_path, arena)?;
-                    // TODO
-                    let _progress = counter.fetch_add(1, atomic::Ordering::Relaxed) + 1;
-                    Ok(entry)
-                },
-            )
-            // TODO: batched put_all?
-            .collect::<Result<FxHashMap<_, _>>>()?;
-
-        self.cache.put_all(&uncached)?;
+            .chunks(BATCH_SIZE)
+            .map(|batch| {
+                let results = batch
+                    .into_par_iter()
+                    .map_init(
+                        || (Arena::new(), counter.clone()),
+                        |(arena, counter), store_path| {
+                            let entry = resolve_one(store_path.clone(), arena)?;
+                            let done = counter.fetch_add(1, atomic::Ordering::Relaxed) + 1;
+                            on_progress(LoadProgress::PathInfo { done, total });
+                            Ok(entry)
+                        },
+                    )
+                    .collect::<Result<FxHashMap<_, _>>>()?;
+                self.cache.put_all(&results)?;
+                Ok(results)
+            })
+            .collect::<Result<Vec<_>>>()?
+            .into_iter()
+            .flatten()
+            .collect::<FxHashMap<_, _>>();
         let mut merged =
             FxHashMap::with_capacity_and_hasher(cached.len() + uncached.len(), Default::default());
         for (store_path, path_info) in uncached {
