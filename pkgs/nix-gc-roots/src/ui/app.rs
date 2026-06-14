@@ -52,24 +52,23 @@ pub enum PrimaryFocus {
     Ranger,
 }
 
-#[derive(Clone, Copy, PartialEq, Default)]
-pub enum SecondaryFocus {
-    #[default]
+pub enum CmdLine {
     None,
-    #[expect(dead_code)] // TODO
-    Search,
+    Message(String),
 }
 
 pub struct App {
     pub quit: bool,
     pub needs_redraw: bool,
     pub primary_focus: PrimaryFocus,
-    #[expect(dead_code)] // TODO:
-    pub secondary_focus: SecondaryFocus,
+    pub cmdline: CmdLine,
     pub clipboard: Result<Clipboard>,
 
+    // TODO: should be a single field
     pub model: Option<GcRootModel>,
     pub view: Option<ViewState>,
+
+    // TODO: should be a single field
     pub progress: Option<LoadProgress>,
     loader: Option<(JoinHandle<()>, Receiver<LoadMessage>)>,
 }
@@ -89,13 +88,21 @@ impl Default for App {
             quit: false,
             needs_redraw: true,
             primary_focus: PrimaryFocus::Progress,
-            secondary_focus: SecondaryFocus::None,
+            cmdline: CmdLine::None,
             clipboard: Clipboard::new().map_err(Into::into),
             model: None,
             view: None,
             progress: Some(LoadProgress::GcRoots),
             loader: None,
         }
+    }
+}
+
+impl App {
+    #[expect(dead_code)]
+    pub fn message(&mut self, msg: impl Into<String>) {
+        self.cmdline = CmdLine::Message(msg.into());
+        self.needs_redraw = true;
     }
 }
 
@@ -196,8 +203,20 @@ impl App {
     }
 
     fn render(&mut self, terminal: &mut Terminal<CrosstermBackend<Stdout>>) -> Result<()> {
+        let cmdline = std::mem::replace(&mut self.cmdline, CmdLine::None);
         terminal.draw(|f| {
-            let area = f.area();
+            let full_area = f.area();
+            let has_cmdline = !matches!(cmdline, CmdLine::None);
+            let (area, cmdline_area) = if has_cmdline {
+                let chunks = Layout::default()
+                    .direction(Direction::Vertical)
+                    .constraints([Constraint::Min(0), Constraint::Length(1)])
+                    .split(full_area);
+                (chunks[0], Some(chunks[1]))
+            } else {
+                (full_area, None)
+            };
+
             match self.primary_focus {
                 PrimaryFocus::Progress => {
                     if let Some(ref progress) = self.progress {
@@ -216,6 +235,15 @@ impl App {
                     }
                 }
             }
+
+            if let Some(cmdline_area) = cmdline_area {
+                match cmdline {
+                    CmdLine::None => {}
+                    CmdLine::Message(msg) => {
+                        f.render_widget(Line::from(msg), cmdline_area);
+                    }
+                }
+            }
         })?;
         Ok(())
     }
@@ -225,6 +253,11 @@ impl App {
 
         if modifiers == KeyModifiers::CONTROL && code == KeyCode::Char('c') {
             self.quit = true;
+            return;
+        }
+
+        if code == KeyCode::Esc && !matches!(self.cmdline, CmdLine::None) {
+            self.cmdline = CmdLine::None;
             return;
         }
 
@@ -316,14 +349,19 @@ impl App {
                 }
             }
             (KeyModifiers::NONE, KeyCode::Char('y')) => {
-                if let Some(id) = view.tree.selected_id()
-                    && let Some(path) = model.path(id)
-                {
-                    // TODO: handle error
-                    if let Ok(clipboard) = self.clipboard.as_mut() {
-                        let _ = clipboard.set_text(path.as_os_str().to_string_lossy());
-                    }
-                    // TODO: show status line message
+                let msg = view.tree.selected_id().and_then(|id| {
+                    let path = model.path(id)?;
+                    let path_str = path.as_os_str().to_string_lossy();
+                    Some(match self.clipboard.as_mut() {
+                        Ok(clipboard) => match clipboard.set_text(&*path_str) {
+                            Ok(()) => format!(r#""{path_str}" copied to clipboard"#),
+                            Err(e) => format!("Error copying clipboard: {e}"),
+                        },
+                        Err(e) => format!("Clipboard unavailable: {e}"),
+                    })
+                });
+                if let Some(msg) = msg {
+                    self.cmdline = CmdLine::Message(msg);
                 }
             }
             (KeyModifiers::NONE, KeyCode::Char('D')) if model.marked_count() > 0 => {
