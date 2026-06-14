@@ -20,8 +20,9 @@ fn perf() -> Result<()> {
     let roots = nix::gc_roots()?;
 
     eprintln!("[{:?}] Lookup PathInfo...", start.elapsed());
-    let cache = Cache::new(&PathBuf::from("/home/nregner/.cache/nix-gc-roots"))?;
-    let roots = cache.get_path_info(roots)?;
+    let cache = Cache::open(&PathBuf::from("/home/nregner/.cache/nix-gc-roots"))?;
+    let txn = cache.txn()?;
+    let roots = txn.resolve(roots)?;
 
     eprintln!("[{:?}] Build graph...", start.elapsed());
     let dominators = StoreGraph::build(&roots);

@@ -40,6 +40,7 @@ pub enum PrimaryFocus {
 pub enum SecondaryFocus {
     #[default]
     None,
+    #[expect(dead_code)] // TODO
     Search,
 }
 
@@ -47,6 +48,7 @@ pub struct App {
     pub quit: bool,
     pub needs_redraw: bool,
     pub primary_focus: PrimaryFocus,
+    #[expect(dead_code)] // TODO:
     pub secondary_focus: SecondaryFocus,
     pub clipboard: Clipboard,
 
@@ -353,8 +355,10 @@ impl App {
 
     pub fn load_roots(&mut self) -> Result<()> {
         let roots = nix::gc_roots()?;
-        let cache = Cache::new(Path::new("/home/nregner/.cache/nix-gc-roots"))?;
-        let roots = cache.get_path_info(roots)?;
+        // TODO
+        let cache = Cache::open(Path::new("/home/nregner/.cache/nix-gc-roots"))?;
+        let txn = cache.txn()?;
+        let roots = txn.resolve(roots)?;
         let dominators = StoreGraph::build(&roots);
 
         let model = GcRootModel::new(dominators);
