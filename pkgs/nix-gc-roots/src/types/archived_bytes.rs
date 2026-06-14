@@ -2,10 +2,10 @@ use std::{hash::Hash, marker::PhantomData, ops::Deref, sync::Arc};
 
 use rkyv::{
     Archive, Archived, Portable, Serialize,
-    api::{high::HighValidator, low::LowSerializer},
+    api::high::{HighSerializer, HighValidator},
     bytecheck::CheckBytes,
     rancor::Error,
-    ser::Allocator,
+    ser::allocator::ArenaHandle,
     util::AlignedVec,
 };
 
@@ -42,13 +42,12 @@ impl<'a> Repr<'a> {
 }
 
 impl<'a, T: Archive> ArchivedBytes<'a, T> {
-    pub fn from_value<A>(value: &T, alloc: A) -> Result<Self, Error>
+    pub fn from_value(value: &T) -> Result<Self, Error>
     where
-        A: Allocator<Error>,
-        T: Serialize<LowSerializer<AlignedVec, A, Error>>,
+        T: for<'h> Serialize<HighSerializer<AlignedVec, ArenaHandle<'h>, Error>>,
     {
         // Invariant: `bytes` is a valid representation of `T::Archived`
-        let vec = rkyv::api::low::to_bytes_in_with_alloc(value, AlignedVec::new(), alloc)?;
+        let vec = rkyv::to_bytes(value)?;
         Ok(Self {
             repr: Repr::Owned(Arc::new(vec)),
             _ty: PhantomData,

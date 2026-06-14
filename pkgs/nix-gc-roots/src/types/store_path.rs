@@ -97,7 +97,6 @@ mod tests {
     use crate::types::ArchivedBytes;
 
     use super::*;
-    use rkyv::ser::allocator::Arena;
     use std::hash::{Hash, Hasher};
 
     fn hash_of<T: Hash>(value: &T) -> u64 {
@@ -110,10 +109,9 @@ mod tests {
     fn archived_hash_eq_matches_original() {
         let paths = ["/store/a", "/store/b", "/nix/store/abc123-foo"];
 
-        let mut arena = Arena::new();
         for path in &paths {
             let path = StorePath::from(*path);
-            let archived = ArchivedBytes::from_value(&path, arena.acquire()).unwrap();
+            let archived = ArchivedBytes::from_value(&path).unwrap();
             assert_eq!(hash_of(&path), hash_of(&*archived));
         }
     }

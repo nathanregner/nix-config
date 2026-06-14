@@ -3,7 +3,6 @@ use petgraph::{
     algo::dominators::{self, Dominators},
     graph::{DiGraph, NodeIndex},
 };
-use rkyv::ser::allocator::{Arena, ArenaHandle};
 use rustc_hash::FxHashMap;
 use std::{
     collections::hash_map::Entry,
@@ -44,10 +43,9 @@ impl StoreGraph {
             nodes: FxHashMap::default(),
             nodes_by_index: FxHashMap::default(),
         };
-        let mut arena = Arena::new();
         for root in roots {
             graph.add_parents(&root.symlink);
-            graph.add_closure(root, arena.acquire());
+            graph.add_closure(root);
         }
         graph.compute_dominators()
     }
@@ -64,10 +62,10 @@ impl StoreGraph {
         }
     }
 
-    fn add_closure(&mut self, root: &GcRootClosure, alloc: ArenaHandle) {
+    fn add_closure(&mut self, root: &GcRootClosure) {
         let referrer = self.add_node(&root.symlink, Node::path());
 
-        let root_store_path = archived_path(&root.store_path, alloc);
+        let root_store_path = archived_path(&root.store_path);
         let mut stack = vec![(*referrer, &*root_store_path)];
         while let Some((referrer, store_path)) = stack.pop() {
             let Some(path_info) = &root.closure.0.get(store_path) else {
@@ -199,11 +197,8 @@ impl StoreGraph {
     }
 }
 
-fn archived_path(
-    path: impl Into<StorePath>,
-    alloc: ArenaHandle,
-) -> ArchivedBytes<'static, StorePath> {
-    ArchivedBytes::from_value(&path.into(), alloc).expect("Failed to serialize store_path")
+fn archived_path(path: impl Into<StorePath>) -> ArchivedBytes<'static, StorePath> {
+    ArchivedBytes::from_value(&path.into()).expect("Failed to serialize store_path")
 }
 
 impl Node {
@@ -345,9 +340,8 @@ mod tests {
                 by_id,
                 closure,
             } = self;
-            let mut arena = Arena::new();
-            let archived = ArchivedBytes::from_value(&Aligned(closure), arena.acquire())
-                .expect("Failed to archive closure");
+            let archived =
+                ArchivedBytes::from_value(&Aligned(closure)).expect("Failed to archive closure");
             StoreBuilder {
                 next_id,
                 by_id,

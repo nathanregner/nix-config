@@ -5,7 +5,7 @@ use nix_gc_roots::{
     nix::{self, Installable},
     types::Aligned,
 };
-use rkyv::{Archived, ser::allocator::Arena};
+use rkyv::Archived;
 
 fn access(buf: &[u8]) -> Result<&Archived<Closure>, rkyv::rancor::Error> {
     rkyv::access(buf)
@@ -21,8 +21,7 @@ fn main() -> anyhow::Result<()> {
     let paths = nix::path_info(Installable::Derivation, ["nixpkgs#firefox"])?;
     eprintln!("Got {} store paths", paths.len());
 
-    let mut arena = Arena::new();
-    let owned = ArchivedClosure::from_value(&Aligned(paths), arena.acquire())?;
+    let owned = ArchivedClosure::from_value(&Aligned(paths))?;
     eprintln!("Serialized size: {} bytes", owned.as_slice().len());
 
     let duration = Duration::from_secs(duration_secs);

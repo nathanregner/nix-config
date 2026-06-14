@@ -7,7 +7,7 @@ use nix_gc_roots::{
     nix::{self, Installable},
     types::Aligned,
 };
-use rkyv::{Archived, ser::allocator::Arena};
+use rkyv::Archived;
 use tempfile::TempDir;
 
 fn fetch_firefox_derivation() -> anyhow::Result<Closure> {
@@ -27,10 +27,8 @@ fn setup_cache() -> (TempDir, Vec<u8>) {
     let tmpdir = TempDir::new().expect("Failed to create temp dir");
     let cache_path = tmpdir.path().to_path_buf();
 
-    let mut arena = Arena::new();
     let paths = Aligned(paths);
-    let serialized =
-        ArchivedClosure::from_value(&paths, arena.acquire()).expect("Failed to serialize");
+    let serialized = ArchivedClosure::from_value(&paths).expect("Failed to serialize");
     eprintln!("rkyv size: {} bytes", serialized.as_slice().len());
 
     // TODO: this is stupid...

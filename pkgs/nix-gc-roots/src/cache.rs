@@ -2,13 +2,14 @@ use std::ops::Deref;
 use std::path::Path;
 use std::sync::Arc;
 use std::sync::atomic::{self, AtomicU32};
+use std::sync::mpsc;
+use std::thread;
 
 use anyhow::{Context, Result};
 use heed::RoTxn;
 use heed::WithTls;
 use heed::types::Bytes;
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
-use rkyv::ser::allocator::Arena;
 use rustc_hash::FxHashMap;
 use rustc_hash::FxHashSet;
 
@@ -124,15 +125,11 @@ impl<'a> CacheTxn<'a> {
         roots: Vec<GcRoot>,
         on_progress: impl Fn(LoadProgress) + Sync,
     ) -> Result<Vec<GcRootClosure<'a>>> {
-        let mut arena = Arena::new();
         let store_paths = roots
             .iter()
             .map(|root| {
-                ArchivedPathBuf::from_value(
-                    &Aligned(StorePath(root.store_path.clone())),
-                    arena.acquire(),
-                )
-                .expect("Failed to serialize store_path")
+                ArchivedPathBuf::from_value(&Aligned(StorePath(root.store_path.clone())))
+                    .expect("Failed to serialize store_path")
             })
             .collect::<FxHashSet<_>>();
 
@@ -149,37 +146,55 @@ impl<'a> CacheTxn<'a> {
 
         fn resolve_one(
             key: ArchivedPathBuf<'static>,
-            arena: &mut Arena,
         ) -> Result<(ArchivedPathBuf<'static>, ArchivedClosure<'static>)> {
             let store_path = key.0.to_path_buf();
             let closure = path_info(Installable::Output, [&store_path])?;
-            let value = ArchivedClosure::from_value(&Aligned(closure), arena.acquire())?;
+            let value = ArchivedClosure::from_value(&Aligned(closure))?;
             Ok((key, value))
         }
 
+        // Writer thread batches entries and flushes without blocking workers
         const BATCH_SIZE: usize = 50;
-        let uncached = to_lookup
-            .chunks(BATCH_SIZE)
-            .map(|batch| {
-                let results = batch
-                    .into_par_iter()
-                    .map_init(
-                        || (Arena::new(), counter.clone()),
-                        |(arena, counter), store_path| {
-                            let entry = resolve_one(store_path.clone(), arena)?;
-                            let done = counter.fetch_add(1, atomic::Ordering::Relaxed) + 1;
-                            on_progress(LoadProgress::PathInfo { done, total });
-                            Ok(entry)
-                        },
-                    )
-                    .collect::<Result<FxHashMap<_, _>>>()?;
-                self.cache.put_all(&results)?;
-                Ok(results)
-            })
-            .collect::<Result<Vec<_>>>()?
-            .into_iter()
-            .flatten()
-            .collect::<FxHashMap<_, _>>();
+        type Entry = (ArchivedPathBuf<'static>, ArchivedClosure<'static>);
+        let (write_tx, write_rx) = mpsc::channel::<Entry>();
+        let cache = &self.cache;
+        let uncached = thread::scope(|s| {
+            let writer_handle = s.spawn(|| {
+                let mut batch = FxHashMap::default();
+                for (k, v) in write_rx {
+                    batch.insert(k, v);
+                    if batch.len() >= BATCH_SIZE {
+                        cache.put_all(&batch)?;
+                        batch.clear();
+                    }
+                }
+                if !batch.is_empty() {
+                    cache.put_all(&batch)?;
+                }
+                anyhow::Ok(())
+            });
+
+            let uncached: Vec<Result<Entry>> = to_lookup
+                .into_par_iter()
+                .map(|store_path| {
+                    let entry = resolve_one(store_path.clone())?;
+                    let done = counter.fetch_add(1, atomic::Ordering::Relaxed) + 1;
+                    on_progress(LoadProgress::PathInfo { done, total });
+                    write_tx.send(entry.clone()).ok();
+                    Ok(entry)
+                })
+                .collect();
+
+            drop(write_tx);
+            writer_handle.join().unwrap()?;
+
+            let mut result = FxHashMap::default();
+            for entry in uncached {
+                let (k, v) = entry?;
+                result.insert(k, v);
+            }
+            anyhow::Ok(result)
+        })?;
         let mut merged =
             FxHashMap::with_capacity_and_hasher(cached.len() + uncached.len(), Default::default());
         for (store_path, path_info) in uncached {
@@ -191,10 +206,7 @@ impl<'a> CacheTxn<'a> {
 
         let mut result = Vec::with_capacity(roots.len());
         for root in roots {
-            let key = ArchivedPathBuf::from_value(
-                &Aligned(StorePath(root.store_path.clone())),
-                arena.acquire(),
-            )?;
+            let key = ArchivedPathBuf::from_value(&Aligned(StorePath(root.store_path.clone())))?;
             let path_info = merged
                 .get(&key)
                 .ok_or_else(|| anyhow::anyhow!("Missing path_info for {:?}", root.store_path))?
