@@ -1,34 +1,42 @@
-use std::io::{self, Stdout};
-use std::path::Path;
-use std::sync::mpsc::{self, Receiver, TryRecvError};
-use std::thread::{self, JoinHandle};
+use std::{
+    io::{self, Stdout},
+    path::Path,
+    sync::mpsc::{self, Receiver, TryRecvError},
+    thread::{self, JoinHandle},
+};
 
 use anyhow::Result;
 use arboard::Clipboard;
-use crossterm::event::{KeyCode, KeyEventKind, KeyModifiers};
-use crossterm::execute;
-use crossterm::terminal::{
-    EnterAlternateScreen, LeaveAlternateScreen, disable_raw_mode, enable_raw_mode,
+use crossterm::{
+    event::{KeyCode, KeyEventKind, KeyModifiers},
+    execute,
+    terminal::{EnterAlternateScreen, LeaveAlternateScreen, disable_raw_mode, enable_raw_mode},
 };
 use petgraph::graph::NodeIndex;
-use ratatui::Terminal;
-use ratatui::backend::CrosstermBackend;
-use ratatui::layout::{Constraint, Direction, Layout, Rect};
-use ratatui::prelude::Frame;
-use ratatui::style::{Color, Modifier, Style};
-use ratatui::symbols::{border, line};
-use ratatui::text::{Line, Span};
-use ratatui::widgets::{Block, Borders, Gauge, List, ListItem, ListState};
+use ratatui::{
+    Terminal,
+    backend::CrosstermBackend,
+    layout::{Constraint, Direction, Layout, Rect},
+    prelude::Frame,
+    style::{Color, Modifier, Style},
+    symbols::{border, line},
+    text::{Line, Span},
+    widgets::{Block, Borders, Gauge, List, ListItem, ListState},
+};
 use tui_treelistview::{
     SimpleColumns, TreeAction, TreeEvent, TreeListView, TreeListViewState, TreeListViewStyle,
 };
 
-use crate::cache::{Cache, LoadProgress};
-use crate::nix;
-use crate::store_graph::StoreGraph;
-use crate::ui::key_handler::{Command, Fold, KeyHandler, Motion, Recurse};
-use crate::ui::tree::{Label, PendingAction, make_columns};
-use crate::ui::{GcRootModel, format_size, is_direnv_path};
+use crate::{
+    cache::{Cache, LoadProgress},
+    nix,
+    store_graph::StoreGraph,
+    ui::{
+        GcRootModel, format_size, is_direnv_path,
+        key_handler::{Command, Fold, KeyHandler, Motion, Recurse},
+        tree::{Label, PendingAction, make_columns},
+    },
+};
 
 enum LoadMessage {
     Progress(LoadProgress),
@@ -48,7 +56,6 @@ pub enum PrimaryFocus {
 pub enum SecondaryFocus {
     #[default]
     None,
-    #[expect(dead_code)] // TODO
     Search,
 }
 
@@ -56,7 +63,6 @@ pub struct App {
     pub quit: bool,
     pub needs_redraw: bool,
     pub primary_focus: PrimaryFocus,
-    #[expect(dead_code)] // TODO:
     pub secondary_focus: SecondaryFocus,
     pub clipboard: Result<Clipboard>,
 
@@ -139,9 +145,8 @@ impl App {
                 tx.send(LoadMessage::Progress(LoadProgress::GcRoots)).ok();
                 let roots = nix::gc_roots()?;
 
-                let cache = Cache::open(Path::new("/home/nregner/.cache/nix-gc-roots"))?;
-                let txn = cache.txn()?;
-                let roots = txn.resolve(roots, |progress| {
+                let cache = Cache::new(Path::new("/home/nregner/.cache/nix-gc-roots"))?;
+                let roots = cache.get_path_info(roots, |progress| {
                     tx.send(LoadMessage::Progress(progress)).ok();
                 })?;
 
@@ -517,13 +522,16 @@ fn render_progress(f: &mut Frame, progress: &ProgressState, area: Rect) {
     let label = if progress.total == 0 {
         progress.message.clone()
     } else {
-        format!("{} ({}/{})", progress.message, progress.current, progress.total)
+        format!(
+            "{} ({}/{})",
+            progress.message, progress.current, progress.total
+        )
     };
 
     let gauge = Gauge::default()
         .block(Block::default().borders(Borders::ALL))
-        .gauge_style(Style::default().fg(Color::Cyan))
-        .label(Span::styled(label, Style::default().fg(Color::White).add_modifier(Modifier::BOLD)))
+        .gauge_style(Style::default().fg(Color::DarkGray))
+        .label(label)
         .ratio(ratio);
 
     f.render_widget(gauge, area);

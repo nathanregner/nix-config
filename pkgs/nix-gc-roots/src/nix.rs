@@ -1,7 +1,7 @@
 use anyhow::Result;
 use std::{ffi::OsStr, path::PathBuf, process::Command, time::SystemTime};
 
-use crate::cache::Closure;
+use crate::cache::PathInfoMap;
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct GcRoot {
@@ -47,19 +47,13 @@ pub fn gc_roots() -> Result<Vec<GcRoot>> {
     Ok(roots)
 }
 
-#[derive(PartialEq, Eq, Clone, Copy, Debug)]
-pub enum Installable {
-    Derivation,
-    Output,
-}
-
 pub fn path_info(
-    ty: Installable,
+    derivation: bool,
     installables: impl IntoIterator<Item = impl AsRef<OsStr>>,
-) -> Result<Closure> {
+) -> Result<PathInfoMap> {
     let mut cmd = Command::new("nix");
     cmd.args(["path-info", "-r", "--json", "--json-format", "1"]);
-    if ty == Installable::Derivation {
+    if derivation {
         cmd.arg("--derivation");
     }
     cmd.args(installables);

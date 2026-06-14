@@ -1,23 +1,20 @@
 use std::os::unix::ffi::OsStrExt;
 
 use criterion::{Criterion, criterion_group, criterion_main};
-use heed::{EnvOpenOptions, types::Bytes};
-use nix_gc_roots::{
-    cache::{ArchivedClosure, Closure},
-    nix::{self, Installable},
-    types::Aligned,
-};
-use rkyv::{Archived, ser::allocator::Arena};
+use heed::EnvOpenOptions;
+use heed::types::Bytes;
+use nix_gc_roots::{cache::PathInfoMap, nix, types::ArchivedBytes};
+use rkyv::Archived;
 use tempfile::TempDir;
 
-fn fetch_firefox_derivation() -> anyhow::Result<Closure> {
+fn fetch_firefox_derivation() -> anyhow::Result<PathInfoMap> {
     eprintln!("Fetching firefox path-info --derivation...");
-    let paths = nix::path_info(Installable::Derivation, ["nixpkgs#firefox"])?;
+    let paths = nix::path_info(true, ["nixpkgs#firefox"])?;
     eprintln!("Got {} store paths", paths.len());
     Ok(paths)
 }
 
-fn access(buf: &[u8]) -> Result<&Archived<Closure>, rkyv::rancor::Error> {
+fn access(buf: &[u8]) -> Result<&Archived<PathInfoMap>, rkyv::rancor::Error> {
     rkyv::access(buf)
 }
 
@@ -27,15 +24,11 @@ fn setup_cache() -> (TempDir, Vec<u8>) {
     let tmpdir = TempDir::new().expect("Failed to create temp dir");
     let cache_path = tmpdir.path().to_path_buf();
 
-    let mut arena = Arena::new();
-    let paths = Aligned(paths);
-    let serialized =
-        ArchivedClosure::from_value(&paths, arena.acquire()).expect("Failed to serialize");
+    let serialized = ArchivedBytes::<PathInfoMap>::from_value(&paths).expect("Failed to serialize");
     eprintln!("rkyv size: {} bytes", serialized.as_slice().len());
 
     // TODO: this is stupid...
     let store_path = paths
-        .0
         .keys()
         .next()
         .unwrap()

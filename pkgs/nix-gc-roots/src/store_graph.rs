@@ -3,25 +3,20 @@ use petgraph::{
     algo::dominators::{self, Dominators},
     graph::{DiGraph, NodeIndex},
 };
-use rkyv::ser::allocator::{Arena, ArenaHandle};
-use rustc_hash::FxHashMap;
 use std::{
-    collections::hash_map::Entry,
+    collections::{BTreeMap, HashMap, hash_map::Entry},
     ops::Deref,
     path::{Path, PathBuf},
     rc::Rc,
 };
 
-use crate::{
-    cache::{ArchivedPathInfo, GcRootClosure},
-    types::{ArchivedBytes, StorePath},
-};
+use crate::cache::{GcRootClosure, PathInfo};
 
 #[derive(Default)]
 pub struct StoreGraph {
     graph: DiGraph<Node, ()>,
-    nodes: FxHashMap<PathBuf, NodeIndex>,
-    nodes_by_index: FxHashMap<NodeIndex, PathBuf>,
+    nodes: HashMap<PathBuf, NodeIndex>,
+    nodes_by_index: HashMap<NodeIndex, PathBuf>,
 }
 
 #[derive(Clone, Copy, Debug)]
@@ -41,13 +36,12 @@ impl StoreGraph {
     pub fn build(roots: &[GcRootClosure]) -> DominatorGraph {
         let mut graph = Self {
             graph: DiGraph::new(),
-            nodes: FxHashMap::default(),
-            nodes_by_index: FxHashMap::default(),
+            nodes: HashMap::new(),
+            nodes_by_index: HashMap::new(),
         };
-        let mut arena = Arena::new();
         for root in roots {
             graph.add_parents(&root.symlink);
-            graph.add_closure(root, arena.acquire());
+            graph.add_closure(root);
         }
         graph.compute_dominators()
     }
@@ -64,33 +58,19 @@ impl StoreGraph {
         }
     }
 
-    fn add_closure(&mut self, root: &GcRootClosure, alloc: ArenaHandle) {
+    fn add_closure(&mut self, root: &GcRootClosure) {
         let referrer = self.add_node(&root.symlink, Node::path());
 
-        let root_store_path = archived_path(&root.store_path, alloc);
-        let mut stack = vec![(*referrer, &*root_store_path)];
+        let mut stack = vec![(*referrer, &root.store_path)];
         while let Some((referrer, store_path)) = stack.pop() {
-            let Some(path_info) = &root.closure.0.get(store_path) else {
-                let mut paths = root
-                    .closure
-                    .0
-                    .keys()
-                    .map(|k| format!(" - {k:?}: {}", k == store_path))
-                    .collect::<Vec<_>>();
-                paths.sort_unstable();
-                panic!(
-                    "Closure missing store path\n   {:#?}:\n{}",
-                    store_path,
-                    paths.join("\n")
-                )
-            };
+            let path_info = &root.path_info[store_path]; // TODO: don't panic?
 
-            let reference = self.add_node(store_path.to_path_buf(), Node::store_path(path_info));
+            let reference = self.add_node(store_path, Node::store_path(path_info));
             self.add_edge(referrer, *reference);
 
             if let NodeEntry::Inserted(reference) = reference {
-                for store_path in path_info.references.iter() {
-                    stack.push((reference, store_path));
+                for store_path in &path_info.references {
+                    stack.push((reference, store_path.deref()));
                 }
             }
         }
@@ -102,7 +82,7 @@ impl StoreGraph {
 
         fn compute_sizes(
             // TODO: vec
-            visited: &mut FxHashMap<NodeIndex, Rc<FixedBitSet>>,
+            visited: &mut HashMap<NodeIndex, Rc<FixedBitSet>>,
             dominators: &Dominators<NodeIndex>,
             graph: &mut DiGraph<Node, ()>,
             index: NodeIndex,
@@ -164,7 +144,7 @@ impl StoreGraph {
         // }
 
         compute_sizes(
-            &mut FxHashMap::with_capacity_and_hasher(self.graph.node_count(), Default::default()),
+            &mut HashMap::with_capacity(self.graph.node_count()),
             &dominators,
             &mut self.graph,
             root,
@@ -199,13 +179,6 @@ impl StoreGraph {
     }
 }
 
-fn archived_path(
-    path: impl Into<StorePath>,
-    alloc: ArenaHandle,
-) -> ArchivedBytes<'static, StorePath> {
-    ArchivedBytes::from_value(&path.into(), alloc).expect("Failed to serialize store_path")
-}
-
 impl Node {
     fn path() -> Self {
         Self {
@@ -215,11 +188,11 @@ impl Node {
         }
     }
 
-    fn store_path(path_info: &ArchivedPathInfo) -> Self {
+    fn store_path(path_info: &PathInfo) -> Self {
         Self {
             ty: NodeType::StorePath,
-            added_size: path_info.nar_size.into(),
-            closure_size: path_info.nar_size.into(),
+            added_size: path_info.nar_size,
+            closure_size: path_info.nar_size,
         }
     }
 }
@@ -250,15 +223,11 @@ pub struct Dominator {
 
 #[cfg(test)]
 mod tests {
-    use std::{fmt::Display, time::SystemTime};
+    use std::{fmt::Display, sync::Arc, time::SystemTime};
 
     use petgraph::dot::Dot;
 
-    use crate::{
-        cache::{ArchivedClosure, Closure, PathInfo},
-        nix::GcRoot,
-        types::{Aligned, StorePath},
-    };
+    use crate::{cache::PathInfoMap, nix::GcRoot, types::StorePath};
 
     use super::*;
 
@@ -306,11 +275,11 @@ mod tests {
     #[derive(Default)]
     struct StoreBuilder<T> {
         next_id: StorePathId,
-        by_id: FxHashMap<StorePathId, StorePath>,
-        closure: T,
+        by_id: HashMap<StorePathId, StorePath>,
+        by_path: T,
     }
 
-    impl StoreBuilder<Closure> {
+    impl StoreBuilder<PathInfoMap> {
         fn new() -> Self {
             Self::default()
         }
@@ -322,11 +291,11 @@ mod tests {
             references: impl IntoIterator<Item = StorePathId>,
         ) -> StorePathId {
             let path = path.into();
-            assert!(!self.closure.contains_key(&path), "Duplicate path {path:?}");
+            assert!(!self.by_path.contains_key(&path), "Duplicate path {path:?}");
 
             let id = self.by_id.len();
             self.by_id.insert(id, path.clone());
-            self.closure.insert(
+            self.by_path.insert(
                 path,
                 PathInfo {
                     nar_size,
@@ -339,36 +308,29 @@ mod tests {
             id
         }
 
-        fn build(self) -> StoreBuilder<ArchivedClosure<'static>> {
+        fn build(self) -> StoreBuilder<Arc<PathInfoMap>> {
             let Self {
                 next_id,
                 by_id,
-                closure,
+                by_path,
             } = self;
-            let mut arena = Arena::new();
-            let archived = ArchivedBytes::from_value(&Aligned(closure), arena.acquire())
-                .expect("Failed to archive closure");
             StoreBuilder {
                 next_id,
                 by_id,
-                closure: archived,
+                by_path: Arc::new(by_path),
             }
         }
     }
 
-    impl StoreBuilder<ArchivedClosure<'static>> {
-        fn root(
-            &self,
-            symlink: impl Into<PathBuf>,
-            store_path: StorePathId,
-        ) -> GcRootClosure<'static> {
+    impl StoreBuilder<Arc<PathInfoMap>> {
+        fn root(&self, symlink: impl Into<PathBuf>, store_path: StorePathId) -> GcRootClosure {
             GcRootClosure {
                 root: GcRoot {
                     symlink: symlink.into(),
                     modified: SystemTime::UNIX_EPOCH,
                     store_path: self.by_id[&store_path].deref().clone(),
                 },
-                closure: self.closure.clone(),
+                path_info: self.by_path.clone(),
             }
         }
     }

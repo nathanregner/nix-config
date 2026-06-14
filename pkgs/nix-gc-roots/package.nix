@@ -26,7 +26,7 @@ let
       devShell = mkRustShell {
         inherit pkg rustPlatform;
         env.CARGO_PROFILE_RELEASE_DEBUG = true;
-        packages = [ cargo-insta ];
+        buildInputs = [ cargo-insta ];
       };
     };
   };
