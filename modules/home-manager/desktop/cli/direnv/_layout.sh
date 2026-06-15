@@ -1,17 +1,10 @@
-if [ -L "$2" ]; then
-  envrc_path="$(realpath "$2")"
-  envrc_path="${envrc_path%/.envrc}"
+envrc_path="$(realpath "$2")"
+envrc_path="${envrc_path%/.envrc}"
 
-  : "${XDG_CACHE_HOME:="${HOME}/.cache"}"
-  declare -A direnv_layout_dirs
-  direnv_layout_dir() {
-    local hash path
-    echo "${direnv_layout_dirs[$envrc_path]:=$(
-      hash="$(sha1sum - <<<"$envrc_path" | head -c40)"
-      path="${envrc_path//[^a-zA-Z0-9]/-}"
-      echo "${XDG_CACHE_HOME}/direnv/layouts/${hash}${path}"
-    )}"
-  }
-fi
+: "${XDG_CACHE_HOME:="${HOME}/.cache"}"
+declare -A direnv_layout_dirs
+direnv_layout_dir() {
+  echo "${direnv_layout_dirs[$envrc_path]:="${XDG_CACHE_HOME}/direnv/layouts$envrc_path"}"
+}
 
 # vim: set ft=bash:
