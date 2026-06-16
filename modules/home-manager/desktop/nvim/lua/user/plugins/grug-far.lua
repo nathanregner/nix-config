@@ -2,5 +2,7 @@
 ---@type LazySpec
 return {
   "MagicDuck/grug-far.nvim",
-  opts = {},
+  opts = {
+    minSearchChars = 1,
+  },
 }
