@@ -3,7 +3,7 @@ use std::path::Path;
 use std::sync::Arc;
 use std::sync::atomic::{self, AtomicU32};
 use std::sync::mpsc;
-use std::thread;
+use std::{fs, thread};
 
 use anyhow::{Context, Result};
 use heed::RoTxn;
@@ -49,7 +49,15 @@ impl Deref for GcRootClosure<'_> {
 }
 
 impl Cache {
-    // TODO: unify with CacheTxn?
+    pub fn open_default() -> Result<Self> {
+        let cache_dir = dirs::cache_dir()
+            .ok_or_else(|| anyhow::anyhow!("Failed to determine cache_dir"))?
+            .join("nix-gc-roots");
+        fs::create_dir_all(&cache_dir)
+            .with_context(|| anyhow::anyhow!("Failed to create cache_dir: {cache_dir:?}"))?;
+        Self::open(&cache_dir)
+    }
+
     pub fn open(path: &Path) -> Result<Self> {
         let env = unsafe {
             heed::EnvOpenOptions::new()

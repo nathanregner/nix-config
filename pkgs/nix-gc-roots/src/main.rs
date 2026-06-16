@@ -8,11 +8,13 @@ use anyhow::Result;
 use petgraph::dot::Dot;
 use std::{
     env,
-    path::PathBuf,
     time::{Duration, Instant},
 };
 
-use crate::{cache::{Cache, LoadProgress}, store_graph::StoreGraph};
+use crate::{
+    cache::{Cache, LoadProgress},
+    store_graph::StoreGraph,
+};
 
 fn perf() -> Result<()> {
     let start = Instant::now();
@@ -20,7 +22,7 @@ fn perf() -> Result<()> {
     let roots = nix::gc_roots()?;
 
     eprintln!("[{:?}] Lookup PathInfo...", start.elapsed());
-    let cache = Cache::open(&PathBuf::from("/home/nregner/.cache/nix-gc-roots"))?;
+    let cache = Cache::open_default()?;
     let txn = cache.txn()?;
     let roots = txn.resolve(roots, |progress| match progress {
         LoadProgress::GcRoots => eprintln!("  Finding GC roots..."),

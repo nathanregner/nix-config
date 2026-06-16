@@ -1,6 +1,5 @@
 use std::{
     io::{self, Stdout},
-    path::Path,
     sync::mpsc::{self, Receiver, TryRecvError},
     thread::{self, JoinHandle},
 };
@@ -144,7 +143,7 @@ impl App {
                 tx.send(LoadMessage::Progress(LoadProgress::GcRoots)).ok();
                 let roots = nix::gc_roots()?;
 
-                let cache = Cache::open(Path::new("/home/nregner/.cache/nix-gc-roots"))?;
+                let cache = Cache::open_default()?;
                 let txn = cache.txn()?;
                 let roots = txn.resolve(roots, |progress| {
                     tx.send(LoadMessage::Progress(progress)).ok();

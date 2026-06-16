@@ -10,6 +10,7 @@ arboard = { version = "3.6.1", default-features = false, features = [
   "wayland-data-control",
 ] }
 crossterm = "0.29"
+dirs = "6.0.0"
 fixedbitset = "0.5.7"
 heed = { version = "0.22.1", features = ["serde-json"] }
 hex = "0.4.3"
