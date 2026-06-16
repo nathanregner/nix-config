@@ -14,13 +14,6 @@
     inputs.nixos-hardware.nixosModules.common-pc-ssd
   ];
 
-  assertions = [
-    {
-      assertion = lib.versionAtLeast config.nix.package.version "2.30.0";
-      message = "${config.nix.package.version} < 2.30.0";
-    }
-  ];
-
   boot = {
     loader.systemd-boot.enable = true;
     loader.efi.canTouchEfiVariables = true;
