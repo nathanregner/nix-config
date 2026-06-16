@@ -19,13 +19,14 @@ use crate::{
 #[derive(Default)]
 pub struct StoreGraph {
     graph: DiGraph<Node, ()>,
-    nodes: FxHashMap<PathBuf, NodeIndex>,
+    nodes_by_path: FxHashMap<PathBuf, NodeIndex>,
     nodes_by_index: FxHashMap<NodeIndex, PathBuf>,
 }
 
 #[derive(Clone, Copy, Debug)]
 struct Node {
     ty: NodeType,
+    nar_size: u64,
     added_size: u64,
     closure_size: u64,
 }
@@ -40,7 +41,7 @@ impl StoreGraph {
     pub fn build(roots: &[GcRootClosure]) -> DominatorGraph {
         let mut graph = Self {
             graph: DiGraph::new(),
-            nodes: FxHashMap::default(),
+            nodes_by_path: FxHashMap::default(),
             nodes_by_index: FxHashMap::default(),
         };
         for root in roots {
@@ -108,6 +109,7 @@ impl StoreGraph {
             if let Some(reachability) = visited.get(&index) {
                 return reachability.clone(); // TODO
             }
+            // TODO: what about cycles with fixed output derivations?
             visited.insert(index, Rc::new(FixedBitSet::new()));
 
             let node = graph[index];
@@ -115,7 +117,7 @@ impl StoreGraph {
 
             let mut reachability = FixedBitSet::with_capacity(graph.node_count());
             for neighbor in neighbors {
-                if matches!(node.ty, NodeType::StorePath) {
+                if matches!(graph[neighbor].ty, NodeType::StorePath) {
                     reachability.insert(neighbor.index());
                 }
                 reachability |= &*compute_sizes(visited, dominators, graph, neighbor);
@@ -123,10 +125,9 @@ impl StoreGraph {
 
             graph[index].closure_size += reachability
                 .ones()
-                .map(|i| graph[NodeIndex::new(i)].added_size)
+                .map(|i| graph[NodeIndex::new(i)].nar_size)
                 .sum::<u64>();
 
-            // TODO: error if missing
             for dominator in dominators.dominators(index).into_iter().flatten() {
                 graph[dominator].added_size += node.added_size;
             }
@@ -135,31 +136,6 @@ impl StoreGraph {
             visited.insert(index, reachability.clone());
             reachability
         }
-
-        // let mut dfs = DfsPostOrder::new(&self.graph, root);
-        // while let Some(node) = dfs.next(&self.graph) {
-        //     let total_size = self
-        //         .graph
-        //         .neighbors(node)
-        //         // TODO: error if missing
-        //         .flat_map(|reference| Some(self.graph.node_weight(reference)?.closure_size))
-        //         .sum();
-        //     // TODO: error if missing
-        //     let Some(node_weight) = self.graph.node_weight_mut(node) else {
-        //         continue;
-        //     };
-        //     node_weight.closure_size = total_size;
-        //     if let Some(dominator) = dominators.immediate_dominator(node) {
-        //         // TODO: error if missing
-        //         let retained = node_weight.added_size;
-        //         // TODO: error if missing
-        //         let Some(dominator) = self.graph.node_weight_mut(dominator) else {
-        //             continue;
-        //         };
-        //         dominator.closure_size += total_size;
-        //         dominator.added_size += retained;
-        //     }
-        // }
 
         compute_sizes(
             &mut FxHashMap::with_capacity_and_hasher(self.graph.node_count(), Default::default()),
@@ -182,7 +158,7 @@ impl StoreGraph {
 
     fn add_node(&mut self, path: impl Into<PathBuf>, node: Node) -> NodeEntry {
         let path = path.into();
-        match self.nodes.entry(path.clone()) {
+        match self.nodes_by_path.entry(path.clone()) {
             Entry::Occupied(entry) => NodeEntry::Existing(*entry.get()),
             Entry::Vacant(entry) => {
                 let index = *entry.insert_entry(self.graph.add_node(node)).get();
@@ -205,16 +181,19 @@ impl Node {
     fn path() -> Self {
         Self {
             ty: NodeType::Path,
+            nar_size: 0,
             added_size: 0,
             closure_size: 0,
         }
     }
 
     fn store_path(path_info: &ArchivedPathInfo) -> Self {
+        let nar_size = path_info.nar_size.into();
         Self {
             ty: NodeType::StorePath,
-            added_size: path_info.nar_size.into(),
-            closure_size: path_info.nar_size.into(),
+            nar_size,
+            added_size: nar_size,
+            closure_size: nar_size,
         }
     }
 }
@@ -258,7 +237,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn sizes() {
+    fn multiple_roots_with_shared_dependencies() {
         let mut store = StoreBuilder::new();
         let a = store.path_info("/store/a", 100, []);
         let b = store.path_info("/store/b", 50, []);
@@ -275,15 +254,15 @@ mod tests {
         let store_graph = StoreGraph::build(&roots);
         insta::assert_snapshot!(Dot::new(&store_graph), @r#"
         digraph {
-            0 [ label = "/run/current/sw          (closure = 200, added = 110)" ]
-            1 [ label = "/run/current             (closure = 200, added = 110)" ]
-            2 [ label = "/run                     (closure = 200, added = 110)" ]
-            3 [ label = "/                        (closure = 300, added = 185)" ]
-            4 [ label = "/home/user/.nix-profile  (closure = 100, added =   5)" ]
-            5 [ label = "/home/user               (closure = 100, added =   5)" ]
-            6 [ label = "/home                    (closure = 100, added =   5)" ]
-            7 [ label = "/tmp/c                   (closure = 100, added =  20)" ]
-            8 [ label = "/tmp                     (closure = 100, added =  20)" ]
+            0 [ label = "/run/current/sw          (closure = 110, added = 110)" ]
+            1 [ label = "/run/current             (closure = 110, added = 110)" ]
+            2 [ label = "/run                     (closure = 110, added = 110)" ]
+            3 [ label = "/                        (closure = 185, added = 185)" ]
+            4 [ label = "/home/user/.nix-profile  (closure =  55, added =   5)" ]
+            5 [ label = "/home/user               (closure =  55, added =   5)" ]
+            6 [ label = "/home                    (closure =  55, added =   5)" ]
+            7 [ label = "/tmp/c                   (closure =  70, added =  20)" ]
+            8 [ label = "/tmp                     (closure =  70, added =  20)" ]
             1 -> 0 [ label = "" ]
             2 -> 1 [ label = "" ]
             3 -> 2 [ label = "" ]
@@ -292,6 +271,27 @@ mod tests {
             3 -> 6 [ label = "" ]
             8 -> 7 [ label = "" ]
             3 -> 8 [ label = "" ]
+        }
+        "#)
+    }
+
+    #[test]
+    fn single_store_path_no_references() {
+        let mut store = StoreBuilder::new();
+        let source = store.path_info("/nix/store/abc-source", 1337, []);
+        let store = store.build();
+
+        let roots = vec![store.root("/a/b/c", source)];
+        let store_graph = StoreGraph::build(&roots);
+        insta::assert_snapshot!(Dot::new(&store_graph), @r#"
+        digraph {
+            0 [ label = "/a/b/c                   (closure = 1337, added = 1337)" ]
+            1 [ label = "/a/b                     (closure = 1337, added = 1337)" ]
+            2 [ label = "/a                       (closure = 1337, added = 1337)" ]
+            3 [ label = "/                        (closure = 1337, added = 1337)" ]
+            1 -> 0 [ label = "" ]
+            2 -> 1 [ label = "" ]
+            3 -> 2 [ label = "" ]
         }
         "#)
     }
