@@ -1,0 +1,17 @@
+name: Check PR
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+
+jobs:
+  cli:
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v6
+      - uses: DeterminateSystems/nix-installer-action@main
+      - uses: DeterminateSystems/magic-nix-cache-action@main
+      - name: Check flake
+        run: nix flake check
