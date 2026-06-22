@@ -95,8 +95,9 @@ in
         };
         sandbox = {
           enable = true;
-          filesystem = {
+          filesystem = rec {
             denyRead = [ "/" ]; # deny by default
+            # anything writable must also be readable
             allowRead = [
               "/nix/store"
               "~/configs"
@@ -106,7 +107,9 @@ in
               "/bin"
               "/private/tmp" # TODO
               "/var/select/developer_dir"
-            ];
+              "~/Library/Java" # JAVA_HOME; maven launches $JAVA_HOME/bin/java
+            ]
+            ++ allowWrite;
             allowWrite = [
               # TODO
               /*
