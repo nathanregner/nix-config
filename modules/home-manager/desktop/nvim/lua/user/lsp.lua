@@ -1,5 +1,7 @@
 local util = require("lspconfig.util")
 
+vim.api.nvim_create_user_command("LspLog", "split $HOME/.local/state/nvim/lsp.log | normal! G", {})
+
 local on_attach = function(_, bufnr)
   local map = function(mode, keys, func, desc)
     if desc then desc = "LSP: " .. desc end
