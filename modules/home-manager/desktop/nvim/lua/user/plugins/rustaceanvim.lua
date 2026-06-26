@@ -24,6 +24,7 @@ vim.g.rustaceanvim = {
         },
         files = {
           excludeDirs = { ".direnv", ".git" },
+          watcher = "server",
         },
       },
     },
