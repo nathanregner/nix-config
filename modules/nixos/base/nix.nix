@@ -23,13 +23,18 @@
     optimise.automatic = true;
 
     settings = {
+      auto-allocate-uids = true;
       auto-optimise-store = lib.mkDefault false;
       builders-use-substitutes = true;
       experimental-features = [
-        "nix-command"
+        "auto-allocate-uids"
+        "cgroups"
         "flakes"
+        "nix-command"
         "pipe-operators"
       ];
+      extra-system-features = [ "uid-range" ];
+
       # https://github.com/NixOS/nix/issues/9087
       inherit (pkgs.local) flake-registry;
       trusted-users = [
