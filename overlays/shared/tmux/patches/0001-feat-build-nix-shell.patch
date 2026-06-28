@@ -1,0 +1,72 @@
+From 4bbc84f071883502945646a5befb590acb39da15 Mon Sep 17 00:00:00 2001
+From: Nathan Regner <nathanregner@gmail.com>
+Date: Sun, 28 Jun 2026 09:08:40 -0600
+Subject: [PATCH 1/2] feat(build): nix-shell
+
+---
+ .envrc      |  2 ++
+ .gitignore  |  4 ++++
+ Makefile.am |  7 +++++++
+ shell.nix   | 11 +++++++++++
+ 4 files changed, 24 insertions(+)
+ create mode 100644 .envrc
+ create mode 100644 shell.nix
+
+diff --git a/.envrc b/.envrc
+new file mode 100644
+index 00000000..acd2e1b1
+--- /dev/null
++++ b/.envrc
+@@ -0,0 +1,2 @@
++watch_file shell.nix
++use nix
+diff --git a/.gitignore b/.gitignore
+index bf012d5f..e6283cec 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -22,3 +22,7 @@ fuzz/*-fuzzer
+ tags
+ tmux
+ tmux.1.*
++
++compile_commands.json
++.cache/
++.bear/
+diff --git a/Makefile.am b/Makefile.am
+index ff0de9f8..05881a8b 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -233,6 +233,13 @@ fuzz_input_fuzzer_LDFLAGS = $(FUZZING_LIBS)
+ fuzz_input_fuzzer_LDADD = $(LDADD) $(tmux_OBJECTS)
+ endif
+ 
++# Generate compile_commands.json for IDE/clangd integration
++compile_commands.json:
++	$(MAKE) clean
++	bear -- $(MAKE)
++
++.PHONY: compile_commands.json
++
+ # Install tmux.1 in the right format.
+ install-exec-hook:
+ 	if test x@MANFORMAT@ = xmdoc; then \
+diff --git a/shell.nix b/shell.nix
+new file mode 100644
+index 00000000..2570f557
+--- /dev/null
++++ b/shell.nix
+@@ -0,0 +1,11 @@
++{
++  pkgs ? import <nixpkgs> { },
++}:
++
++pkgs.mkShell {
++  inherit (pkgs.tmux)
++    buildInputs
++    nativeBuildInputs
++    ;
++  packages = [ pkgs.bear ];
++}
+-- 
+2.54.0
+

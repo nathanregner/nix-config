@@ -1,0 +1,470 @@
+From 7a8dc2859aafd357c1fa0efd2c9f1d25804eee03 Mon Sep 17 00:00:00 2001
+From: Nathan Regner <nathanregner@gmail.com>
+Date: Sun, 28 Jun 2026 08:42:43 -0600
+Subject: [PATCH 2/2] hack: sigkill all pane children on close
+
+---
+ compat.h         |   3 +-
+ compat/systemd.c | 237 ++++++++++++++++++++++++++++++++++++++++++++++-
+ osdep-darwin.c   |  44 ++++++++-
+ osdep-linux.c    |   4 +
+ spawn.c          |  24 ++---
+ tmux.h           |   5 +
+ window.c         |  11 +++
+ 7 files changed, 313 insertions(+), 15 deletions(-)
+
+diff --git a/compat.h b/compat.h
+index 76ef70df..905bf717 100644
+--- a/compat.h
++++ b/compat.h
+@@ -450,7 +450,8 @@ void		*recallocarray(void *, size_t, size_t, size_t);
+ /* systemd.c */
+ int		 systemd_activated(void);
+ int		 systemd_create_socket(int, char **);
+-int		 systemd_move_to_new_cgroup(char **);
++char		*systemd_create_scope(pid_t, char **);
++void		 systemd_stop_scope(const char *);
+ #endif
+ 
+ #ifdef HAVE_UTF8PROC
+diff --git a/compat/systemd.c b/compat/systemd.c
+index 3548f317..ec6d6552 100644
+--- a/compat/systemd.c
++++ b/compat/systemd.c
+@@ -21,9 +21,10 @@
+ 
+ #include <systemd/sd-bus.h>
+ #include <systemd/sd-daemon.h>
+-#include <systemd/sd-login.h>
+ #include <systemd/sd-id128.h>
++#include <systemd/sd-login.h>
+ 
++#include <signal.h>
+ #include <stdlib.h>
+ #include <string.h>
+ #include <unistd.h>
+@@ -31,7 +32,7 @@
+ #include "tmux.h"
+ 
+ #ifndef SD_ID128_UUID_FORMAT_STR
+-#define SD_ID128_UUID_FORMAT_STR \
++#define SD_ID128_UUID_FORMAT_STR                                               \
+ 	"%02x%02x%02x%02x-%02x%02x-%02x%02x-%02x%02x-%02x%02x%02x%02x%02x%02x"
+ #endif
+ 
+@@ -324,3 +325,235 @@ finish:
+ 
+ 	return (r);
+ }
++
++/*
++ * Create a systemd scope for a given PID (called from parent process).
++ * Returns allocated scope name on success, NULL on failure.
++ */
++char *systemd_create_scope(pid_t pid, char **cause) {
++  sd_bus_error error = SD_BUS_ERROR_NULL;
++  sd_bus_message *m = NULL, *reply = NULL;
++  sd_bus *bus = NULL;
++  sd_bus_slot *slot = NULL;
++  char *name = NULL, *desc, *slice;
++  sd_id128_t uuid;
++  int r;
++  uint64_t elapsed_usec;
++  pid_t parent_pid;
++  struct timeval start, now;
++  struct systemd_job_watch watch = {};
++
++  gettimeofday(&start, NULL);
++
++  r = sd_bus_default_user(&bus);
++  if (r < 0) {
++    xasprintf(cause, "failed to connect to session bus: %s", strerror(-r));
++    goto finish;
++  }
++
++  r = sd_bus_match_signal(bus, &slot, "org.freedesktop.systemd1",
++                          "/org/freedesktop/systemd1",
++                          "org.freedesktop.systemd1.Manager", "JobRemoved",
++                          job_removed_handler, &watch);
++  if (r < 0) {
++    xasprintf(cause, "failed to create match signal: %s", strerror(-r));
++    goto finish;
++  }
++
++  r = sd_bus_message_new_method_call(
++      bus, &m, "org.freedesktop.systemd1", "/org/freedesktop/systemd1",
++      "org.freedesktop.systemd1.Manager", "StartTransientUnit");
++  if (r < 0) {
++    xasprintf(cause, "failed to create bus message: %s", strerror(-r));
++    goto finish;
++  }
++
++  r = sd_id128_randomize(&uuid);
++  if (r < 0) {
++    xasprintf(cause, "failed to generate uuid: %s", strerror(-r));
++    goto finish;
++  }
++  xasprintf(&name, "tmux-pane-" SD_ID128_UUID_FORMAT_STR ".scope",
++            SD_ID128_FORMAT_VAL(uuid));
++  r = sd_bus_message_append(m, "s", name);
++  if (r < 0) {
++    xasprintf(cause, "failed to append to bus message: %s", strerror(-r));
++    free(name);
++    name = NULL;
++    goto finish;
++  }
++
++  r = sd_bus_message_append(m, "s", "fail");
++  if (r < 0) {
++    xasprintf(cause, "failed to append to bus message: %s", strerror(-r));
++    free(name);
++    name = NULL;
++    goto finish;
++  }
++
++  r = sd_bus_message_open_container(m, 'a', "(sv)");
++  if (r < 0) {
++    xasprintf(cause, "failed to start properties array: %s", strerror(-r));
++    free(name);
++    name = NULL;
++    goto finish;
++  }
++
++  parent_pid = getpid();
++  xasprintf(&desc, "tmux pane pid %ld", (long)pid);
++  r = sd_bus_message_append(m, "(sv)", "Description", "s", desc);
++  free(desc);
++  if (r < 0) {
++    xasprintf(cause, "failed to append to properties: %s", strerror(-r));
++    free(name);
++    name = NULL;
++    goto finish;
++  }
++
++  /* Use SIGKILL to kill all processes including those ignoring signals */
++  r = sd_bus_message_append(m, "(sv)", "KillSignal", "i", SIGKILL);
++  if (r < 0) {
++    xasprintf(cause, "failed to append to properties: %s", strerror(-r));
++    free(name);
++    name = NULL;
++    goto finish;
++  }
++
++  r = sd_pid_get_user_slice(parent_pid, &slice);
++  if (r < 0) {
++    slice = xstrdup("app-tmux.slice");
++  }
++  r = sd_bus_message_append(m, "(sv)", "Slice", "s", slice);
++  free(slice);
++  if (r < 0) {
++    xasprintf(cause, "failed to append to properties: %s", strerror(-r));
++    free(name);
++    name = NULL;
++    goto finish;
++  }
++
++  r = sd_bus_message_append(m, "(sv)", "PIDs", "au", 1, (uint32_t)pid);
++  if (r < 0) {
++    xasprintf(cause, "failed to append to properties: %s", strerror(-r));
++    free(name);
++    name = NULL;
++    goto finish;
++  }
++
++  r = sd_bus_message_append(m, "(sv)", "CollectMode", "s", "inactive-or-failed");
++  if (r < 0) {
++    xasprintf(cause, "failed to append to properties: %s", strerror(-r));
++    free(name);
++    name = NULL;
++    goto finish;
++  }
++
++  r = sd_bus_message_close_container(m);
++  if (r < 0) {
++    xasprintf(cause, "failed to end properties array: %s", strerror(-r));
++    free(name);
++    name = NULL;
++    goto finish;
++  }
++
++  r = sd_bus_message_append(m, "a(sa(sv))", 0);
++  if (r < 0) {
++    xasprintf(cause, "failed to append to bus message: %s", strerror(-r));
++    free(name);
++    name = NULL;
++    goto finish;
++  }
++
++  r = sd_bus_call(bus, m, 1000000, &error, &reply);
++  if (r < 0) {
++    if (error.message != NULL)
++      xasprintf(cause, "StartTransientUnit failed: %s", error.message);
++    else
++      xasprintf(cause, "StartTransientUnit failed: %s", strerror(-r));
++    free(name);
++    name = NULL;
++    goto finish;
++  }
++
++  r = sd_bus_message_read(reply, "o", &watch.path);
++  if (r < 0) {
++    xasprintf(cause, "failed to parse method reply: %s", strerror(-r));
++    free(name);
++    name = NULL;
++    goto finish;
++  }
++
++  while (!watch.done) {
++    r = sd_bus_process(bus, NULL);
++    if (r < 0) {
++      xasprintf(cause, "failed waiting for scope: %s", strerror(-r));
++      free(name);
++      name = NULL;
++      goto finish;
++    }
++    if (r > 0)
++      continue;
++
++    gettimeofday(&now, NULL);
++    elapsed_usec =
++        (now.tv_sec - start.tv_sec) * 1000000 + now.tv_usec - start.tv_usec;
++    if (elapsed_usec >= 1000000) {
++      xasprintf(cause, "timeout waiting for scope");
++      free(name);
++      name = NULL;
++      goto finish;
++    }
++
++    r = sd_bus_wait(bus, 1000000 - elapsed_usec);
++    if (r < 0) {
++      xasprintf(cause, "failed waiting for scope: %s", strerror(-r));
++      free(name);
++      name = NULL;
++      goto finish;
++    }
++  }
++
++  log_debug("systemd_create_scope: created %s for pid %d", name, (int)pid);
++
++finish:
++  sd_bus_error_free(&error);
++  sd_bus_message_unref(m);
++  sd_bus_message_unref(reply);
++  sd_bus_slot_unref(slot);
++  sd_bus_unref(bus);
++
++  return (name);
++}
++
++/*
++ * Stop a systemd scope, killing all processes in it.
++ */
++void systemd_stop_scope(const char *name) {
++  sd_bus_error error = SD_BUS_ERROR_NULL;
++  sd_bus *bus = NULL;
++  int r;
++
++  if (name == NULL)
++    return;
++
++  r = sd_bus_default_user(&bus);
++  if (r < 0) {
++    log_debug("systemd_stop_scope: failed to connect: %s", strerror(-r));
++    goto finish;
++  }
++
++  r = sd_bus_call_method(bus, "org.freedesktop.systemd1",
++                         "/org/freedesktop/systemd1",
++                         "org.freedesktop.systemd1.Manager", "StopUnit", &error,
++                         NULL, "ss", name, "fail");
++  if (r < 0) {
++    log_debug("systemd_stop_scope: StopUnit %s failed: %s", name,
++              error.message ? error.message : strerror(-r));
++  } else {
++    log_debug("systemd_stop_scope: stopped %s", name);
++  }
++
++finish:
++  sd_bus_error_free(&error);
++  sd_bus_unref(bus);
++}
+diff --git a/osdep-darwin.c b/osdep-darwin.c
+index 79090d9f..4161ffa9 100644
+--- a/osdep-darwin.c
++++ b/osdep-darwin.c
+@@ -17,22 +17,25 @@
+  */
+ 
+ #include <sys/cdefs.h>
+-#include <sys/types.h>
+ #include <sys/sysctl.h>
++#include <sys/types.h>
+ 
+ #include <AvailabilityMacros.h>
+ #if MAC_OS_X_VERSION_MIN_REQUIRED >= 1050
+ #include <libproc.h>
+ #endif
++#include <signal.h>
+ #include <stdlib.h>
+ #include <string.h>
+ #include <unistd.h>
+ 
+ #include "compat.h"
++#include "tmux.h"
+ 
+ char			*osdep_get_name(int, char *);
+ char			*osdep_get_cwd(int);
+ struct event_base	*osdep_event_init(void);
++void       osdep_kill_tree(pid_t);
+ 
+ char *
+ osdep_get_name(int fd, __unused char *tty)
+@@ -107,3 +110,42 @@ osdep_event_init(void)
+ 	unsetenv("EVENT_NOPOLL");
+ 	return (base);
+ }
++
++void osdep_kill_tree(pid_t pid) {
++  pid_t *children;
++  int nchildren, capacity, bufsize, i;
++
++  log_debug("osdep_kill_tree: killing tree from pid %d", (int)pid);
++
++  if (pid <= 1)
++    return;
++
++  /*
++   * proc_listchildpids returns the number of pids, not bytes. Calling it
++   * with a NULL buffer returns an upper bound suitable for sizing the
++   * allocation, with extra space in case children spawn between calls.
++   */
++  nchildren = proc_listchildpids(pid, NULL, 0);
++  if (nchildren > 0) {
++    /* Add some buffer for race conditions */
++    capacity = nchildren + 16;
++    bufsize = capacity * sizeof(pid_t);
++    children = malloc(bufsize);
++    if (children != NULL) {
++      nchildren = proc_listchildpids(pid, children, bufsize);
++      if (nchildren > capacity)
++        nchildren = capacity;
++      for (i = 0; i < nchildren; i++) {
++        if (children[i] > 1) {
++          log_debug("osdep_kill_tree: found child %d of %d", (int)children[i],
++                    (int)pid);
++          osdep_kill_tree(children[i]);
++        }
++      }
++      free(children);
++    }
++  }
++
++  /* Kill the process itself with SIGKILL */
++  kill(pid, SIGKILL);
++}
+diff --git a/osdep-linux.c b/osdep-linux.c
+index 7dbab1f0..434fa5d6 100644
+--- a/osdep-linux.c
++++ b/osdep-linux.c
+@@ -20,8 +20,11 @@
+ #include <sys/stat.h>
+ #include <sys/param.h>
+ 
++#include <dirent.h>
++#include <signal.h>
+ #include <stdio.h>
+ #include <stdlib.h>
++#include <string.h>
+ #include <unistd.h>
+ 
+ #include "tmux.h"
+@@ -100,3 +103,4 @@ osdep_event_init(void)
+ 	unsetenv("EVENT_NOEPOLL");
+ 	return (base);
+ }
++
+diff --git a/spawn.c b/spawn.c
+index 90cda757..30353646 100644
+--- a/spawn.c
++++ b/spawn.c
+@@ -383,19 +383,21 @@ spawn_pane(struct spawn_context *sc, char **cause)
+ 
+ 	/* In the parent process, everything is done now. */
+ 	if (new_wp->pid != 0) {
++#if defined(HAVE_SYSTEMD) && defined(ENABLE_CGROUPS)
++		/*
++		 * Create a systemd scope for the child process. This allows us
++		 * to kill all descendants when the pane is destroyed.
++		 */
++		new_wp->scope_name = systemd_create_scope(new_wp->pid, cause);
++		if (new_wp->scope_name == NULL) {
++			log_debug("%s: creating scope failed: %s",
++			    __func__, *cause);
++			free(*cause);
++			*cause = NULL;
++		}
++#endif
+ 		goto complete;
+ 	}
+-
+-#if defined(HAVE_SYSTEMD) && defined(ENABLE_CGROUPS)
+-	/*
+-	 * Move the child process into a new cgroup for systemd-oomd isolation.
+-	 */
+-	if (systemd_move_to_new_cgroup(cause) < 0) {
+-		log_debug("%s: moving pane to new cgroup failed: %s",
+-		    __func__, *cause);
+-		free (*cause);
+-	}
+-#endif
+ 	/*
+ 	 * Child process. Change to the working directory or home if that
+ 	 * fails.
+diff --git a/tmux.h b/tmux.h
+index 1927fa95..fc036ee6 100644
+--- a/tmux.h
++++ b/tmux.h
+@@ -1209,6 +1209,8 @@ struct window_pane {
+ 	int		 status;
+ 	struct timeval	 dead_time;
+ 
++	char		*scope_name;  /* systemd scope for cgroup cleanup */
++
+ 	int		 fd;
+ 	struct bufferevent *event;
+ 
+@@ -3548,6 +3550,9 @@ int		 utf8_cstrhas(const char *, const struct utf8_data *);
+ char		*osdep_get_name(int, char *);
+ char		*osdep_get_cwd(int);
+ struct event_base *osdep_event_init(void);
++#ifdef __APPLE__
++void		osdep_kill_tree(pid_t);
++#endif
+ 
+ /* utf8-combined.c */
+ int		 utf8_has_zwj(const struct utf8_data *);
+diff --git a/window.c b/window.c
+index 562fcc7d..979f3013 100644
+--- a/window.c
++++ b/window.c
+@@ -979,6 +979,17 @@ window_pane_destroy(struct window_pane *wp)
+ 	window_pane_reset_mode_all(wp);
+ 	free(wp->searchstr);
+ 
++	/* Kill entire process tree to handle processes that ignore SIGHUP */
++#if defined(HAVE_SYSTEMD) && defined(ENABLE_CGROUPS)
++	if (wp->scope_name != NULL) {
++		systemd_stop_scope(wp->scope_name);
++		free(wp->scope_name);
++		wp->scope_name = NULL;
++	}
++#elif defined(__APPLE__)
++	osdep_kill_tree(wp->pid);
++#endif
++
+ 	if (wp->fd != -1) {
+ #ifdef HAVE_UTEMPTER
+ 		utempter_remove_record(wp->fd);
+-- 
+2.54.0
+
