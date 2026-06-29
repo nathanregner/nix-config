@@ -1,5 +1,9 @@
 inoremap jk <esc>
 
+set VimEverywhere
+
+set inccommand=nosplit
+
 set highlightedyank
 set number relativenumber
 
@@ -76,3 +80,4 @@ nnoremap <leader>hb :action Annotate<CR>
 
 " Debugging
 nnoremap <leader>b :action ToggleLineBreakpoint<CR>
+
