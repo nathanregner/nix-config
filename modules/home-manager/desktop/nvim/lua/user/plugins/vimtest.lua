@@ -3,11 +3,13 @@
 return {
   "vim-test/vim-test",
   dependencies = {
-    -- "skywind3000/asyncrun.vim",
+    "neomake/neomake",
+    "skywind3000/asyncrun.vim",
+    "tpope/vim-dispatch",
     { "akinsho/toggleterm.nvim", opts = {} },
   },
   config = function() --
-    local default = "toggleterm"
+    local default = "dispatch_background"
     vim.g["test#strategy"] = {
       file = default,
       nearest = default,
