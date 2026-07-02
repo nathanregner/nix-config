@@ -25,6 +25,7 @@ in
       enable = true;
       package = pkgs.unstable.claude-code;
 
+      env.ENABLE_TOOL_SEARCH = "true"; # lazy-load MCPs
       mcpServers = {
         github = {
           type = "stdio";
@@ -32,9 +33,10 @@ in
           args = [ "stdio" ];
         };
 
-        # playwright = {
-        #   command = lib.getExe pkgs.playwright-mcp;
-        # };
+        playwright = {
+          type = "stdio";
+          command = lib.getExe pkgs.playwright-mcp;
+        };
       };
 
       # https://code.claude.com/docs/en/settings
@@ -102,6 +104,10 @@ in
               "/nix/store"
               "~/configs"
               "~/dev"
+              # ~/.nix-profile/bin/git resolves through this symlink chain;
+              # without it git falls back to the /usr/bin xcode-select stub
+              "~/.nix-profile"
+              "~/.local/state/nix/profiles"
             ]
             ++ lib.optionals pkgs.stdenv.isDarwin [
               "/bin"
