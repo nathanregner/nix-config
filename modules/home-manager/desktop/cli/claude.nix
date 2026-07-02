@@ -114,6 +114,10 @@ in
               "/private/tmp" # TODO
               "/var/select/developer_dir"
               "~/Library/Java" # JAVA_HOME; maven launches $JAVA_HOME/bin/java
+              # the JVM reads the OS version from this plist at boot; without it
+              # os.version resolves to -1.0 and the boot layer fails to initialize
+              "/System/Library/CoreServices/SystemVersion.plist"
+              "/System/Library/CoreServices/.SystemVersionPlatform.plist"
             ]
             ++ allowWrite;
             allowWrite = [
