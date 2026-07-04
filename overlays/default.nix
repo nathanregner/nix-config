@@ -17,7 +17,7 @@ rec {
 
   modifications = overlaysFromDirectoryRecursive ./shared;
 
-  unstable-packages = stableFinal: _stablePrev: {
+  unstable-packages = stableFinal: _stablePrev: rec {
     unstable = import inputs.nixpkgs-unstable {
       inherit (stableFinal.stdenv.hostPlatform) system;
       config.allowUnfree = true;
@@ -26,5 +26,6 @@ rec {
         modifications
       ];
     };
+    inherit (unstable) tmux;
   };
 }

@@ -1,4 +1,4 @@
-From 4bbc84f071883502945646a5befb590acb39da15 Mon Sep 17 00:00:00 2001
+From 0ccaffdae8174de358a39df1bbfc8cf67ecefab6 Mon Sep 17 00:00:00 2001
 From: Nathan Regner <nathanregner@gmail.com>
 Date: Sun, 28 Jun 2026 09:08:40 -0600
 Subject: [PATCH 1/2] feat(build): nix-shell
@@ -33,11 +33,11 @@ index bf012d5f..e6283cec 100644
 +.cache/
 +.bear/
 diff --git a/Makefile.am b/Makefile.am
-index ff0de9f8..05881a8b 100644
+index ba9142fe..06023411 100644
 --- a/Makefile.am
 +++ b/Makefile.am
-@@ -233,6 +233,13 @@ fuzz_input_fuzzer_LDFLAGS = $(FUZZING_LIBS)
- fuzz_input_fuzzer_LDADD = $(LDADD) $(tmux_OBJECTS)
+@@ -257,6 +257,13 @@ fuzz_style_fuzzer_LDFLAGS = $(FUZZING_LIBS)
+ fuzz_style_fuzzer_LDADD = $(LDADD) $(tmux_OBJECTS)
  endif
  
 +# Generate compile_commands.json for IDE/clangd integration
