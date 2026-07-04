@@ -7,7 +7,7 @@ chrono = "0.4.38"
 clients = { path = "clients" }
 color-eyre = "0.6.3"
 figment = "0.10.19"
-gix-config = "0.57.0"
+gix-config = "0.58.0"
 gix-hash = { version = "0.25", features = ["sha1", "sha256"] }
 http = "1"
 prettyplease = "0.2.22"
