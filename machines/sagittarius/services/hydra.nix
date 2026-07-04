@@ -41,6 +41,7 @@ in
           "x86_64-linux"
           "aarch64-linux"
           "aarch64-darwin"
+          "i686-linux"
         ]
       }
 
@@ -148,7 +149,7 @@ in
         {
           hostName = "iapetus";
           sshUser = "nregner";
-          systems = [ "x86_64-linux" ];
+          systems = [ "x86_64-linux" "i686-linux" ];
           supportedFeatures = [
             "nixos-test"
             "benchmark"
