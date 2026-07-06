@@ -25,7 +25,6 @@ in
       enable = true;
       package = pkgs.unstable.claude-code;
 
-      env.ENABLE_TOOL_SEARCH = "true"; # lazy-load MCPs
       mcpServers = {
         github = {
           type = "stdio";
@@ -62,6 +61,9 @@ in
         statusLine = {
           type = "command";
           command = "${config.home.homeDirectory}/.claude/statusline";
+        };
+        env = {
+          ENABLE_TOOL_SEARCH = "true"; # lazy-load MCPs
         };
         permissions = {
           defaultMode = "acceptEdits";
