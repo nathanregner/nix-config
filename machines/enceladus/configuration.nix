@@ -54,6 +54,7 @@
   ];
 
   ids.gids.nixbld = 350;
+  users.knownGroups = [ "nixbld" ];
 
   # Used for backwards compatibility, please read the changelog before changing.
   # $ darwin-rebuild changelog

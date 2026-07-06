@@ -25,6 +25,9 @@ in
         cargo-nextest
         cargo-outdated
         cargo-udeps
+
+        # cargo flamegraph --post-process "inferno-collapse-recursive"
+        inferno
       ])
       ++ [
         # https://github.com/rust-lang/cargo/issues/2904?timeline_page=1

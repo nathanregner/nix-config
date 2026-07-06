@@ -1,15 +1,24 @@
 {
   inputs,
+  outputs,
+  config,
   pkgs,
   lib,
-  outputs,
   ...
 }:
 {
+  # relativeWorktree support https://github.com/NixOS/nix/issues/14987
+  assertions = [
+    {
+      assertion = lib.versionAtLeast config.nix.package.version "2.33.0";
+      message = "${config.nix.package.version} < 2.33.0";
+    }
+  ];
+
   nixpkgs = import ../../../nixpkgs.nix { inherit inputs outputs; };
 
   nix = {
-    package = pkgs.unstable.nix;
+    package = pkgs.unstable.nixVersions.latest;
     distributedBuilds = true;
     optimise.automatic = true;
 

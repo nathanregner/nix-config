@@ -1,6 +1,9 @@
 -- https://github.com/mrcjkb/rustaceanvim?tab=readme-ov-file#books-usage--features
 -- TODO: parentModule bind
 
+-- prefer treesitter injections
+vim.api.nvim_set_hl(0, "@lsp.type.string.rust", {})
+
 ---@type rustaceanvim.Opts
 vim.g.rustaceanvim = {
   server = {
@@ -21,6 +24,7 @@ vim.g.rustaceanvim = {
         },
         files = {
           excludeDirs = { ".direnv", ".git" },
+          watcher = "server",
         },
       },
     },

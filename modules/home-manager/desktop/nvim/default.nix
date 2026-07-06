@@ -86,6 +86,7 @@ in
             lua-language-server
             nil
             nixd
+            rust-analyzer
             terraform-ls
             tflint
             typescript-go

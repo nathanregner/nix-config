@@ -1,4 +1,4 @@
-From 7a8dc2859aafd357c1fa0efd2c9f1d25804eee03 Mon Sep 17 00:00:00 2001
+From ad433d1f5c6a7614269abdff20e0411b5b9df1c7 Mon Sep 17 00:00:00 2001
 From: Nathan Regner <nathanregner@gmail.com>
 Date: Sun, 28 Jun 2026 08:42:43 -0600
 Subject: [PATCH 2/2] hack: sigkill all pane children on close
@@ -14,7 +14,7 @@ Subject: [PATCH 2/2] hack: sigkill all pane children on close
  7 files changed, 313 insertions(+), 15 deletions(-)
 
 diff --git a/compat.h b/compat.h
-index 76ef70df..905bf717 100644
+index 8d71a9cf..ad16fffa 100644
 --- a/compat.h
 +++ b/compat.h
 @@ -450,7 +450,8 @@ void		*recallocarray(void *, size_t, size_t, size_t);
@@ -25,35 +25,35 @@ index 76ef70df..905bf717 100644
 +char		*systemd_create_scope(pid_t, char **);
 +void		 systemd_stop_scope(const char *);
  #endif
- 
+
  #ifdef HAVE_UTF8PROC
 diff --git a/compat/systemd.c b/compat/systemd.c
-index 3548f317..ec6d6552 100644
+index b1f47063..004b469c 100644
 --- a/compat/systemd.c
 +++ b/compat/systemd.c
 @@ -21,9 +21,10 @@
- 
+
  #include <systemd/sd-bus.h>
  #include <systemd/sd-daemon.h>
 -#include <systemd/sd-login.h>
  #include <systemd/sd-id128.h>
 +#include <systemd/sd-login.h>
- 
+
 +#include <signal.h>
  #include <stdlib.h>
  #include <string.h>
  #include <unistd.h>
 @@ -31,7 +32,7 @@
  #include "tmux.h"
- 
+
  #ifndef SD_ID128_UUID_FORMAT_STR
 -#define SD_ID128_UUID_FORMAT_STR \
 +#define SD_ID128_UUID_FORMAT_STR                                               \
  	"%02x%02x%02x%02x-%02x%02x-%02x%02x-%02x%02x-%02x%02x%02x%02x%02x%02x"
  #endif
- 
-@@ -324,3 +325,235 @@ finish:
- 
+
+@@ -345,3 +346,235 @@ finish:
+
  	return (r);
  }
 +
@@ -294,12 +294,12 @@ index 79090d9f..4161ffa9 100644
 +++ b/osdep-darwin.c
 @@ -17,22 +17,25 @@
   */
- 
+
  #include <sys/cdefs.h>
 -#include <sys/types.h>
  #include <sys/sysctl.h>
 +#include <sys/types.h>
- 
+
  #include <AvailabilityMacros.h>
  #if MAC_OS_X_VERSION_MIN_REQUIRED >= 1050
  #include <libproc.h>
@@ -308,15 +308,15 @@ index 79090d9f..4161ffa9 100644
  #include <stdlib.h>
  #include <string.h>
  #include <unistd.h>
- 
+
  #include "compat.h"
 +#include "tmux.h"
- 
+
  char			*osdep_get_name(int, char *);
  char			*osdep_get_cwd(int);
  struct event_base	*osdep_event_init(void);
 +void       osdep_kill_tree(pid_t);
- 
+
  char *
  osdep_get_name(int fd, __unused char *tty)
 @@ -107,3 +110,42 @@ osdep_event_init(void)
@@ -369,14 +369,14 @@ index 7dbab1f0..434fa5d6 100644
 @@ -20,8 +20,11 @@
  #include <sys/stat.h>
  #include <sys/param.h>
- 
+
 +#include <dirent.h>
 +#include <signal.h>
  #include <stdio.h>
  #include <stdlib.h>
 +#include <string.h>
  #include <unistd.h>
- 
+
  #include "tmux.h"
 @@ -100,3 +103,4 @@ osdep_event_init(void)
  	unsetenv("EVENT_NOEPOLL");
@@ -384,13 +384,13 @@ index 7dbab1f0..434fa5d6 100644
  }
 +
 diff --git a/spawn.c b/spawn.c
-index 90cda757..30353646 100644
+index ddeca0d3..9c05966c 100644
 --- a/spawn.c
 +++ b/spawn.c
-@@ -383,19 +383,21 @@ spawn_pane(struct spawn_context *sc, char **cause)
- 
- 	/* In the parent process, everything is done now. */
- 	if (new_wp->pid != 0) {
+@@ -411,19 +411,21 @@ spawn_pane(struct spawn_context *sc, char **cause)
+ 		    chdir(path) != 0 &&
+ 		    (home == NULL || chdir(home) != 0))
+ 			chdir("/");
 +#if defined(HAVE_SYSTEMD) && defined(ENABLE_CGROUPS)
 +		/*
 +		 * Create a systemd scope for the child process. This allows us
@@ -418,39 +418,39 @@ index 90cda757..30353646 100644
 -	}
 -#endif
  	/*
- 	 * Child process. Change to the working directory or home if that
- 	 * fails.
+ 	 * Child process. Set PWD to the working directory.
+ 	 */
 diff --git a/tmux.h b/tmux.h
-index 1927fa95..fc036ee6 100644
+index 56dd2e53..86b082c4 100644
 --- a/tmux.h
 +++ b/tmux.h
-@@ -1209,6 +1209,8 @@ struct window_pane {
+@@ -1301,6 +1301,8 @@ struct window_pane {
  	int		 status;
  	struct timeval	 dead_time;
- 
+
 +	char		*scope_name;  /* systemd scope for cgroup cleanup */
 +
  	int		 fd;
  	struct bufferevent *event;
- 
-@@ -3548,6 +3550,9 @@ int		 utf8_cstrhas(const char *, const struct utf8_data *);
+
+@@ -3754,6 +3756,9 @@ int		 utf8_cstrhas(const char *, const struct utf8_data *);
  char		*osdep_get_name(int, char *);
  char		*osdep_get_cwd(int);
  struct event_base *osdep_event_init(void);
 +#ifdef __APPLE__
 +void		osdep_kill_tree(pid_t);
 +#endif
- 
+
  /* utf8-combined.c */
  int		 utf8_has_zwj(const struct utf8_data *);
 diff --git a/window.c b/window.c
-index 562fcc7d..979f3013 100644
+index 89c28b8e..fd1aeef8 100644
 --- a/window.c
 +++ b/window.c
-@@ -979,6 +979,17 @@ window_pane_destroy(struct window_pane *wp)
+@@ -1093,6 +1093,17 @@ window_pane_destroy(struct window_pane *wp)
  	window_pane_reset_mode_all(wp);
  	free(wp->searchstr);
- 
+
 +	/* Kill entire process tree to handle processes that ignore SIGHUP */
 +#if defined(HAVE_SYSTEMD) && defined(ENABLE_CGROUPS)
 +	if (wp->scope_name != NULL) {
@@ -465,6 +465,6 @@ index 562fcc7d..979f3013 100644
  	if (wp->fd != -1) {
  #ifdef HAVE_UTEMPTER
  		utempter_remove_record(wp->fd);
--- 
+--
 2.54.0
 
