@@ -1,6 +1,6 @@
 inoremap jk <esc>
 
-set VimEverywhere
+" set VimEverywhere
 
 set inccommand=nosplit
 
