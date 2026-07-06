@@ -9,7 +9,7 @@ module.exports = grammar({
     header: ($) =>
       seq("╔═", field("filename", choice($.end_marker, $.filename)), "═╗"),
 
-    filename: ($) => /[^\s═╗]+/,
+    filename: ($) => /[^═╗\n]*[^\s═╗\n]/,
 
     end_marker: ($) => "[end of file]",
 
