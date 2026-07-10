@@ -21,3 +21,16 @@
   (#gsub! @injection.language "/%*%s*([%w%p]+)%s*%*/" "%1")
   (#set! injection.combined)
 )
+
+(
+  (annotation
+    name: (_) @_name
+    arguments: (annotation_argument_list
+      (string_literal
+        (_) @injection.content
+      )
+    )
+  )
+  (#match? @_name "NativeQuery|Formula")
+  (#set! injection.language "sql")
+)
