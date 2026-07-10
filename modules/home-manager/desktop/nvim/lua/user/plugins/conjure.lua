@@ -32,6 +32,8 @@ return {
     require("conjure.mapping")["on-filetype"]()
   end,
   init = function()
+    -- keep W/B/E/gE as normal WORD motions instead of sexp element motions
+    vim.g.sexp_no_word_maps = 1
     vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
       pattern = { "conjure-log-*" },
       callback = function(ev) vim.diagnostic.enable(false, { bufnr = ev.buf }) end,
