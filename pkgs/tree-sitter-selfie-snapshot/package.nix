@@ -4,4 +4,11 @@ tree-sitter.buildGrammar {
   version = "0.1.0";
   src = ./.;
   generate = true;
+
+  doCheck = true;
+  checkPhase = ''
+    runHook preCheck
+    HOME=$(mktemp -d) tree-sitter test
+    runHook postCheck
+  '';
 }

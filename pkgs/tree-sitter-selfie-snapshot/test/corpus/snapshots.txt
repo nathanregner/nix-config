@@ -1,0 +1,75 @@
+==================
+single snapshot with end marker
+==================
+╔═ example ═╗
+hello world
+╔═ [end of file] ═╗
+---
+
+(document
+  (block
+    (header
+      filename: (filename))
+    (content))
+  (block
+    (header
+      filename: (end_marker))))
+
+==================
+filename with facet and spaces
+==================
+╔═ my test/1. some case[md] ═╗
+some
+multiline
+content
+╔═ [end of file] ═╗
+---
+
+(document
+  (block
+    (header
+      filename: (filename))
+    (content))
+  (block
+    (header
+      filename: (end_marker))))
+
+==================
+multiple snapshots
+==================
+╔═ first ═╗
+one
+╔═ second ═╗
+two
+╔═ [end of file] ═╗
+---
+
+(document
+  (block
+    (header
+      filename: (filename))
+    (content))
+  (block
+    (header
+      filename: (filename))
+    (content))
+  (block
+    (header
+      filename: (end_marker))))
+
+==================
+binary base64 flag in header
+==================
+╔═ image ═╗ base64 length 9 bytes
+aGVsbG8=
+╔═ [end of file] ═╗
+---
+
+(document
+  (block
+    (header
+      filename: (filename))
+    (content))
+  (block
+    (header
+      filename: (end_marker))))
