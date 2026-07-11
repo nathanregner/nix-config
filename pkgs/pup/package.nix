@@ -7,16 +7,16 @@
 
 rustPlatform.buildRustPackage (finalAttrs: {
   pname = "pup";
-  version = "0.56.3";
+  version = "1.6.3";
 
   src = fetchFromGitHub {
     owner = "datadog-labs";
     repo = "pup";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-LAiMJHOfIvydzZPKo3u8Wd6buXapMZVR2av+pCCJCEc=";
+    hash = "sha256-hhbcGCLBVH4aF0fAWDs7jI+ymameoKowbKaN4MSyoN4=";
   };
 
-  cargoHash = "sha256-APIA2j0B40R183f5cGCpOopFOhC3t5B5JJ6EF19z/bk=";
+  cargoHash = "sha256-c7XUScom7kuhF487JNyY7QaZjHtRGBswzFToT/g/RVg=";
 
   # Tests require network access
   doCheck = false;
