@@ -29,6 +29,9 @@
       complete -C aws_completer aws
     ''
     + lib.optionalString pkgs.stdenv.isDarwin ''
+      autoload -U +X compinit && compinit
+      autoload -U +X bashcompinit && bashcompinit
+
       source ${./zsh/completions/_launchctl}
     '';
     # defaultKeymap = "viins";
