@@ -149,7 +149,10 @@ in
         {
           hostName = "iapetus";
           sshUser = "nregner";
-          systems = [ "x86_64-linux" "i686-linux" ];
+          systems = [
+            "x86_64-linux"
+            "i686-linux"
+          ];
           supportedFeatures = [
             "nixos-test"
             "benchmark"

@@ -1,7 +1,7 @@
 use serde::Deserialize;
 use std::path::{Path, PathBuf};
 
-use crate::{cli::Args, Profile, Result};
+use crate::{Profile, Result, cli::Args};
 
 pub fn get_latest_build(
     Args {

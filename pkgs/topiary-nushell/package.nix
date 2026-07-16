@@ -10,7 +10,7 @@ let
     grammar
     ;
 
-  drv = stdenv.mkDerivation (finalAttrs: {
+  drv = stdenv.mkDerivation (_finalAttrs: {
     pname = "topiary-nushell";
     version = "latest";
     src = fetchFromGitHub src;

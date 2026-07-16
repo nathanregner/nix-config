@@ -1,5 +1,5 @@
 use color_eyre::eyre;
-use figment::{providers::Env, Figment};
+use figment::{Figment, providers::Env};
 use serde::Deserialize;
 
 mod access_token;

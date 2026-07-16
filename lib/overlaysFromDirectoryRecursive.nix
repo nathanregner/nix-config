@@ -18,7 +18,7 @@ let
         { }
     ) (builtins.readDir dir);
 in
-final: prev:
+_final: prev:
 lib.mapAttrs (
   name: overlayFn:
   let
