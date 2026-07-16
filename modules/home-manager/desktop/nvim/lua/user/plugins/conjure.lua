@@ -1,5 +1,3 @@
-vim.g.sexp_no_word_maps = 1
-
 ---@module "lazy"
 ---@type LazySpec
 return {
