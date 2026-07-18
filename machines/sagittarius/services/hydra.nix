@@ -4,6 +4,8 @@
 # sudo su hydra-queue-runner
 # ssh builder@enceladus-linux-vm
 
+# ssh -L 5432:/var/run/postgresql/.s.PGSQL.5432 -N 192.168.0.8
+
 {
   self,
   inputs,
@@ -201,6 +203,9 @@ in
       default                  "";
     }
   '';
+
+  # allow port forwarding to postgres socket
+  services.openssh.settings.PermitListen = "any";
 }
 
 # programs.ssh.extraConfig = ''

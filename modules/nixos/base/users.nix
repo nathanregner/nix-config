@@ -23,6 +23,7 @@ in
       "libvirtd"
       "networkmanager"
       "podman"
+      "postgres"
       "reposilite"
       "restic"
     ];
