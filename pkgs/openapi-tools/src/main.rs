@@ -18,7 +18,7 @@ use std::{
     fs::{self},
     io::{self, Read, Write},
 };
-use visitor::{visit_paths, Visit, Visitor};
+use visitor::{Visit, Visitor, visit_paths};
 
 type Result<T> = std::result::Result<T, Box<dyn Error>>;
 

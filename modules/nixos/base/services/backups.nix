@@ -42,7 +42,7 @@ let
   mkOverrides = overrides: builtins.mapAttrs (name: override: override baseOptions.${name}) overrides;
 
   mkTarget =
-    base: overrides:
+    overrides:
     mkOption {
       type = types.submodule {
         options =
@@ -101,7 +101,7 @@ in
               };
               type = types.submodule {
                 options = {
-                  server = mkTarget base {
+                  server = mkTarget {
                     repository = mkReadonly "rest:http://sagittarius:${toString self.globals.services.restic-server.port}/${config.networking.hostName}/${name}";
                     environmentFile = mkReadonly config.sops.templates.restic-server-env.path;
                     timerConfig = mkDefault {
@@ -110,7 +110,7 @@ in
                       Persistent = true;
                     };
                   };
-                  google-drive = mkTarget base {
+                  google-drive = mkTarget {
                     repository = mkReadonly "rclone:google_drive:restic/${config.networking.hostName}/${name}";
                     timerConfig = mkDefault {
                       OnCalendar = "daily";

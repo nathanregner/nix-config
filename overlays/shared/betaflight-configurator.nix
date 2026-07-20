@@ -2,7 +2,7 @@
 # https://github.com/betaflight/betaflight-configurator/issues/3947
 prev: pkg:
 let
-  lib = prev.lib;
+  inherit (prev) lib;
   assertVersion =
     version: pkg:
     lib.throwIf (

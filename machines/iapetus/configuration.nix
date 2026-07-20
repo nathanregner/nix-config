@@ -169,6 +169,19 @@
     SUBSYSTEM=="tty", ATTRS{idVendor}=="1337", ATTRS{idProduct}=="1337", MODE="0666", GROUP="dialout"
   '';
 
+  # https://discourse.nixos.org/t/26-05-systemd-tmpfiles-clean-protocol-driver-not-attached/78101/3
+  systemd.package =
+    lib.throwIfNot (pkgs.systemd.version == "260.2")
+      "systemd version override outdated! ${pkgs.systemd.version}"
+      (
+        pkgs.systemd.overrideAttrs (prevAttrs: {
+          version = "260.2";
+          src = prevAttrs.src.override {
+            hash = "sha256-NXmmSV7/9WIW6C8wjdOwaerCy4v7Zcrd8+XDzcS8rEk=";
+          };
+        })
+      );
+
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions
   # on your system were taken. It‘s perfectly fine and recommended to leave

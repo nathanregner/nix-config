@@ -54,7 +54,7 @@ in
     home.file."sgconfig.yml" = {
       source = yaml.generate "sgconfig.yml" {
         customLanguages = builtins.mapAttrs (
-          name: lang:
+          _name: lang:
           {
             inherit (lang) extensions;
             libraryPath = "${lang.library}/parser";

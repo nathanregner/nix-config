@@ -18,16 +18,14 @@ in
     finalPackage = mkOption {
       type = types.nullOr types.package;
       readOnly = true;
-      default = (
-        pkgs.unstable.writers.writeNuBin "jdtls" {
+      default = pkgs.unstable.writers.writeNuBin "jdtls" {
           makeWrapperArgs = [
             "--prefix"
             "PATH"
             ":"
             "${lib.makeBinPath [ pkgs.unstable.jdt-language-server ]}"
           ];
-        } ./jdtls.nu
-      );
+        } ./jdtls.nu;
     };
   };
 

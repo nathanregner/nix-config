@@ -1,7 +1,7 @@
 use crate::github;
 use clients::gitea::{self, types::MigrateRepoOptions};
 use color_eyre::eyre;
-use http::{header::AUTHORIZATION, HeaderValue};
+use http::{HeaderValue, header::AUTHORIZATION};
 use reqwest::header::HeaderMap;
 
 pub use gitea::types::Repository;

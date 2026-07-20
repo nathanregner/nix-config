@@ -2,7 +2,7 @@ use std::str::FromStr;
 
 use clients::github::{self, types::ReposListForAuthenticatedUserType};
 use color_eyre::eyre;
-use http::{header, HeaderName, HeaderValue};
+use http::{HeaderName, HeaderValue, header};
 use reqwest::header::HeaderMap;
 
 pub use github::types::Repository;

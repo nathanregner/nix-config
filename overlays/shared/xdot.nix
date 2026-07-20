@@ -1,5 +1,5 @@
 # disable xvfb-run tests to fix build on darwin
-prev: pkg:
+_prev: pkg:
 (pkg.overridePythonAttrs (_oldAttrs: {
   nativeCheckInputs = [ ];
 })).overrideAttrs

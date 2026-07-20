@@ -3,9 +3,6 @@ let
   dataDir = "/var/lib/spoolman";
 in
 {
-  # TODO: upstream a "package" option
-  nixpkgs.overlays = [ (final: _prev: { inherit (final.unstable) spoolman; }) ];
-
   services.spoolman = {
     enable = true;
     listen = "0.0.0.0";

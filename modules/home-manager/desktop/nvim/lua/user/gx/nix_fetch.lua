@@ -58,9 +58,7 @@ local function extract_attrs(attrs_node, bufnr)
             end
           end
 
-          if attr_name and attr_value then
-            attrs[attr_name] = attr_value
-          end
+          if attr_name and attr_value then attrs[attr_name] = attr_value end
         end
       end
     end
@@ -107,9 +105,7 @@ function M.handle()
         if owner and repo then
           local url = "https://github.com/" .. owner .. "/" .. repo
           local ref = attrs["tag"] or attrs["rev"]
-          if ref then
-            url = url .. "/tree/" .. ref
-          end
+          if ref then url = url .. "/tree/" .. ref end
           return url
         end
       end

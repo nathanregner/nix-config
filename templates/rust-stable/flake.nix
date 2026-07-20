@@ -6,7 +6,6 @@
 
   outputs =
     {
-      self,
       flake-parts,
       ...
     }@inputs:
@@ -38,8 +37,6 @@
       perSystem =
         {
           pkgs,
-          lib,
-          system,
           ...
         }:
         rec {
@@ -53,10 +50,5 @@
 
           devShells.default = pkgs.callPackage ./shell.nix { };
         };
-
-      flake = {
-        overlays.default = final: prev: {
-        };
-      };
     };
 }
