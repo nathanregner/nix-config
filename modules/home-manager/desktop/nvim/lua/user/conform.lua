@@ -22,6 +22,8 @@ local enabled = function(bufnr, before)
   return true
 end
 
+local log = require("user.log").create("conform")
+
 require("conform").setup({
   formatters_by_ft = {
     bash = { "shfmt" },
@@ -35,8 +37,8 @@ require("conform").setup({
     graphql = { "prettierd" },
     html = { "prettierd" },
     java = { "spring_javaformat" },
-    javascript = { "prettierd" },
-    javascriptreact = { "prettierd" },
+    javascript = { "prettierd", "lsp_organize_imports" },
+    javascriptreact = { "prettierd", "lsp_organize_imports" },
     json = { "prettierd" },
     jsonc = { "prettierd" },
     lua = { "stylua" },
@@ -57,8 +59,8 @@ require("conform").setup({
     sh = { "shfmt" },
     terraform = { "terraform_fmt", "injected" },
     toml = { "taplo" },
-    typescript = { "prettierd" },
-    typescriptreact = { "prettierd" },
+    typescript = { "prettierd", "lsp_organize_imports" },
+    typescriptreact = { "prettierd", "lsp_organize_imports" },
     typst = { "typstyle" },
     vue = { "prettierd" },
     yaml = { "prettierd" },
@@ -71,6 +73,40 @@ require("conform").setup({
     ["_"] = { "trim_whitespace" },
   },
   formatters = {
+    lsp_organize_imports = {
+      format = function(self, ctx, lines, callback)
+        -- vim.lsp.buf.code_action({
+        --   context = { only = { "source.organizeImports" } },
+        --   apply = true,
+        -- })
+        -- 1. Fetch code actions synchronously from the LSP (blocks until done or timeout)
+        -- local responses =
+        --   vim.lsp.buf_request_sync(ctx.buf, "textDocument/codeAction", { only = { "source.organizeImports" } }, 1000)
+        --
+        -- if not responses or vim.tbl_isempty(responses) then
+        --   return callback(nil) -- No actions found, skip to next formatter safely
+        -- end
+        --
+        -- -- 2. Iterate through responses to find and apply the edit immediately
+        -- for _, response in pairs(responses) do
+        --   log("response: " .. vim.print(response))
+        --   if response.result then
+        --     for _, action in ipairs(response.result) do
+        --       -- Handle workspace edits if provided directly by the action
+        --       if action.edit then
+        --         vim.lsp.util.apply_workspace_edit(action.edit, "utf-8")
+        --       -- Handle command resolving if the action requires execution
+        --       elseif action.command then
+        --         vim.lsp.buf.execute_command(action.command)
+        --       end
+        --     end
+        --   end
+        -- end
+        --
+        -- -- 3. The edits are guaranteed to be in the buffer now; proceed safely
+        callback(nil)
+      end,
+    },
     nginxfmt = {
       command = "nginxfmt",
       args = { "--pipe" },
