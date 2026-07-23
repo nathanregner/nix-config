@@ -1,6 +1,6 @@
 #!/usr/bin/env nu
 
-use std log
+use std/log
 
 def parse-porcelain [] {
   str trim

@@ -1,7 +1,7 @@
 #!/usr/bin/env nix-shell
 #!nix-shell -i nu -p openssl apacheHttpd
 
-use std log
+use std/log
 
 let hosts = [
   "iapetus"
