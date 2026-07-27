@@ -19,8 +19,10 @@ impl PaneId {
 }
 
 pub struct TmuxPaneContext {
-    pub session_name: String,
-    pub window_name: String,
+    /// Session/window names, for logging only. A sandboxed hook can't reach the
+    /// tmux server to resolve them, so they may be absent.
+    pub session_name: Option<String>,
+    pub window_name: Option<String>,
     pub pane_id: PaneId,
 }
 
@@ -29,8 +31,8 @@ impl Display for TmuxPaneContext {
         write!(
             f,
             "{}/{}/{}",
-            self.session_name,
-            self.window_name,
+            self.session_name.as_deref().unwrap_or("?"),
+            self.window_name.as_deref().unwrap_or("?"),
             self.pane_id.as_str()
         )
     }
@@ -38,10 +40,29 @@ impl Display for TmuxPaneContext {
 
 impl TmuxPaneContext {
     pub fn current() -> anyhow::Result<Self> {
+        // The pane id is forwarded via $TMUX_PANE and is all the status write
+        // needs. The session/window names require the tmux server, which a
+        // sandboxed hook can't reach, so resolving them is best-effort.
         let pane_id = std::env::var("TMUX_PANE")
             .map(PaneId::new)
             .context("Failed to read TMUX_PANE")?;
 
+        let (session_name, window_name) = match Self::resolve_names(&pane_id) {
+            Ok((session, window)) => (Some(session), Some(window)),
+            Err(err) => {
+                tracing::debug!("Failed to resolve tmux session/window names: {err:#}");
+                (None, None)
+            }
+        };
+
+        Ok(Self {
+            session_name,
+            window_name,
+            pane_id,
+        })
+    }
+
+    fn resolve_names(pane_id: &PaneId) -> anyhow::Result<(String, String)> {
         let cmd = DisplayMessage::new()
             .target_pane(pane_id.as_str())
             .message("#{session_name}\n#{window_name}")
@@ -59,10 +80,6 @@ impl TmuxPaneContext {
             anyhow::bail!("Unparseable display-message output: {stdout}");
         };
 
-        Ok(Self {
-            session_name: session_name.to_owned(),
-            window_name: window_name.to_owned(),
-            pane_id,
-        })
+        Ok((session_name.to_owned(), window_name.to_owned()))
     }
 }

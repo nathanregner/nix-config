@@ -9,6 +9,7 @@ use std::fs::{self, File, OpenOptions};
 use std::io::{Read, Seek, Write};
 use std::os::fd::{AsFd, OwnedFd};
 use std::path::{Path, PathBuf};
+use std::process::Command;
 
 #[derive(Serialize, Deserialize, Hash, Eq, PartialEq, PartialOrd, Ord, Copy, Clone, Debug)]
 #[serde(rename_all = "snake_case")]
@@ -41,9 +42,24 @@ impl AgentStatus {
 
 pub type Pid = u32;
 
+/// How to test whether an agent is still alive.
+///
+/// PIDs are namespaced, so a PID written by a sandboxed agent inside a
+/// container is meaningless to the host process that reads the status file.
+/// Sandboxed agents therefore record their container instead, which the host
+/// checks via `docker inspect`.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum Liveness {
+    /// Native agent: PID in the reader's process namespace.
+    Pid(Pid),
+    /// Sandboxed agent: docker container name or id.
+    Container(String),
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Agent {
-    pub pid: Pid,
+    pub liveness: Liveness,
     pub status: AgentStatus,
     #[serde(default, with = "humantime_serde")]
     pub last_update: Option<std::time::SystemTime>,
@@ -125,11 +141,11 @@ impl<'b> StatusFile<'b, ReadMode> {
         self.data
             .agents
             .iter()
-            .filter_map(|(key, entry)| match is_process_alive(entry.pid) {
+            .filter_map(|(key, entry)| match is_agent_alive(&entry.liveness) {
                 Ok(true) => None,
                 Ok(false) => Some(key.clone()),
                 Err(err) => {
-                    tracing::error!("failed to signal process {}: {err:#}", entry.pid);
+                    tracing::error!("failed to check liveness of {:?}: {err:#}", entry.liveness);
                     None
                 }
             })
@@ -186,13 +202,13 @@ impl<'b> StatusFile<'b, WriteMode> {
     pub fn set_agent(
         &mut self,
         pane_id: PaneId,
-        pid: Pid,
+        liveness: Liveness,
         status: AgentStatus,
     ) -> Option<AgentStatus> {
         let prev = self.data.agents.insert(
             pane_id,
             Agent {
-                pid,
+                liveness,
                 status,
                 last_update: Some(std::time::SystemTime::now()),
             },
@@ -232,6 +248,13 @@ fn ensure_status_dir(path: &Path) -> Result<()> {
     Ok(())
 }
 
+fn is_agent_alive(liveness: &Liveness) -> anyhow::Result<bool> {
+    match liveness {
+        Liveness::Pid(pid) => is_process_alive(*pid),
+        Liveness::Container(id) => is_container_alive(id),
+    }
+}
+
 fn is_process_alive(pid: Pid) -> anyhow::Result<bool> {
     let pid = pid.try_into()?;
     let pid = nix::unistd::Pid::from_raw(pid);
@@ -240,6 +263,22 @@ fn is_process_alive(pid: Pid) -> anyhow::Result<bool> {
         Err(nix::errno::Errno::ESRCH) => Ok(false),
         Err(err) => Err(err.into()),
     }
+}
+
+/// A sandboxed agent is alive iff its docker container is still running.
+/// `docker inspect` exits non-zero when the container no longer exists, and
+/// prints `true`/`false` for `.State.Running` while it does.
+fn is_container_alive(id: &str) -> anyhow::Result<bool> {
+    let output = Command::new("docker")
+        .args(["inspect", "-f", "{{.State.Running}}", id])
+        .output()
+        .context("failed to run docker inspect")?;
+
+    if !output.status.success() {
+        return Ok(false);
+    }
+
+    Ok(String::from_utf8_lossy(&output.stdout).trim() == "true")
 }
 
 #[cfg(test)]

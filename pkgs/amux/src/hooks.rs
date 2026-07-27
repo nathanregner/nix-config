@@ -1,5 +1,5 @@
 use crate::{
-    state::{AgentStatus, Pid, StatusFile},
+    state::{AgentStatus, Liveness, StatusFile},
     tmux::{PaneId, TmuxPaneContext},
 };
 use anyhow::{Context, Result};
@@ -60,13 +60,19 @@ pub fn run(base_dirs: &dyn BaseStrategy, stdin: impl Read) {
         }
     };
 
-    // Use parent PID (Claude Code's PID) rather than our own
-    let parent_pid = std::os::unix::process::parent_id();
+    // A sandboxed agent runs in its own PID namespace, so its PID is
+    // meaningless to the host that reads the status file; it identifies itself
+    // by container instead (set by the sandbox launcher). A native agent uses
+    // its parent PID (Claude Code's PID) rather than the short-lived hook's.
+    let liveness = match std::env::var("AMUX_CONTAINER") {
+        Ok(id) if !id.is_empty() => Liveness::Container(id),
+        _ => Liveness::Pid(std::os::unix::process::parent_id()),
+    };
 
-    let span = error_span!("hook", %ctx, parent_pid);
+    let span = error_span!("hook", %ctx, ?liveness);
     let _span = span.enter();
 
-    if let Err(err) = handle_inner(base_dirs, stdin, ctx.pane_id, parent_pid) {
+    if let Err(err) = handle_inner(base_dirs, stdin, ctx.pane_id, liveness) {
         tracing::error!("{err:#}");
         let output = HookOutput {
             system_message: format!("amux hook error: {err:#}"),
@@ -79,7 +85,7 @@ fn handle_inner(
     base_dirs: &dyn BaseStrategy,
     mut stdin: impl Read,
     pane_id: PaneId,
-    parent_pid: Pid,
+    liveness: Liveness,
 ) -> Result<()> {
     let mut json = String::new();
     stdin
@@ -119,7 +125,7 @@ fn handle_inner(
     let mut status_file = StatusFile::load_for_write(base_dirs)?;
     let should_notify = status == AgentStatus::Waiting;
 
-    let prev = status_file.set_agent(pane_id, parent_pid, status);
+    let prev = status_file.set_agent(pane_id, liveness, status);
     status_file.save()?;
     tracing::debug!("Handled event {event:?}: {prev:?} -> {status:?}");
 
@@ -146,8 +152,8 @@ mod tests {
 
     fn run_hook(base_dirs: &dyn BaseStrategy, json: &str) {
         let pane_id = PaneId::new("%0");
-        let parent_pid = std::process::id();
-        handle_inner(base_dirs, json.as_bytes(), pane_id, parent_pid).unwrap();
+        let liveness = Liveness::Pid(std::process::id());
+        handle_inner(base_dirs, json.as_bytes(), pane_id, liveness).unwrap();
     }
 
     fn get_status(base_dirs: &dyn BaseStrategy) -> Option<AgentStatus> {

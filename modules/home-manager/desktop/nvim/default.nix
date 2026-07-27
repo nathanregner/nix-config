@@ -90,7 +90,7 @@ in
             tflint
             typescript-go
             vscode-langservers-extracted
-            vtsls
+            # vtsls
             yaml-language-server
             ;
 
