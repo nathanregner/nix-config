@@ -110,6 +110,8 @@ in
               # without it git falls back to the /usr/bin xcode-select stub
               "~/.nix-profile"
               "~/.local/state/nix/profiles"
+              "~/.config/git"
+              "/tmp"
             ]
             ++ lib.optionals pkgs.stdenv.isDarwin [
               "/bin"
