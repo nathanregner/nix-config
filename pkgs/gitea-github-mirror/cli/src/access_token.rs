@@ -82,7 +82,7 @@ fn update_remote(config: &mut gix_config::File, access_token: &str) -> Result<bo
 
     url.set_password(Some(access_token))
         .expect("should have host");
-    origin.set("url".try_into()?, url.to_string().as_bytes().into());
+    origin.set("url", url.to_string().as_bytes())?;
     Ok(true)
 }
 
