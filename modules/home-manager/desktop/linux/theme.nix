@@ -5,7 +5,7 @@
     gtk4 = { inherit (config.gtk) theme; };
     theme = {
       name = "Colloid-Dark-Compact-Catppuccin";
-      package = pkgs.unstable.colloid-gtk-theme.override {
+      package = pkgs.local.colloid-gtk-theme.override {
         # https://github.com/NixOS/nixpkgs/blob/nixos-unstable/pkgs/data/themes/colloid-gtk-theme/default.nix#L67
         sizeVariants = [ "compact" ];
         tweaks = [
@@ -22,6 +22,7 @@
   };
 
   home.pointerCursor = {
+    enable = true;
     package = pkgs.unstable.catppuccin-cursors.mochaDark;
     name = "catppuccin-mocha-dark-cursors";
     size = 24;
