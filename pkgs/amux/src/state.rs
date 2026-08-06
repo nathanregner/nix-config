@@ -47,13 +47,13 @@ pub type Pid = u32;
 /// PIDs are namespaced, so a PID written by a sandboxed agent inside a
 /// container is meaningless to the host process that reads the status file.
 /// Sandboxed agents therefore record their container instead, which the host
-/// checks via `docker inspect`.
+/// checks via `container inspect`.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum Liveness {
     /// Native agent: PID in the reader's process namespace.
     Pid(Pid),
-    /// Sandboxed agent: docker container name or id.
+    /// Sandboxed agent: Apple `container` name or id.
     Container(String),
 }
 
@@ -265,20 +265,36 @@ fn is_process_alive(pid: Pid) -> anyhow::Result<bool> {
     }
 }
 
-/// A sandboxed agent is alive iff its docker container is still running.
-/// `docker inspect` exits non-zero when the container no longer exists, and
-/// prints `true`/`false` for `.State.Running` while it does.
+/// A sandboxed agent is alive iff its Apple `container` is still running.
+/// `container inspect` exits non-zero when the container no longer exists.
+/// Unlike docker it has no `-f` template flag, so it emits a JSON array whose
+/// element's `.status.state` is `running` while the container lives.
 fn is_container_alive(id: &str) -> anyhow::Result<bool> {
-    let output = Command::new("docker")
-        .args(["inspect", "-f", "{{.State.Running}}", id])
+    let output = Command::new("container")
+        .args(["inspect", id])
         .output()
-        .context("failed to run docker inspect")?;
+        .context("failed to run container inspect")?;
 
     if !output.status.success() {
         return Ok(false);
     }
 
-    Ok(String::from_utf8_lossy(&output.stdout).trim() == "true")
+    #[derive(Deserialize)]
+    struct Inspect {
+        status: InspectStatus,
+    }
+
+    #[derive(Deserialize)]
+    struct InspectStatus {
+        state: String,
+    }
+
+    let containers: Vec<Inspect> = serde_json::from_slice(&output.stdout)
+        .context("failed to parse container inspect output")?;
+
+    Ok(containers
+        .first()
+        .is_some_and(|c| c.status.state == "running"))
 }
 
 #[cfg(test)]

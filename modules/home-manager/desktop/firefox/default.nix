@@ -14,7 +14,10 @@
       isDefault = false;
     };
     profiles.dev-edition-default = {
-      extensions.packages = [ pkgs.local.firefox-extensions.aws-cli-sso ];
+      extensions.packages = [
+        pkgs.local.firefox-extensions.aws-cli-sso
+        pkgs.local.firefox-extensions.team-elevated-access
+      ];
       settings = {
         "browser.aboutConfig.showWarning" = false;
 

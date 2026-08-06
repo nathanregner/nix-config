@@ -1,0 +1,20 @@
+{
+  "manifest_version": 2,
+  "name": "TEAM Elevated Access",
+  "version": "1.0",
+
+  "description": "Auto-select the ClickBank Production account and DB Read Only role on the TEAM elevated access request page",
+
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "team-elevated-access@nregner.net"
+    }
+  },
+
+  "content_scripts": [
+    {
+      "matches": ["https://team.clickbank.io/requests/request*"],
+      "js": ["main.js"]
+    }
+  ]
+}
