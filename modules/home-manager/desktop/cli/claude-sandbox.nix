@@ -42,19 +42,21 @@ let
   profileEnvVars = lib.foldl' (acc: profile: acc // mkProfileEnvVars profile) { } allAwsProfiles;
 
   defaultAwsEnvVars =
-    if cfg.awsCredsDir != null then {
-      AWS_SHARED_CREDENTIALS_FILE = "$AWS_SHARED_CREDENTIALS_FILE";
-      AWS_CONFIG_FILE = "$AWS_CONFIG_FILE";
-      AWS_PROFILE = "$AWS_PROFILE";
-      AWS_DEFAULT_REGION = "$AWS_DEFAULT_REGION";
-    }
-    else lib.optionalAttrs (allAwsProfiles != [ ]) {
-      AWS_ACCESS_KEY_ID = "$AWS_ACCESS_KEY_ID";
-      AWS_SECRET_ACCESS_KEY = "$AWS_SECRET_ACCESS_KEY";
-      AWS_SESSION_TOKEN = "$AWS_SESSION_TOKEN";
-      AWS_REGION = "$AWS_REGION";
-      AWS_DEFAULT_REGION = "$AWS_DEFAULT_REGION";
-    };
+    if cfg.awsCredsDir != null then
+      {
+        AWS_SHARED_CREDENTIALS_FILE = "$AWS_SHARED_CREDENTIALS_FILE";
+        AWS_CONFIG_FILE = "$AWS_CONFIG_FILE";
+        AWS_PROFILE = "$AWS_PROFILE";
+        AWS_DEFAULT_REGION = "$AWS_DEFAULT_REGION";
+      }
+    else
+      lib.optionalAttrs (allAwsProfiles != [ ]) {
+        AWS_ACCESS_KEY_ID = "$AWS_ACCESS_KEY_ID";
+        AWS_SECRET_ACCESS_KEY = "$AWS_SECRET_ACCESS_KEY";
+        AWS_SESSION_TOKEN = "$AWS_SESSION_TOKEN";
+        AWS_REGION = "$AWS_REGION";
+        AWS_DEFAULT_REGION = "$AWS_DEFAULT_REGION";
+      };
 
   allStateDirs = [
     "$HOME/.claude"

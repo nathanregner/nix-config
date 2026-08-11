@@ -111,6 +111,7 @@ in
               "~/.nix-profile"
               "~/.local/state/nix/profiles"
               "~/.config/git"
+              "~/.npmrc"
               "/tmp"
             ]
             ++ lib.optionals pkgs.stdenv.isDarwin [

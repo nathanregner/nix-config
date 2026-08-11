@@ -20,6 +20,7 @@
       </component>
       <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "last_opened_file_path": "/Users/nathan.regner/dev/engineering/cb-stack/.local/tomcats/cb",
     "settings.build.tools.auto.reload": "ALL",
     "settings.editor.selected.configurable": "com.poratu.idea.plugins.tomcat.setting.TomcatServersConfigurable"
   }
