@@ -1,21 +1,5 @@
 {
   "nodes": {
-    "agent-sandbox": {
-      "inputs": {
-        "nixpkgs": [
-          "nixpkgs-unstable"
-        ]
-      },
-      "locked": {
-        "path": "./agent-sandbox.nix",
-        "type": "path"
-      },
-      "original": {
-        "path": "./agent-sandbox.nix",
-        "type": "path"
-      },
-      "parent": []
-    },
     "catppuccin-nix": {
       "inputs": {
         "nixpkgs": [
@@ -515,7 +499,6 @@
     },
     "root": {
       "inputs": {
-        "agent-sandbox": "agent-sandbox",
         "catppuccin-nix": "catppuccin-nix",
         "deploy-rs": "deploy-rs",
         "devshell": "devshell",

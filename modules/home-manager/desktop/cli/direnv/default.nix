@@ -37,7 +37,5 @@ in
   #   { command = toString ./direnv-hook.nu; }
   # ];
 
-  programs.claude-code.sandbox.allowedPackages = [ direnvWrapper ];
-
   xdg.configFile."direnv/lib/_layout.sh".source = config.lib.file.mkFlakeSymlink ./_layout.sh;
 }

@@ -23,11 +23,6 @@
     };
     import-tree.url = "github:vic/import-tree";
 
-    agent-sandbox = {
-      url = "./agent-sandbox.nix";
-      inputs.nixpkgs.follows = "nixpkgs-unstable";
-    };
-
     # Misc
     catppuccin-nix = {
       url = "github:catppuccin/nix/release-26.05";

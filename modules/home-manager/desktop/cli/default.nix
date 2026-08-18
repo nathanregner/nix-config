@@ -7,7 +7,6 @@
     ./bat.nix
     ./btop.nix
     ./claude.nix
-    ./claude-sandbox.nix
     ./direnv
     ./eza.nix
     ./git
@@ -15,6 +14,7 @@
     ./lazygit
     ./nix.nix
     ./nushell
+    ./srt.nix
     ./starship.nix
     ./terraform
     ./tmux-sessionizer.nix
