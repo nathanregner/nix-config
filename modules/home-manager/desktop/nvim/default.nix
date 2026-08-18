@@ -40,8 +40,6 @@ in
         require('user')
       '';
 
-      plugins = with pkgs.unstable.vimPlugins; [ lazy-nvim ];
-
       extraLuaPackages =
         let
           propagateBuildInputs =
