@@ -8,6 +8,9 @@
   programs.zsh = {
     enable = true;
     dotDir = "${config.xdg.configHome}/zsh";
+    defaultKeymap = "viins";
+    enableCompletion = true;
+    completionInit = "autoload -Uz compinit && compinit -C";
     initContent = lib.mkMerge [
       # zprof must be loaded before everything else, since it
       # benchmarks the shell initialization.
@@ -19,6 +22,60 @@
       '')
 
       /* zsh */ ''
+        # === Replaces oh-my-zsh lib/completion.zsh ===
+        zmodload -i zsh/complist
+        WORDCHARS=""
+        unsetopt menu_complete
+        unsetopt flowcontrol
+        setopt auto_menu
+        setopt complete_in_word
+        setopt always_to_end
+        bindkey -M menuselect '^o' accept-and-infer-next-history
+        zstyle ':completion:*:*:*:*:*' menu select
+        zstyle ':completion:*' matcher-list 'm:{[:lower:][:upper:]}={[:upper:][:lower:]}' 'r:|=*' 'l:|=* r:|=*'
+        zstyle ':completion:*' special-dirs true
+        zstyle ':completion:*' list-colors "''${(s.:.)LS_COLORS}"
+        zstyle ':completion:*:*:kill:*:processes' list-colors '=(#b) #([0-9]#) ([0-9a-z-]#)*=01;34=0=01'
+        zstyle ':completion:*:*:*:*:processes' command "ps -u $USERNAME -o pid,user,comm -w -w"
+        zstyle ':completion:*:cd:*' tag-order local-directories directory-stack path-directories
+        zstyle ':completion::complete:*' use-cache 1
+        zstyle ':completion::complete:*' cache-path "$XDG_CACHE_HOME/zsh"
+
+        # === Replaces oh-my-zsh lib/directories.zsh ===
+        setopt auto_cd
+        setopt auto_pushd
+        setopt pushd_ignore_dups
+        setopt pushdminus
+        alias -g ...='../..'
+        alias -g ....='../../..'
+        alias -g .....='../../../..'
+        alias -- -='cd -'
+        for i in {1..9}; do alias "$i"="cd -$i"; done
+        alias md='mkdir -p'
+        alias rd=rmdir
+
+        # === Replaces oh-my-zsh lib/key-bindings.zsh ===
+        if (( ''${+terminfo[smkx]} && ''${+terminfo[rmkx]} )); then
+          zle-line-init() { echoti smkx }
+          zle-line-finish() { echoti rmkx }
+          zle -N zle-line-init
+          zle -N zle-line-finish
+        fi
+        [[ -n "''${terminfo[khome]}" ]] && bindkey -M viins "''${terminfo[khome]}" beginning-of-line
+        [[ -n "''${terminfo[kend]}" ]] && bindkey -M viins "''${terminfo[kend]}" end-of-line
+        [[ -n "''${terminfo[kdch1]}" ]] && bindkey -M viins "''${terminfo[kdch1]}" delete-char
+        bindkey '^?' backward-delete-char
+        bindkey '^w' backward-kill-word
+
+        # History navigation (from lib/key-bindings.zsh)
+        autoload -U up-line-or-beginning-search down-line-or-beginning-search
+        zle -N up-line-or-beginning-search
+        zle -N down-line-or-beginning-search
+        bindkey '^p' up-line-or-beginning-search
+        bindkey '^n' down-line-or-beginning-search
+        bindkey '^[[A' up-line-or-beginning-search
+        bindkey '^[[B' down-line-or-beginning-search
+
         bindkey -M viins 'jk' vi-cmd-mode
 
         flakify() {
@@ -43,11 +100,7 @@
         ''}
       ''
     ];
-    # defaultKeymap = "viins";
-    oh-my-zsh = {
-      enable = true;
-      plugins = [ "vi-mode" ];
-    };
+    oh-my-zsh.enable = false;
     shellAliases =
       let
         sys = if pkgs.stdenv.isDarwin then "darwin" else "os";
