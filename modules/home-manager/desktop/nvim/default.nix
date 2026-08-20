@@ -83,6 +83,7 @@ in
             lua-language-server
             nil
             nixd
+            oxlint
             rust-analyzer
             terraform-ls
             tflint

@@ -147,6 +147,7 @@ local servers = {
   --     },
   --   },
   -- },
+  oxlint = {},
   eslint = {
     handlers = {
       ["textDocument/diagnostic"] = make_eslint_diagnostic_handler("textDocument/diagnostic"),
