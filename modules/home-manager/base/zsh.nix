@@ -7,33 +7,42 @@
 {
   programs.zsh = {
     enable = true;
-    dotDir = config.home.homeDirectory;
-    initContent = ''
-      bindkey -M viins 'jk' vi-cmd-mode
+    dotDir = "${config.xdg.configHome}/zsh";
+    initContent = lib.mkMerge [
+      # zprof must be loaded before everything else, since it
+      # benchmarks the shell initialization.
+      (lib.mkOrder 400 /* zsh */ ''
+        if [ -n "$ZPROF" ]; then zmodload zsh/zprof; fi
+      '')
+      (lib.mkOrder 1450 /* zsh */ ''
+        if [ -n "$ZPROF" ]; then zprof; fi
+      '')
 
-      flakify() {
-        nix flake new -t github:NixOS/templates#''${1:-"utils-generic"} .
-      }
+      /* zsh */ ''
+        bindkey -M viins 'jk' vi-cmd-mode
 
-      nixify() {
-        cp ${./templates}/{shell.nix,.envrc} .
-        chmod +w {shell.nix,.envrc}
-      }
+        flakify() {
+          nix flake new -t github:NixOS/templates#''${1:-"utils-generic"} .
+        }
 
-      catwhich() {
-        cat "$(which "$1")"
-      }
-      compdef catwhich=which
+        nixify() {
+          cp ${./templates}/{shell.nix,.envrc} .
+          chmod +w {shell.nix,.envrc}
+        }
 
-      # https://github.com/NixOS/nixpkgs/issues/275770
-      complete -C aws_completer aws
-    ''
-    + lib.optionalString pkgs.stdenv.isDarwin ''
-      autoload -U +X compinit && compinit
-      autoload -U +X bashcompinit && bashcompinit
+        catwhich() {
+          cat "$(which "$1")"
+        }
+        compdef catwhich=which
 
-      source ${./zsh/completions/_launchctl}
-    '';
+        # https://github.com/NixOS/nixpkgs/issues/275770
+        complete -C aws_completer aws
+
+        ${lib.optionalString pkgs.stdenv.isDarwin ''
+          source ${./zsh/completions/_launchctl}
+        ''}
+      ''
+    ];
     # defaultKeymap = "viins";
     oh-my-zsh = {
       enable = true;
