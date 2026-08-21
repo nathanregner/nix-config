@@ -89,7 +89,7 @@ pub struct StatusFile<'b, Mode> {
 }
 
 impl<T> StatusFile<'_, T> {
-    fn status_file_path(base_dirs: &dyn BaseStrategy) -> PathBuf {
+    pub fn status_file_path(base_dirs: &dyn BaseStrategy) -> PathBuf {
         base_dirs.cache_dir().join("amux/status.json")
     }
 }

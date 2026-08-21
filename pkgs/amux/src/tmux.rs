@@ -2,7 +2,19 @@ use std::fmt::Display;
 
 use anyhow::Context;
 use serde::{Deserialize, Serialize};
-use tmux_interface::{DisplayMessage, Tmux};
+use tmux_interface::{DisplayMessage, RefreshClient, Tmux};
+
+/// Redraw the tmux status bar so it reflects the current status file.
+pub fn refresh_status_line() -> anyhow::Result<()> {
+    let output = Tmux::new()
+        .command(RefreshClient::new().status_line())
+        .output()
+        .context("failed to refresh tmux status bar")?;
+    if !output.success() {
+        anyhow::bail!("{}", String::from_utf8_lossy(&output.stderr()));
+    }
+    Ok(())
+}
 
 #[derive(Serialize, Deserialize, Hash, PartialEq, Eq, PartialOrd, Ord, Clone, Debug)]
 #[serde(transparent)]

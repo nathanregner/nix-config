@@ -2,11 +2,11 @@ use crate::{
     state::{AgentStatus, Liveness, StatusFile},
     tmux::{PaneId, TmuxPaneContext},
 };
+use crate::tmux;
 use anyhow::{Context, Result};
 use etcetera::BaseStrategy;
 use serde::{Deserialize, Serialize};
 use std::{collections::HashMap, io::Read};
-use tmux_interface::{RefreshClient, Tmux};
 use tracing::error_span;
 
 type ExtraFields = HashMap<String, serde_json::Value>;
@@ -130,10 +130,7 @@ fn handle_inner(
     tracing::debug!("Handled event {event:?}: {prev:?} -> {status:?}");
 
     // Refresh tmux status bar immediately
-    if let Err(err) = Tmux::new()
-        .command(RefreshClient::new().status_line())
-        .output()
-    {
+    if let Err(err) = tmux::refresh_status_line() {
         tracing::warn!("Failed to refresh tmux status bar: {err:#}");
     }
 

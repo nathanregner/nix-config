@@ -19,4 +19,6 @@ pub enum Commands {
     },
     /// List all agents with fzf for interactive selection
     List,
+    /// Watch the status file and refresh the tmux status bar on changes
+    Daemon,
 }

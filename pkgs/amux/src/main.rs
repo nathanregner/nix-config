@@ -8,6 +8,7 @@ use tracing_subscriber::layer::SubscriberExt;
 use tracing_subscriber::util::SubscriberInitExt;
 
 mod cli;
+mod daemon;
 mod hooks;
 mod list;
 mod state;
@@ -32,6 +33,12 @@ fn main() {
         }
         Commands::List => {
             if let Err(err) = list::output(&base_dirs) {
+                tracing::error!("{err:#}");
+                std::process::exit(1);
+            }
+        }
+        Commands::Daemon => {
+            if let Err(err) = daemon::run(&base_dirs) {
                 tracing::error!("{err:#}");
                 std::process::exit(1);
             }
