@@ -125,11 +125,10 @@ in
       network.allowedDomains = [
         "*.amazonaws.com"
         "*.awsapps.com"
-        "*.clickbank.com"
-        "*.clickbank.io"
         "*.github.com"
         "*.npmjs.org"
         "github.com"
+        "githubusercontent.com"
         "npmjs.org"
       ];
 
