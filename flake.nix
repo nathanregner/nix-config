@@ -70,7 +70,7 @@
           flake-parts.follows = "flake-parts";
         };
         flake-compat.follows = "flake-compat";
-        # nixpkgs.follows = "nixpkgs-unstable";
+        nixpkgs.follows = "nixpkgs-unstable";
         treefmt-nix.follows = "treefmt-nix";
       };
     };
