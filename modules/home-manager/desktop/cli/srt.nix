@@ -173,6 +173,9 @@ in
       };
     };
 
-    xdg.configFile.${cfg.target}.source = settingsFormat.generate "srt.json" cfg.settings;
+    xdg.configFile.${cfg.target} = {
+      source = settingsFormat.generate "srt.json" cfg.settings;
+      force = true;
+    };
   };
 }
