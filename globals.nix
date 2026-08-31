@@ -1,6 +1,14 @@
 # TODO: generate sops.yaml
 { lib }:
 {
+  tailscale.hosts = [
+    "enceladus"
+    "enceladus-linux-vm"
+    "iapetus"
+    "sagittarius"
+    "voron"
+  ];
+
   ssh = rec {
     hostKeys = {
       enceladus = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIByCYpEo+AjtM2kWxxr5C9Mp3tm1PyVDVD8BGesKTi85";
