@@ -11,16 +11,16 @@
 }:
 buildNpmPackage {
   pname = "sandbox-runtime";
-  version = "0.0.73";
+  version = "0.0.74";
 
   src = fetchFromGitHub {
     owner = "anthropic-experimental";
     repo = "sandbox-runtime";
-    rev = "v0.0.73";
-    hash = "sha256-dOncsjSmkWjF5TC+BhjmqlPgZLdVSjfP7RrSzPqzRdE=";
+    rev = "v0.0.74";
+    hash = "sha256-TZWRIA+Ez6nBJ3fUp0Xmzh6Ce0Ls0i2tBK0t/9hnga4=";
   };
 
-  npmDepsHash = "sha256-JYDqFC6OaU+uqOuQtObmoTp/JfwXv2uP6ZmC4wJcv2w=";
+  npmDepsHash = "sha256-C6czchG+kdb9ZQS+pRJ/ntY83vajykurfDuvRZAvmSc=";
 
   nativeBuildInputs = [ makeWrapper ];
 
