@@ -3,10 +3,6 @@ let
   keysDirectory = "/mnt/secrets";
 in
 {
-  imports = [
-    ../../../modules/nixos/base/tailscale.nix
-  ];
-
   virtualisation.sharedDirectories.tailscale = {
     source = lib.removeSuffix "/tailscale-auth-key" "${secrets.tailscale-auth-key}";
     target = keysDirectory;

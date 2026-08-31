@@ -321,6 +321,21 @@
         "type": "github"
       }
     },
+    "multiverse": {
+      "locked": {
+        "lastModified": 1788190790,
+        "narHash": "sha256-RMTJUD32UnD3aq7V1gljvWc27DgkqAlQqxp31akdrLg=",
+        "owner": "fzakaria",
+        "repo": "nixpkgs-multiverse",
+        "rev": "f19017292b4970e7045aa81f0f47ca8119d9a490",
+        "type": "github"
+      },
+      "original": {
+        "owner": "fzakaria",
+        "repo": "nixpkgs-multiverse",
+        "type": "github"
+      }
+    },
     "nix-darwin": {
       "inputs": {
         "nixpkgs": [
@@ -512,6 +527,7 @@
         "import-tree": "import-tree",
         "mac-app-util": "mac-app-util",
         "microvm": "microvm",
+        "multiverse": "multiverse",
         "nix-darwin": "nix-darwin",
         "nix-index-database": "nix-index-database",
         "nixos-generators": "nixos-generators",

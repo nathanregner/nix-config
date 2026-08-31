@@ -11,7 +11,6 @@
     ./networking.nix
     ./nix.nix
     ./services
-    ./tailscale.nix
     ./users.nix
   ]
   ++ (with inputs.self.modules.nixos; [
