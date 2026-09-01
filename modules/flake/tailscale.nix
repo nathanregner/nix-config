@@ -25,7 +25,7 @@ in
 
   flake.modules.darwin.tailscale = mkModule {
     services.tailscale = {
-      overrideLocalDns = true;
+      # overrideLocalDns = true;
     };
     # FIXME
     # https://github.com/tailscale/tailscale/issues/20890

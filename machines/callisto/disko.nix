@@ -1,6 +1,9 @@
 { inputs, ... }:
 {
-  imports = [ inputs.disko.nixosModules.disko ];
+  imports = [
+    inputs.disko.nixosModules.disko
+    inputs.self.modules.nixos.btrfs
+  ];
 
   disko.devices.disk.vda = {
     type = "disk";
