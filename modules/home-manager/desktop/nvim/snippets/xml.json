@@ -1,6 +1,23 @@
 {
+  "aws-sso": {
+    "body": [
+      "<dependency>",
+      "  <groupId>software.amazon.awssdk</groupId>",
+      "  <artifactId>sts</artifactId>",
+      "</dependency>",
+      "<dependency>",
+      "  <groupId>software.amazon.awssdk</groupId>",
+      "  <artifactId>sso</artifactId>",
+      "  <optional>true</optional>",
+      "</dependency>"
+    ],
+    "prefix": "aws-sso"
+  },
+  "ignore_optional_problems": {
+    "body": "<attribute name=\"ignore_optional_problems\" value=\"true\"/>",
+    "prefix": "ignore_optional_problems"
+  },
   "maven-enforcer-plugin": {
-    "prefix": "maven-enforcer-plugin",
     "body": [
       "<plugin>",
       "   <groupId>org.apache.maven.plugins</groupId>",
@@ -29,38 +46,29 @@
       "     </execution>",
       "   </executions>",
       " </plugin>"
-    ]
+    ],
+    "prefix": "maven-enforcer-plugin"
   },
-  "aws-sso": {
-    "prefix": "aws-sso",
+  "maven-plugin-spring-javaformat": {
     "body": [
-      "<dependency>",
-      "  <groupId>software.amazon.awssdk</groupId>",
-      "  <artifactId>sts</artifactId>",
-      "</dependency>",
-      "<dependency>",
-      "  <groupId>software.amazon.awssdk</groupId>",
-      "  <artifactId>sso</artifactId>",
-      "  <optional>true</optional>",
-      "</dependency>"
-    ]
-  },
-  "spring-boot-devtools": {
-    "prefix": "spring-boot-devtools",
-    "body": [
-      "<dependency>",
-      "    <groupId>org.springframework.boot</groupId>",
-      "    <artifactId>spring-boot-devtools</artifactId>",
-      "    <optional>true</optional>",
-      "</dependency>"
-    ]
-  },
-  "ignore_optional_problems": {
-    "prefix": "ignore_optional_problems",
-    "body": "<attribute name=\"ignore_optional_problems\" value=\"true\"/>"
+      "<plugin>",
+      "  <groupId>io.spring.javaformat</groupId>",
+      "  <artifactId>spring-javaformat-maven-plugin</artifactId>",
+      "  <version>0.0.47</version>",
+      "  <executions>",
+      "    <execution>",
+      "      <phase>validate</phase>",
+      "      <inherited>true</inherited>",
+      "      <goals>",
+      "        <goal>validate</goal>",
+      "      </goals>",
+      "    </execution>",
+      "  </executions>",
+      "</plugin>"
+    ],
+    "prefix": "maven-plugin-spring-javaformat"
   },
   "maven-profile-netty-resolver-dns-native-macos-aarch64": {
-    "prefix": "netty-resolver-dns-native-macos-aarch64",
     "body": [
       "<profile>",
       "    <id>maven-profile-netty-resolver-dns-native-macos-aarch64</id>",
@@ -78,25 +86,42 @@
       "        </dependency>",
       "    </dependencies>",
       "</profile>"
-    ]
+    ],
+    "prefix": "netty-resolver-dns-native-macos-aarch64"
   },
-  "maven-plugin-spring-javaformat": {
-    "prefix": "maven-plugin-spring-javaformat",
+  "mvn-mockito": {
     "body": [
       "<plugin>",
-      "  <groupId>io.spring.javaformat</groupId>",
-      "  <artifactId>spring-javaformat-maven-plugin</artifactId>",
-      "  <version>0.0.47</version>",
-      "  <executions>",
-      "    <execution>",
-      "      <phase>validate</phase>",
-      "      <inherited>true</inherited>",
-      "      <goals>",
-      "        <goal>validate</goal>",
-      "      </goals>",
-      "    </execution>",
-      "  </executions>",
+      "    <groupId>org.apache.maven.plugins</groupId>",
+      "    <artifactId>maven-dependency-plugin</artifactId>",
+      "    <executions>",
+      "        <execution>",
+      "            <goals>",
+      "                <goal>properties</goal>",
+      "            </goals>",
+      "        </execution>",
+      "    </executions>",
+      "</plugin>",
+      "<plugin>",
+      "    <groupId>org.apache.maven.plugins</groupId>",
+      "    <artifactId>maven-surefire-plugin</artifactId>",
+      "    <configuration>",
+      "        <!-- Mockito can no longer self-attach its inline mock maker on JDK 25;",
+      "             load byte-buddy-agent explicitly. -->",
+      "        <argLine>@{argLine} -javaagent:\\${net.bytebuddy:byte-buddy-agent:jar}</argLine>",
+      "    </configuration>",
       "</plugin>"
-    ]
+    ],
+    "prefix": "mvn-mockito"
+  },
+  "spring-boot-devtools": {
+    "body": [
+      "<dependency>",
+      "    <groupId>org.springframework.boot</groupId>",
+      "    <artifactId>spring-boot-devtools</artifactId>",
+      "    <optional>true</optional>",
+      "</dependency>"
+    ],
+    "prefix": "spring-boot-devtools"
   }
 }

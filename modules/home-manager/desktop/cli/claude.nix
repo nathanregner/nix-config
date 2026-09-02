@@ -97,64 +97,7 @@ in
             "Read(**/secrets/**)"
           ];
         };
-        sandbox = {
-          enable = true;
-          filesystem = rec {
-            denyRead = [ "/" ]; # deny by default
-            # anything writable must also be readable
-            allowRead = [
-              "/nix/store"
-              "~/configs"
-              "~/dev"
-              # ~/.nix-profile/bin/git resolves through this symlink chain;
-              # without it git falls back to the /usr/bin xcode-select stub
-              "~/.nix-profile"
-              "~/.local/state/nix/profiles"
-              "~/.config/git"
-              "~/.npmrc"
-              "/tmp"
-            ]
-            ++ lib.optionals pkgs.stdenv.isDarwin [
-              "/bin"
-              "/private/tmp" # TODO
-              "/var/select/developer_dir"
-              "~/Library/Java" # JAVA_HOME; maven launches $JAVA_HOME/bin/java
-              # the JVM reads the OS version from this plist at boot; without it
-              # os.version resolves to -1.0 and the boot layer fails to initialize
-              "/System/Library/CoreServices/SystemVersion.plist"
-              "/System/Library/CoreServices/.SystemVersionPlatform.plist"
-            ]
-            ++ allowWrite;
-            allowWrite = [
-              # TODO
-              /*
-                 Error: Exit code 1
-                 Auto configuration failed
-                 8515903104:error:02FFF001:system library:func(4095):Operation not permitted:/AppleInternal/Library/BuildRoots/4~CNqEugB7-7yoTeHDwKLZ0PRIsI79y9XP33qXeIo/Library/Caches/com.apple.xbs/TemporaryDirectory.MoIAiI/Sour
-                 ces/libressl/libressl-3.3/crypto/bio/bss_file.c:122:fopen('/private/etc/ssl/openssl.cnf', 'rb')
-                 8515903104:error:20FFF002:BIO routines:CRYPTO_internal:system
-                 lib:/AppleInternal/Library/BuildRoots/4~CNqEugB7-7yoTeHDwKLZ0PRIsI79y9XP33qXeIo/Library/Caches/com.apple.xbs/TemporaryDirectory.MoIAiI/Sources/libressl/libressl-3.3/crypto/bio/bss_file.c:127:
-                 8515903104:error:0EFFF002:configuration file routines:CRYPTO_internal:system
-                 lib:/AppleInternal/Library/BuildRoots/4~CNqEugB7-7yoTeHDwKLZ0PRIsI79y9XP33qXeIo/Library/Caches/com.apple.xbs/TemporaryDirectory.MoIAiI/Sources/libressl/libressl-3.3/crypto/conf/conf_def.c:202:
-                 Auto configuration failed
-                 8515903104:error:02FFF001:system library:func(4095):Operation not permitted:/AppleInternal/Library/BuildRoots/4~CNqEugB7-7yoTeHDwKLZ0PRIsI79y9XP33qXeIo/Library/Caches/com.apple.xbs/TemporaryDirectory.MoIAiI/Sour
-                 ces/libressl/libressl-3.3/crypto/bio/bss_file.c:122:fopen('/private/etc/ssl/openssl.cnf', 'rb')
-                 8515903104:error:20FFF002:BIO routines:CRYPTO_internal:system
-                 lib:/AppleInternal/Library/BuildRoots/4~CNqEugB7-7yoTeHDwKLZ0PRIsI79y9XP33qXeIo/Library/Caches/com.apple.xbs/TemporaryDirectory.MoIAiI/Sources/libressl/libressl-3.3/crypto/bio/bss_file.c:127:
-                 8515903104:error:0EFFF002:configuration file routines:CRYPTO_internal:system
-                 lib:/AppleInternal/Library/BuildRoots/4~CNqEugB7-7yoTeHDwKLZ0PRIsI79y9XP33qXeIo/Library/Caches/com.apple.xbs/TemporaryDirectory.MoIAiI/Sources/libressl/libressl-3.3/crypto/conf/conf_def.c:202:
-              */
-              "/tmp" # TODO
-              "~/.cache/node"
-              "~/.cache/pnpm"
-              "~/.cache/yarn"
-              "~/.local/share/colim"
-              "~/.local/share/pnpm"
-              "~/.local/share/yarn"
-              "~/.m2"
-            ];
-          };
-        };
+        tui = "fullscreen";
       };
     };
 
