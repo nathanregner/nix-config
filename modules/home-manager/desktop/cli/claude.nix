@@ -88,6 +88,7 @@ in
             "Read(**/secrets/**)"
           ];
         };
+        tui = "fullscreen";
       };
     };
 
