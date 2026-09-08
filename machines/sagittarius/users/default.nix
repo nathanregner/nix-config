@@ -39,12 +39,6 @@ in
 
     users.defaultUserShell = pkgs.zsh;
 
-    programs.zsh.ohMyZsh = {
-      enable = true;
-      plugins = [ "vi-mode" ];
-      theme = "robbyrussell";
-    };
-
     programs.fzf = {
       fuzzyCompletion = true;
       keybindings = true;

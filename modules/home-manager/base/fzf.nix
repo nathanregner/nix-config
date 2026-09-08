@@ -1,8 +1,7 @@
-{ lib, ... }:
+{ config, lib, ... }:
 {
   programs.fzf = rec {
     enable = true;
-    enableZshIntegration = true;
     # https://github.com/sharkdp/fd#using-fd-with-fzf
     defaultCommand = "fd --hidden --follow --exclude .git";
     fileWidgetCommand = defaultCommand;
@@ -29,5 +28,7 @@
     _fzf_compgen_dir() {
       fd --type d --hidden --follow --exclude ".git" . "$1"
     }
+
+    zvm_after_init_commands+=('source <(${lib.getExe config.programs.fzf.package} --zsh)')
   '';
 }
