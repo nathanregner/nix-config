@@ -11,6 +11,17 @@
     defaultKeymap = "viins";
     enableCompletion = true;
     completionInit = "autoload -Uz compinit && compinit -C";
+    plugins = [
+      {
+        name = "vi-mode";
+        src = pkgs.zsh-vi-mode;
+        file = "share/zsh-vi-mode/zsh-vi-mode.plugin.zsh";
+      }
+    ];
+    initExtraFirst = ''
+      ZVM_SYSTEM_CLIPBOARD_ENABLED=true
+      ZVM_VI_INSERT_ESCAPE_BINDKEY=jk
+    '';
     initContent = lib.mkMerge [
       # zprof must be loaded before everything else, since it
       # benchmarks the shell initialization.
@@ -53,30 +64,6 @@
         for i in {1..9}; do alias "$i"="cd -$i"; done
         alias md='mkdir -p'
         alias rd=rmdir
-
-        # === Replaces oh-my-zsh lib/key-bindings.zsh ===
-        if (( ''${+terminfo[smkx]} && ''${+terminfo[rmkx]} )); then
-          zle-line-init() { echoti smkx }
-          zle-line-finish() { echoti rmkx }
-          zle -N zle-line-init
-          zle -N zle-line-finish
-        fi
-        [[ -n "''${terminfo[khome]}" ]] && bindkey -M viins "''${terminfo[khome]}" beginning-of-line
-        [[ -n "''${terminfo[kend]}" ]] && bindkey -M viins "''${terminfo[kend]}" end-of-line
-        [[ -n "''${terminfo[kdch1]}" ]] && bindkey -M viins "''${terminfo[kdch1]}" delete-char
-        bindkey '^?' backward-delete-char
-        bindkey '^w' backward-kill-word
-
-        # History navigation (from lib/key-bindings.zsh)
-        autoload -U up-line-or-beginning-search down-line-or-beginning-search
-        zle -N up-line-or-beginning-search
-        zle -N down-line-or-beginning-search
-        bindkey '^p' up-line-or-beginning-search
-        bindkey '^n' down-line-or-beginning-search
-        bindkey '^[[A' up-line-or-beginning-search
-        bindkey '^[[B' down-line-or-beginning-search
-
-        bindkey -M viins 'jk' vi-cmd-mode
 
         flakify() {
           nix flake new -t github:NixOS/templates#''${1:-"utils-generic"} .
