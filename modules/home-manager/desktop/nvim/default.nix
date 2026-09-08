@@ -87,7 +87,7 @@ in
             rust-analyzer
             terraform-ls
             tflint
-            typescript-go
+            typescript
             vscode-langservers-extracted
             # vtsls
             yaml-language-server
