@@ -1,0 +1,39 @@
+From 0b8376d9c040e086ee7997dbe2e80ecb737c1317 Mon Sep 17 00:00:00 2001
+From: App-rentice <14206678+App-rentice@users.noreply.github.com>
+Date: Sat, 27 Jun 2026 16:59:24 +0200
+Subject: [PATCH] Support MAVEN_ARGS env var (fixes #1464) (#1464) (#1631)
+
+In the current version of Maven Daemon (1.0.6), the `MAVEN_ARGS` env var is not supported.
+`mvnd` should accept the same command line options according to the README.
+
+This PR is a backport of #1219 to mvnd-1.x.
+Cherry-picked from [dac81c7](https://github.com/apache/maven-mvnd/commit/dac81c7011f83d417feab815b06dd1fbd3fb39c9).
+
+Co-authored-by: Guillaume Nodet <gnodet@gmail.com>
+---
+ .../main/java/org/mvndaemon/mvnd/daemon/Server.java   | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
+
+diff --git a/daemon/src/main/java/org/mvndaemon/mvnd/daemon/Server.java b/daemon/src/main/java/org/mvndaemon/mvnd/daemon/Server.java
+index 89a961528..819f9fbce 100644
+--- a/daemon/src/main/java/org/mvndaemon/mvnd/daemon/Server.java
++++ b/daemon/src/main/java/org/mvndaemon/mvnd/daemon/Server.java
+@@ -616,8 +616,17 @@ public <T extends Message> T request(Message request, Class<T> responseType, Pre
+                 System.setIn(daemonInputStream);
+                 System.setOut(new LoggingOutputStream(s -> sendQueue.add(Message.out(s))).printStream());
+                 System.setErr(new LoggingOutputStream(s -> sendQueue.add(Message.err(s))).printStream());
++                // Process MAVEN_ARGS environment variable
++                List<String> args = buildRequest.getArgs();
++                String mavenArgsEnv = buildRequest.getEnv().get("MAVEN_ARGS");
++                if (mavenArgsEnv != null && !mavenArgsEnv.isEmpty()) {
++                    args = new ArrayList<>(args);
++                    Arrays.stream(mavenArgsEnv.split(" "))
++                            .filter(s -> !s.trim().isEmpty())
++                            .forEach(args::add);
++                }
+                 int exitCode = cli.main(
+-                        buildRequest.getArgs(),
++                        args,
+                         buildRequest.getWorkingDir(),
+                         buildRequest.getProjectDir(),
+                         buildRequest.getEnv(),
