@@ -1,11 +1,14 @@
 #!/usr/bin/env -S nu --stdin
 
 def model-name [] {
-  $in
-  | parse --regex 'claude-(?<name>\w+)-(?<major>\d)-(?<minor>\d)'
-  | each { $"($in.name | str title-case) ($in.major).($in.minor)" }
-  | first
-  | default $in
+  let name = $in
+  let parsed = $name | parse --regex 'claude-(?<name>\w+)-(?<major>\d)-(?<minor>\d)'
+  if ($parsed | is-empty) {
+    $name
+  } else {
+    let row = $parsed | first
+    $"($row.name | str title-case) ($row.major).($row.minor)"
+  }
 }
 
 def main [] {
