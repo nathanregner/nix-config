@@ -18,11 +18,72 @@
         <option name="myConfigurationMode" value="AUTOMATIC" />
         <option name="myRunOnSave" value="true" />
       </component>
+      <component name="ProjectInspectionProfilesVisibleTreeState">
+        <entry key="Project Default">
+          <profile-state>
+            <expanded-state>
+              <State>
+                <id>Code maturityJava</id>
+              </State>
+              <State>
+                <id>Compiler issuesJava</id>
+              </State>
+              <State>
+                <id>JUnit</id>
+              </State>
+              <State>
+                <id>JVM languages</id>
+              </State>
+              <State>
+                <id>Java</id>
+              </State>
+              <State>
+                <id>Java 5Java language level migration aidsJava</id>
+              </State>
+              <State>
+                <id>Java 8Java language level migration aidsJava</id>
+              </State>
+              <State>
+                <id>Java language level migration aidsJava</id>
+              </State>
+              <State>
+                <id>JavadocJava</id>
+              </State>
+              <State>
+                <id>Numeric issuesJava</id>
+              </State>
+              <State>
+                <id>PerformanceJava</id>
+              </State>
+              <State>
+                <id>Spring</id>
+              </State>
+              <State>
+                <id>Spring AOPSpring</id>
+              </State>
+              <State>
+                <id>TestNGJava</id>
+              </State>
+              <State>
+                <id>Threading issuesJava</id>
+              </State>
+              <State>
+                <id>Verbose or redundant code constructsJava</id>
+              </State>
+            </expanded-state>
+            <selected-state>
+              <State>
+                <id>User defined</id>
+              </State>
+            </selected-state>
+          </profile-state>
+        </entry>
+      </component>
       <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "last_opened_file_path": "/Users/nathan.regner/dev/engineering/cb-stack/.local/tomcats/cb",
     "settings.build.tools.auto.reload": "ALL",
-    "settings.editor.selected.configurable": "com.poratu.idea.plugins.tomcat.setting.TomcatServersConfigurable"
+    "settings.editor.selected.configurable": "Errors"
   }
 }]]></component>
       <component name="RunManager">
@@ -55,11 +116,20 @@
           </method>
         </configuration>
       </component>
+      <component name="TaskManager">
+        <task active="true" id="Default" summary="Default task">
+          <created>1789579844864</created>
+          <option name="number" value="Default" />
+          <option name="presentableId" value="Default" />
+          <updated>1789579844864</updated>
+        </task>
+        <servers />
+      </component>
       <component name="WindowStateProjectService">
-        <state x="395" y="-931" key="SettingsEditor" timestamp="1767974722506">
-          <screen x="-74" y="-1050" width="1920" height="1050" />
+        <state x="340" y="-1061" key="SettingsEditor" timestamp="1789579849713">
+          <screen x="-449" y="-1410" width="2560" height="1410" />
         </state>
-        <state x="395" y="-931" key="SettingsEditor/0.33.1728.989/1846.-1050.1920.1050/-74.-1050.1920.1050" timestamp="1767974722506" />
+        <state x="340" y="-1061" key="SettingsEditor/0.33.1728.989/-449.-1410.2560.1410/2111.-1410.2560.1410" timestamp="1789579849713" />
       </component>
     </defaultProject>
   </component>
