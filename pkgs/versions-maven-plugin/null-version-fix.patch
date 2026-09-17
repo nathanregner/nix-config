@@ -1,0 +1,22 @@
+diff --git a/versions-maven-plugin/src/main/java/org/codehaus/mojo/versions/UseLatestVersionsMojoBase.java b/versions-maven-plugin/src/main/java/org/codehaus/mojo/versions/UseLatestVersionsMojoBase.java
+index 0bca152e..aee861fd 100644
+--- a/versions-maven-plugin/src/main/java/org/codehaus/mojo/versions/UseLatestVersionsMojoBase.java
++++ b/versions-maven-plugin/src/main/java/org/codehaus/mojo/versions/UseLatestVersionsMojoBase.java
+@@ -30,6 +30,7 @@ import java.util.concurrent.ExecutorService;
+ import java.util.concurrent.Executors;
+ import java.util.stream.Stream;
+ 
++import org.apache.commons.lang3.StringUtils;
+ import org.apache.maven.artifact.Artifact;
+ import org.apache.maven.artifact.versioning.ArtifactVersion;
+ import org.apache.maven.model.Dependency;
+@@ -277,6 +278,9 @@ public abstract class UseLatestVersionsMojoBase extends AbstractVersionsDependen
+                         () -> {
+                             if (!updateFilter(dep)) {
+                                 return;
++                            } else if (StringUtils.isBlank(dep.getVersion())) {
++                                getLog().debug("Ignoring dependency with no version (managed elsewhere): "
++                                        + toString(dep));
+                             } else if (getExcludeReactor() && isProducedByReactor(dep)) {
+                                 getLog().info("Ignoring reactor dependency: " + toString(dep));
+                             } else if (isHandledByProperty(dep)) {

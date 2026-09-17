@@ -1,7 +1,5 @@
 {
   inputs = {
-    self.submodules = true;
-
     # Nix
     nixpkgs.url = "github:nixos/nixpkgs/release-26.05";
     nixpkgs-unstable.url = "github:nixos/nixpkgs/nixpkgs-unstable";
@@ -17,6 +15,7 @@
       url = "github:LnL7/nix-darwin/nix-darwin-26.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    multiverse.url = "github:fzakaria/nixpkgs-multiverse";
     microvm = {
       url = "github:microvm-nix/microvm.nix";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -70,7 +69,7 @@
           flake-parts.follows = "flake-parts";
         };
         flake-compat.follows = "flake-compat";
-        nixpkgs.follows = "nixpkgs-unstable";
+        # nixpkgs.follows = "nixpkgs-unstable";
         treefmt-nix.follows = "treefmt-nix";
       };
     };
@@ -125,7 +124,7 @@
         inputs.pkgs-by-name-for-flake-parts.flakeModule
         inputs.treefmt-nix.flakeModule
       ]
-      ++ (inputs.import-tree ./modules/flake).imports;
+      ++ (inputs.import-tree ./modules/flake inputs).imports;
 
       perSystem =
         {

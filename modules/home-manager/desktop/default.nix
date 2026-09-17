@@ -10,6 +10,7 @@
     ./cli
     ./firefox
     ./insync.nix
+    ./java.nix
     ./jetbrains
     ./nvim
     ./theme.nix
