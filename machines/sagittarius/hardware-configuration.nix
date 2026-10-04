@@ -121,5 +121,6 @@
   };
 
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
+  nix.settings.extra-platforms = [ "i686-linux" ];
   hardware.cpu.intel.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
 }

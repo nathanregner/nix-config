@@ -31,7 +31,11 @@ in
       "/var/lib/hydra/machines"
       (pkgs.writeTextFile {
         name = "local-machine";
-        text = "localhost ${pkgs.stdenv.hostPlatform.system} - 10 1 nixos-test,benchmark,big-parallel,kvm - -";
+        text = "localhost ${
+          builtins.concatStringsSep "," (
+            [ pkgs.stdenv.hostPlatform.system ] ++ config.nix.settings.extra-platforms
+          )
+        } - 10 1 nixos-test,benchmark,big-parallel,kvm - -";
       })
     ];
     extraConfig = ''
