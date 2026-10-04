@@ -25,11 +25,11 @@ in
 
   flake.modules.darwin.tailscale = mkModule {
     services.tailscale = {
-      # overrideLocalDns = true;
+      overrideLocalDns = true;
     };
     # FIXME
     # https://github.com/tailscale/tailscale/issues/20890
     # https://github.com/tailscale/tailscale/issues/19139
-    multiverse.pins.tailscale = "1.98.10";
+    # multiverse.pins.tailscale = "1.98.10";
   };
 }

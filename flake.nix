@@ -124,7 +124,7 @@
         inputs.pkgs-by-name-for-flake-parts.flakeModule
         inputs.treefmt-nix.flakeModule
       ]
-      ++ (inputs.import-tree ./modules/flake).imports;
+      ++ (inputs.import-tree ./modules/flake inputs).imports;
 
       perSystem =
         {
