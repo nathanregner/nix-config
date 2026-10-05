@@ -1,8 +1,8 @@
+use crate::tmux;
 use crate::{
     state::{AgentStatus, Liveness, StatusFile},
     tmux::{PaneId, TmuxPaneContext},
 };
-use crate::tmux;
 use anyhow::{Context, Result};
 use etcetera::BaseStrategy;
 use serde::{Deserialize, Serialize};
@@ -30,7 +30,7 @@ enum HookInput {
         #[serde(flatten)]
         extra_fields: ExtraFields,
     },
-    PermissionPrompt(#[expect(dead_code)] ExtraFields),
+    PermissionRequest(#[expect(dead_code)] ExtraFields),
     Stop(#[expect(dead_code)] ExtraFields),
 }
 
@@ -39,7 +39,7 @@ enum HookInput {
 #[serde(rename_all = "snake_case")]
 enum NotificationType {
     IdlePrompt,
-    PermissionPrompt,
+    PermissionRequest,
     ElicitationDialog,
     #[serde(untagged)]
     Unknown(String),
@@ -99,7 +99,7 @@ fn handle_inner(
         HookInput::UserPromptSubmit(..)
         | HookInput::PreToolUse(..)
         | HookInput::PostToolUseFailure(..) => AgentStatus::Working,
-        HookInput::PermissionPrompt(..) => AgentStatus::Waiting,
+        HookInput::PermissionRequest(..) => AgentStatus::Waiting,
         HookInput::PostToolUse { tool_name, .. } => {
             if tool_name == "AskUserQuestion" {
                 AgentStatus::Waiting
@@ -111,7 +111,7 @@ fn handle_inner(
             notification_type, ..
         } => match notification_type {
             NotificationType::IdlePrompt => AgentStatus::Idle,
-            NotificationType::PermissionPrompt | NotificationType::ElicitationDialog => {
+            NotificationType::PermissionRequest | NotificationType::ElicitationDialog => {
                 AgentStatus::Waiting
             }
             NotificationType::Unknown(ty) => {
@@ -185,7 +185,7 @@ mod tests {
         Some(AgentStatus::Idle)
     )]
     #[case(
-        r#"{ "hook_event_name": "Notification", "notification_type": "permission_prompt" }"#,
+        r#"{ "hook_event_name": "Notification", "notification_type": "permission_request" }"#,
         Some(AgentStatus::Waiting)
     )]
     #[case(
@@ -197,7 +197,7 @@ mod tests {
         None
     )]
     #[case(
-        r#"{ "hook_event_name": "PermissionPrompt" }"#,
+        r#"{ "hook_event_name": "PermissionRequest" }"#,
         Some(AgentStatus::Waiting)
     )]
     #[case(r#"{ "hook_event_name": "Stop" }"#, Some(AgentStatus::Idle))]
