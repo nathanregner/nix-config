@@ -36,6 +36,15 @@ return {
       pattern = { "conjure-log-*" },
       callback = function(ev) vim.diagnostic.enable(false, { bufnr = ev.buf }) end,
     })
+    -- vim.api.nvim_create_autocmd("FileType", {
+    --   pattern = { "clojure", "scheme", "lisp", "fennel" },
+    --   callback = function()
+    --     vim.keymap.del("n", "p", { buffer = true, silent = true })
+    --     vim.keymap.del("n", "P", { buffer = true, silent = true })
+    --     vim.keymap.del("n", "gp", { buffer = true, silent = true })
+    --     vim.keymap.del("n", "gP", { buffer = true, silent = true })
+    --   end,
+    -- })
     vim.g["conjure#extract#tree_sitter#enabled"] = true
     vim.g["conjure#client#clojure#nrepl#refresh#backend"] = "clj-reload"
     -- Rebind from K
