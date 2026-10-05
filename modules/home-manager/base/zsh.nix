@@ -119,4 +119,6 @@
         nix-stray-roots = ''nix-store --gc --print-roots | egrep -v "^(/nix/var|/run/\w+-system|\{memory)"'';
       };
   };
+
+  home.packages = [ pkgs.unstable.zsh-completions ];
 }
