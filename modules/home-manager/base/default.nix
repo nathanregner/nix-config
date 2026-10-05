@@ -15,7 +15,7 @@
     programs.ssh = {
       enable = true;
       enableDefaultConfig = false;
-      settings."Host.*" = {
+      settings."Host *" = {
         # https://docs.ssh.com/manuals/server-zos-user/64/disabling-agent-forwarding.html
         ForwardAgent = false;
         # share connections

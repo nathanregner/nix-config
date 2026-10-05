@@ -8,6 +8,7 @@ in
       enable = true;
       settings = {
         bind = "[::]:${toString port}";
+        priority = 30;
       };
     };
     package = pkgs.unstable.harmonia;

@@ -10,6 +10,7 @@
     "${modulesPath}/installer/scan/not-detected.nix"
     inputs.nixos-hardware.nixosModules.common-cpu-intel
     inputs.nixos-hardware.nixosModules.common-pc-ssd
+    inputs.self.modules.nixos.btrfs
   ];
 
   assertions = [
@@ -120,5 +121,6 @@
   };
 
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
+  nix.settings.extra-platforms = [ "i686-linux" ];
   hardware.cpu.intel.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
 }
