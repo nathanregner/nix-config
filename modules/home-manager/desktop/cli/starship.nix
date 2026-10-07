@@ -5,19 +5,19 @@
     enableZshIntegration = true;
     # https://starship.rs/config
     settings = {
-      aws.disabled = true;
+      aws.symbol = " ";
       docker_context.only_with_files = false;
       gcloud.disabled = true;
       git_status.disabled = true;
+      java.disabled = true;
       nix_shell = {
         symbol = "❄️";
         heuristic = true;
       };
-      package.disabled = true;
-
-      java.disabled = true;
       nodejs.disabled = true;
+      package.disabled = true;
       python.disabled = true;
+      terraform.disabled = true;
 
       # FIXME: IFD
       # catppuccin.starship.enable = false;
