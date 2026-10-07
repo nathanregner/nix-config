@@ -376,6 +376,17 @@ capabilities = vim.tbl_deep_extend(
   }, false)
 )
 
+local disabled_env = os.getenv("DISABLE_LSP") or ""
+local disabled_servers
+if disabled_env == "all" then
+  disabled_servers = true
+else
+  disabled_servers = {}
+  for name in vim.gsplit(disabled_env, ",", { trimempty = true }) do
+    disabled_servers[name] = true
+  end
+end
+
 for server_name, server_config in pairs(servers) do
   local custom_capabilities = server_config.capabilities
   if custom_capabilities then
@@ -408,5 +419,5 @@ for server_name, server_config in pairs(servers) do
   server_config.on_attach = chain(on_attach, server_config.on_attach, on_attach_workspace)
 
   vim.lsp.config(server_name, server_config)
-  vim.lsp.enable(server_name, true)
+  if disabled_servers ~= true and not disabled_servers[server_name] then vim.lsp.enable(server_name, true) end
 end
