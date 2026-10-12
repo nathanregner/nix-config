@@ -74,7 +74,7 @@ in
   config = lib.mkIf cfg.enable {
     home.file.".ideavimrc".source = config.lib.file.mkFlakeSymlink ./ideavimrc;
 
-    home.packages = lib.optionals pkgs.stdenv.isLinux (
+    home.packages = lib.optionals pkgs.stdenv.hostPlatform.isLinux (
       [
         pkgs.unstable.jetbrains-toolbox
       ]
