@@ -189,7 +189,7 @@ fn test_status_line_waiting() {
     let env = TestEnv::new("waiting");
 
     env.run_hook(
-        r#"{ "hook_event_name": "Notification", "notification_type": "permission_prompt" }"#,
+        r#"{ "hook_event_name": "Notification", "notification_type": "permission_request" }"#,
     );
 
     insta::assert_snapshot!(env.status_line(), @"#[fg=#f38ba8,bold]󰀦 1#[default]");
