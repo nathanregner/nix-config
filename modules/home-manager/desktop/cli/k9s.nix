@@ -13,7 +13,7 @@
     (
       { pkgs, lib, ... }:
       {
-        config = lib.mkIf pkgs.stdenv.isDarwin {
+        config = lib.mkIf pkgs.stdenv.hostPlatform.isDarwin {
           home.file."Library/Application Support/k9s".source =
             config.lib.file.mkOutOfStoreSymlink "${config.xdg.configHome}/k9s";
         };

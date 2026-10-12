@@ -1,0 +1,14 @@
+#! /nix/store/10dxp0qxqxxsyiljrh2kp0xqhz6arhcx-bash-5.3p15/bin/bash -e
+LG_CONFIG_FILE=${LG_CONFIG_FILE:+','$LG_CONFIG_FILE','}
+LG_CONFIG_FILE=${LG_CONFIG_FILE/',''/home/nregner/.config/lazygit/config.yml'','/','}
+LG_CONFIG_FILE='/home/nregner/.config/lazygit/config.yml'$LG_CONFIG_FILE
+LG_CONFIG_FILE=${LG_CONFIG_FILE#','}
+LG_CONFIG_FILE=${LG_CONFIG_FILE%','}
+export LG_CONFIG_FILE
+LG_CONFIG_FILE=${LG_CONFIG_FILE:+','$LG_CONFIG_FILE','}
+# LG_CONFIG_FILE=${LG_CONFIG_FILE/',''/nix/store/qr65dfzddf238z8pz8dwmcqzy3n3p591-catppuccin-lazygit-0-unstable-2026-04-01/mocha/blue.yml'','/','}
+# LG_CONFIG_FILE='/nix/store/qr65dfzddf238z8pz8dwmcqzy3n3p591-catppuccin-lazygit-0-unstable-2026-04-01/mocha/blue.yml'$LG_CONFIG_FILE
+LG_CONFIG_FILE=${LG_CONFIG_FILE#','}
+LG_CONFIG_FILE=${LG_CONFIG_FILE%','}
+export LG_CONFIG_FILE
+exec "/nix/store/bgyfdhb9ngszzpwczbwy1bkfnx6kbml0-lazygit-0.66.0/bin/lazygit" "$@"

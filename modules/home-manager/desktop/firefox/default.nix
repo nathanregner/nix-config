@@ -7,7 +7,7 @@
 {
   programs.firefox = {
     enable = true;
-    package = if pkgs.stdenv.isLinux then pkgs.unstable.firefox-devedition else null;
+    package = if pkgs.stdenv.hostPlatform.isLinux then pkgs.unstable.firefox-devedition else null;
     # name must start with "dev-edition-"? https://github.com/nix-community/home-manager/issues/4703
     profiles.default = {
       id = 1;
@@ -24,7 +24,7 @@
     };
   };
 
-  home.packages = lib.optionals (!pkgs.stdenv.isDarwin) [
+  home.packages = lib.optionals (!pkgs.stdenv.hostPlatform.isDarwin) [
     (pkgs.runCommand "firefox" { nativeBuildInputs = [ pkgs.makeWrapper ]; } ''
       makeWrapper ${lib.getExe config.programs.firefox.package} $out/bin/firefox
     '')

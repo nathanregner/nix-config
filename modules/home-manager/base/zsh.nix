@@ -18,13 +18,13 @@
         file = "share/zsh-vi-mode/zsh-vi-mode.plugin.zsh";
       }
     ];
-    initExtraFirst = ''
-      ZVM_SYSTEM_CLIPBOARD_ENABLED=true
-      ZVM_VI_INSERT_ESCAPE_BINDKEY=jk
-    '';
     initContent = lib.mkMerge [
       # zprof must be loaded before everything else, since it
       # benchmarks the shell initialization.
+      (lib.mkBefore ''
+        ZVM_SYSTEM_CLIPBOARD_ENABLED=true
+        ZVM_VI_INSERT_ESCAPE_BINDKEY=jk
+      '')
       (lib.mkOrder 400 /* zsh */ ''
         if [ -n "$ZPROF" ]; then zmodload zsh/zprof; fi
       '')
@@ -82,7 +82,7 @@
         # https://github.com/NixOS/nixpkgs/issues/275770
         complete -C aws_completer aws
 
-        ${lib.optionalString pkgs.stdenv.isDarwin ''
+        ${lib.optionalString pkgs.stdenv.hostPlatform.isDarwin ''
           source ${./zsh/completions/_launchctl}
         ''}
       ''
@@ -90,7 +90,7 @@
     oh-my-zsh.enable = false;
     shellAliases =
       let
-        sys = if pkgs.stdenv.isDarwin then "darwin" else "os";
+        sys = if pkgs.stdenv.hostPlatform.isDarwin then "darwin" else "os";
       in
       {
         nrb = "nh ${sys} build .";
