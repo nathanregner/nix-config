@@ -19,7 +19,15 @@
           else
             "${config.home.homeDirectory}/Library/Application Support";
         configFile = "${configDirectory}/lazygit/config.yml";
-        themePkg = inputs.catppuccin-nix.packages.${pkgs.stdenv.hostPlatform.system}.lazygit;
+        # lazygit tries to migrate gui.authorColors -> gui.theme.authorColors in place, which fails on the read-only store
+        themePkg = pkgs.runCommand "catppuccin-lazygit-migrated" { nativeBuildInputs = [ pkgs.yq-go ]; } ''
+          cp -r ${inputs.catppuccin-nix.packages.${pkgs.stdenv.hostPlatform.system}.lazygit} $out
+          chmod -R u+w $out
+          for f in $(find $out -name '*.yml'); do
+            yq -e '.gui.authorColors' "$f" > /dev/null
+            yq -i '.gui.theme.authorColors = .gui.authorColors | del(.gui.authorColors)' "$f"
+          done
+        '';
       in
       ''
         makeWrapper ${lib.getExe pkgs.unstable.lazygit} $out/bin/lazygit \

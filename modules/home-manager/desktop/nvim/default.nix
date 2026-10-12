@@ -84,7 +84,7 @@ in
             unzip
             ;
         }
-        // lib.optionalAttrs pkgs.stdenv.isLinux {
+        // lib.optionalAttrs pkgs.stdenv.hostPlatform.isLinux {
           inherit (pkgs.unstable)
             inotify-tools
             ;
