@@ -63,6 +63,7 @@ in
           command = "${config.home.homeDirectory}/.claude/statusline";
         };
         env = {
+          AWS_PROFILE = "default";
           ENABLE_TOOL_SEARCH = "true"; # lazy-load MCPs
         };
         permissions = {
