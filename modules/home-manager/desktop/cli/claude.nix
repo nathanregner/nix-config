@@ -97,7 +97,7 @@ in
             "Read(**/secrets/**)"
           ];
         };
-        tui = "fullscreen";
+        tui = "default";
       };
     };
 
