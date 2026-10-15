@@ -48,6 +48,10 @@ let
   origWithPlugins = base.passthru.withPlugins;
 
   nvim-treesitter = base.overrideAttrs (old: {
+    # The stock java queries don't compile against the orchard grammar.
+    patches = (old.patches or [ ]) ++ [
+      ./patches/0001-fix-java-adapt-highlights-to-tree-sitter-java-orchard.patch
+    ];
     passthru = old.passthru // {
       builtGrammars = substitute old.passthru.builtGrammars;
       grammarPlugins =

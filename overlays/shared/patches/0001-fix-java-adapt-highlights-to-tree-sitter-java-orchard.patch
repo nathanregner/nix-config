@@ -1,0 +1,49 @@
+From a73d42945a208a99e75c3b9b5800807b2e647a10 Mon Sep 17 00:00:00 2001
+From: Nathan Regner <nathan.regner@clickbank.com>
+Date: Thu, 15 Oct 2026 15:27:51 -0600
+Subject: [PATCH] fix(java): adapt highlights to tree-sitter-java-orchard
+
+The orchard grammar splits `@interface` into `@` and `interface` tokens,
+so the combined keyword is an invalid node type. Its `modifiers` node
+cannot contain "synchronized" as written in the stock query.
+
+`///` comments parse as `markdown_comment`; highlight them as
+documentation.
+---
+ runtime/queries/java/highlights.scm | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
+
+diff --git a/runtime/queries/java/highlights.scm b/runtime/queries/java/highlights.scm
+index 641f1e3..78c474d 100644
+--- a/runtime/queries/java/highlights.scm
++++ b/runtime/queries/java/highlights.scm
+@@ -174,7 +174,6 @@
+   "extends"
+   "implements"
+   "instanceof"
+-  "@interface"
+   "permits"
+   "to"
+   "with"
+@@ -205,9 +204,6 @@
+   "transitive"
+ ] @keyword.modifier
+ 
+-(modifiers
+-  "synchronized" @keyword.modifier)
+-
+ [
+   "transient"
+   "volatile"
+@@ -331,3 +327,8 @@
+ 
+ ((line_comment) @comment.documentation
+   (#lua-match? @comment.documentation "^///$"))
++
++(annotation_type_declaration
++  "@" @keyword.type)
++
++(markdown_comment) @comment @spell @comment.documentation
+-- 
+2.55.0
+
