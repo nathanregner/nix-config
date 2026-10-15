@@ -1,0 +1,127 @@
+From 59c140321ea08889b5a750bb45dfe71b1cbf002c Mon Sep 17 00:00:00 2001
+From: Nathan Regner <nathan.regner@clickbank.com>
+Date: Thu, 15 Oct 2026 15:18:59 -0600
+Subject: [PATCH] feat: support markdown_comment
+
+---
+ grammar.js               | 11 +++++++
+ queries/highlights.scm   |  1 +
+ test/corpus/comments.txt | 64 ++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 76 insertions(+)
+
+diff --git a/grammar.js b/grammar.js
+index dbaa26d..8d850ec 100644
+--- a/grammar.js
++++ b/grammar.js
+@@ -50,6 +50,7 @@ export default grammar({
+   extras: $ => [
+     $.line_comment,
+     $.block_comment,
++    $.markdown_comment,
+     /\s/,
+   ],
+ 
+@@ -1349,6 +1350,16 @@ export default grammar({
+ 
+     line_comment: _ => token(prec(PREC.COMMENT, seq('//', /[^\n]*/))),
+ 
++    // JEP 467 Markdown doc comment: consecutive `///` lines form one comment. The extra precedence
++    // makes it beat line_comment, which matches the same text on a single `///` line.
++    markdown_comment: _ => token(prec(PREC.COMMENT + 1,
++      seq(
++        '///',
++        /[^\n]*/,
++        repeat(seq(/[ \t]*\r?\n[ \t]*/, '///', /[^\n]*/)),
++      ),
++    )),
++
+     // http://stackoverflow.com/questions/13014947/regex-to-match-a-c-style-multiline-comment/36328890#36328890
+     block_comment: _ => token(prec(PREC.COMMENT,
+       seq(
+diff --git a/queries/highlights.scm b/queries/highlights.scm
+index b13b4f4..1a36e85 100644
+--- a/queries/highlights.scm
++++ b/queries/highlights.scm
+@@ -88,6 +88,7 @@
+ [
+   (line_comment)
+   (block_comment)
++  (markdown_comment)
+ ] @comment
+ 
+ ; Keywords
+diff --git a/test/corpus/comments.txt b/test/corpus/comments.txt
+index 674e03f..31640f6 100644
+--- a/test/corpus/comments.txt
++++ b/test/corpus/comments.txt
+@@ -35,3 +35,67 @@ comments and literals
+ (program
+   (expression_statement (decimal_integer_literal))
+   (line_comment))
++
++======================
++markdown comment single line
++======================
++
++/// Hello
++
++---
++
++(program
++  (markdown_comment))
++
++======================
++markdown comment consecutive lines
++======================
++
++/// First
++  /// Second
++
++///   Third
++/// Fourth
++
++---
++
++(program
++  (markdown_comment)
++  (markdown_comment))
++
++======================
++markdown comment before method
++======================
++
++class A {
++  /// Does a thing.
++  ///
++  /// - item
++  void f() {}
++}
++
++---
++
++(program
++  (class_declaration
++    name: (identifier)
++    body: (class_body
++      (markdown_comment)
++      (method_declaration
++        type: (void_type)
++        name: (identifier)
++        parameters: (formal_parameters)
++        body: (block)))))
++
++======================
++markdown comment and other comments
++======================
++
++// plain
++/// doc
++
++---
++
++(program
++  (line_comment)
++  (markdown_comment))
+-- 
+2.55.0
+

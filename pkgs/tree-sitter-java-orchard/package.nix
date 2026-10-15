@@ -13,6 +13,7 @@ tree-sitter.buildGrammar {
     rev = "81b7484a2e249428a7b7b90c0027ac53ac6d22c8";
     hash = "sha256-lvyZ8y+6OxtydOsyl8TVoHi2wzOlzwLjWZoP4rreBRo=";
   };
+  patches = [ ./0001-feat-support-markdown_comment.patch ];
   generate = true;
 
   doCheck = true;
