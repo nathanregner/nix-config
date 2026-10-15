@@ -11,10 +11,10 @@ let
   # language name, so `tree-sitter generate` emits the `tree_sitter_<name>`
   # symbol neovim loads.
   overrides = {
-    # java = {
-    #   package = prev.local.tree-sitter-java-orchard;
-    #   grammar = "java_orchard";
-    # };
+    java = {
+      package = prev.local.tree-sitter-java-orchard;
+      grammar = "java_orchard";
+    };
   };
 
   mkGrammar =

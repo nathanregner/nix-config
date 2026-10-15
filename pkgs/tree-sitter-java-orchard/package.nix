@@ -5,7 +5,7 @@
 }:
 tree-sitter.buildGrammar {
   language = "java_orchard";
-  version = "0.5.18";
+  version = "0.5.22";
   src = fetchFromGitea {
     domain = "codeberg.org";
     owner = "grammar-orchard";
