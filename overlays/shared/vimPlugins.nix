@@ -22,6 +22,7 @@ let
     { package, grammar }:
     base.passthru.builtGrammars.${name}.overrideAttrs (old: {
       inherit (package) version src;
+      patches = (old.patches or [ ]) ++ (package.patches or [ ]);
       nativeBuildInputs = (old.nativeBuildInputs or [ ]) ++ [
         prev.nodejs
         prev.tree-sitter
@@ -45,21 +46,31 @@ let
   substitute =
     set: set // grammars // lib.mapAttrs' (name: g: lib.nameValuePair "tree-sitter-${name}" g) grammars;
 
+  # The stock java queries don't compile against the orchard grammar. `withPlugins`
+  # rebuilds from the unoverridden plugin, so its result has to be patched as well.
+  patchQueries =
+    plugin:
+    plugin.overrideAttrs (old: {
+      patches = (old.patches or [ ]) ++ [
+        ./patches/0001-fix-java-adapt-highlights-to-tree-sitter-java-orchard.patch
+      ];
+    });
+
   origWithPlugins = base.passthru.withPlugins;
 
-  nvim-treesitter = base.overrideAttrs (old: {
-    # The stock java queries don't compile against the orchard grammar.
-    patches = (old.patches or [ ]) ++ [
-      ./patches/0001-fix-java-adapt-highlights-to-tree-sitter-java-orchard.patch
-    ];
+  nvim-treesitter = (patchQueries base).overrideAttrs (old: {
     passthru = old.passthru // {
       builtGrammars = substitute old.passthru.builtGrammars;
       grammarPlugins =
         old.passthru.grammarPlugins // lib.mapAttrs (_: prev.neovimUtils.grammarToPlugin) grammars;
-      withPlugins = f: origWithPlugins (set: f (substitute set));
-      withAllGrammars = origWithPlugins (
-        _:
-        map (g: grammars.${lib.removePrefix "tree-sitter-" (lib.getName g)} or g) old.passthru.allGrammars
+      withPlugins = f: patchQueries (origWithPlugins (set: f (substitute set)));
+      withAllGrammars = patchQueries (
+        origWithPlugins (
+          _:
+          map (
+            g: grammars.${lib.removePrefix "tree-sitter-" (lib.getName g)} or g
+          ) old.passthru.allGrammars
+        )
       );
     };
   });

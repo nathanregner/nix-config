@@ -35,6 +35,7 @@ vim.opt.shortmess:append("A")
 vim.g.fugitive_legacy_commands = 0
 
 require("user.treesitter")
+require("user.markdown-comments")
 require("user.shada").setup()
 
 ---@param spec LazyPluginSpec

@@ -21,6 +21,7 @@ html
 hyprlang
 ini
 java
+javadoc
 javascript
 jq
 json

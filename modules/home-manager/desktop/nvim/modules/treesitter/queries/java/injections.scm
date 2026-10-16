@@ -34,3 +34,13 @@
   (#match? @_name "NativeQuery|Formula")
   (#set! injection.language "sql")
 )
+
+; Markdown doc comments https://openjdk.org/jeps/467
+((markdown_comment) @injection.content
+  (#set! injection.language "markdown")
+  (#set! injection.strip-prefix "///"))
+
+; Block and inline tags (@param, {@link}, ...) that Markdown doesn't know about. The javadoc
+; grammar expects the `///` prefix.
+((markdown_comment) @injection.content
+  (#set! injection.language "javadoc"))
