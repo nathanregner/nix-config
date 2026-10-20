@@ -18,13 +18,13 @@
         file = "share/zsh-vi-mode/zsh-vi-mode.plugin.zsh";
       }
     ];
-    initExtraFirst = ''
-      ZVM_SYSTEM_CLIPBOARD_ENABLED=true
-      ZVM_VI_INSERT_ESCAPE_BINDKEY=jk
-    '';
     initContent = lib.mkMerge [
       # zprof must be loaded before everything else, since it
       # benchmarks the shell initialization.
+      (lib.mkBefore ''
+        ZVM_SYSTEM_CLIPBOARD_ENABLED=true
+        ZVM_VI_INSERT_ESCAPE_BINDKEY=jk
+      '')
       (lib.mkOrder 400 /* zsh */ ''
         if [ -n "$ZPROF" ]; then zmodload zsh/zprof; fi
       '')
