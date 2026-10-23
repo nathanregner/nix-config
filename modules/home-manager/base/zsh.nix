@@ -82,7 +82,7 @@
         # https://github.com/NixOS/nixpkgs/issues/275770
         complete -C aws_completer aws
 
-        ${lib.optionalString pkgs.stdenv.isDarwin ''
+        ${lib.optionalString pkgs.stdenv.hostPlatform.isDarwin ''
           source ${./zsh/completions/_launchctl}
         ''}
       ''
@@ -90,7 +90,7 @@
     oh-my-zsh.enable = false;
     shellAliases =
       let
-        sys = if pkgs.stdenv.isDarwin then "darwin" else "os";
+        sys = if pkgs.stdenv.hostPlatform.isDarwin then "darwin" else "os";
       in
       {
         nrb = "nh ${sys} build .";

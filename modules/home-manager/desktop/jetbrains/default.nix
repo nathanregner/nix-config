@@ -107,7 +107,7 @@ in
     };
 
     # TODO: move to cfg.tools
-    programs.zsh.shellAliases = lib.optionalAttrs pkgs.stdenv.isDarwin (
+    programs.zsh.shellAliases = lib.optionalAttrs pkgs.stdenv.hostPlatform.isDarwin (
       builtins.mapAttrs (
         name: cfg: "open -na ~/Applications/${cfg.darwinAppGlob}/Contents/MacOS/${name} --args"
       ) cfg.tools

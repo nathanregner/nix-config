@@ -8,7 +8,7 @@ let
   cfg = config.programs.tmux-sessionizer;
   tomlFormat = pkgs.formats.toml { };
 
-  configDir = if pkgs.stdenv.isDarwin then "Library/Application Support" else config.xdg.configHome;
+  configDir = if pkgs.stdenv.hostPlatform.isDarwin then "Library/Application Support" else config.xdg.configHome;
 in
 {
   options.programs.tmux-sessionizer = {

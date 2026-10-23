@@ -24,7 +24,7 @@
     };
   };
 
-  home.packages = lib.optionals (!pkgs.stdenv.isDarwin) [
+  home.packages = lib.optionals (!pkgs.stdenv.hostPlatform.isDarwin) [
     (pkgs.runCommand "firefox" { nativeBuildInputs = [ pkgs.makeWrapper ]; } ''
       makeWrapper ${lib.getExe config.programs.firefox.package} $out/bin/firefox
     '')
