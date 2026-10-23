@@ -88,7 +88,7 @@ in
             "Read(**/secrets/**)"
           ];
         };
-        tui = "default";
+        tui = "fullscreen";
       };
     };
 
