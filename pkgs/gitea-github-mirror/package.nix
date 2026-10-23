@@ -33,7 +33,7 @@ let
           ];
         }
         ''
-          cat '${src}/templates/swagger/v1_json.tmpl' |
+          cat '${src}/templates/swagger/v1-openapi3.generated.json' |
             jq '.info.version="${version}"' |
             jq '.basePath="localhost"' |
             jq '.definitions.Repository.required=["owner", "name"]' \
