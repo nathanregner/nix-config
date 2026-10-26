@@ -19,13 +19,13 @@ in
       type = types.nullOr types.package;
       readOnly = true;
       default = pkgs.unstable.writers.writeNuBin "jdtls" {
-          makeWrapperArgs = [
-            "--prefix"
-            "PATH"
-            ":"
-            "${lib.makeBinPath [ pkgs.unstable.jdt-language-server ]}"
-          ];
-        } ./jdtls.nu;
+        makeWrapperArgs = [
+          "--prefix"
+          "PATH"
+          ":"
+          "${lib.makeBinPath [ pkgs.unstable.jdt-language-server ]}"
+        ];
+      } ./jdtls.nu;
     };
   };
 
@@ -34,6 +34,7 @@ in
       extraPackages = with pkgs.unstable; [
         config.programs.neovim.modules.java.finalPackage
         local.spring-javaformat
+        local.intellij-server
       ];
 
       lua.globals = {
