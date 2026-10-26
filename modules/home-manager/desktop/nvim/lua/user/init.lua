@@ -37,6 +37,7 @@ vim.g.fugitive_legacy_commands = 0
 require("user.treesitter")
 require("user.markdown-comments")
 require("user.shada").setup()
+require("user.jar")
 
 ---@param spec LazyPluginSpec
 ---@return LazyPluginSpec

@@ -15,24 +15,11 @@ in
       default = true;
     };
 
-    finalPackage = mkOption {
-      type = types.nullOr types.package;
-      readOnly = true;
-      default = pkgs.unstable.writers.writeNuBin "jdtls" {
-        makeWrapperArgs = [
-          "--prefix"
-          "PATH"
-          ":"
-          "${lib.makeBinPath [ pkgs.unstable.jdt-language-server ]}"
-        ];
-      } ./jdtls.nu;
-    };
   };
 
   config = mkIf cfg.enable {
     programs.neovim = {
       extraPackages = with pkgs.unstable; [
-        config.programs.neovim.modules.java.finalPackage
         local.spring-javaformat
         local.intellij-server
       ];
@@ -41,11 +28,6 @@ in
         junit_jar = pkgs.fetchurl {
           url = "https://repo1.maven.org/maven2/org/junit/platform/junit-platform-console-standalone/1.10.1/junit-platform-console-standalone-1.10.1.jar";
           hash = "sha256-tC6qU9E1dtF9tfuLKAcipq6eNtr5X0JivG6W1Msgcl8=";
-        };
-        jdtls = {
-          lombok = "${pkgs.local.lombok}/share/java/lombok.jar";
-          settings = {
-          };
         };
       };
     };
