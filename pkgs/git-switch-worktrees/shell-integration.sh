@@ -8,3 +8,6 @@ wt() {
     return 1
   fi
 }
+
+# An executable can't change the shell's cwd, so this has to be a function.
+gwt() { wt "$@"; }

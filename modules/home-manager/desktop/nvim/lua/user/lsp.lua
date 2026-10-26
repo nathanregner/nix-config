@@ -230,6 +230,12 @@ local servers = {
       },
     },
   },
+  -- https://www.jetbrains.com/help/intellij-vscode/About-instance.html
+  intellij_server = {
+    cmd = { "intellij-server", "--stdio" },
+    filetypes = { "java", "kotlin" },
+    root_markers = { "settings.gradle", "settings.gradle.kts", "pom.xml", "build.gradle", "build.gradle.kts", ".git" },
+  },
   lua_ls = {
     Lua = {
       workspace = { checkThirdParty = false },
