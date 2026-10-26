@@ -232,7 +232,10 @@ local servers = {
   },
   -- https://www.jetbrains.com/help/intellij-vscode/About-instance.html
   intellij_server = {
-    cmd = { "intellij-server", "--stdio" },
+    cmd = vim.list_extend(
+      { "intellij-server", "--stdio" },
+      vim.g.nix.intellij_server and { "--license-key-file=" .. vim.g.nix.intellij_server.license_key_file } or {}
+    ),
     filetypes = { "java", "kotlin" },
     root_markers = { "settings.gradle", "settings.gradle.kts", "pom.xml", "build.gradle", "build.gradle.kts", ".git" },
   },

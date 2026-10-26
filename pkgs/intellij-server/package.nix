@@ -74,7 +74,10 @@ stdenv.mkDerivation {
     mkdir -p $out/share/intellij-server $out/bin
     cp -r . $out/share/intellij-server
     # the launcher locates the bundled runtime relative to itself
-    makeWrapper $out/share/intellij-server/bin/intellij-server $out/bin/intellij-server
+    # the server refuses to start until it is given the leading 16 hex chars of the bundled EULA's sha256
+    eulaHash=$(sha256sum $out/share/intellij-server/EULA.txt | cut -c1-16)
+    makeWrapper $out/share/intellij-server/bin/intellij-server $out/bin/intellij-server \
+      --add-flags "--eula=$eulaHash"
 
     runHook postInstall
   '';
