@@ -34,7 +34,7 @@ in
 
     programs.git.ignores = [
       ".classpath"
-      ".eclipse"
+      ".eclipe"
       ".factorypath"
       ".project"
       ".settings"

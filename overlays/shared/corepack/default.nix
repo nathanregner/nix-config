@@ -1,11 +1,11 @@
+# Adds completions via a wrapper so the corepack build itself is not rebuilt.
 prev: pkg:
-pkg.overrideAttrs (oldAttrs: {
-  nativeBuildInputs = oldAttrs.nativeBuildInputs ++ [
-    prev.installShellFiles
+prev.symlinkJoin {
+  inherit (pkg) name meta;
+  paths = [
+    pkg
+    (prev.runCommand "${pkg.name}-completions" { nativeBuildInputs = [ prev.installShellFiles ]; } ''
+      installShellCompletion --cmd pnpm --zsh ${./_pnpm}
+    '')
   ];
-  installPhase = ''
-    ${oldAttrs.installPhase or ""}
-    installShellCompletion --cmd pnpm \
-      --zsh ${./_pnpm}
-  '';
-})
+}

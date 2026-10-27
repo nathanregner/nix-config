@@ -1,0 +1,70 @@
+direnv: loading ~/configs/.envrc                                                                                                                                                                                        
+direnv: using flake .?submodules=1
+nvdirenv: nix-direnv: Using cached dev shell
+idirenv: export +CONFIG_SHELL +HOST_PATH +IN_NIX_SHELL +MACOSX_DEPLOYMENT_TARGET +NIX_BUILD_CORES +NIX_CFLAGS_COMPILE +NIX_DONT_SET_RPATH +NIX_DONT_SET_RPATH_FOR_BUILD +NIX_ENFORCE_NO_NATIVE +NIX_IGNORE_LD_THROUGH_GCC +NIX_NO_SELF_RPATH +NIX_STORE +PATH_LOCALE +SOURCE_DATE_EPOCH +__darwinAllowLocalNetworking +__impureHostDeps +__propagatedImpureHostDeps +__propagatedSandboxProfile +__sandboxProfile +__structuredAttrs +allowSubstitutes +buildInputs +buildPhase +builder +cmakeFlags +configureFlags +depsBuildBuild +depsBuildBuildPropagated +depsBuildTarget +depsBuildTargetPropagated +depsHostHost +depsHostHostPropagated +depsTargetTarget +depsTargetTargetPropagated +doCheck +doInstallCheck +dontAddDisableDepTrack +mesonFlags +name +nativeBuildInputs +out +outputs +patches +phases +preferLocalBuild +propagatedBuildInputs +propagatedNativeBuildInputs +shell +shellHook +stdenv +strictDeps +system ~PATH
+
+k8s=dev() configs on  master (afdeeb1) via ❄️impure (nix-shell-env) on  default (us-west-2) 
+❯ nvim nix-config/pkgs/log4jdbc-agent/src/log4jdbc/agent/Log4jdbcAgent.java
+direnv: loading ~/configs/.envrc                                                                                                                                                                                        
+direnv: using flake .?submodules=1
+direnv: nix-direnv: Using cached dev shell
+direnv: export +CONFIG_SHELL +HOST_PATH +IN_NIX_SHELL +MACOSX_DEPLOYMENT_TARGET +NIX_BUILD_CORES +NIX_CFLAGS_COMPILE +NIX_DONT_SET_RPATH +NIX_DONT_SET_RPATH_FOR_BUILD +NIX_ENFORCE_NO_NATIVE +NIX_IGNORE_LD_THROUGH_GCC +NIX_NO_SELF_RPATH +NIX_STORE +PATH_LOCALE +SOURCE_DATE_EPOCH +__darwinAllowLocalNetworking +__impureHostDeps +__propagatedImpureHostDeps +__propagatedSandboxProfile +__sandboxProfile +__structuredAttrs +allowSubstitutes +buildInputs +buildPhase +builder +cmakeFlags +configureFlags +depsBuildBuild +depsBuildBuildPropagated +depsBuildTarget +depsBuildTargetPropagated +depsHostHost +depsHostHostPropagated +depsTargetTarget +depsTargetTargetPropagated +doCheck +doInstallCheck +dontAddDisableDepTrack +mesonFlags +name +nativeBuildInputs +out +outputs +patches +phases +preferLocalBuild +propagatedBuildInputs +propagatedNativeBuildInputs +shell +shellHook +stdenv +strictDeps +system ~PATH
+
+k8s=dev() configs on  master (afdeeb1) via ❄️impure (nix-shell-env) on  default (us-west-2) took 3m33s 
+❯ nv
+
+k8s=dev() configs on  master (afdeeb1) via ❄️impure (nix-shell-env) on  default (us-west-2) 
+❯ 
+
+k8s=dev() configs on  master (afdeeb1) via ❄️impure (nix-shell-env) on  default (us-west-2) 
+❯ nix-config/pkgs/spring-javaformat/pom.xml
+zsh: permission denied: nix-config/pkgs/spring-javaformat/pom.xml
+
+k8s=dev() configs on  master (afdeeb1) via ❄️impure (nix-shell-env) on  default (us-west-2) 
+❯ nix-config/pkgs/spring-javaformat/        
+direnv: loading ~/configs/nix-config/.envrc
+direnv: using flake
+ldirenv: nix-direnv: Using cached dev shell
+s🔨 Welcome to devshell
+
+[[general commands]]
+
+  menu - prints this menu
+
+direnv: export +DEVSHELL_DIR +IN_NIX_SHELL +NIXPKGS_PATH +PRJ_DATA_DIR +PRJ_ROOT +name ~PATH ~XDG_DATA_DIRS
+                                                                                                                                                                                                                        
+
+k8s=dev() nix-config/pkgs/spring-javaformat on  mac (23ba8ed) via 🅼 via ❄️impure (devshell-env) on  default (us-west-2) 
+❯ ls
+ package.nix   pom.xml  󰣞 src   target   target-jdtls
+
+k8s=dev() nix-config/pkgs/spring-javaformat on  mac (23ba8ed) via 🅼 via ❄️impure (devshell-env) on  default (us-west-2) 
+❯ nvim 
+
+k8s=dev() nix-config/pkgs/spring-javaformat on  mac (23ba8ed) via 🅼 via ❄️impure (devshell-env) on  default (us-west-2) 
+❯ nvim src/main/
+  1                                                                                                                                                                                                                     
+~                                                                                                                                                                                                                       
+~                                                                                                                                                                                                                       
+~                                                                                                                                                                                                                       
+~                                                                                                                                                                                                                       
+~                                                                                                                                                                                                                       
+~                                                                                                                                                                                                                       
+~                                                                                                                                                                                                                       
+~                                                                                                                                                                                                                       
+~                                                                                                                                                                                                                       
+~                                                                                                                                                                                                                       
+~                                                                                                                                                                                                                       
+~                                                                                                                                                                                                                       
+~                                                                                                                                                                                                                       
+~                                                                                                                                                                                                                       
+~                                                                                                                                                                                                                       
+~                                                                                                                                                                                                                       
+~                                                                                                                                                                                                                       
+~                                                                                                                                                                                                                       
+~                                                                                                                                                                                                                       
+~                                                                                                                                                                                                                       
+~                                                                                                                                                                                                                       
+~                                                                                                                                                                                                                       
+~                                                                                                                                                                                                                       
+ NORMAL  jar:///Users/nathan.regner/.nix-profile/lib/src.zip!/java.base/java/lang/Appendable.java                                                                                           unix | java  Top    1:1  
