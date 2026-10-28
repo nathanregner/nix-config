@@ -31,7 +31,7 @@
       url = "github:serokell/deploy-rs";
       inputs = {
         flake-compat.follows = "flake-compat";
-        nixpkgs.follows = "nixpkgs";
+        nixpkgs.follows = "nixpkgs-unstable";
       };
     };
     devshell = {
