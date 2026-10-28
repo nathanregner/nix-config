@@ -99,6 +99,7 @@ in
             nixfmt
             prettierd
             shfmt
+            sqlfluff
             stylua
             taplo
             ;
@@ -117,6 +118,10 @@ in
     };
 
     xdg.configFile = {
+      "sqlfluff/.sqlfluff" = {
+        source = config.lib.file.mkFlakeSymlink ./sqlfluff;
+        force = true;
+      };
       "nvim/lazy-lock.json" = {
         source = config.lib.file.mkFlakeSymlink ./lazy-lock.json;
         force = true;
