@@ -27,6 +27,12 @@
           serverPort = 5001;
           dbs = [
             {
+              name = "services";
+              host = "services-ro.clickbank-tst.net";
+              user = "nathan.regner";
+              passwordEnv = "NREGNER_PASSWORD";
+            }
+            {
               name = "useradmin";
               host = "tstdb-ro.clickbank-tst.net";
               user = "svc_useradmin_ro";
@@ -48,6 +54,7 @@
                 port = lib.toInt (toString (db.port or 3306));
                 database = db.name;
                 password = "\${${db.passwordEnv}}";
+                readOnly = "true";
               };
             }) dbs
           );
@@ -105,7 +112,8 @@
 
       mcpToolboxPermissions = lib.concatLists (
         lib.mapAttrsToList (
-          env: { dbs, ... }:
+          env:
+          { dbs, ... }:
           builtins.concatMap (db: [
             "mcp__mcp-toolbox-${env}__${db.name}_execute_sql"
             "mcp__mcp-toolbox-${env}__${db.name}_list_tables"
