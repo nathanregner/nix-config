@@ -27,7 +27,7 @@
           serverPort = 5001;
           dbs = [
             {
-              name = "services";
+              name = "offer";
               host = "services-ro.clickbank-tst.net";
               user = "nathan.regner";
               passwordEnv = "NREGNER_PASSWORD";
@@ -54,7 +54,6 @@
                 port = lib.toInt (toString (db.port or 3306));
                 database = db.name;
                 password = "\${${db.passwordEnv}}";
-                readOnly = "true";
               };
             }) dbs
           );
