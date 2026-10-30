@@ -20,7 +20,8 @@ def setup-bare-repo [src: path] {
     | where {|it| $it =~ '^(remote|branch)\.' }
     | each {|entry| $entry | split row --number 2 "=" }
 
-  let temp = mktemp -d $"(basename $src)-bare.XXXXXXXXXX" | path join ".git"
+  # Must live outside $src: the source is trashed once the worktrees are copied
+  let temp = mktemp -d --tmpdir-path ($src | path dirname) $"(basename $src)-bare.XXXXXXXXXX" | path join ".git"
   log info $"Cloning bare repo into ($temp)..."
   git clone --bare $src $temp
   cd $temp

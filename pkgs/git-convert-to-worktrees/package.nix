@@ -4,12 +4,13 @@
   lib,
   nushell,
   runCommandLocal,
+  symlinkJoin,
   trash-cli,
   writableTmpDirAsHomeHook,
   writers,
 }:
 let
-  pkg = writers.writeNuBin "git-convert-to-worktrees" {
+  unwrapped = writers.writeNuBin "git-convert-to-worktrees" {
     makeWrapperArgs = [
       "--prefix"
       "PATH"
@@ -17,10 +18,8 @@ let
       "${lib.makeBinPath [ trash-cli ]}"
     ];
   } ./convert-to-worktrees.nu;
-in
-pkg
-// {
-  passthru.tests = lib.mapAttrs' (path: _: {
+
+  tests = lib.mapAttrs' (path: _: {
     name = lib.strings.replaceString ".nu" "" path;
     value =
       runCommandLocal "git-convert-to-worktrees-${path}"
@@ -28,7 +27,7 @@ pkg
           nativeBuildInputs = [
             git
             nushell
-            pkg
+            unwrapped
             writableTmpDirAsHomeHook
             gitSetupHook
             # addBinToPathHook
@@ -39,4 +38,11 @@ pkg
           nu ${./tests + "/${path}"} $out
         '';
   }) (builtins.readDir ./tests);
+in
+symlinkJoin {
+  inherit (unwrapped) name meta;
+  paths = [ unwrapped ];
+  # Referencing the tests makes them build dependencies of the package itself
+  checks = lib.attrValues tests;
+  passthru = { inherit tests; };
 }
