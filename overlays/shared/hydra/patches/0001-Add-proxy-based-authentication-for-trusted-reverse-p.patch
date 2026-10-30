@@ -1,4 +1,4 @@
-From 9d1410ce039cec30d05bbef66f84bbf7b2a194d6 Mon Sep 17 00:00:00 2001
+From 118f20c7b7b5ea651f3725bf6e1b45ebf17135dd Mon Sep 17 00:00:00 2001
 From: Nathan Regner <nathanregner@gmail.com>
 Date: Sat, 2 May 2026 11:00:43 -0600
 Subject: [PATCH] Add proxy-based authentication for trusted reverse proxy
@@ -29,12 +29,12 @@ Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>
  create mode 100644 subprojects/hydra-tests/Hydra/Controller/User/proxy-auth.t
 
 diff --git a/subprojects/hydra-manual/src/configuration.md b/subprojects/hydra-manual/src/configuration.md
-index fa2da07f..0f9da35f 100644
+index cd2e5a2f..0b473d6e 100644
 --- a/subprojects/hydra-manual/src/configuration.md
 +++ b/subprojects/hydra-manual/src/configuration.md
-@@ -241,6 +241,61 @@ When Hydra uses the deprecated YAML file, Hydra applies the following default ro
+@@ -358,6 +358,61 @@ the two need not use the same names. Hydra validates the mapping at startup.
  
- Note that configuring both the LDAP parameters in the hydra.conf and via the environment variable is a fatal error.
+ See the [OIDC documentation](oidc.md) for all settings, role handling, sign-out, and examples for Authentik and GitHub.
  
 +Proxy-Based Authentication
 +--------------------------
@@ -266,12 +266,12 @@ index 00000000..20f30334
 +
 +done_testing;
 diff --git a/subprojects/hydra/lib/Hydra/Controller/Root.pm b/subprojects/hydra/lib/Hydra/Controller/Root.pm
-index 4c73b270..73561a63 100644
+index bf55aaa1..272c7b45 100644
 --- a/subprojects/hydra/lib/Hydra/Controller/Root.pm
 +++ b/subprojects/hydra/lib/Hydra/Controller/Root.pm
-@@ -62,6 +62,17 @@ sub begin :Private {
-     $c->stash->{successMsg} = $c->flash->{successMsg};
+@@ -78,6 +78,17 @@ sub begin :Private {
      $c->stash->{localStore} = isLocalStore;
+     $c->stash->{logoutToken} = logoutToken($c) if $c->user_exists;
  
 +    # TODO: if user_exists but header contains different username, existing session wins
 +    if ($c->config->{using_frontend_proxy} && $c->config->{proxy_auth} && !$c->user_exists) {
@@ -285,15 +285,15 @@ index 4c73b270..73561a63 100644
 +    }
 +
      $c->stash->{isPrivateHydra} = $c->config->{private} // "0" ne "0";
+     $c->stash->{enableSearch} = $c->config->{search_enable} // "1" ne "0";
  
-     if ($c->stash->{isPrivateHydra} && ! noLoginNeeded($c)) {
 diff --git a/subprojects/hydra/lib/Hydra/Controller/User.pm b/subprojects/hydra/lib/Hydra/Controller/User.pm
-index 2a38c411..7775c08e 100644
+index 36595b30..fabb0c3b 100644
 --- a/subprojects/hydra/lib/Hydra/Controller/User.pm
 +++ b/subprojects/hydra/lib/Hydra/Controller/User.pm
-@@ -25,6 +25,11 @@ sub login :Local :Args(0) :ActionClass('REST') { }
- sub login_POST {
-     my ($self, $c) = @_;
+@@ -32,6 +32,11 @@ sub login_POST {
+     accessDenied($c, "Signing in with a password is disabled on this Hydra.")
+         unless passwordSigninEnabled($c->config);
  
 +    if ($c->config->{proxy_auth} &&
 +        ($c->config->{proxy_auth}->{disable_password_login} // 0) ne "0") {
@@ -303,8 +303,8 @@ index 2a38c411..7775c08e 100644
      my $username = $c->stash->{params}->{username} // "";
      my $password = $c->stash->{params}->{password} // "";
  
-@@ -91,6 +96,49 @@ sub doLDAPLogin {
-     $c->set_authenticated($user);
+@@ -167,6 +172,49 @@ sub valid_email_address {
+     return length($1) <= 64 && length($2) <= 253;
  }
  
 +sub doProxyLogin {
@@ -351,8 +351,8 @@ index 2a38c411..7775c08e 100644
 +}
 +
  sub doEmailLogin {
-     my ($self, $c, $type, $email, $fullName) = @_;
- 
+     my ($self, $c, %args) = @_;
+     my ($type, $email, $fullName) = @args{qw(type email fullName)};
 -- 
-2.51.2
+2.56.0
 
