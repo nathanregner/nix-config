@@ -20,6 +20,33 @@ return {
         end,
         desc = "Diffview Open ma{in,aster}",
       },
+      {
+        "<leader>db",
+        function()
+          vim.ui.select(git.branches(), { prompt = "Diff against branch point of:" }, function(branch)
+            if not branch then return end
+            local base = git.merge_base(branch)
+            if not base then
+              vim.notify("No merge base with " .. branch, vim.log.levels.ERROR)
+              return
+            end
+            vim.cmd({ cmd = "DiffviewOpen", args = { base } })
+          end)
+        end,
+        desc = "Diffview Open branch point of...",
+      },
+      {
+        "<leader>df",
+        function()
+          local commit = git.fork_point()
+          if not commit then
+            vim.notify("No fork point found", vim.log.levels.ERROR)
+            return
+          end
+          vim.cmd({ cmd = "DiffviewOpen", args = { commit } })
+        end,
+        desc = "Diffview Open fork point",
+      },
       { "<leader>du", "<cmd>DiffviewOpen @{u}<cr>", desc = "Diffview Open upstream" },
     }
   end,
