@@ -46,12 +46,6 @@ in
             ];
           }) hooks)
         ) config.programs.claude-code.merged-hooks;
-        model = "claude-opus-4-5";
-        availableModels = [
-          "claude-sonnet-4-5"
-          "claude-opus-4-5"
-          "haiku"
-        ];
         statusLine = {
           type = "command";
           command = "${config.home.homeDirectory}/.claude/statusline";
