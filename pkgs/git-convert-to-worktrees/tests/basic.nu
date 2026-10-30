@@ -1,8 +1,9 @@
 use std/assert
 
 def main [out: string] {
-  mkdir $out
-  cd $out
+  let repo = $out | path join repo
+  mkdir $repo
+  cd $repo
 
   git init -b master
 
