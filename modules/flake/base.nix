@@ -4,6 +4,7 @@
     imports = with inputs.self.modules.nixos; [
       multiverse
       nh
+      pki
       sops
       tailscale
     ];
@@ -13,6 +14,7 @@
     imports = with inputs.self.modules.darwin; [
       multiverse
       nh
+      pki
       sops
       tailscale
     ];
