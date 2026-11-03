@@ -28,7 +28,7 @@
       imports = [ inputs.sops-nix.homeManagerModule ];
       sops.age.sshKeyPaths = lib.mkDefault [ keyPath ];
 
-      home.sessionVariables.SOPS_AGE_KEY_CMD = pkgs.writers.writeBash "sops-age-key" {
+      home.sessionVariables.SOPS_AGE_SSH_PRIVATE_KEY_CMD = pkgs.writers.writeBash "sops-age-key" {
         makeWrapperArgs = [
           "--prefix"
           "PATH"
