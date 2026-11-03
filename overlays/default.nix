@@ -27,13 +27,5 @@ rec {
       ];
     };
     inherit (unstable) tmux;
-
-    inherit
-      (import inputs.nixpkgs-hydra {
-        inherit (stableFinal.stdenv.hostPlatform) system;
-        overlays = [ modifications ];
-      })
-      hydra
-      ;
   };
 }

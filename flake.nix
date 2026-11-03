@@ -3,9 +3,6 @@
     # Nix
     nixpkgs.url = "github:nixos/nixpkgs/release-26.05";
     nixpkgs-unstable.url = "github:nixos/nixpkgs/nixpkgs-unstable";
-    # last hydra compatible with the stable hydra module and SSH build machines (hydra-sentinel);
-    # newer versions require services.hydra.dbUrl and gRPC builders (nixos-26.11)
-    nixpkgs-hydra.url = "github:nixos/nixpkgs/c9fe7d12cd78d1adcd12dd15e24432dde5b155a0";
     home-manager = {
       url = "github:nix-community/home-manager/release-26.05";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -56,7 +53,7 @@
     flake-compat.url = "github:edolstra/flake-compat";
     flake-parts.url = "github:hercules-ci/flake-parts";
     hydra-sentinel = {
-      url = "github:nathanregner/hydra-sentinel";
+      url = "github:nathanregner/hydra-sentinel?ref=grpc-builders";
       inputs = {
         flake-parts.follows = "flake-parts";
         nixpkgs.follows = "nixpkgs-unstable";

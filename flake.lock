@@ -245,15 +245,16 @@
         ]
       },
       "locked": {
-        "lastModified": 1766943693,
-        "narHash": "sha256-uxX7fkt44+kJ5fXrs6t3dXL/Q8khtzNM647Sjoxn9oU=",
+        "lastModified": 1793727961,
+        "narHash": "sha256-YNKwYGwd2SWz36WLHSIDChg6o4ydDfvMok05k0csA4Y=",
         "owner": "nathanregner",
         "repo": "hydra-sentinel",
-        "rev": "aed80a1cc6b9496cc6fd54a2a6c1fdd7bf7b5eec",
+        "rev": "4de575d8fcf621a8b51054edcff055b408875643",
         "type": "github"
       },
       "original": {
         "owner": "nathanregner",
+        "ref": "grpc-builders",
         "repo": "hydra-sentinel",
         "type": "github"
       }
@@ -451,22 +452,6 @@
         "type": "github"
       }
     },
-    "nixpkgs-hydra": {
-      "locked": {
-        "lastModified": 1790769526,
-        "narHash": "sha256-5AIVFLRcx8YAwbFTVPTs7YhwJH7JyHfAQsvXmpovcXI=",
-        "owner": "nixos",
-        "repo": "nixpkgs",
-        "rev": "c9fe7d12cd78d1adcd12dd15e24432dde5b155a0",
-        "type": "github"
-      },
-      "original": {
-        "owner": "nixos",
-        "repo": "nixpkgs",
-        "rev": "c9fe7d12cd78d1adcd12dd15e24432dde5b155a0",
-        "type": "github"
-      }
-    },
     "nixpkgs-lib": {
       "locked": {
         "lastModified": 1790477367,
@@ -535,7 +520,6 @@
         "nixos-generators": "nixos-generators",
         "nixos-hardware": "nixos-hardware",
         "nixpkgs": "nixpkgs",
-        "nixpkgs-hydra": "nixpkgs-hydra",
         "nixpkgs-unstable": "nixpkgs-unstable",
         "pkgs-by-name-for-flake-parts": "pkgs-by-name-for-flake-parts",
         "sops-nix": "sops-nix",
