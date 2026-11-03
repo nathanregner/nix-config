@@ -71,4 +71,29 @@ in
     };
   };
 
+  # The writable store layer and nix db persist on the root disk, but the store image is replaced
+  # whenever the VM config changes. Stale entries then point into the old image, so the db lists
+  # paths that are gone and erofs reports "unsupported i_format" for stale overlay lookups. Start
+  # from a clean layer whenever the image changes; register-nix-paths reloads the db from regInfo.
+  boot.initrd.systemd.services.reset-rw-store = {
+    description = "Reset writable Nix store after a store image change";
+    requiredBy = [ "rw-sysroot-nix-store.service" ];
+    before = [ "rw-sysroot-nix-store.service" ];
+    unitConfig = {
+      DefaultDependencies = false;
+      RequiresMountsFor = "/sysroot/nix";
+    };
+    serviceConfig.Type = "oneshot";
+    script = ''
+      [[ "$(cat /proc/cmdline)" =~ regInfo=([^ ]*) ]] || exit 0
+      image="''${BASH_REMATCH[1]}"
+      marker=/sysroot/nix/.rw-store/image
+      if [[ "$(cat "$marker" 2>/dev/null)" != "$image" ]]; then
+        echo "store image changed, resetting writable store and nix db"
+        rm -rf /sysroot/nix/.rw-store /sysroot/nix/var/nix/db
+        mkdir -p /sysroot/nix/.rw-store
+        echo "$image" > "$marker"
+      fi
+    '';
+  };
 }
