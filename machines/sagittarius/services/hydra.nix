@@ -22,7 +22,7 @@ in
 
   services.hydra = {
     enable = true;
-    package = pkgs.unstable.hydra;
+    package = pkgs.hydra;
     hydraURL = "https://hydra.nregner.net";
     notificationSender = "hydra@nregner.net";
     useSubstitutes = true;
