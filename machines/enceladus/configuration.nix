@@ -24,7 +24,10 @@
 
   system.primaryUser = "nregner";
 
-  local.services.hydra-builder.enable = true;
+  local.services.hydra-builder = {
+    enable = true;
+    settings.maxJobs = 12;
+  };
 
   services.tailscale = {
     enable = true;

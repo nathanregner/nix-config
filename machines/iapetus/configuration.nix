@@ -94,6 +94,10 @@
   services.logind.settings.Login.HandlePowerKey = "suspend";
 
   local.services.hydra-builder.enable = true;
+  services.hydra-builder.settings = {
+    maxJobs = 12;
+    speedFactor = 2;
+  };
 
   services.prometheus-host-metrics.enable = lib.mkDefault true;
 

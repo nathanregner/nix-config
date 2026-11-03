@@ -1,4 +1,10 @@
-{ self, lib, ... }:
+{
+  self,
+  inputs,
+  lib,
+  pkgs,
+  ...
+}:
 {
   imports = [
     ../../../modules/nixos/base/nix.nix
@@ -9,6 +15,22 @@
   ];
 
   networking.hostName = "enceladus-linux-vm";
+
+  services.hydra-builder = {
+    enable = true;
+    package = inputs.nixpkgs-unstable.legacyPackages.${pkgs.stdenv.hostPlatform.system}.hydra-builder;
+    queueRunnerAddr = "http://sagittarius:50051";
+    settings = {
+      maxJobs = 8;
+      supportedFeatures = [
+        "benchmark"
+        "big-parallel"
+        "gccarch-armv8-a"
+        "kvm"
+        "nixos-test"
+      ];
+    };
+  };
 
   users.users.timesync = {
     isSystemUser = true;
