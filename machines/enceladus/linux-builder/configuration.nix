@@ -41,6 +41,14 @@
 
   users.groups.timesync = { };
 
+  users.users.nregner = {
+    isNormalUser = true;
+    extraGroups = [ "wheel" ];
+    openssh.authorizedKeys.keys = builtins.attrValues self.globals.ssh.userKeys.nregner;
+  };
+
+  security.sudo.wheelNeedsPassword = false;
+
   security.sudo.extraRules = [
     {
       users = [ "timesync" ];
