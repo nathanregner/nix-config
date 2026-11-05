@@ -1,35 +1,44 @@
-data "tailscale_device" "iapetus" {
-  hostname = "iapetus"
+locals {
+  # hostname => tags. Devices that aren't currently registered in the tailnet are skipped.
+  device_tags = {
+    iapetus            = ["tag:admin", "tag:builder"]
+    sagittarius        = ["tag:hydra", "tag:server"]
+    enceladus          = ["tag:admin", "tag:builder"]
+    enceladus-linux-vm = ["tag:builder"]
+  }
+
+  devices_by_hostname = {
+    for d in data.tailscale_devices.all.devices : d.hostname => d...
+    if contains(keys(local.device_tags), d.hostname)
+  }
+
+  devices = { for hostname, ds in local.devices_by_hostname : hostname => ds[0] }
 }
 
-resource "tailscale_device_tags" "iapetus" {
-  device_id = data.tailscale_device.iapetus.id
-  tags      = ["tag:admin", "tag:builder"]
+data "tailscale_devices" "all" {}
+
+resource "tailscale_device_tags" "device" {
+  for_each  = local.devices
+  device_id = each.value.id
+  tags      = local.device_tags[each.key]
 }
 
-data "tailscale_device" "sagittarius" {
-  hostname = "sagittarius"
+moved {
+  from = tailscale_device_tags.iapetus
+  to   = tailscale_device_tags.device["iapetus"]
 }
 
-resource "tailscale_device_tags" "sagittarius" {
-  device_id = data.tailscale_device.sagittarius.id
-  tags      = ["tag:hydra", "tag:server"]
+moved {
+  from = tailscale_device_tags.sagittarius
+  to   = tailscale_device_tags.device["sagittarius"]
 }
 
-data "tailscale_device" "enceladus_linux_vm" {
-  hostname = "enceladus-linux-vm"
+moved {
+  from = tailscale_device_tags.enceladus
+  to   = tailscale_device_tags.device["enceladus"]
 }
 
-resource "tailscale_device_tags" "enceladus_linux_vm" {
-  device_id = data.tailscale_device.enceladus_linux_vm.id
-  tags      = ["tag:builder"]
-}
-
-data "tailscale_device" "enceladus" {
-  hostname = "enceladus"
-}
-
-resource "tailscale_device_tags" "enceladus" {
-  device_id = data.tailscale_device.enceladus.id
-  tags      = ["tag:admin", "tag:builder"]
+moved {
+  from = tailscale_device_tags.enceladus_linux_vm
+  to   = tailscale_device_tags.device["enceladus-linux-vm"]
 }
