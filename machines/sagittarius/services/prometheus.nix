@@ -5,6 +5,7 @@
   # https://github.com/NixOS/nixpkgs/blob/nixos-24.05/nixos/modules/services/monitoring/prometheus/default.nix
   services.prometheus = {
     enable = true;
+    retentionTime = "180d";
     scrapeConfigs = [
       {
         job_name = "host_metrics";
