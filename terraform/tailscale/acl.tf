@@ -86,6 +86,11 @@ resource "tailscale_acl" "acl" {
           accept = ["builder"]
         },
         {
+          src    = "enceladus"
+          dst    = ["enceladus-linux-vm"]
+          accept = ["nregner"]
+        },
+        {
           src    = "sagittarius"
           dst    = ["iapetus"]
           accept = ["nregner"]
