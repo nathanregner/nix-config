@@ -1,4 +1,5 @@
 {
+  self,
   inputs,
   config,
   lib,
@@ -16,7 +17,7 @@
 
   config = lib.mkMerge [
     {
-      services.hydra-queue-builder-dev.queueRunnerAddr = lib.mkDefault "http://sagittarius:50051";
+      services.hydra-queue-builder-dev.queueRunnerAddr = lib.mkDefault "http://sagittarius:${toString self.globals.services.hydra.grpcPort}";
     }
     (lib.mkIf config.local.services.hydra-builder.enable {
       services.hydra-queue-builder-dev.enable = true;

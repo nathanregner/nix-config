@@ -55,7 +55,10 @@ in
   services.hydra-queue-runner-dev = {
     enable = true;
     # builders connect over tailscale; see networking.firewall below
-    grpc.address = "[::]";
+    grpc = {
+      address = "[::]";
+      port = self.globals.services.hydra.grpcPort;
+    };
     settings = {
       useSubstitutes = true;
       maxOutputSize = 4 * 1024 * 1024 * 1024;

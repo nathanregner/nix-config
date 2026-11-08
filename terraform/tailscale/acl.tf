@@ -40,6 +40,12 @@ resource "tailscale_acl" "acl" {
           dst    = ["sagittarius:${local.globals.services.hydra.port}"]
         },
         {
+          # hydra builders dial the queue runner over gRPC
+          action = "accept"
+          src    = ["tag:builder"]
+          dst    = ["sagittarius:${local.globals.services.hydra.grpcPort}"]
+        },
+        {
           action = "accept"
           src    = ["tag:server"]
           dst    = ["sagittarius:${local.globals.services.restic-server.port}"]

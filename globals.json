@@ -1,6 +1,6 @@
 {
   "services": {
-    "hydra": { "port": 3001 },
+    "hydra": { "port": 3001, "grpcPort": 50051 },
     "prometheus": {
       "node": { "port": 9001 }
     },

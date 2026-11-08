@@ -16,7 +16,7 @@
 
   services.hydra-queue-builder-dev = {
     enable = true;
-    queueRunnerAddr = "http://sagittarius:50051";
+    queueRunnerAddr = "http://sagittarius:${toString self.globals.services.hydra.grpcPort}";
     settings = {
       maxJobs = 8;
       supportedFeatures = [
