@@ -100,13 +100,22 @@ in
         languages = {
           languages = builtins.mapAttrs (
             _: language:
-            language
-            // {
-              grammar = {
-                inherit (language.grammar) symbol;
-                source.path = parserPath language.grammar.package;
-              };
-            }
+            lib.filterAttrs (_: v: v != null) (
+              language
+              // {
+                grammar = lib.filterAttrs (_: v: v != null) {
+                  inherit (language.grammar) symbol;
+                  source.path = parserPath language.grammar.package;
+                };
+                queries =
+                  if language.queries == null then
+                    null
+                  else
+                    {
+                      formatting.source.path = "${language.queries}";
+                    };
+              }
+            )
           ) cfg.languages;
         };
       in
