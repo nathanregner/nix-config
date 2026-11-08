@@ -76,7 +76,7 @@ in
   config = lib.mkIf (cfg.enable && cfg.languages or null != null) {
     xdg.configFile."topiary/languages".source = "${pkgs.runCommandLocal "topiary-queries" { } ''
       mkdir $out
-      cp ${package}/share/queries/* $out/
+      cp -r --no-preserve=mode ${package}/share/queries/* $out/
       ${builtins.concatStringsSep "\n" (
         lib.mapAttrsToList (name: language: ''
           if [ ! -f "${parserPath language.grammar.package}" ]; then
