@@ -52,6 +52,8 @@
     };
     flake-compat.url = "github:edolstra/flake-compat";
     flake-parts.url = "github:hercules-ci/flake-parts";
+    # don't follow nixpkgs: hydra pins the nixpkgs/nix it's tested against
+    hydra.url = "github:NixOS/hydra";
     hydra-sentinel = {
       url = "github:nathanregner/hydra-sentinel?ref=grpc-builders";
       inputs = {

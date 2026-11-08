@@ -1,8 +1,6 @@
 {
   self,
-  inputs,
   lib,
-  pkgs,
   ...
 }:
 {
@@ -16,9 +14,8 @@
 
   networking.hostName = "enceladus-linux-vm";
 
-  services.hydra-builder = {
+  services.hydra-queue-builder-dev = {
     enable = true;
-    package = inputs.nixpkgs-unstable.legacyPackages.${pkgs.stdenv.hostPlatform.system}.hydra-builder;
     queueRunnerAddr = "http://sagittarius:50051";
     settings = {
       maxJobs = 8;
