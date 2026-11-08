@@ -69,12 +69,6 @@ resource "tailscale_acl" "acl" {
         dst    = ["tag:builder", "tag:server", "tag:admin"]
         users  = ["autogroup:nonroot", "root"]
       },
-      {
-        action = "accept"
-        src    = ["group:admin", "tag:admin", "tag:hydra"]
-        dst    = ["tag:builder"]
-        users  = ["autogroup:nonroot", "root"]
-      },
     ]
 
     # https://tailscale.com/kb/1337/acl-syntax#sshtests
@@ -82,23 +76,8 @@ resource "tailscale_acl" "acl" {
     sshTests = [
       for test in [
         {
-          src    = "sagittarius"
-          dst    = ["enceladus"]
-          accept = ["nregner"]
-        },
-        {
-          src    = "sagittarius"
-          dst    = ["enceladus-linux-vm"]
-          accept = ["builder"]
-        },
-        {
           src    = "enceladus"
           dst    = ["enceladus-linux-vm"]
-          accept = ["nregner"]
-        },
-        {
-          src    = "sagittarius"
-          dst    = ["iapetus"]
           accept = ["nregner"]
         },
       ] : test
