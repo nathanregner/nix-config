@@ -94,7 +94,7 @@
   services.logind.settings.Login.HandlePowerKey = "suspend";
 
   local.services.hydra-builder.enable = true;
-  services.hydra-builder.settings = {
+  services.hydra-queue-builder-dev.settings = {
     maxJobs = 12;
     speedFactor = 2;
   };

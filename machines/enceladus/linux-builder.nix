@@ -23,8 +23,7 @@
     config = {
       imports = [
         ./linux-builder/configuration.nix
-        # use bleeding edge (nixos-26.11)
-        "${inputs.nixpkgs-unstable}/nixos/modules/services/continuous-integration/hydra/builder.nix"
+        inputs.hydra.nixosModules.builder
       ];
       config._module.args = {
         inherit

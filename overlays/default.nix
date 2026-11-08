@@ -13,6 +13,7 @@ rec {
     in
     {
       local = filterPackagesRecursive system outputs.legacyPackages.${system};
+      hydra-dev = inputs.hydra.packages.${system}.hydra;
     };
 
   modifications = overlaysFromDirectoryRecursive ./shared;
