@@ -13,5 +13,6 @@
     ./restic-server.nix
     ./silverbullet.nix
     ./spoolman.nix
+    ./tailscale.nix
   ];
 }
