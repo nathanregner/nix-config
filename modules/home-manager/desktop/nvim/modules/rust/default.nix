@@ -40,7 +40,7 @@ in
     # https://github.com/rui314/mold?tab=readme-ov-file#how-to-use
     # https://discourse.nixos.org/t/create-nix-develop-shell-for-rust-with-mold/35894/6
     home.file.".cargo/config.toml".source = pkgs.writeText "config.toml" (
-      lib.optionalString pkgs.stdenv.isLinux ''
+      lib.optionalString pkgs.stdenv.hostPlatform.isLinux ''
         [target.x86_64-unknown-linux-gnu]
         linker = "${(lib.getExe' (pkgs.unstable.stdenvAdapters.useMoldLinker pkgs.unstable.clangStdenv).cc "clang")}"
       ''

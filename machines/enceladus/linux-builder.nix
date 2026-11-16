@@ -21,7 +21,10 @@
     # comment out for inital setup (pulls vm image via cache.nixos.org)
     # remove /var/lib/darwin-builder/*.img to force a reset
     config = {
-      imports = [ ./linux-builder/configuration.nix ];
+      imports = [
+        ./linux-builder/configuration.nix
+        inputs.hydra.nixosModules.builder
+      ];
       config._module.args = {
         inherit
           self

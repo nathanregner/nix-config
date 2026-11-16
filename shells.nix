@@ -32,6 +32,6 @@ in
     packages = [
       inputs'.home-manager-unstable.packages.home-manager
     ]
-    ++ lib.optionals pkgs.stdenv.isDarwin [ inputs'.nix-darwin.packages.darwin-rebuild ];
+    ++ lib.optionals pkgs.stdenv.hostPlatform.isDarwin [ inputs'.nix-darwin.packages.darwin-rebuild ];
   };
 }

@@ -15,43 +15,29 @@
   ...
 }:
 let
-  prometheusAddress = "127.0.0.1:9198";
+  prometheusAddress = "[::1]:${toString config.services.hydra-queue-runner-dev.rest.port}";
+  grpcPort = config.services.hydra-queue-runner-dev.grpc.port;
 in
 {
-  imports = [ inputs.hydra-sentinel.nixosModules.server ];
+  # upstream flake modules: the rust queue runner/evaluator and gRPC builders. not
+  # nixosModules.hydra, which also includes the builder module that base already imports.
+  imports = [
+    inputs.hydra-sentinel.nixosModules.server
+    inputs.hydra.nixosModules.web-app
+    inputs.hydra.nixosModules.evaluator
+    inputs.hydra.nixosModules.queue-runner
+    inputs.hydra.nixosModules.ws-server
+  ];
 
-  services.hydra = {
+  services.hydra-dev = {
     enable = true;
-    package = pkgs.unstable.hydra;
     hydraURL = "https://hydra.nregner.net";
     notificationSender = "hydra@nregner.net";
     useSubstitutes = true;
     inherit (self.globals.services.hydra) port;
-    buildMachinesFiles = [
-      "/var/lib/hydra/machines"
-      (pkgs.writeTextFile {
-        name = "local-machine";
-        text = "localhost ${
-          builtins.concatStringsSep "," (
-            [ pkgs.stdenv.hostPlatform.system ] ++ config.nix.settings.extra-platforms
-          )
-        } - 10 1 nixos-test,benchmark,big-parallel,kvm - -";
-      })
-    ];
     extraConfig = ''
       evaluator_workers = 10
-      max_output_size = ${toString (4 * 1024 * 1024 * 1024)}
-      max_unsupported_time_in_s = ${toString (1 * 60 * 60)}
-      always_supported_system_types = ${
-        lib.concatStringsSep "," [
-          "x86_64-linux"
-          "aarch64-linux"
-          "aarch64-darwin"
-          "i686-linux"
-        ]
-      }
-
-      queue_runner_metrics_address = ${prometheusAddress}
+      ws_endpoint = wss://hydra.nregner.net/ws
 
       using_frontend_proxy = 1
       <proxy_auth>
@@ -65,6 +51,34 @@ in
       </webhooks>
     '';
   };
+
+  services.hydra-queue-runner-dev = {
+    enable = true;
+    # builders connect over tailscale; see networking.firewall below
+    grpc = {
+      address = "[::]";
+      port = self.globals.services.hydra.grpcPort;
+    };
+    settings = {
+      useSubstitutes = true;
+      maxOutputSize = 4 * 1024 * 1024 * 1024;
+      # builders sleep until hydra-sentinel wakes them, and iapetus can't be woken remotely.
+      # there is no per-system exemption (always_supported_system_types was removed), so this
+      # also delays failing builds for systems no builder supports.
+      maxUnsupportedTimeInS = 7 * 24 * 60 * 60;
+    };
+  };
+
+  services.hydra-ws-dev.enable = true;
+
+  services.hydra-queue-builder-dev = {
+    enable = true;
+    queueRunnerAddr = "http://[::1]:${toString grpcPort}";
+    settings.maxJobs = 10;
+  };
+  systemd.services.hydra-queue-builder-dev.after = [ "hydra-queue-runner-dev.service" ];
+
+  networking.firewall.interfaces.tailscale0.allowedTCPPorts = [ grpcPort ];
 
   services.prometheus.exporters.postgres.enable = true;
 
@@ -124,49 +138,26 @@ in
         "100.0.0.0/8"
       ];
       githubWebhookSecretFile = config.sops.secrets.hydra-github-webhook-secret.path;
+      # the default reads services.hydra.port, which is the unused nixpkgs module
+      hydraBaseUrl = "http://127.0.0.1:${toString config.services.hydra-dev.port}";
       buildMachines = [
         {
           hostName = "enceladus";
-          sshUser = "nregner";
           systems = [ "aarch64-darwin" ];
-          supportedFeatures = [
-            "nixos-test"
-            "benchmark"
-            "big-parallel"
-          ];
-          maxJobs = 12;
           macAddress = "60:3e:5f:4e:4e:bc";
           vms = [
             {
               hostName = "enceladus-linux-vm";
-              sshUser = "builder";
               systems = [ "aarch64-linux" ];
-              supportedFeatures = [
-                "nixos-test"
-                "benchmark"
-                "big-parallel"
-                "kvm"
-                "gccarch-armv8-a"
-              ];
-              maxJobs = 8;
             }
           ];
         }
         {
           hostName = "iapetus";
-          sshUser = "nregner";
           systems = [
             "x86_64-linux"
             "i686-linux"
           ];
-          supportedFeatures = [
-            "nixos-test"
-            "benchmark"
-            "big-parallel"
-            "kvm"
-          ];
-          maxJobs = 12;
-          speedFactor = 2;
           # macAddress = "00:d8:61:a3:ea:8c";
         }
       ];
@@ -187,14 +178,18 @@ in
   nginx.subdomain.hydra = {
     locations = {
       "/" = {
-        proxyPass = "http://127.0.0.1:${toString config.services.hydra.port}";
+        proxyPass = "http://127.0.0.1:${toString config.services.hydra-dev.port}";
         extraConfig = /* nginx */ ''
           proxy_set_header X-Remote-User $user;
           proxy_set_header X-Remote-Roles $hydra_roles;
         '';
       };
+      "/ws" = {
+        proxyPass = "http://${config.services.hydra-ws-dev.bind.address}:${toString config.services.hydra-ws-dev.bind.port}";
+        proxyWebsockets = true;
+      };
       "/github/webhook" = {
-        proxyPass = "http://127.0.0.1:${toString config.services.hydra.port}/api/push-github";
+        proxyPass = "http://127.0.0.1:${toString config.services.hydra-dev.port}/api/push-github";
         extraConfig = "auth_request off;";
       };
     };

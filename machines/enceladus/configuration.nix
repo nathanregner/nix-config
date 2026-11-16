@@ -25,6 +25,7 @@
   system.primaryUser = "nregner";
 
   local.services.hydra-builder.enable = true;
+  services.hydra-queue-builder-dev.settings.maxJobs = 12;
 
   services.tailscale = {
     enable = true;

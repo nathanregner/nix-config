@@ -413,19 +413,7 @@ for server_name, server_config in pairs(servers) do
     end
   end
 
-  -- https://github.com/artemave/workspace-diagnostics.nvim
-  local on_attach_workspace
-  if server_config.workspace_diagnostics then
-    on_attach_workspace = function(client, bufnr)
-      if client:supports_method("workspace/diagnostic", bufnr) then
-        vim.lsp.buf.workspace_diagnostics({ client_id = client.id })
-      else
-        require("workspace-diagnostics").populate_workspace_diagnostics(client, bufnr)
-      end
-    end
-  end
-
-  server_config.on_attach = chain(on_attach, server_config.on_attach, on_attach_workspace)
+  server_config.on_attach = chain(on_attach, server_config.on_attach)
 
   vim.lsp.config(server_name, server_config)
   if disabled_servers ~= true and not disabled_servers[server_name] then vim.lsp.enable(server_name, true) end
