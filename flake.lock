@@ -299,15 +299,16 @@
         ]
       },
       "locked": {
-        "lastModified": 1793841393,
-        "narHash": "sha256-q2IxuMeA/NV0azvjtNjYvLS6agRjLy3OlsOCfZVcR8g=",
+        "lastModified": 1794959875,
+        "narHash": "sha256-8Dq82q5dU+cPasqDpuSsAidgRf2enz1+tOAOhCq3jSI=",
         "owner": "nathanregner",
         "repo": "hydra-sentinel",
-        "rev": "38c1ea161f5cf64ffd3cb9056aed162793818b45",
+        "rev": "d6ed98ac49fb58bb93960e9e03babcca2ea296e2",
         "type": "github"
       },
       "original": {
         "owner": "nathanregner",
+        "ref": "staging",
         "repo": "hydra-sentinel",
         "type": "github"
       }
@@ -553,11 +554,11 @@
     },
     "nixpkgs-unstable": {
       "locked": {
-        "lastModified": 1793735720,
-        "narHash": "sha256-smoxPKrzAhdGuFd2LLnG4m8P6IrZuW95DVyzjnlab7w=",
+        "lastModified": 1794705614,
+        "narHash": "sha256-DZ5eNWHA6heAHwkMt1SBtF1p8Lfgi4ivqdqmgxUZkLs=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "9d3b8db48266c17be0b5f9c6360c3ecfbac3d1f5",
+        "rev": "1c872b8c508bbbfebc1b0b74777ff391ce0a574c",
         "type": "github"
       },
       "original": {
@@ -569,11 +570,11 @@
     },
     "nixpkgs_2": {
       "locked": {
-        "lastModified": 1793839220,
-        "narHash": "sha256-sHK+t9H8bo4xy/nmrjj3joFNEE93SedkPT8q7Kg17Zs=",
+        "lastModified": 1794957370,
+        "narHash": "sha256-GJH9blLBu0O3/Pg+QBAmqUMjJ+30gqlWeguhhhdJVWM=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "8f8c5eeda6decdbe6eae8d067c874ec95ecd6fd4",
+        "rev": "9d746d9327e09aecd2b67a28727080453da4f0e6",
         "type": "github"
       },
       "original": {

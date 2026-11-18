@@ -1,8 +1,11 @@
 {
   lib,
+  aws-lc,
   cargo-update-script,
   mkRustShell,
+  pkg-config,
   rustPlatform,
+  stdenv,
 }:
 let
   pkg = rustPlatform.buildRustPackage {
@@ -19,6 +22,13 @@ let
     };
 
     cargoLock.lockFile = ./Cargo.lock;
+
+    nativeBuildInputs = lib.optionals stdenv.hostPlatform.isLinux [
+      pkg-config
+    ];
+    buildInputs = lib.optionals stdenv.hostPlatform.isLinux [
+      aws-lc
+    ];
 
     passthru = {
       updateScript = cargo-update-script pkg { breaking = false; };

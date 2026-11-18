@@ -55,7 +55,7 @@
     # don't follow nixpkgs: hydra pins the nixpkgs/nix it's tested against
     hydra.url = "github:NixOS/hydra";
     hydra-sentinel = {
-      url = "github:nathanregner/hydra-sentinel";
+      url = "github:nathanregner/hydra-sentinel?ref=staging";
       inputs = {
         flake-parts.follows = "flake-parts";
         nixpkgs.follows = "nixpkgs-unstable";
