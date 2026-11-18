@@ -40,7 +40,10 @@
 
   # hardware.enableRedistributableFirmware = false;
 
-  networking.interfaces.end1.useDHCP = true;
+  networking.interfaces.end1 = {
+    useDHCP = true;
+    wakeOnLan.enable = true;
+  };
 
   nixpkgs.hostPlatform = lib.mkForce "x86_64-linux";
   disko.devices = {

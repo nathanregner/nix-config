@@ -36,6 +36,8 @@
     });
   '';
   systemd.services.NetworkManager-wait-online.enable = false;
+  # magic packets from hydra-sentinel on sagittarius, or `wol -i 192.168.0.255 <mac>`
+  networking.interfaces.enp38s0.wakeOnLan.enable = true;
   services.blueman.enable = true;
   hardware.bluetooth.enable = true;
 
