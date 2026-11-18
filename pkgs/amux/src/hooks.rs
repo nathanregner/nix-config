@@ -40,6 +40,7 @@ enum HookInput {
 enum NotificationType {
     IdlePrompt,
     PermissionRequest,
+    PermissionPrompt,
     ElicitationDialog,
     #[serde(untagged)]
     Unknown(String),
@@ -111,9 +112,9 @@ fn handle_inner(
             notification_type, ..
         } => match notification_type {
             NotificationType::IdlePrompt => AgentStatus::Idle,
-            NotificationType::PermissionRequest | NotificationType::ElicitationDialog => {
-                AgentStatus::Waiting
-            }
+            NotificationType::PermissionRequest
+            | NotificationType::PermissionPrompt
+            | NotificationType::ElicitationDialog => AgentStatus::Waiting,
             NotificationType::Unknown(ty) => {
                 tracing::warn!("Ignoring unknown notification_type: {}", ty);
                 return Ok(());
@@ -132,6 +133,8 @@ fn handle_inner(
     // Refresh tmux status bar immediately
     if let Err(err) = tmux::refresh_status_line() {
         tracing::warn!("Failed to refresh tmux status bar: {err:#}");
+    } else {
+        tracing::debug!("Refreshed tmux status bar");
     }
 
     if should_notify {
@@ -186,6 +189,10 @@ mod tests {
     )]
     #[case(
         r#"{ "hook_event_name": "Notification", "notification_type": "permission_request" }"#,
+        Some(AgentStatus::Waiting)
+    )]
+    #[case(
+        r#"{ "hook_event_name": "Notification", "notification_type": "permission_prompt" }"#,
         Some(AgentStatus::Waiting)
     )]
     #[case(

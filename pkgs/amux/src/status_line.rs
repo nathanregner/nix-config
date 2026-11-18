@@ -16,6 +16,7 @@ pub fn output(base_dirs: &dyn BaseStrategy, test: bool) -> Result<()> {
         let read_status = StatusFile::load(base_dirs)?;
         let dead_agents = read_status.find_dead_agents();
         let statuses = read_status.count_by_status();
+        tracing::debug!(?statuses, ?dead_agents, "status-line read status file");
 
         if !dead_agents.is_empty() {
             let mut write_status = read_status.upgrade()?;

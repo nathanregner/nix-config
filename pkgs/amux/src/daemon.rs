@@ -41,6 +41,7 @@ pub fn run(base_dirs: &dyn BaseStrategy) -> Result<()> {
     for event in rx {
         match event {
             Ok(event) if relevant(&event, &status_path) => {
+                tracing::debug!("status file event: {:?}", event.kind);
                 if let Err(err) = tmux::refresh_status_line() {
                     tracing::warn!("failed to refresh tmux status bar: {err:#}");
                 }
