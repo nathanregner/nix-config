@@ -9,16 +9,21 @@ let
       filterdiff -p1 -i 'subprojects/hydra/lib/*' ${patch} > $out
     '';
 in
-pkg.overrideAttrs (oldAttrs: {
-  patches = (oldAttrs.patches or [ ]) ++ map libOnly (readPatches ./patches);
-  # sourceRoot is subprojects/hydra, but patches are relative to the repo root
-  postUnpack = (oldAttrs.postUnpack or "") + ''
-    chmod -R u+w "$sourceRoot/../.."
-  '';
-  patchFlags = [
-    "-p1"
-    "-d"
-    "../.."
-  ];
-  doCheck = false;
-})
+# `hydra` is a wrapper around the `hydra-perl` scripts/libs; patch hydra-perl and rebuild the wrapper
+(pkg.hydraComponents.overrideScope (
+  _final: prevScope: {
+    hydra-perl = prevScope.hydra-perl.overrideAttrs (oldAttrs: {
+      patches = (oldAttrs.patches or [ ]) ++ map libOnly (readPatches ./patches);
+      # sourceRoot is subprojects/hydra, but patches are relative to the repo root
+      postUnpack = (oldAttrs.postUnpack or "") + ''
+        chmod -R u+w "$sourceRoot/../.."
+      '';
+      patchFlags = [
+        "-p1"
+        "-d"
+        "../.."
+      ];
+      doCheck = false;
+    });
+  }
+)).hydra

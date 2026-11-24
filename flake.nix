@@ -319,7 +319,16 @@
                   hostname = config.networking.hostName;
                   profiles =
                     let
-                      inherit (deploy-rs.lib.${pkgs.stdenv.hostPlatform.system}) activate;
+                      # Reuse the flake input's activation lib, but substitute the (cached) nixpkgs
+                      # deploy-rs binary for `activate-rs` instead of building the input from source.
+                      inputVersion = (lib.importTOML "${deploy-rs}/Cargo.toml").package.version;
+                      deployPkgs = pkgs // {
+                        deploy-rs.deploy-rs =
+                          lib.warnIf (pkgs.deploy-rs.version != inputVersion)
+                            "deploy-rs: nixpkgs version (${pkgs.deploy-rs.version}) differs from flake input version (${inputVersion})"
+                            pkgs.deploy-rs;
+                      };
+                      inherit ((deploy-rs.overlays.default deployPkgs pkgs).deploy-rs.lib) activate;
                     in
                     {
                       system = {

@@ -1,7 +1,9 @@
 {
   lib,
+  aws-lc,
   cargo-update-script,
   mkRustShell,
+  pkg-config,
   rustPlatform,
 }:
 let
@@ -19,6 +21,13 @@ let
     };
 
     cargoLock.lockFile = ./Cargo.lock;
+
+    nativeBuildInputs = [
+      pkg-config
+    ];
+    buildInputs = [
+      aws-lc
+    ];
 
     passthru = {
       updateScript = cargo-update-script pkg { breaking = false; };
