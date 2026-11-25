@@ -185,6 +185,14 @@ in
           proxy_set_header X-Remote-Roles $hydra_roles;
         '';
       };
+      # read-only view of the queue runner's REST API (e.g. /queue-runner/status/machines). the API is
+      # unauthenticated and also has write endpoints, so only expose GETs under /status
+      "/queue-runner/status" = {
+        proxyPass = "http://${prometheusAddress}/status";
+        extraConfig = /* nginx */ ''
+          limit_except GET { deny all; }
+        '';
+      };
       "/ws" = {
         proxyPass = "http://${config.services.hydra-ws-dev.bind.address}:${toString config.services.hydra-ws-dev.bind.port}";
         proxyWebsockets = true;
