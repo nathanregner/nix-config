@@ -1,11 +1,14 @@
 #!/usr/bin/env -S nu --stdin
 
 def model-name [] {
-  $in
-  | parse --regex 'claude-(?<name>\w+)-(?<major>\d)-(?<minor>\d)'
-  | each { $"($in.name | str title-case) ($in.major).($in.minor)" }
-  | first
-  | default $in
+  let name = $in
+  let parsed = $name | parse --regex 'claude-(?<name>\w+)-(?<major>\d)-(?<minor>\d)'
+  if ($parsed | is-empty) {
+    $name
+  } else {
+    let row = $parsed | first
+    $"($row.name | str title-case) ($row.major).($row.minor)"
+  }
 }
 
 def main [] {
@@ -13,6 +16,9 @@ def main [] {
 
   # Model
   let model = $input | get -o model.display_name | model-name | default "unknown"
+
+  # Sandbox
+  let sandbox = if ($input | get -o sandbox | default false) { $"(ansi yellow_bold)[SANDBOX](ansi reset) " } else { "" }
 
   # Context
   let pct = $input | get -o context_window.used_percentage | default 0 | math round | into int
@@ -34,5 +40,5 @@ def main [] {
   let mins = $duration_ms // 60000
   let secs = ($duration_ms mod 60000) // 1000
 
-  print -n $"[($model)]($branch) ($bar_color)($bar)(ansi reset) ($pct)% | ($cost_fmt) | ⏱️($mins)m ($secs)s"
+  print -n $"($sandbox)[($model)]($branch) ($bar_color)($bar)(ansi reset) ($pct)% | ($cost_fmt) | ⏱️($mins)m ($secs)s"
 }
