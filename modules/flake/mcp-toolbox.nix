@@ -134,7 +134,7 @@
       };
 
       # Darwin: launchd agents restart the server when sops rotates the secret.
-      launchd.agents = lib.mkIf pkgs.stdenv.isDarwin (
+      launchd.agents = lib.mkIf pkgs.stdenv.hostPlatform.isDarwin (
         lib.mapAttrs' (env: envCfg: {
           name = "mcp-toolbox-${env}";
           value = {

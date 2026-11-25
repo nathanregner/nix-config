@@ -24,7 +24,7 @@ in
   # Watch the status file and refresh the tmux status bar. Sandboxed agents
   # write the status file from inside a container and can't reach the host tmux
   # server, so this host-side daemon is what makes their updates visible.
-  launchd.agents.amux-daemon = lib.mkIf pkgs.stdenv.isDarwin {
+  launchd.agents.amux-daemon = lib.mkIf pkgs.stdenv.hostPlatform.isDarwin {
     enable = true;
     config = {
       ProgramArguments = [

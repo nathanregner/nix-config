@@ -31,6 +31,7 @@ in
 
   services.hydra-dev = {
     enable = true;
+    package = pkgs.hydra-dev;
     hydraURL = "https://hydra.nregner.net";
     notificationSender = "hydra@nregner.net";
     useSubstitutes = true;
@@ -99,7 +100,7 @@ in
       # nu
       ''
         let tmp = mktemp -d
-        pg_dump -d hydra -Z zstd -Fd -f $tmp
+        pg_dump -U hydra -d hydra -Z zstd -Fd -f $tmp
         $tmp
       ''
     }";

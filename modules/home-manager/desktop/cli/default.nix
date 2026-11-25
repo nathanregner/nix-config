@@ -10,7 +10,6 @@
     ./direnv
     ./eza.nix
     ./git
-    ./k9s.nix
     ./lazygit
     ./nix.nix
     ./nushell
