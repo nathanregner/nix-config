@@ -7,10 +7,49 @@
 
     views = {
       "v1/pods" = {
-        columns = [ { Version = ".metadata.labels\\.tags\\.datadoghq\\.com/version"; } ];
+        columns = [
+          "NAMESPACE"
+          "NAME"
+          "VERSION:.metadata.labels.tags\\.datadoghq\\.com/version"
+          "VS"
+          "PF"
+          "READY"
+          "STATUS"
+          "RESTARTS"
+          "LAST RESTART"
+          "CPU"
+          "CPU/RL"
+          "%CPU/R"
+          "%CPU/L"
+          "MEM"
+          "MEM/RL"
+          "%MEM/R"
+          "%MEM/L"
+          "GPU/RL"
+          "IP"
+          "NODE"
+          "SERVICE-ACCOUNT"
+          "NOMINATED NODE"
+          "READINESS GATES"
+          "QOS"
+          "LABELS"
+          "VALID"
+          "AGE"
+        ];
       };
-      "v1/deployments" = {
-        columns = [ { Version = ".metadata.labels\\.tags\\.datadoghq\\.com/version"; } ];
+      "apps/v1/deployments" = {
+        columns = [
+          "NAMESPACE"
+          "NAME"
+          "VERSION:.metadata.labels.tags\\.datadoghq\\.com/version"
+          "VS"
+          "READY"
+          "UP-TO-DATE"
+          "AVAILABLE"
+          "LABELS"
+          "VALID"
+          "AGE"
+        ];
       };
     };
   };
