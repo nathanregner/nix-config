@@ -15,10 +15,7 @@
 
   local.services.backup.jobs.factorio = {
     root = "/home/factorio";
-    timerConfig = {
-      OnCalendar = lib.mkForce "hourly";
-      Persistent = true;
-    };
+    interval = "1h";
     pruneOpts = lib.mkForce [
       "--tag"
       "''"

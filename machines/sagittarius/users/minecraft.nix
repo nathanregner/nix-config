@@ -16,10 +16,7 @@
   };
 
   local.services.backup.jobs.minecraft = {
-    timerConfig = {
-      OnCalendar = lib.mkForce "hourly";
-      Persistent = true;
-    };
+    interval = "1h";
     # TODO: this option should not merge
     pruneOpts = lib.mkForce [
       "--tag"
