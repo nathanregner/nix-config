@@ -44,6 +44,12 @@ creation_rules:
           - *host_sagittarius
           - *user_nregner
           - *user_nregner_enceladus
+  - path_regex: machines/enceladus/secrets.yaml
+    key_groups:
+      - age:
+          - *host_enceladus
+          - *user_nregner
+          - *user_nregner_enceladus
   - path_regex: machines/iapetus/secrets.yaml
     key_groups:
       - age:

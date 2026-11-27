@@ -1,4 +1,5 @@
 {
+  config,
   inputs,
   lib,
   pkgs,
@@ -11,6 +12,23 @@
     ../../modules/home-manager/desktop/jetbrains
     inputs.mac-app-util.homeManagerModules.default
   ];
+
+  sops.defaultSopsFile = ./secrets.yaml;
+
+  local.services.backup = {
+    hostName = "enceladus";
+    jobs.factorio = rec {
+      root = "${config.home.homeDirectory}/Library/Application Support/factorio";
+      exclude = [
+        "${root}/mods" # large, re-downloadable
+        "${root}/temp"
+        "*.log"
+        "crop-cache.dat"
+        ".lock"
+      ];
+      targets.server.interval = "1h";
+    };
+  };
 
   programs.alacritty.settings = {
     font = {
